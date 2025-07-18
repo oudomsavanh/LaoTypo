@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Game - Google Sheets Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="game-container w-full max-w-2xl p-8">
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-6">🎮 Word Game</h1>
+            <p class="text-lg text-gray-600 mb-8">Test your word knowledge with our interactive game!</p>
+            
+            <div class="mb-6">
+                <label for="player-name" class="block text-lg font-semibold text-gray-700 mb-3">Enter your name:</label>
+                <input 
+                    type="text" 
+                    id="player-name" 
+                    placeholder="Your name here..."
+                    class="w-full px-4 py-3 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+                    onkeypress="handleNameInput(event)"
+                />
+            </div>
+            
+            <button 
+                onclick="startGame()" 
+                class="btn bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold"
+            >
+                Start Game 🚀
+            </button>
+            
+            <div class="mt-8 p-4 bg-yellow-50 rounded-lg">
+                <h3 class="font-semibold text-gray-800 mb-2">📋 How to Play:</h3>
+                <ul class="text-sm text-gray-600 text-left space-y-1">
+                    <li>• A word context will be displayed</li>
+                    <li>• Choose LEFT or RIGHT randomly</li>
+                    <li>• Score points when your choice matches the random result</li>
+                    <li>• See your level progression</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <!-- Player Info -->
+            <div class="flex justify-between items-center mb-6 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Player: <span id="player-display"></span></h2>
+                    <p class="text-gray-600">Level: <span id="level-display" class="font-semibold">1</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-green-600">Score: <span id="score-display">0</span></p>
+                    <p class="text-sm text-gray-500">Round: <span id="round-display">1</span></p>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">Loading word from database...</p>
+            </div>
+
+            <!-- Word Display -->
+            <div id="word-display" class="hidden text-center mb-8">
+                <div class="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Word Context:</h3>
+                    <p id="context-text" class="text-2xl font-bold text-gray-800 mb-4"></p>
+                    <div class="flex justify-center space-x-4 text-sm text-gray-600">
+                        <span>True: <span id="true-display" class="font-semibold"></span></span>
+                        <span>False: <span id="false-display" class="font-semibold"></span></span>
+                    </div>
+                </div>
+
+                <!-- Choice Buttons -->
+                <div class="flex justify-center space-x-6 mb-6">
+                    <button 
+                        onclick="makeChoice('left')" 
+                        id="left-btn"
+                        class="btn bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-lg text-xl font-bold pulse"
+                    >
+                        ⬅️ LEFT
+                    </button>
+                    <button 
+                        onclick="makeChoice('right')" 
+                        id="right-btn"
+                        class="btn bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-xl font-bold pulse"
+                    >
+                        RIGHT ➡️
+                    </button>
+                </div>
+
+                <!-- Level Display -->
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <p class="text-center text-lg">
+                        <span class="font-semibold">Current Level:</span> 
+                        <span id="current-level" class="text-2xl font-bold text-blue-600"></span>
+                    </p>
+                    <p id="level-remark" class="text-center text-gray-600 mt-2"></p>
+                </div>
+            </div>
+
+            <!-- Result Display -->
+            <div id="result-display" class="hidden text-center mb-6">
+                <div id="result-content" class="p-6 rounded-lg mb-4">
+                    <h3 id="result-title" class="text-2xl font-bold mb-3"></h3>
+                    <p id="result-text" class="text-lg mb-4"></p>
+                    <p id="score-change" class="text-xl font-bold"></p>
+                </div>
+                
+                <button 
+                    onclick="nextRound()" 
+                    class="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-lg font-semibold"
+                >
+                    Next Round 🎯
+                </button>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over" class="hidden text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">🎉 Game Complete!</h2>
+                <p class="text-lg text-gray-600 mb-6">Great job playing!</p>
+                <div class="p-6 bg-gray-50 rounded-lg mb-6">
+                    <p class="text-2xl font-bold text-green-600 mb-2">Final Score: <span id="final-score"></span></p>
+                    <p class="text-lg text-gray-700">Final Level: <span id="final-level"></span></p>
+                </div>
+                <button 
+                    onclick="restartGame()" 
+                    class="btn bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-lg font-semibold"
+                >
+                    Play Again 🔄
+                </button>
+            </div>
+        </div>
+
+        <!-- Google Sheets Integration Info -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <h3 class="font-semibold text-gray-800 mb-2">📊 Google Sheets Integration</h3>
+            <p class="text-sm text-gray-600 mb-2">This game connects to your Google Sheets database with columns:</p>
+            <ul class="text-xs text-gray-500 space-y-1">
+                <li>• <strong>context:</strong> The word or phrase to display</li>
+                <li>• <strong>true:</strong> True option text</li>
+                <li>• <strong>false:</strong> False option text</li>
+                <li>• <strong>level:</strong> Difficulty level (1-10)</li>
+                <li>• <strong>remark:</strong> Additional notes or hints</li>
+            </ul>
+            <p class="text-xs text-gray-500 mt-2">
+                <strong>Status:</strong> <span id="connection-status" class="text-orange-600">Demo Mode (Sample Data)</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            playerName: '',
+            score: 0,
+            level: 1,
+            round: 1,
+            currentWord: null,
+            totalRounds: 10,
+            words: []
+        };
+
+        // Sample data (replace with Google Sheets data)
+        const sampleWords = [
+            {
+                context: "The capital of France",
+                true: "Paris",
+                false: "London",
+                level: 1,
+                remark: "Basic geography question"
+            },
+            {
+                context: "Largest planet in our solar system",
+                true: "Jupiter",
+                false: "Saturn",
+                level: 2,
+                remark: "Space knowledge"
+            },
+            {
+                context: "Author of Romeo and Juliet",
+                true: "Shakespeare",
+                false: "Dickens",
+                level: 3,
+                remark: "Classic literature"
+            },
+            {
+                context: "Chemical symbol for gold",
+                true: "Au",
+                false: "Ag",
+                level: 4,
+                remark: "Chemistry basics"
+            },
+            {
+                context: "Year World War II ended",
+                true: "1945",
+                false: "1944",
+                level: 5,
+                remark: "Historical events"
+            }
+        ];
+
+        // Google Sheets Configuration
+        const GOOGLE_SHEETS_CONFIG = {
+            // Replace with your Google Sheets API configuration
+            spreadsheetId: 'YOUR_SPREADSHEET_ID',
+            apiKey: 'YOUR_API_KEY',
+            range: 'Sheet1!A2:E', // Adjust range as needed
+            enabled: false // Set to true when you have API credentials
+        };
+
+        // Initialize game
+        function handleNameInput(event) {
+            if (event.key === 'Enter') {
+                startGame();
+            }
+        }
+
+        async function startGame() {
+            const nameInput = document.getElementById('player-name');
+            const playerName = nameInput.value.trim();
+            
+            if (!playerName) {
+                alert('Please enter your name!');
+                return;
+            }
+
+            gameState.playerName = playerName;
+            document.getElementById('player-display').textContent = playerName;
+            
+            // Hide welcome screen and show game screen
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            // Load words from Google Sheets or use sample data
+            await loadWords();
+            
+            // Start first round
+            startRound();
+        }
+
+        async function loadWords() {
+            try {
+                if (GOOGLE_SHEETS_CONFIG.enabled) {
+                    // Load from Google Sheets
+                    const words = await fetchFromGoogleSheets();
+                    gameState.words = words;
+                    document.getElementById('connection-status').textContent = 'Connected to Google Sheets';
+                    document.getElementById('connection-status').className = 'text-green-600';
+                } else {
+                    // Use sample data
+                    gameState.words = sampleWords;
+                    document.getElementById('connection-status').textContent = 'Demo Mode (Sample Data)';
+                    document.getElementById('connection-status').className = 'text-orange-600';
+                }
+            } catch (error) {
+                console.error('Error loading words:', error);
+                gameState.words = sampleWords;
+                document.getElementById('connection-status').textContent = 'Error: Using Sample Data';
+                document.getElementById('connection-status').className = 'text-red-600';
+            }
+        }
+
+        async function fetchFromGoogleSheets() {
+            // Try public sheet method first (no API key needed)
+            if (!GOOGLE_SHEETS_CONFIG.apiKey || GOOGLE_SHEETS_CONFIG.apiKey === 'YOUR_API_KEY') {
+                return await fetchFromPublicSheet();
+            }
+            
+            // Google Sheets API call (with API key)
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.spreadsheetId}/values/${GOOGLE_SHEETS_CONFIG.range}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (!data.values) {
+                throw new Error('No data found in Google Sheets');
+            }
+
+            // Convert rows to word objects
+            return data.values.map(row => ({
+                context: row[0] || '',
+                true: row[1] || '',
+                false: row[2] || '',
+                level: parseInt(row[3]) || 1,
+                remark: row[4] || ''
+            }));
+        }
+
+        async function fetchFromPublicSheet() {
+            const spreadsheetId = GOOGLE_SHEETS_CONFIG.spreadsheetId;
+            const range = GOOGLE_SHEETS_CONFIG.range;
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&range=${range}`;
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Parse Google Sheets JSON response
+                const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+                
+                if (!jsonData.table || !jsonData.table.rows) {
+                    throw new Error('No data found in Google Sheets');
+                }
+                
+                return jsonData.table.rows.map(row => ({
+                    context: row.c[0]?.v || '',
+                    true: row.c[1]?.v || '',
+                    false: row.c[2]?.v || '',
+                    level: parseInt(row.c[3]?.v) || 1,
+                    remark: row.c[4]?.v || ''
+                }));
+            } catch (error) {
+                console.error('Error fetching from public Google Sheets:', error);
+                throw error;
+            }
+        }
+
+        function startRound() {
+            // Show loading
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('word-display').classList.add('hidden');
+            document.getElementById('result-display').classList.add('hidden');
+            
+            // Simulate loading delay
+            setTimeout(() => {
+                // Select random word
+                const randomIndex = Math.floor(Math.random() * gameState.words.length);
+                gameState.currentWord = gameState.words[randomIndex];
+                
+                // Update displays
+                updateGameDisplay();
+                
+                // Hide loading and show word
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('word-display').classList.remove('hidden');
+                document.getElementById('word-display').classList.add('fade-in');
+            }, 1000);
+        }
+
+        function updateGameDisplay() {
+            const word = gameState.currentWord;
+            
+            // Update word info
+            document.getElementById('context-text').textContent = word.context;
+            document.getElementById('true-display').textContent = word.true;
+            document.getElementById('false-display').textContent = word.false;
+            document.getElementById('current-level').textContent = word.level;
+            document.getElementById('level-remark').textContent = word.remark;
+            
+            // Update game stats
+            document.getElementById('score-display').textContent = gameState.score;
+            document.getElementById('level-display').textContent = gameState.level;
+            document.getElementById('round-display').textContent = gameState.round;
+        }
+
+        function makeChoice(playerChoice) {
+            // Disable buttons
+            document.getElementById('left-btn').disabled = true;
+            document.getElementById('right-btn').disabled = true;
+            
+            // Generate random result (left or right)
+            const randomResult = Math.random() < 0.5 ? 'left' : 'right';
+            
+            // Check if player won
+            const won = playerChoice === randomResult;
+            
+            // Update score
+            if (won) {
+                gameState.score += 10;
+                if (gameState.score >= gameState.level * 50) {
+                    gameState.level++;
+                }
+            }
+            
+            // Show result
+            showResult(playerChoice, randomResult, won);
+        }
+
+        function showResult(playerChoice, randomResult, won) {
+            const resultDisplay = document.getElementById('result-display');
+            const resultContent = document.getElementById('result-content');
+            const resultTitle = document.getElementById('result-title');
+            const resultText = document.getElementById('result-text');
+            const scoreChange = document.getElementById('score-change');
+            
+            // Hide word display
+            document.getElementById('word-display').classList.add('hidden');
+            
+            // Configure result display
+            if (won) {
+                resultContent.className = 'p-6 rounded-lg mb-4 bg-green-100 border-2 border-green-300';
+                resultTitle.textContent = '🎉 Correct!';
+                resultTitle.className = 'text-2xl font-bold mb-3 text-green-700';
+                resultText.textContent = `You chose ${playerChoice.toUpperCase()} and the random result was ${randomResult.toUpperCase()}!`;
+                scoreChange.textContent = '+10 points!';
+                scoreChange.className = 'text-xl font-bold text-green-600';
+            } else {
+                resultContent.className = 'p-6 rounded-lg mb-4 bg-red-100 border-2 border-red-300';
+                resultTitle.textContent = '❌ Wrong!';
+                resultTitle.className = 'text-2xl font-bold mb-3 text-red-700';
+                resultText.textContent = `You chose ${playerChoice.toUpperCase()} but the random result was ${randomResult.toUpperCase()}.`;
+                scoreChange.textContent = 'No points this time.';
+                scoreChange.className = 'text-xl font-bold text-red-600';
+            }
+            
+            // Show result
+            resultDisplay.classList.remove('hidden');
+            resultDisplay.classList.add('fade-in');
+            
+            // Update score display
+            document.getElementById('score-display').textContent = gameState.score;
+            document.getElementById('level-display').textContent = gameState.level;
+        }
+
+        function nextRound() {
+            gameState.round++;
+            
+            // Check if game is over
+            if (gameState.round > gameState.totalRounds) {
+                endGame();
+                return;
+            }
+            
+            // Re-enable buttons
+            document.getElementById('left-btn').disabled = false;
+            document.getElementById('right-btn').disabled = false;
+            
+            // Start next round
+            startRound();
+        }
+
+        function endGame() {
+            document.getElementById('word-display').classList.add('hidden');
+            document.getElementById('result-display').classList.add('hidden');
+            
+            // Show game over screen
+            document.getElementById('final-score').textContent = gameState.score;
+            document.getElementById('final-level').textContent = gameState.level;
+            document.getElementById('game-over').classList.remove('hidden');
+            document.getElementById('game-over').classList.add('fade-in');
+        }
+
+        function restartGame() {
+            // Reset game state
+            gameState = {
+                playerName: '',
+                score: 0,
+                level: 1,
+                round: 1,
+                currentWord: null,
+                totalRounds: 10,
+                words: []
+            };
+            
+            // Reset displays
+            document.getElementById('player-name').value = '';
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('welcome-screen').classList.remove('hidden');
+            document.getElementById('game-over').classList.add('hidden');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Word Game initialized');
+            console.log('To connect to Google Sheets, update the GOOGLE_SHEETS_CONFIG object with your credentials');
+        });
+    </script>
+</body>
+</html>
