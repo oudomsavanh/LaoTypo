@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Secure Google Sheets Connection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background-color: #e7f3ff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .sheet-url {
+            word-break: break-all;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .security-note {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test Secure Google Sheets Connection</h1>
+        
+        <div class="info">
+            <h3>🎯 Secure Setup</h3>
+            <p>This method keeps your Google Sheet <strong>private</strong> and uses API key authentication.</p>
+            <p><strong>Your Sheet:</strong> Only you can access it</p>
+            <p><strong>API Key:</strong> Allows your game to read the data securely</p>
+        </div>
+
+        <div class="warning">
+            <h3>📋 Prerequisites:</h3>
+            <ol>
+                <li>Create a Google Cloud project</li>
+                <li>Enable Google Sheets API</li>
+                <li>Create an API key</li>
+                <li>Keep your Google Sheet private (don't share it publicly)</li>
+            </ol>
+            <p><strong>Need help?</strong> Check the <code>secure-setup-guide.md</code> file for detailed instructions.</p>
+        </div>
+
+        <div class="input-group">
+            <label for="apiKey">Google Sheets API Key:</label>
+            <input type="password" id="apiKey" placeholder="Paste your API key here..." />
+            <small>Your API key will be hidden for security</small>
+        </div>
+
+        <div class="input-group">
+            <label for="sheetId">Google Sheet ID:</label>
+            <input type="text" id="sheetId" value="1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0" />
+            <small>Your sheet ID (already filled in)</small>
+        </div>
+
+        <button onclick="testSecureConnection()">🔍 Test Secure Connection</button>
+        <button onclick="openSheet()" class="btn-success">📊 Open Your Sheet</button>
+        <button onclick="toggleApiKey()" class="btn-warning">👁️ Show/Hide API Key</button>
+
+        <div class="security-note">
+            <h4>🔒 Security Note:</h4>
+            <p><strong>Never share your API key publicly!</strong> It's like a password for your Google Cloud project.</p>
+            <ul>
+                <li>Keep it secure and private</li>
+                <li>Don't put it in public repositories</li>
+                <li>Use domain restrictions when possible</li>
+            </ul>
+        </div>
+
+        <div id="result"></div>
+        <div id="dataPreview"></div>
+    </div>
+
+    <script>
+        const SHEET_ID = '1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0';
+        
+        function openSheet() {
+            window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+        }
+
+        function toggleApiKey() {
+            const apiKeyInput = document.getElementById('apiKey');
+            if (apiKeyInput.type === 'password') {
+                apiKeyInput.type = 'text';
+            } else {
+                apiKeyInput.type = 'password';
+            }
+        }
+
+        async function testSecureConnection() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const sheetId = document.getElementById('sheetId').value.trim();
+            const resultDiv = document.getElementById('result');
+            const previewDiv = document.getElementById('dataPreview');
+            
+            if (!apiKey) {
+                resultDiv.innerHTML = '<div class="result error">❌ Please enter your Google Sheets API key</div>';
+                return;
+            }
+
+            if (!sheetId) {
+                resultDiv.innerHTML = '<div class="result error">❌ Please enter your Google Sheet ID</div>';
+                return;
+            }
+
+            // Show loading
+            resultDiv.innerHTML = '<div class="result loading">🔄 Testing secure connection...</div>';
+            previewDiv.innerHTML = '';
+
+            try {
+                // Test with Google Sheets API v4
+                const range = 'Sheet1!A2:E';
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+                
+                console.log('Testing secure connection...');
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    let errorMessage = data.error.message;
+                    if (data.error.code === 403) {
+                        errorMessage = 'API key invalid or Google Sheets API not enabled. Check your Google Cloud setup.';
+                    } else if (data.error.code === 404) {
+                        errorMessage = 'Sheet not found. Check your Sheet ID or make sure the sheet exists.';
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                if (!data.values || data.values.length === 0) {
+                    throw new Error('No data found. Make sure your sheet has data starting from row 2 with headers: context, true, false, level, remark');
+                }
+                
+                // Convert to readable format
+                const rows = data.values.map(row => ({
+                    context: row[0] || '',
+                    true: row[1] || '',
+                    false: row[2] || '',
+                    level: row[3] || '',
+                    remark: row[4] || ''
+                }));
+                
+                // Show success
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        ✅ <strong>Secure Connection Successful!</strong><br>
+                        Found ${rows.length} rows of data from your private Google Sheet<br>
+                        <small>Your sheet remains private and secure.</small>
+                    </div>
+                `;
+                
+                // Show data preview
+                let tableHTML = `
+                    <div style="margin-top: 20px;">
+                        <h3>📊 Your Private Data Preview:</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Context</th>
+                                    <th>True</th>
+                                    <th>False</th>
+                                    <th>Level</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                rows.slice(0, 10).forEach(row => {
+                    tableHTML += `
+                        <tr>
+                            <td>${row.context}</td>
+                            <td>${row.true}</td>
+                            <td>${row.false}</td>
+                            <td>${row.level}</td>
+                            <td>${row.remark}</td>
+                        </tr>
+                    `;
+                });
+                
+                if (rows.length > 10) {
+                    tableHTML += `<tr><td colspan="5"><em>... and ${rows.length - 10} more rows</em></td></tr>`;
+                }
+                
+                tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                previewDiv.innerHTML = tableHTML;
+                
+                // Show configuration code
+                resultDiv.innerHTML += `
+                    <div class="result success" style="margin-top: 20px;">
+                        <h4>🔧 Configuration for your game:</h4>
+                        <div class="code-block">const GOOGLE_SHEETS_CONFIG = {
+    spreadsheetId: '${sheetId}',
+    apiKey: '${apiKey.substring(0, 10)}...', // Your API key (hidden for security)
+    range: 'Sheet1!A2:E',
+    enabled: true
+};</div>
+                        <p><strong>Next steps:</strong></p>
+                        <ol>
+                            <li>Copy your API key and paste it into <code>word-game.html</code></li>
+                            <li>Open <code>word-game.html</code> in your browser</li>
+                            <li>Check that the status shows "Connected to Google Sheets"</li>
+                            <li>Start playing with your secure, private data!</li>
+                        </ol>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Secure connection test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        ❌ <strong>Secure Connection Failed</strong><br>
+                        ${error.message}<br><br>
+                        <strong>Common Solutions:</strong><br>
+                        • Check that your API key is correct<br>
+                        • Make sure Google Sheets API is enabled in your Google Cloud project<br>
+                        • Verify your Sheet ID is correct<br>
+                        • Ensure your sheet has data starting from row 2<br>
+                        • Check column headers are: context, true, false, level, remark<br><br>
+                        <strong>Need help?</strong> Check the <code>secure-setup-guide.md</code> file for detailed setup instructions.
+                    </div>
+                `;
+                previewDiv.innerHTML = '';
+            }
+        }
+
+        // Focus on API key input when page loads
+        window.addEventListener('load', function() {
+            document.getElementById('apiKey').focus();
+        });
+    </script>
+</body>
+</html>
