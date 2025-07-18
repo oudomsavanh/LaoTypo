@@ -300,7 +300,12 @@
         }
 
         async function fetchFromGoogleSheets() {
-            // Google Sheets API call
+            // Try public sheet method first (no API key needed)
+            if (!GOOGLE_SHEETS_CONFIG.apiKey || GOOGLE_SHEETS_CONFIG.apiKey === 'YOUR_API_KEY') {
+                return await fetchFromPublicSheet();
+            }
+            
+            // Google Sheets API call (with API key)
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEETS_CONFIG.spreadsheetId}/values/${GOOGLE_SHEETS_CONFIG.range}?key=${GOOGLE_SHEETS_CONFIG.apiKey}`;
             
             const response = await fetch(url);
@@ -318,6 +323,35 @@
                 level: parseInt(row[3]) || 1,
                 remark: row[4] || ''
             }));
+        }
+
+        async function fetchFromPublicSheet() {
+            const spreadsheetId = GOOGLE_SHEETS_CONFIG.spreadsheetId;
+            const range = GOOGLE_SHEETS_CONFIG.range;
+            const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&range=${range}`;
+            
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Parse Google Sheets JSON response
+                const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+                
+                if (!jsonData.table || !jsonData.table.rows) {
+                    throw new Error('No data found in Google Sheets');
+                }
+                
+                return jsonData.table.rows.map(row => ({
+                    context: row.c[0]?.v || '',
+                    true: row.c[1]?.v || '',
+                    false: row.c[2]?.v || '',
+                    level: parseInt(row.c[3]?.v) || 1,
+                    remark: row.c[4]?.v || ''
+                }));
+            } catch (error) {
+                console.error('Error fetching from public Google Sheets:', error);
+                throw error;
+            }
         }
 
         function startRound() {
