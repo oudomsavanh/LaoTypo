@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Your Google Sheet Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info {
+            background-color: #e7f3ff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .sheet-url {
+            word-break: break-all;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Your Google Sheet Connection</h1>
+        
+        <div class="info">
+            <h3>📋 Your Google Sheet Information:</h3>
+            <p><strong>Sheet URL:</strong></p>
+            <div class="sheet-url">https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/edit?usp=sharing</div>
+            <p><strong>Sheet ID:</strong> <code>1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0</code></p>
+        </div>
+
+        <div class="info">
+            <h3>⚠️ Important: Make Your Sheet Public</h3>
+            <p>Before testing, make sure your Google Sheet is public:</p>
+            <ol>
+                <li>Open your Google Sheet</li>
+                <li>Click the <strong>"Share"</strong> button (top right)</li>
+                <li>Click <strong>"Change to anyone with the link"</strong></li>
+                <li>Select <strong>"Viewer"</strong> (not Editor)</li>
+                <li>Click <strong>"Done"</strong></li>
+            </ol>
+        </div>
+
+        <button onclick="testConnection()">🔍 Test Connection</button>
+        <button onclick="openSheet()" class="btn-success">📊 Open Your Sheet</button>
+
+        <div id="result"></div>
+        <div id="dataPreview"></div>
+    </div>
+
+    <script>
+        const SHEET_ID = '1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0';
+        
+        function openSheet() {
+            window.open(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`, '_blank');
+        }
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            const previewDiv = document.getElementById('dataPreview');
+            
+            // Show loading
+            resultDiv.innerHTML = '<div class="loading">🔄 Testing connection to your Google Sheet...</div>';
+            previewDiv.innerHTML = '';
+
+            try {
+                // Test the connection
+                const range = 'Sheet1!A2:E';
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&range=${range}`;
+                
+                console.log('Testing URL:', url);
+                
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                console.log('Response received:', text.substring(0, 100) + '...');
+                
+                if (text.includes('Error') || text.includes('error')) {
+                    throw new Error('Sheet not accessible. Make sure it\'s public and has the correct permissions.');
+                }
+                
+                // Parse the response
+                const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+                
+                if (!jsonData.table || !jsonData.table.rows) {
+                    throw new Error('No data found. Make sure your sheet has data starting from row 2 with headers: context, true, false, level, remark');
+                }
+                
+                // Convert to readable format
+                const data = jsonData.table.rows.map(row => ({
+                    context: row.c[0]?.v || '',
+                    true: row.c[1]?.v || '',
+                    false: row.c[2]?.v || '',
+                    level: row.c[3]?.v || '',
+                    remark: row.c[4]?.v || ''
+                }));
+                
+                // Show success
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        ✅ <strong>Connection Successful!</strong><br>
+                        Found ${data.length} rows of data from your Google Sheet<br>
+                        <small>Your sheet is properly configured and accessible.</small>
+                    </div>
+                `;
+                
+                // Show data preview
+                let tableHTML = `
+                    <div style="margin-top: 20px;">
+                        <h3>📊 Your Data Preview:</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Context</th>
+                                    <th>True</th>
+                                    <th>False</th>
+                                    <th>Level</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                data.slice(0, 10).forEach(row => {
+                    tableHTML += `
+                        <tr>
+                            <td>${row.context}</td>
+                            <td>${row.true}</td>
+                            <td>${row.false}</td>
+                            <td>${row.level}</td>
+                            <td>${row.remark}</td>
+                        </tr>
+                    `;
+                });
+                
+                if (data.length > 10) {
+                    tableHTML += `<tr><td colspan="5"><em>... and ${data.length - 10} more rows</em></td></tr>`;
+                }
+                
+                tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                previewDiv.innerHTML = tableHTML;
+                
+                // Show next steps
+                resultDiv.innerHTML += `
+                    <div class="success" style="margin-top: 20px;">
+                        <h4>🎉 Your Game is Ready!</h4>
+                        <p>Your word-game.html file has been updated with your Sheet ID.</p>
+                        <p><strong>Next steps:</strong></p>
+                        <ol>
+                            <li>Open <code>word-game.html</code> in your browser</li>
+                            <li>Check that the status shows "Connected to Google Sheets"</li>
+                            <li>Start playing with your custom questions!</li>
+                        </ol>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Connection test failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ <strong>Connection Failed</strong><br>
+                        ${error.message}<br><br>
+                        <strong>Common Solutions:</strong><br>
+                        • Make sure your sheet is public ("Anyone with the link can view")<br>
+                        • Check that your sheet has data starting from row 2<br>
+                        • Verify column headers are: context, true, false, level, remark<br>
+                        • Try refreshing this page and testing again
+                    </div>
+                `;
+                previewDiv.innerHTML = '';
+            }
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', function() {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>
