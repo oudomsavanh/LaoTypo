@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Game - Google Sheets Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Noto Sans Lao Looped', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
@@ -182,7 +185,7 @@
                 <li>• <strong>remark:</strong> Additional notes or hints</li>
             </ul>
             <p class="text-xs text-gray-500 mt-2">
-                <strong>Status:</strong> <span id="connection-status" class="text-orange-600">Demo Mode (Sample Data)</span>
+                <strong>Status:</strong> <span id="connection-status" class="text-blue-600">Connecting to Google Sheets...</span>
             </p>
         </div>
     </div>
@@ -199,44 +202,8 @@
             words: []
         };
 
-        // Sample data (replace with Google Sheets data)
-        const sampleWords = [
-            {
-                context: "The capital of France",
-                true: "Paris",
-                false: "London",
-                level: 1,
-                remark: "Basic geography question"
-            },
-            {
-                context: "Largest planet in our solar system",
-                true: "Jupiter",
-                false: "Saturn",
-                level: 2,
-                remark: "Space knowledge"
-            },
-            {
-                context: "Author of Romeo and Juliet",
-                true: "Shakespeare",
-                false: "Dickens",
-                level: 3,
-                remark: "Classic literature"
-            },
-            {
-                context: "Chemical symbol for gold",
-                true: "Au",
-                false: "Ag",
-                level: 4,
-                remark: "Chemistry basics"
-            },
-            {
-                context: "Year World War II ended",
-                true: "1945",
-                false: "1944",
-                level: 5,
-                remark: "Historical events"
-            }
-        ];
+        // Sample data removed - using Google Sheets data only
+        const sampleWords = [];
 
         // Google Sheets Configuration
         const GOOGLE_SHEETS_CONFIG = {
@@ -286,16 +253,18 @@
                     document.getElementById('connection-status').textContent = 'Connected to Google Sheets';
                     document.getElementById('connection-status').className = 'text-green-600';
                 } else {
-                    // Use sample data
-                    gameState.words = sampleWords;
-                    document.getElementById('connection-status').textContent = 'Demo Mode (Sample Data)';
-                    document.getElementById('connection-status').className = 'text-orange-600';
+                    // No sample data - must use Google Sheets
+                    throw new Error('Google Sheets not configured. Please set up your Google Sheets connection.');
                 }
             } catch (error) {
                 console.error('Error loading words:', error);
-                gameState.words = sampleWords;
-                document.getElementById('connection-status').textContent = 'Error: Using Sample Data';
+                // No fallback to sample data - show error
+                document.getElementById('connection-status').textContent = 'Error: Google Sheets connection failed';
                 document.getElementById('connection-status').className = 'text-red-600';
+                
+                // Show error message to user
+                alert('Google Sheets connection failed. Please check your setup and make sure your sheet is public.');
+                return;
             }
         }
 
