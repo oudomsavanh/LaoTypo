@@ -271,8 +271,8 @@
                 <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
             </div>
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
-                <p>Local Storage Mode</p>
-                <p>Version demo5</p>
+                <p>Google Sheets Only Mode</p>
+                <p>Version demo6</p>
             </div>
         </div>
 
@@ -469,22 +469,13 @@
                 
             } catch (error) {
                 console.error("Error loading word list from Google Sheets:", error);
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຄຳສັບຕົວຢ່າງ';
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບ Google Sheets';
                 wordLoadingStatus.style.color = 'var(--error-color)';
                 
-                // Fallback to default entries
-                wordList = [
-                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
-                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
-                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
-                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
-                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 },
-                    { context: 'ອິນເຕີເນັດ', correct: 'ອິນເຕີເນັດ', wrong: 'ອິນເຕີເນັດ', difficulty: 3 },
-                    { context: 'ຕະຫຼາດ', correct: 'ຕະຫຼາດ', wrong: 'ຕະຫຼາັດ', difficulty: 1 },
-                    { context: 'ອາຫານ', correct: 'ອາຫານ', wrong: 'ອາຫານ', difficulty: 1 }
-                ];
-                startGameBtn.disabled = false;
-                startGameBtn.textContent = 'ເລີ່ມເກມ';
+                // No fallback data - Google Sheets only
+                wordList = [];
+                startGameBtn.disabled = true;
+                startGameBtn.textContent = 'ບໍ່ສາມາດໂຫຼດຂໍ້ມູນ';
             }
         }
 
@@ -725,7 +716,7 @@
             }
 
             if (wordList.length === 0) {
-                alert("ກຳລັງໂຫຼດລາຍການຄຳສັບ, ກະລຸນາລໍຖ້າຈັກຄາວ!");
+                alert("ບໍ່ມີຂໍ້ມູນຄຳສັບ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ Google Sheets");
                 return;
             }
             playSound('start');
