@@ -17,6 +17,7 @@
             --text-color: #d1d0c5;
             --error-color: #ca4754;
             --correct-color: #72b483;
+            --warning-color: #f59e0b;
         }
         body {
             font-family: 'Noto Sans Lao Looped', sans-serif;
@@ -268,7 +269,7 @@
             </div>
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>Local Storage Mode</p>
-                <p>Version demo2</p>
+                <p>Version demo3</p>
             </div>
         </div>
 
@@ -780,18 +781,21 @@
             document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
             
             const evaluationEl = document.getElementById('evaluation-result');
-            if (sessionAccuracy === 0) {
-                evaluationEl.textContent = "ເປັນລູກຊອດ 100%";
+            if (sessionAccuracy > 0 && sessionAccuracy < 30) {
+                evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
                 evaluationEl.style.color = 'var(--error-color)';
-            } else if (sessionAccuracy > 0 && sessionAccuracy < 85) {
-                evaluationEl.textContent = "ເປັນລູກຊອດ 90%";
+            } else if (sessionAccuracy >= 30 && sessionAccuracy < 50) {
+                evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ "ຈຣິງໃຈ"";
+                evaluationEl.style.color = 'var(--warning-color)';
+            } else if (sessionAccuracy >= 50 && sessionAccuracy < 70) {
+                evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
                 evaluationEl.style.color = 'var(--main-color)';
-            } else if (sessionAccuracy >= 85 && sessionAccuracy < 91) {
-                evaluationEl.textContent = "ເປັນລູກຊອດ 60%";
+            } else if (sessionAccuracy >= 70 && sessionAccuracy < 80) {
+                evaluationEl.textContent = "ລູກຊອດລາວ";
                 evaluationEl.style.color = 'var(--main-color)';
             } else {
-                evaluationEl.textContent = "ລາວແທ້ 100%!";
-                evaluationEl.style.color = 'var(--correct-color)';
+                evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
+                evaluationEl.style.color = 'var(--correct-color)'; 
             }
 
             if (currentStreak > 0) {
