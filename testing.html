@@ -273,7 +273,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo9</p>
+                <p>Version demo10</p>
             </div>
         </div>
 
@@ -712,7 +712,15 @@
             soundToggle.checked = settings.sound;
             
             // Display user ID in footer
-            document.getElementById('user-id-display').textContent = '...' + userId.slice(-6);
+            console.log('DEBUG: Updating user ID display, userId =', userId);
+            const userIdElement = document.getElementById('user-id-display');
+            if (userIdElement) {
+                const displayText = '...' + userId.slice(-6);
+                userIdElement.textContent = displayText;
+                console.log('DEBUG: Set user ID display to:', displayText);
+            } else {
+                console.error('DEBUG: user-id-display element not found!');
+            }
         }
 
         function startGame() {
