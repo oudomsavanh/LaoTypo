@@ -219,6 +219,12 @@
         .input-error {
             border-color: var(--error-color) !important;
         }
+        /* ADDED: Loading indicator styles for Google Sheets integration */
+        .loading-indicator {
+            color: var(--main-color);
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body>
@@ -242,9 +248,15 @@
             <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
             <p class="text-lg text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
             
-            <div class="w-full max-w-sm">
+            <!-- ADDED: Loading status indicator for Google Sheets -->
+            <div id="word-loading-status" class="loading-indicator">
+                ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+            </div>
+            
+            <!-- MODIFIED: Centered player name input -->
+            <div class="w-full max-w-sm mx-auto">
                 <label for="player-name-input" class="sr-only">ຊື່ຜູ້ຫຼິ້ນ</label>
-                <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors">
+                <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors mx-auto block">
             </div>
 
             <div class="flex justify-center items-center space-x-4">
@@ -254,10 +266,14 @@
             </div>
 
             <div>
-                <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4">ເລີ່ມເກມ</button>
+                <!-- MODIFIED: Start button disabled until words are loaded -->
+                <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
             </div>
-             <div class="absolute bottom-4 right-4 text-xs text-sub-color">
+            
+            <!-- ADDED: Version information in footer -->
+            <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
+                <p>Version demo2</p>
             </div>
         </div>
 
@@ -270,6 +286,19 @@
             <div id="timer-container" class="h-2 mb-6">
                 <div id="timer-bar" class="timer-bar"></div>
             </div>
+            
+            <!-- ADDED: Context display area for showing word from Google Sheets Column A -->
+            <div class="mb-6 text-center">
+                <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+            </div>
+            
+            <!-- ADDED: Difficulty level display with color coding -->
+            <div class="mb-4 text-center">
+                <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
+                <span id="difficulty-display" class="font-bold"></span>
+            </div>
+            
             <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
                 <div id="word-card-left" class="word-card"></div>
                 <div id="word-card-right" class="word-card"></div>
@@ -360,10 +389,8 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        // MODIFIED: Removed Firebase imports and added Google Sheets integration
+        
         // --- DOM ELEMENTS ---
         const screens = {
             start: document.getElementById('start-screen'),
@@ -384,12 +411,21 @@
         const difficultySelect = document.getElementById('difficulty-select');
         const timerToggle = document.getElementById('timer-toggle');
         const soundToggle = document.getElementById('sound-toggle');
+        
+        // ADDED: New DOM elements for Google Sheets integration
+        const wordLoadingStatus = document.getElementById('word-loading-status');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const contextDisplay = document.getElementById('context-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
 
         // --- GAME STATE & SETTINGS ---
-        let db, auth, userId;
-        let isAuthReady = false;
+        // MODIFIED: Changed authentication to use local user ID instead of Firebase
+        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
+        let isAuthReady = true; // Always ready in local mode
         let currentStreak = 0;
-        let correctWord, typoWord, correctWordPosition;
+        
+        // MODIFIED: Changed variable names to match new Google Sheets structure
+        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
@@ -409,124 +445,147 @@
         
         let wordList = [];
 
-        // --- FIREBASE SETUP ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-typo-game';
-        let firebaseConfig;
-        try {
-            firebaseConfig = JSON.parse(__firebase_config);
-        } catch (e) {
-            console.error("Firebase config not found or invalid. Using placeholder.");
-            firebaseConfig = { apiKey: "AIza...", authDomain: "...", projectId: "..." };
-        }
+        // ADDED: Google Sheets configuration
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
 
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                document.getElementById('user-id-display').textContent = '...' + userId.slice(-6);
-                isAuthReady = true;
-                await loadUserData();
-                await loadWordLists();
-                updateUI();
-            } else {
-                console.log("No user signed in.");
-                isAuthReady = false;
-            }
-        });
-        
-        async function initializeAuth() {
+        // REPLACED: Firebase data loading with Google Sheets integration
+        // Structure: Column A=context, B=correct, C=wrong, D=difficulty (1=easy, 2=medium, 3=difficult)
+        async function loadWordListsFromGoogleSheets() {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.style.color = 'var(--main-color)';
+                
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            } catch (error) {
-                console.error("Authentication failed:", error);
-            }
-        }
-
-        // --- DATA PERSISTENCE (FIRESTORE) ---
-        async function loadWordLists() {
-            if (!db) return;
-            try {
-                const wordListDocRef = doc(db, `artifacts/${appId}/public/data/wordLists/common`);
-                const docSnap = await getDoc(wordListDocRef);
-
-                if (docSnap.exists() && docSnap.data().words) {
-                    wordList = docSnap.data().words;
-                    console.log("Word list loaded from Firestore:", wordList.length, "words");
-                } else {
-                    console.log("No word list found in Firestore. Using default list.");
-                    wordList = ['ສະບາຍດີ', 'ຂອບໃຈ', 'ຂໍໂທດ', 'ພາສາລາວ', 'ໂຮງຮຽນ', 'ຕະຫຼາດ']; 
+                
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+                
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty
+                wordList = lines
+                    .slice(1) // Skip header row (A1:D1)
+                    .map(line => {
+                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
+                        if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
+                            return {
+                                context: columns[0],    // Column A - context to display
+                                correct: columns[1],    // Column B - correct answer
+                                wrong: columns[2],      // Column C - wrong answer
+                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty (1=easy, 2=medium, 3=difficult)
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null); // Remove invalid entries
+                
+                console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
+                console.log("Sample entries:", wordList.slice(0, 3));
+                
+                if (wordList.length === 0) {
+                    throw new Error("No valid entries found in the spreadsheet");
                 }
+                
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordList.length} ຄຳສັບ`;
+                wordLoadingStatus.style.color = 'var(--correct-color)';
+                startGameBtn.disabled = false;
+                startGameBtn.textContent = 'ເລີ່ມເກມ';
+                
             } catch (error) {
-                console.error("Error loading word list:", error);
-                wordList = ['ສະບາຍດີ', 'ຂອບໃຈ', 'ຂໍໂທດ', 'ພາສາລາວ', 'ໂຮງຮຽນ', 'ຕະຫຼາດ'];
+                console.error("Error loading word list from Google Sheets:", error);
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຄຳສັບຕົວຢ່າງ';
+                wordLoadingStatus.style.color = 'var(--error-color)';
+                
+                // Fallback to default entries
+                wordList = [
+                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
+                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
+                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 }
+                ];
+                startGameBtn.disabled = false;
+                startGameBtn.textContent = 'ເລີ່ມເກມ';
             }
         }
 
-        async function loadUserData() {
-            if (!isAuthReady || !userId) return;
-            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/typo-game-lao/stats`);
+        // REPLACED: Firebase data persistence with Local Storage
+        function loadUserData() {
             try {
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+                const savedData = localStorage.getItem('laoTypoGame_userData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
                     settings = { ...settings, ...data.settings };
                     stats = { ...stats, ...data.stats };
                     displayName = data.displayName || '';
                     playerNameInput.value = displayName;
+                }
+            } catch (error) {
+                console.error("Error loading user data from localStorage:", error);
+            }
+        }
+
+        function saveUserData() {
+            try {
+                const userData = {
+                    settings,
+                    stats,
+                    displayName,
+                    lastPlayed: new Date().toISOString()
+                };
+                localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
+            } catch (error) {
+                console.error("Error saving user data to localStorage:", error);
+            }
+        }
+
+        function updateLeaderboard(score) {
+            try {
+                const finalDisplayName = displayName || 'Anonymous';
+                let leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                
+                // Check if user already exists in leaderboard
+                const existingIndex = leaderboard.findIndex(entry => entry.userId === userId);
+                
+                if (existingIndex !== -1) {
+                    // Update existing entry only if new score is higher
+                    if (score > leaderboard[existingIndex].score) {
+                        leaderboard[existingIndex] = {
+                            userId,
+                            score,
+                            displayName: finalDisplayName,
+                            timestamp: new Date().toISOString()
+                        };
+                    }
                 } else {
-                    await saveUserData(); // Creates initial doc for new user
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-            }
-        }
-
-        async function saveUserData() {
-            if (!isAuthReady || !userId) return;
-            const userDocRef = doc(db, `artifacts/${appId}/users/${userId}/typo-game-lao/stats`);
-            try {
-                await setDoc(userDocRef, { settings, stats, displayName, lastPlayed: serverTimestamp() }, { merge: true });
-            } catch (error) {
-                console.error("Error saving user data:", error);
-            }
-        }
-
-        async function updateLeaderboard(score) {
-            if (!isAuthReady || !userId) return;
-            
-            const finalDisplayName = displayName || 'Anonymous';
-            const leaderboardRef = doc(db, `artifacts/${appId}/public/data/leaderboard/${userId}`);
-            
-            try {
-                const docSnap = await getDoc(leaderboardRef);
-                // Only update if the new score is higher than the existing one, or if there's no entry yet.
-                if (!docSnap.exists() || score > docSnap.data().score) {
-                    await setDoc(leaderboardRef, {
-                        userId: userId,
-                        score: score,
+                    // Add new entry
+                    leaderboard.push({
+                        userId,
+                        score,
                         displayName: finalDisplayName,
-                        timestamp: serverTimestamp()
+                        timestamp: new Date().toISOString()
                     });
-                    console.log(`Leaderboard updated with new high score: ${score}`);
                 }
+                
+                // Sort and keep top 20
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 20);
+                
+                localStorage.setItem('laoTypoGame_leaderboard', JSON.stringify(leaderboard));
+                console.log(`Leaderboard updated with score: ${score}`);
             } catch (error) {
                 console.error("Error updating leaderboard:", error);
             }
         }
 
-        function formatDate(timestamp) {
-            if (!timestamp || !timestamp.toDate) {
+        function formatDate(isoString) {
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (error) {
                 return 'N/A';
             }
-            const date = timestamp.toDate();
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         }
 
         async function showLeaderboard() {
@@ -534,19 +593,9 @@
             leaderboardContainer.innerHTML = '<p class="text-center">ກຳລັງໂຫຼດ...</p>';
 
             try {
-                const leaderboardColRef = collection(db, `artifacts/${appId}/public/data/leaderboard`);
-                const querySnapshot = await getDocs(leaderboardColRef);
+                const leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
                 
-                let scores = [];
-                querySnapshot.forEach((doc) => {
-                    scores.push(doc.data());
-                });
-
-                // Sort scores descending
-                scores.sort((a, b) => b.score - a.score);
-                const topScores = scores.slice(0, 20); // Show top 20
-
-                if (topScores.length === 0) {
+                if (leaderboard.length === 0) {
                     leaderboardContainer.innerHTML = '<p class="text-center">ຍັງບໍ່ມີໃຜຕິດອັນດັບເທື່ອ!</p>';
                     return;
                 }
@@ -564,7 +613,7 @@
                         <tbody>
                 `;
 
-                topScores.forEach((entry, index) => {
+                leaderboard.forEach((entry, index) => {
                     const isCurrentUser = entry.userId === userId;
                     tableHTML += `
                         <tr class="${isCurrentUser ? 'user-best' : ''}">
@@ -604,57 +653,28 @@
             }
         }
 
-        // --- WORD & TYPO GENERATION (LAO) ---
-        function generateTypo(word, difficulty) {
-            const chars = [...word];
-            const len = chars.length;
-            if (len < 2) return word + 'ກ';
-            const type = Math.random();
+        // REPLACED: Old typo generation with difficulty helper functions
+        function getDifficultyLabel(level) {
+            switch(level) {
+                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
+                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
+                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            }
+        }
+
+        function filterWordsByDifficulty(difficulty) {
+            // Filter words based on settings difficulty
+            let targetLevel;
+            switch(difficulty) {
+                case 'easy': targetLevel = 1; break;
+                case 'medium': targetLevel = 2; break;
+                case 'hard': targetLevel = 3; break;
+                default: targetLevel = 1;
+            }
             
-            if (difficulty === 'easy') {
-                if (type < 0.5 && len > 1) {
-                    const randomIndex = Math.floor(Math.random() * len);
-                    chars.splice(randomIndex, 1);
-                } else {
-                    const randomIndex = Math.floor(Math.random() * len);
-                    chars.splice(randomIndex, 0, chars[randomIndex]);
-                }
-            } 
-            else if (difficulty === 'medium') {
-                if (type < 0.5 && len > 1) {
-                    const randomIndex = Math.floor(Math.random() * (len - 1));
-                    [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                } else {
-                    const subs = {'ກ': 'ຂ', 'ຂ': 'ຄ', 'ຄ': 'ກ', 'ດ': 'ຕ', 'ຕ': 'ດ', 'ບ': 'ປ', 'ປ': 'ບ', 'ສ': 'ຊ', 'ຊ': 'ສ', 'ຫ': 'ຮ', 'ຮ': 'ຫ'};
-                    const subIndices = chars.map((c, i) => subs[c] ? i : -1).filter(i => i !== -1);
-                    if (subIndices.length > 0) {
-                        const indexToChange = subIndices[Math.floor(Math.random() * subIndices.length)];
-                        chars[indexToChange] = subs[chars[indexToChange]];
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * (len - 1));
-                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                    }
-                }
-            }
-            else if (difficulty === 'hard') {
-                 const toneMarks = ['່', '້', '໊', '໋'];
-                 const toneMarkIndices = chars.map((c, i) => toneMarks.includes(c) ? i : -1).filter(i => i !== -1);
-                 if (type < 0.5 && toneMarkIndices.length > 0) {
-                    const indexToRemove = toneMarkIndices[Math.floor(Math.random() * toneMarkIndices.length)];
-                    chars.splice(indexToRemove, 1);
-                 } else {
-                    const vowelSubs = {'ະ': 'າ', 'າ': 'ະ', 'ິ': 'ີ', 'ີ': 'ິ', 'ຶ': 'ື', 'ື': 'ຶ', 'ຸ': 'ູ', 'ູ': 'ຸ'};
-                    const vowelIndices = chars.map((c, i) => vowelSubs[c] ? i : -1).filter(i => i !== -1);
-                     if (vowelIndices.length > 0) {
-                        const indexToChange = vowelIndices[Math.floor(Math.random() * vowelIndices.length)];
-                        chars[indexToChange] = vowelSubs[chars[indexToChange]];
-                    } else {
-                         const randomIndex = Math.floor(Math.random() * (len - 1));
-                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                    }
-                 }
-            }
-            return chars.join('');
+            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
+            return filtered.length > 0 ? filtered : wordList; // Fallback to all if none found
         }
 
         // --- UI & GAME FLOW ---
@@ -678,6 +698,9 @@
             difficultySelect.value = settings.difficulty;
             timerToggle.checked = settings.timer;
             soundToggle.checked = settings.sound;
+            
+            // ADDED: Display user ID in footer
+            document.getElementById('user-id-display').textContent = '...' + userId.slice(-6);
         }
 
         function startGame() {
@@ -709,30 +732,40 @@
             nextRound();
         }
 
+        // COMPLETELY REWRITTEN: Game logic to use Google Sheets data instead of generating typos
         function nextRound() {
             currentStreakEl.textContent = currentStreak;
             bestStreakEl.textContent = stats.bestStreak;
             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             
-            let currentDifficulty = settings.difficulty;
-            if (settings.difficulty === 'easy' && currentStreak > 10) currentDifficulty = 'medium';
-            if (settings.difficulty === 'medium' && currentStreak > 15) currentDifficulty = 'hard';
+            // Filter words by difficulty setting
+            const availableWords = filterWordsByDifficulty(settings.difficulty);
+            
+            // Select random entry from filtered list
+            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+            
+            // Display context from Column A
+            contextDisplay.textContent = currentEntry.context;
+            
+            // Display difficulty level with color coding
+            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+            difficultyDisplay.textContent = difficultyInfo.text;
+            difficultyDisplay.style.color = difficultyInfo.color;
+            
+            // Set correct and wrong answers from Columns B and C
+            correctAnswer = currentEntry.correct;
+            wrongAnswer = currentEntry.wrong;
 
-            correctWord = wordList[Math.floor(Math.random() * wordList.length)];
-            typoWord = generateTypo(correctWord, currentDifficulty);
-            while(typoWord === correctWord) {
-                typoWord = generateTypo(correctWord, currentDifficulty);
-            }
-
+            // Randomly position correct answer
             correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
 
             if (correctWordPosition === 'left') {
-                wordCardLeft.textContent = correctWord;
-                wordCardRight.textContent = typoWord;
+                wordCardLeft.textContent = correctAnswer;
+                wordCardRight.textContent = wrongAnswer;
             } else {
-                wordCardLeft.textContent = typoWord;
-                wordCardRight.textContent = correctWord;
+                wordCardLeft.textContent = wrongAnswer;
+                wordCardRight.textContent = correctAnswer;
             }
             startTimer();
         }
@@ -855,7 +888,8 @@
                 leaderboardPanel.classList.add('hidden');
             }
             if (screens.start.classList.contains('active') && e.key === 'Enter') {
-                startGame();
+                // MODIFIED: Check if start button is disabled before starting game
+                if (!startGameBtn.disabled) startGame();
             }
             if (gameInProgress) {
                 if (e.key.toLowerCase() === 'a') {
@@ -875,9 +909,11 @@
              if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
         });
 
-        // --- INITIALIZATION ---
+        // MODIFIED: Initialization to load from Google Sheets instead of Firebase
         window.onload = async () => {
-            await initializeAuth();
+            loadUserData();
+            updateUI();
+            await loadWordListsFromGoogleSheets();
         };
 
     </script>
