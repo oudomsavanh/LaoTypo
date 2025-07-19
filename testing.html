@@ -273,7 +273,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo12</p>
+                <p>Version demo13</p>
             </div>
         </div>
 
@@ -493,23 +493,28 @@
             }
         }
 
-        // Filter words by difficulty level
+        // COPIED FROM index.html (working version)
+        function getDifficultyLabel(level) {
+            switch(level) {
+                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
+                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
+                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            }
+        }
+
         function filterWordsByDifficulty(difficulty) {
-            if (!wordList || wordList.length === 0) {
-                console.log("No word list available for filtering");
-                return [];
+            // Filter words based on settings difficulty
+            let targetLevel;
+            switch(difficulty) {
+                case 'easy': targetLevel = 1; break;
+                case 'medium': targetLevel = 2; break;
+                case 'hard': targetLevel = 3; break;
+                default: targetLevel = 1;
             }
             
-            const filtered = wordList.filter(word => word.difficulty === difficulty);
-            console.log(`Filtered words for difficulty ${difficulty}:`, filtered.length, "entries");
-            
-            // If no words found for this difficulty, return all words
-            if (filtered.length === 0) {
-                console.log("No words found for difficulty", difficulty, "- returning all words");
-                return wordList;
-            }
-            
-            return filtered;
+            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
+            return filtered.length > 0 ? filtered : wordList; // Fallback to all if none found
         }
 
         // --- LOCAL STORAGE DATA PERSISTENCE ---
