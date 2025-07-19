@@ -252,9 +252,9 @@
                 ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
             </div>
             
-            <div class="w-full max-w-sm">
+            <div class="w-full max-w-sm mx-auto">
                 <label for="player-name-input" class="sr-only">ຊື່ຜູ້ຫຼິ້ນ</label>
-                <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors">
+                <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors mx-auto block">
             </div>
 
             <div class="flex justify-center items-center space-x-4">
@@ -280,6 +280,19 @@
             <div id="timer-container" class="h-2 mb-6">
                 <div id="timer-bar" class="timer-bar"></div>
             </div>
+            
+            <!-- Context Display -->
+            <div class="mb-6 text-center">
+                <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+            </div>
+            
+            <!-- Difficulty Display -->
+            <div class="mb-4 text-center">
+                <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
+                <span id="difficulty-display" class="font-bold"></span>
+            </div>
+            
             <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
                 <div id="word-card-left" class="word-card"></div>
                 <div id="word-card-right" class="word-card"></div>
@@ -392,11 +405,13 @@
         const soundToggle = document.getElementById('sound-toggle');
         const wordLoadingStatus = document.getElementById('word-loading-status');
         const startGameBtn = document.getElementById('start-game-btn');
+        const contextDisplay = document.getElementById('context-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
 
         // --- GAME STATE & SETTINGS ---
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
         let currentStreak = 0;
-        let correctWord, typoWord, correctWordPosition;
+        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
@@ -433,18 +448,28 @@
                 const csvText = await response.text();
                 const lines = csvText.split('\n');
                 
-                // Assuming the words are in the first column, starting from row 2 (skipping header)
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty
                 wordList = lines
-                    .slice(1) // Skip header row
-                    .map(line => line.split(',')[0]) // Get first column
-                    .map(word => word.replace(/"/g, '').trim()) // Remove quotes and trim
-                    .filter(word => word.length > 0); // Remove empty entries
+                    .slice(1) // Skip header row (A1:D1)
+                    .map(line => {
+                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
+                        if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
+                            return {
+                                context: columns[0],    // Column A - context to display
+                                correct: columns[1],    // Column B - correct answer
+                                wrong: columns[2],      // Column C - wrong answer
+                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty (1=easy, 2=medium, 3=difficult)
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null); // Remove invalid entries
                 
-                console.log("Word list loaded from Google Sheets:", wordList.length, "words");
-                console.log("Sample words:", wordList.slice(0, 10));
+                console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
+                console.log("Sample entries:", wordList.slice(0, 3));
                 
                 if (wordList.length === 0) {
-                    throw new Error("No words found in the spreadsheet");
+                    throw new Error("No valid entries found in the spreadsheet");
                 }
                 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordList.length} ຄຳສັບ`;
@@ -457,12 +482,13 @@
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຄຳສັບຕົວຢ່າງ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
                 
-                // Fallback to default words
+                // Fallback to default entries
                 wordList = [
-                    'ສະບາຍດີ', 'ຂອບໃຈ', 'ຂໍໂທດ', 'ພາສາລາວ', 'ໂຮງຮຽນ', 'ຕະຫຼາດ',
-                    'ອາຫານ', 'ເວລາ', 'ເມືອງ', 'ບ້ານ', 'ຄອບຄົວ', 'ເພື່ອນ',
-                    'ວຽກງານ', 'ການຮຽນ', 'ປຶ້ມ', 'ຫນັງສື', 'ຄອມພິວເຕີ', 'ອິນເຕີເນັດ',
-                    'ລົດ', 'ບິນ', 'ເຮືອ', 'ທ່ອງທ່ຽວ', 'ສຸຂະພາບ', 'ໂຮງຫມໍ'
+                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
+                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
+                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 }
                 ];
                 startGameBtn.disabled = false;
                 startGameBtn.textContent = 'ເລີ່ມເກມ';
@@ -612,57 +638,28 @@
             }
         }
 
-        // --- WORD & TYPO GENERATION (LAO) ---
-        function generateTypo(word, difficulty) {
-            const chars = [...word];
-            const len = chars.length;
-            if (len < 2) return word + 'ກ';
-            const type = Math.random();
+        // --- DIFFICULTY HELPER FUNCTIONS ---
+        function getDifficultyLabel(level) {
+            switch(level) {
+                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
+                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
+                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            }
+        }
+
+        function filterWordsByDifficulty(difficulty) {
+            // Filter words based on settings difficulty
+            let targetLevel;
+            switch(difficulty) {
+                case 'easy': targetLevel = 1; break;
+                case 'medium': targetLevel = 2; break;
+                case 'hard': targetLevel = 3; break;
+                default: targetLevel = 1;
+            }
             
-            if (difficulty === 'easy') {
-                if (type < 0.5 && len > 1) {
-                    const randomIndex = Math.floor(Math.random() * len);
-                    chars.splice(randomIndex, 1);
-                } else {
-                    const randomIndex = Math.floor(Math.random() * len);
-                    chars.splice(randomIndex, 0, chars[randomIndex]);
-                }
-            } 
-            else if (difficulty === 'medium') {
-                if (type < 0.5 && len > 1) {
-                    const randomIndex = Math.floor(Math.random() * (len - 1));
-                    [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                } else {
-                    const subs = {'ກ': 'ຂ', 'ຂ': 'ຄ', 'ຄ': 'ກ', 'ດ': 'ຕ', 'ຕ': 'ດ', 'ບ': 'ປ', 'ປ': 'ບ', 'ສ': 'ຊ', 'ຊ': 'ສ', 'ຫ': 'ຮ', 'ຮ': 'ຫ'};
-                    const subIndices = chars.map((c, i) => subs[c] ? i : -1).filter(i => i !== -1);
-                    if (subIndices.length > 0) {
-                        const indexToChange = subIndices[Math.floor(Math.random() * subIndices.length)];
-                        chars[indexToChange] = subs[chars[indexToChange]];
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * (len - 1));
-                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                    }
-                }
-            }
-            else if (difficulty === 'hard') {
-                 const toneMarks = ['່', '້', '໊', '໋'];
-                 const toneMarkIndices = chars.map((c, i) => toneMarks.includes(c) ? i : -1).filter(i => i !== -1);
-                 if (type < 0.5 && toneMarkIndices.length > 0) {
-                    const indexToRemove = toneMarkIndices[Math.floor(Math.random() * toneMarkIndices.length)];
-                    chars.splice(indexToRemove, 1);
-                 } else {
-                    const vowelSubs = {'ະ': 'າ', 'າ': 'ະ', 'ິ': 'ີ', 'ີ': 'ິ', 'ຶ': 'ື', 'ື': 'ຶ', 'ຸ': 'ູ', 'ູ': 'ຸ'};
-                    const vowelIndices = chars.map((c, i) => vowelSubs[c] ? i : -1).filter(i => i !== -1);
-                     if (vowelIndices.length > 0) {
-                        const indexToChange = vowelIndices[Math.floor(Math.random() * vowelIndices.length)];
-                        chars[indexToChange] = vowelSubs[chars[indexToChange]];
-                    } else {
-                         const randomIndex = Math.floor(Math.random() * (len - 1));
-                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
-                    }
-                 }
-            }
-            return chars.join('');
+            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
+            return filtered.length > 0 ? filtered : wordList; // Fallback to all if none found
         }
 
         // --- UI & GAME FLOW ---
@@ -723,24 +720,33 @@
             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             
-            let currentDifficulty = settings.difficulty;
-            if (settings.difficulty === 'easy' && currentStreak > 10) currentDifficulty = 'medium';
-            if (settings.difficulty === 'medium' && currentStreak > 15) currentDifficulty = 'hard';
+            // Filter words by difficulty setting
+            const availableWords = filterWordsByDifficulty(settings.difficulty);
+            
+            // Select random entry from filtered list
+            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+            
+            // Display context
+            contextDisplay.textContent = currentEntry.context;
+            
+            // Display difficulty level
+            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+            difficultyDisplay.textContent = difficultyInfo.text;
+            difficultyDisplay.style.color = difficultyInfo.color;
+            
+            // Set correct and wrong answers
+            correctAnswer = currentEntry.correct;
+            wrongAnswer = currentEntry.wrong;
 
-            correctWord = wordList[Math.floor(Math.random() * wordList.length)];
-            typoWord = generateTypo(correctWord, currentDifficulty);
-            while(typoWord === correctWord) {
-                typoWord = generateTypo(correctWord, currentDifficulty);
-            }
-
+            // Randomly position correct answer
             correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
 
             if (correctWordPosition === 'left') {
-                wordCardLeft.textContent = correctWord;
-                wordCardRight.textContent = typoWord;
+                wordCardLeft.textContent = correctAnswer;
+                wordCardRight.textContent = wrongAnswer;
             } else {
-                wordCardLeft.textContent = typoWord;
-                wordCardRight.textContent = correctWord;
+                wordCardLeft.textContent = wrongAnswer;
+                wordCardRight.textContent = correctAnswer;
             }
             startTimer();
         }
