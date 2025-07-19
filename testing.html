@@ -271,8 +271,8 @@
                 <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
             </div>
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
-                <p>Debug Mode</p>
-                <p>Version demo7</p>
+                <p>Fixed Mode</p>
+                <p>Version demo8</p>
             </div>
         </div>
 
@@ -280,6 +280,7 @@
         <div id="game-screen" class="screen">
             <div class="flex justify-between items-center mb-6 text-2xl">
                 <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
+                <div class="text-sub-color text-center">Player: <span id="game-player-name" class="text-text-color font-bold"></span></div>
                 <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
             </div>
             <div id="timer-container" class="h-2 mb-6">
@@ -397,11 +398,14 @@
         const soundToggle = document.getElementById('sound-toggle');
         const wordLoadingStatus = document.getElementById('word-loading-status');
         const startGameBtn = document.getElementById('start-game-btn');
+        const contextDisplay = document.getElementById('context-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const gamePlayerName = document.getElementById('game-player-name');
 
         // --- GAME STATE & SETTINGS ---
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
         let currentStreak = 0;
-        let correctWord, typoWord, correctWordPosition;
+        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
@@ -724,6 +728,9 @@
                 saveUserData();
             }
 
+            // Display player name in game screen
+            gamePlayerName.textContent = displayName;
+
             if (wordList.length === 0) {
                 alert("ບໍ່ມີຂໍ້ມູນຄຳສັບ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ Google Sheets");
                 return;
@@ -742,24 +749,33 @@
             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             
-            let currentDifficulty = settings.difficulty;
-            if (settings.difficulty === 'easy' && currentStreak > 10) currentDifficulty = 'medium';
-            if (settings.difficulty === 'medium' && currentStreak > 15) currentDifficulty = 'hard';
+            // Filter words by difficulty setting
+            const availableWords = filterWordsByDifficulty(settings.difficulty);
+            
+            // Select random entry from filtered list
+            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+            
+            // Display context from Column A
+            contextDisplay.textContent = currentEntry.context;
+            
+            // Display difficulty level with color coding
+            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+            difficultyDisplay.textContent = difficultyInfo.text;
+            difficultyDisplay.style.color = difficultyInfo.color;
+            
+            // Set correct and wrong answers from Columns B and C
+            correctAnswer = currentEntry.correct;
+            wrongAnswer = currentEntry.wrong;
 
-            correctWord = wordList[Math.floor(Math.random() * wordList.length)];
-            typoWord = generateTypo(correctWord, currentDifficulty);
-            while(typoWord === correctWord) {
-                typoWord = generateTypo(correctWord, currentDifficulty);
-            }
-
+            // Randomly position correct answer
             correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
 
             if (correctWordPosition === 'left') {
-                wordCardLeft.textContent = correctWord;
-                wordCardRight.textContent = typoWord;
+                wordCardLeft.textContent = correctAnswer;
+                wordCardRight.textContent = wrongAnswer;
             } else {
-                wordCardLeft.textContent = typoWord;
-                wordCardRight.textContent = correctWord;
+                wordCardLeft.textContent = wrongAnswer;
+                wordCardRight.textContent = correctAnswer;
             }
             startTimer();
         }
