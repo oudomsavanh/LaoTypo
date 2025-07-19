@@ -269,7 +269,7 @@
             </div>
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>Local Storage Mode</p>
-                <p>Version demo3</p>
+                <p>Version demo4</p>
             </div>
         </div>
 
@@ -435,18 +435,28 @@
                 const csvText = await response.text();
                 const lines = csvText.split('\n');
                 
-                // Assuming the words are in the first column, starting from row 2 (skipping header)
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty
                 wordList = lines
-                    .slice(1) // Skip header row
-                    .map(line => line.split(',')[0]) // Get first column
-                    .map(word => word.replace(/"/g, '').trim()) // Remove quotes and trim
-                    .filter(word => word.length > 0); // Remove empty entries
+                    .slice(1) // Skip header row (A1:D1)
+                    .map(line => {
+                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
+                        if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
+                            return {
+                                context: columns[0],    // Column A - context to display
+                                correct: columns[1],    // Column B - correct answer
+                                wrong: columns[2],      // Column C - wrong answer
+                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty (1=easy, 2=medium, 3=difficult)
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null); // Remove invalid entries
                 
-                console.log("Word list loaded from Google Sheets:", wordList.length, "words");
-                console.log("Sample words:", wordList.slice(0, 10));
+                console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
+                console.log("Sample entries:", wordList.slice(0, 3));
                 
                 if (wordList.length === 0) {
-                    throw new Error("No words found in the spreadsheet");
+                    throw new Error("No valid entries found in the spreadsheet");
                 }
                 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordList.length} ຄຳສັບ`;
@@ -459,12 +469,16 @@
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຄຳສັບຕົວຢ່າງ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
                 
-                // Fallback to default words
+                // Fallback to default entries
                 wordList = [
-                    'ສະບາຍດີ', 'ຂອບໃຈ', 'ຂໍໂທດ', 'ພາສາລາວ', 'ໂຮງຮຽນ', 'ຕະຫຼາດ',
-                    'ອາຫານ', 'ເວລາ', 'ເມືອງ', 'ບ້ານ', 'ຄອບຄົວ', 'ເພື່ອນ',
-                    'ວຽກງານ', 'ການຮຽນ', 'ປຶ້ມ', 'ຫນັງສື', 'ຄອມພິວເຕີ', 'ອິນເຕີເນັດ',
-                    'ລົດ', 'ບິນ', 'ເຮືອ', 'ທ່ອງທ່ຽວ', 'ສຸຂະພາບ', 'ໂຮງຫມໍ'
+                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
+                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
+                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 },
+                    { context: 'ອິນເຕີເນັດ', correct: 'ອິນເຕີເນັດ', wrong: 'ອິນເຕີເນັດ', difficulty: 3 },
+                    { context: 'ຕະຫຼາດ', correct: 'ຕະຫຼາດ', wrong: 'ຕະຫຼາັດ', difficulty: 1 },
+                    { context: 'ອາຫານ', correct: 'ອາຫານ', wrong: 'ອາຫານ', difficulty: 1 }
                 ];
                 startGameBtn.disabled = false;
                 startGameBtn.textContent = 'ເລີ່ມເກມ';
