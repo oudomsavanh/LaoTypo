@@ -273,7 +273,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo11</p>
+                <p>Version demo12</p>
             </div>
         </div>
 
@@ -491,6 +491,25 @@
                 startGameBtn.disabled = false;
                 startGameBtn.textContent = 'ເລີ່ມເກມ (DEBUG)';
             }
+        }
+
+        // Filter words by difficulty level
+        function filterWordsByDifficulty(difficulty) {
+            if (!wordList || wordList.length === 0) {
+                console.log("No word list available for filtering");
+                return [];
+            }
+            
+            const filtered = wordList.filter(word => word.difficulty === difficulty);
+            console.log(`Filtered words for difficulty ${difficulty}:`, filtered.length, "entries");
+            
+            // If no words found for this difficulty, return all words
+            if (filtered.length === 0) {
+                console.log("No words found for difficulty", difficulty, "- returning all words");
+                return wordList;
+            }
+            
+            return filtered;
         }
 
         // --- LOCAL STORAGE DATA PERSISTENCE ---
