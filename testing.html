@@ -271,8 +271,9 @@
                 <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
             </div>
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
+                <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo8</p>
+                <p>Version demo9</p>
             </div>
         </div>
 
@@ -709,6 +710,9 @@
             difficultySelect.value = settings.difficulty;
             timerToggle.checked = settings.timer;
             soundToggle.checked = settings.sound;
+            
+            // Display user ID in footer
+            document.getElementById('user-id-display').textContent = '...' + userId.slice(-6);
         }
 
         function startGame() {
