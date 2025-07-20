@@ -241,6 +241,136 @@
             font-weight: 500;
         }
         
+        /* Enhanced Account Screen Styles */
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--bg-color);
+            border: 3px solid var(--main-color);
+        }
+        
+        .achievement-badge {
+            background: rgba(62, 64, 67, 0.5);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-color: var(--main-color);
+            box-shadow: 0 4px 12px rgba(226, 183, 20, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        .badge-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .achievement-badge.unlocked .badge-name {
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .stat-value-with-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color) 0%, #f5c93d 100%);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .difficulty-progress {
+            margin-bottom: 12px;
+        }
+        
+        .difficulty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .difficulty-icon {
+            font-size: 1.2rem;
+        }
+        
+        .difficulty-name {
+            flex: 1;
+            margin-left: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .difficulty-score {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
         /* Toggle Switch Styles */
         .switch {
             position: relative;
@@ -581,19 +711,135 @@
             </div>
         </div>
 
-        <!-- Stats Screen -->
-        <div id="stats-screen" class="screen space-y-6">
-            <h2 class="text-4xl font-bold text-main-color">ສະຖິຕິສ່ວນຕົວ</h2>
-            <div class="text-xl space-y-3 text-left max-w-md mx-auto bg-[#3e4043] p-6 rounded-lg">
-                <p>ຊື່: <span id="stats-display-name" class="font-bold text-white float-right"></span></p>
-                <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຜິດ: <span id="stats-total-mistakes" class="font-bold text-white float-right">0</span></p>
-                <p>ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-bold text-white float-right">0%</span></p>
+        <!-- Enhanced Account Screen -->
+        <div id="stats-screen" class="screen space-y-6 pb-8">
+            <!-- Profile Header -->
+            <div class="bg-gradient-to-r from-[#3e4043] to-[#2c2e31] p-6 rounded-xl border-2 border-main-color">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="profile-avatar" id="user-avatar">👤</div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-main-color" id="profile-display-name">ຜູ້ຫຼິ້ນ</h2>
+                        <p class="text-sub-color text-sm">ເລີ່ມຫຼິ້ນເມື່ອ: <span id="join-date">ມື້ນີ້</span></p>
+                        <button id="edit-profile-btn" class="text-xs text-main-color hover:underline mt-1">✏️ ແກ້ໄຂໂປຣໄຟລ໌</button>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold text-main-color" id="current-rank">#-</div>
+                        <div class="text-xs text-sub-color">ອັນດັບປະຈຸບັນ</div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <button id="stats-back-btn" class="btn">ກັບຄືນ</button>
+
+            <!-- Achievement Badges -->
+            <div class="bg-[#3e4043] p-4 rounded-xl">
+                <h3 class="text-xl font-bold text-main-color mb-3">🏆 ລາງວັນທີ່ໄດ້ຮັບ</h3>
+                <div class="grid grid-cols-4 gap-2" id="achievement-badges">
+                    <div class="achievement-badge locked" data-achievement="first-game">
+                        <div class="badge-icon">🎮</div>
+                        <div class="badge-name">ເກມທຳອິດ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="streak-5">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-name">5 ຄຳຕິດຕໍ່</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="streak-10">
+                        <div class="badge-icon">⚡</div>
+                        <div class="badge-name">10 ຄຳຕິດຕໍ່</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="perfectionist">
+                        <div class="badge-icon">💯</div>
+                        <div class="badge-name">100% ແມ່ນຍຳ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="difficulty-master">
+                        <div class="badge-icon">👑</div>
+                        <div class="badge-name">ເຊື່ອງ ທຸກ ລະດັບ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="consistent-player">
+                        <div class="badge-icon">📅</div>
+                        <div class="badge-name">ຫຼິ້ນ 7 ມື້ຕິດ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="word-master">
+                        <div class="badge-icon">📚</div>
+                        <div class="badge-name">500 ຄຳຖືກ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="champion">
+                        <div class="badge-icon">🥇</div>
+                        <div class="badge-name">ແຊມ ອັນດັບ 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Stats with Visual Progress -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Personal Stats -->
+                <div class="bg-[#3e4043] p-4 rounded-xl">
+                    <h3 class="text-xl font-bold text-main-color mb-3">📊 ສະຖິຕິສ່ວນຕົວ</h3>
+                    <div class="space-y-3">
+                        <div class="stat-item">
+                            <div class="stat-label">ຄະແນນທີ່ດີທີ່ສຸດ</div>
+                            <div class="stat-value" id="stats-best-streak">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຈຳນວນເກມທັງໝົດ</div>
+                            <div class="stat-value" id="stats-total-games">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຄຳຕອບທີ່ຖືກຕ້ອງ</div>
+                            <div class="stat-value" id="stats-total-correct">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຄວາມຖືກຕ້ອງທັງໝົດ</div>
+                            <div class="stat-value-with-bar">
+                                <span id="stats-overall-accuracy">0%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="accuracy-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Difficulty Progress -->
+                <div class="bg-[#3e4043] p-4 rounded-xl">
+                    <h3 class="text-xl font-bold text-main-color mb-3">🎯 ຄວາມກ້າວໜ້າຕາມລະດັບ</h3>
+                    <div class="space-y-3">
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🟢</span>
+                                <span class="difficulty-name">ງ່າຍ</span>
+                                <span class="difficulty-score" id="easy-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="easy-progress"></div>
+                            </div>
+                        </div>
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🟡</span>
+                                <span class="difficulty-name">ປານກາງ</span>
+                                <span class="difficulty-score" id="medium-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="medium-progress"></div>
+                            </div>
+                        </div>
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🔴</span>
+                                <span class="difficulty-name">ຍາກ</span>
+                                <span class="difficulty-score" id="hard-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="hard-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 justify-center">
+                <button id="stats-back-btn" class="btn btn-secondary">ກັບຄືນ</button>
+                <button id="reset-progress-btn" class="btn btn-danger">ລຶບຂໍ້ມູນ</button>
             </div>
         </div>
     </div>
@@ -1223,12 +1469,19 @@
 
         function updateUI() {
             bestStreakEl.textContent = stats.bestStreak;
-            document.getElementById('stats-display-name').textContent = displayName || 'ບໍ່ມີຊື່';
+            
+            // Update enhanced profile
+            updateEnhancedProfile();
+            
+            // Update original stats elements (for compatibility)
+            const statsDisplayName = document.getElementById('stats-display-name');
+            if (statsDisplayName) statsDisplayName.textContent = displayName || 'ບໍ່ມີຊື່';
+            
             document.getElementById('stats-best-streak').textContent = stats.bestStreak;
             document.getElementById('results-best-streak').textContent = stats.bestStreak;
             document.getElementById('stats-total-games').textContent = stats.totalGames;
             document.getElementById('stats-total-correct').textContent = stats.totalCorrect;
-            document.getElementById('stats-total-mistakes').textContent = stats.totalMistakes;
+            
             const totalPlays = stats.totalCorrect + stats.totalMistakes;
             const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
             document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
