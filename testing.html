@@ -391,7 +391,7 @@
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
             <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
             <p class="text-lg text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
-            <p class="text-sm text-sub-color">(Testing Version - Using Google Sheets)</p>
+            <p class="text-sm text-sub-color">(Testing Version)</p>
             
 
             
@@ -459,7 +459,7 @@
                 <div id="timer-bar" class="timer-bar"></div>
             </div>
             
-            <!-- ADDED: Context display area for showing word from Google Sheets Column A -->
+            <!-- Context display area for showing word -->
             <div class="mb-6 text-center">
                 <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
                 <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
@@ -722,7 +722,7 @@
             totalMistakes: 0,
         };
         
-        let wordList = [];
+
 
 
 
@@ -1176,10 +1176,6 @@
             // Display player name in game screen
             gamePlayerName.textContent = displayName;
 
-            if (wordList.length === 0) {
-                alert("ບໍ່ມີຂໍ້ມູນຄຳສັບ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ Google Sheets");
-                return;
-            }
             playSound('start');
             
             // Save current settings and player data before navigation
