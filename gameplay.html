@@ -227,7 +227,7 @@
             font-weight: 500;
         }
         
-        .life-text, .life-count {
+        .life-text {
             font-weight: bold;
             color: var(--main-color);
             font-size: 1.1rem;
@@ -255,7 +255,6 @@
                         <span class="heart active"></span>
                         <span class="heart active"></span>
                     </div>
-                    <span class="life-count">3/3</span>
                 </div>
                 <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
             </div>
@@ -351,13 +350,14 @@
              <div class="space-y-4">
                  <button onclick="playAgain()" class="btn text-xl px-8 py-3">ຫຼິ້ນອີກຄັ້ງ</button>
                  <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປທີ່ເມນູ</button>
+                 <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
              </div>
          </div>
         
         <!-- Footer -->
         <div class="absolute bottom-4 right-4 text-xs text-sub-color">
             <p>Game Mode</p>
-            <p>Version: 1.3.0-Testing</p>
+            <p>Version: 1.4.0-Testing</p>
         </div>
     </div>
 
@@ -389,7 +389,7 @@
         // Life System
         let playerLives = 3;
         let maxLives = 3;
-        let heartsContainer, lifeCountEl, motivationText;
+        let heartsContainer, motivationText;
         
         // Settings from URL parameters
         let settings = {
@@ -542,7 +542,7 @@
         // Life System Functions
         function updateLifeDisplay() {
             const hearts = heartsContainer.querySelectorAll('.heart');
-            lifeCountEl.textContent = `${playerLives}/${maxLives}`;
+
             
             hearts.forEach((heart, index) => {
                 if (index < playerLives) {
@@ -947,6 +947,10 @@
             window.location.href = 'testing.html';
         }
 
+        function addWords() {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSefITi3AKGdPc843ID2PffFaYei-O7oouF0XAAciiK3seA55Q/viewform', '_blank');
+        }
+
         // Enhanced URL Parameter Functions with validation and debugging
         function getURLParameters() {
             console.log('🔗 Reading URL parameters...');
@@ -1034,7 +1038,6 @@
              
              // Initialize DOM references
              heartsContainer = document.querySelector('.hearts');
-             lifeCountEl = document.querySelector('.life-count');
              motivationText = document.querySelector('.motivation-text');
              
              // Initialize background music
