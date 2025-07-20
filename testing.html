@@ -371,6 +371,12 @@
             background-color: #c82333;
         }
         
+        @keyframes achievementUnlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.05); }
+        }
+        
         /* Toggle Switch Styles */
         .switch {
             position: relative;
@@ -648,7 +654,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.6.1 - Testing</p>
+                <p>Version: 1.7.0 - Testing</p>
             </div>
         </div>
 
@@ -1716,6 +1722,123 @@
             updateUI(); // Make sure stats screen shows latest name
             switchScreen('stats');
         });
+
+        // Enhanced Account Functions
+        function updateEnhancedProfile() {
+            // Update profile info
+            document.getElementById('profile-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update join date (from localStorage or set today)
+            const joinDate = localStorage.getItem('joinDate') || new Date().toLocaleDateString('lo-LA');
+            document.getElementById('join-date').textContent = joinDate;
+            if (!localStorage.getItem('joinDate')) {
+                localStorage.setItem('joinDate', joinDate);
+            }
+            
+            // Update current rank (mock calculation)
+            const rank = calculateUserRank();
+            document.getElementById('current-rank').textContent = `#${rank}`;
+            
+            // Update progress bars
+            updateProgressBars();
+            
+            // Update achievements
+            updateAchievements();
+            
+            // Update difficulty scores
+            updateDifficultyScores();
+        }
+        
+        function calculateUserRank() {
+            // Simple rank calculation based on best streak
+            if (stats.bestStreak >= 50) return Math.floor(Math.random() * 10) + 1;
+            if (stats.bestStreak >= 25) return Math.floor(Math.random() * 25) + 10;
+            if (stats.bestStreak >= 10) return Math.floor(Math.random() * 50) + 25;
+            return Math.floor(Math.random() * 100) + 50;
+        }
+        
+        function updateProgressBars() {
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // Update accuracy progress bar
+            const accuracyProgress = document.getElementById('accuracy-progress');
+            if (accuracyProgress) {
+                setTimeout(() => {
+                    accuracyProgress.style.width = `${accuracy}%`;
+                }, 100);
+            }
+        }
+        
+        function updateDifficultyScores() {
+            // Update difficulty best scores from stats
+            document.getElementById('easy-best-score').textContent = stats.difficulties?.easy?.bestStreak || 0;
+            document.getElementById('medium-best-score').textContent = stats.difficulties?.medium?.bestStreak || 0;
+            document.getElementById('hard-best-score').textContent = stats.difficulties?.hard?.bestStreak || 0;
+            
+            // Update difficulty progress bars
+            const maxScore = 20; // Assuming max target score is 20
+            updateDifficultyProgress('easy', stats.difficulties?.easy?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('medium', stats.difficulties?.medium?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('hard', stats.difficulties?.hard?.bestStreak || 0, maxScore);
+        }
+        
+        function updateDifficultyProgress(difficulty, score, maxScore) {
+            const progressBar = document.getElementById(`${difficulty}-progress`);
+            if (progressBar) {
+                const percentage = Math.min((score / maxScore) * 100, 100);
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 200);
+            }
+        }
+        
+        function updateAchievements() {
+            const achievements = calculateAchievements();
+            achievements.forEach(achievement => {
+                const badge = document.querySelector(`[data-achievement="${achievement}"]`);
+                if (badge && !badge.classList.contains('unlocked')) {
+                    badge.classList.remove('locked');
+                    badge.classList.add('unlocked');
+                    // Add unlock animation
+                    badge.style.animation = 'achievementUnlock 0.6s ease';
+                }
+            });
+        }
+        
+        function calculateAchievements() {
+            const unlocked = [];
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // First game
+            if (stats.totalGames >= 1) unlocked.push('first-game');
+            
+            // Streak achievements
+            if (stats.bestStreak >= 5) unlocked.push('streak-5');
+            if (stats.bestStreak >= 10) unlocked.push('streak-10');
+            
+            // Perfect accuracy
+            if (accuracy === 100 && stats.totalCorrect >= 5) unlocked.push('perfectionist');
+            
+            // Word master
+            if (stats.totalCorrect >= 50) unlocked.push('word-master');
+            
+            // Difficulty master (played all levels)
+            if (stats.difficulties?.easy?.bestStreak > 0 && 
+                stats.difficulties?.medium?.bestStreak > 0 && 
+                stats.difficulties?.hard?.bestStreak > 0) {
+                unlocked.push('difficulty-master');
+            }
+            
+            // Consistent player (7 days - mock for now)
+            if (stats.totalGames >= 7) unlocked.push('consistent-player');
+            
+            // Champion (top rank - mock)
+            if (stats.bestStreak >= 50) unlocked.push('champion');
+            
+            return unlocked;
+        }
         
         // Tab Navigation
         document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
@@ -1757,6 +1880,44 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Enhanced account button handlers
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+            }
+        });
+        
+        document.getElementById('reset-progress-btn').addEventListener('click', () => {
+            if (confirm('ເຈົ້າແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້!')) {
+                // Reset all stats
+                stats = {
+                    bestStreak: 0,
+                    totalGames: 0,
+                    totalCorrect: 0,
+                    totalMistakes: 0,
+                    difficulties: {
+                        easy: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        medium: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        hard: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 }
+                    }
+                };
+                localStorage.removeItem('gameStats');
+                localStorage.removeItem('joinDate');
+                
+                // Reset achievement badges
+                document.querySelectorAll('.achievement-badge').forEach(badge => {
+                    badge.classList.remove('unlocked');
+                    badge.classList.add('locked');
+                });
+                
+                updateUI();
+                alert('ຂໍ້ມູນທັງໝົດຖືກລຶບແລ້ວ!');
+            }
+        });
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Escape') {
