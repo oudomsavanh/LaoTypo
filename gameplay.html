@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ? - Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #e2b714;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
+        }
+        body {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .btn {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1rem;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background-color: var(--sub-color);
+            color: var(--text-color);
+        }
+        .btn-back {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background-color: var(--sub-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        .btn-back:hover {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+        }
+        .word-card {
+            background-color: #3e4043;
+            border: 2px solid #4a4d50;
+            border-radius: 1rem;
+            padding: 2rem;
+            font-size: 1.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .word-card:hover {
+            border-color: var(--main-color);
+            transform: scale(1.02);
+        }
+        .word-card.focused {
+            border-color: var(--main-color);
+            box-shadow: 0 0 0 3px rgba(226, 183, 20, 0.3);
+        }
+        .word-card.feedback-correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+        }
+        .word-card.feedback-incorrect {
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+        .timer-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--correct-color) 0%, var(--main-color) 50%, var(--error-color) 100%);
+            border-radius: 1rem;
+            transform-origin: left;
+            transition: transform 0.1s linear;
+        }
+        
+        /* Life Bar System Styles */
+        .life-bar-header {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .life-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hearts {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .heart {
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .heart.active {
+            animation: heartPulse 3s infinite;
+        }
+        
+        .heart.lost {
+            opacity: 0.3;
+            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            transform: scale(0.8);
+        }
+        
+        .heart.losing {
+            animation: heartBreak 0.6s ease-in-out forwards;
+        }
+        
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes heartBreak {
+            0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+            25% { transform: scale(1.2) rotate(5deg); color: #ff4444; }
+            50% { transform: scale(1.3) rotate(-5deg); color: #ff0000; }
+            75% { transform: scale(0.9) rotate(2deg); opacity: 0.7; }
+            100% { transform: scale(0.8); opacity: 0.3; filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        }
+        
+        @keyframes lifeBarFlash {
+            0%, 100% { background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%); }
+            50% { background: linear-gradient(135deg, #ca4754 0%, #8b2635 100%); }
+        }
+        
+        .motivation-text {
+            font-size: 1rem;
+            color: var(--sub-color);
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .life-text, .life-count {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Back Button -->
+        <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ເມນູ</button>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen active">
+            <!-- Life Bar System -->
+            <div class="life-bar-header mb-6">
+                <div class="life-container">
+                    <span class="life-text">Lives:</span>
+                    <div class="hearts">
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                    </div>
+                    <span class="life-count">3/3</span>
+                </div>
+                <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6 text-2xl">
+                <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
+                <div class="text-sub-color text-center">Player: <span id="game-player-name" class="text-text-color font-bold"></span></div>
+                <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+            </div>
+            <div id="timer-container" class="h-2 mb-6">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+            
+            <!-- Context display area for showing word from Google Sheets Column A -->
+            <div class="mb-6 text-center">
+                <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+            </div>
+            
+            <!-- Difficulty level display with color coding -->
+            <div class="mb-4 text-center">
+                <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
+                <span id="difficulty-display" class="font-bold"></span>
+            </div>
+            
+            <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
+                <div id="word-card-left" class="word-card"></div>
+                <div id="word-card-right" class="word-card"></div>
+            </div>
+            <p class="text-sub-color">ໃຊ້ <kbd class="border-b-2 border-sub-color">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 border-sub-color">D</kbd> ສຳລັບຂວາ.</p>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen space-y-6">
+            <h2 class="text-4xl font-bold text-main-color">ເກມຈົບ</h2>
+            <div class="text-2xl space-y-2">
+                <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
+                <p>ຄວາມແມ່ນຍຳ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
+            </div>
+            <div id="evaluation-result" class="text-xl font-bold"></div>
+            <div class="space-y-4">
+                <button onclick="playAgain()" class="btn text-xl px-8 py-3">ຫຼິ້ນອີກຄັ້ງ</button>
+                <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປທີ່ເມນູ</button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="absolute bottom-4 right-4 text-xs text-sub-color">
+            <p>Game Mode</p>
+            <p>Version demo16</p>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets CSV URL
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1cAOkI1IxBNMRPaRF0dqtBNgc6fE-3dthHGOvmq_5i04/export?format=csv';
+
+        // DOM Elements
+        const currentStreakEl = document.getElementById('current-streak');
+        const bestStreakEl = document.getElementById('best-streak');
+        const wordCardLeft = document.getElementById('word-card-left');
+        const wordCardRight = document.getElementById('word-card-right');
+        const timerBar = document.getElementById('timer-bar');
+        const contextDisplay = document.getElementById('context-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const gamePlayerName = document.getElementById('game-player-name');
+
+        // Game State & Settings - Will be populated from URL parameters
+        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
+        let currentStreak = 0;
+        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
+        let timerInterval;
+        let gameInProgress = false;
+        let displayName = '';
+        let wordList = [];
+        
+        // Life System
+        let playerLives = 3;
+        let maxLives = 3;
+        let heartsContainer, lifeCountEl, motivationText;
+        
+        // Settings from URL parameters
+        let settings = {
+            difficulty: 'easy',
+            timer: false,
+            sound: true,
+            music: false,
+        };
+
+        let stats = {
+            bestStreak: 0,
+            totalGames: 0,
+            totalCorrect: 0,
+            totalMistakes: 0,
+        };
+
+        // Background Music System
+        let backgroundMusic = null;
+        
+        function initializeBackgroundMusic() {
+            backgroundMusic = document.createElement('audio');
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.3;
+            backgroundMusic.preload = 'none';
+            // backgroundMusic.src = 'background-music.wav';
+        }
+        
+        function toggleBackgroundMusic() {
+            if (!backgroundMusic) return;
+            
+            if (settings.music && backgroundMusic.src) {
+                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
+            } else {
+                backgroundMusic.pause();
+            }
+        }
+
+        // Load word lists from Google Sheets
+        async function loadWordListsFromGoogleSheets() {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+
+                wordList = lines
+                    .slice(1) // Skip header row
+                    .map(line => {
+                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
+                        if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
+                            return {
+                                context: columns[0],    // Column A - context to display
+                                correct: columns[1],    // Column B - correct answer
+                                wrong: columns[2],      // Column C - wrong answer
+                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null);
+
+                console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
+
+                if (wordList.length === 0) {
+                    throw new Error("No valid entries found in the spreadsheet");
+                }
+
+            } catch (error) {
+                console.error("Error loading word list from Google Sheets:", error);
+                // Fallback data
+                wordList = [
+                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
+                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
+                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 }
+                ];
+                console.log("Using fallback word list");
+            }
+        }
+
+        function getDifficultyLabel(level) {
+            switch(level) {
+                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
+                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
+                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            }
+        }
+
+        function filterWordsByDifficulty(difficulty) {
+            let targetLevel;
+            switch(difficulty) {
+                case 'easy': targetLevel = 1; break;
+                case 'medium': targetLevel = 2; break;
+                case 'hard': targetLevel = 3; break;
+                default: targetLevel = 1;
+            }
+            
+            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
+            return filtered.length > 0 ? filtered : wordList;
+        }
+
+        // Life System Functions
+        function updateLifeDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            lifeCountEl.textContent = `${playerLives}/${maxLives}`;
+            
+            hearts.forEach((heart, index) => {
+                if (index < playerLives) {
+                    heart.classList.remove('lost');
+                    heart.classList.add('active');
+                } else {
+                    heart.classList.add('lost');
+                    heart.classList.remove('active');
+                }
+            });
+            
+            updateMotivationText();
+        }
+
+        function loseLife() {
+            if (playerLives > 0) {
+                playerLives--;
+                
+                const hearts = heartsContainer.querySelectorAll('.heart');
+                const heartToBreak = hearts[playerLives];
+                heartToBreak.classList.add('losing');
+                
+                setTimeout(() => {
+                    heartToBreak.classList.remove('losing');
+                    updateLifeDisplay();
+                    
+                    if (playerLives === 0) {
+                        gameOver();
+                    } else {
+                        showLifeWarning();
+                        setTimeout(nextRound, 1500);
+                    }
+                }, 600);
+            }
+        }
+
+        function updateMotivationText() {
+            switch(playerLives) {
+                case 3:
+                    motivationText.textContent = "You've got 3 lives—spend them wisely!";
+                    motivationText.style.color = 'var(--correct-color)';
+                    break;
+                case 2:
+                    motivationText.textContent = "Be careful! 2 lives remaining.";
+                    motivationText.style.color = 'var(--main-color)';
+                    break;
+                case 1:
+                    motivationText.textContent = "Last chance! Don't waste it!";
+                    motivationText.style.color = 'var(--error-color)';
+                    break;
+                case 0:
+                    // This case will use endGame() evaluation instead
+                    break;
+            }
+        }
+
+        function showLifeWarning() {
+            const lifeBar = document.querySelector('.life-bar-header');
+            lifeBar.style.animation = 'lifeBarFlash 0.5s ease-in-out 2';
+            
+            setTimeout(() => {
+                lifeBar.style.animation = '';
+            }, 1000);
+        }
+
+        function resetLives() {
+            playerLives = maxLives;
+            updateLifeDisplay();
+        }
+
+        function gameOver() {
+            gameInProgress = false;
+            clearInterval(timerInterval);
+            
+            // Show results screen with endGame() evaluation for case 0
+            switchScreen('results');
+            endGame();
+        }
+
+        // Local Storage Functions
+        function loadUserData() {
+            try {
+                const savedData = localStorage.getItem('laoTypoGame_userData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    stats = { ...stats, ...data.stats };
+                    displayName = data.displayName || '';
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+            }
+        }
+
+        function saveUserData() {
+            try {
+                const userData = {
+                    settings,
+                    stats,
+                    displayName,
+                    lastPlayed: new Date().toISOString()
+                };
+                localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
+            } catch (error) {
+                console.error("Error saving user data:", error);
+            }
+        }
+
+        // Game Functions
+        function switchScreen(screenName) {
+            const screens = {
+                game: document.getElementById('game-screen'),
+                results: document.getElementById('results-screen')
+            };
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            if (screens[screenName]) screens[screenName].classList.add('active');
+        }
+
+        function nextRound() {
+            currentStreakEl.textContent = currentStreak;
+            bestStreakEl.textContent = stats.bestStreak;
+            wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            
+            const availableWords = filterWordsByDifficulty(settings.difficulty);
+            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+            
+            contextDisplay.textContent = currentEntry.context;
+            
+            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+            difficultyDisplay.textContent = difficultyInfo.text;
+            difficultyDisplay.style.color = difficultyInfo.color;
+            
+            correctAnswer = currentEntry.correct;
+            wrongAnswer = currentEntry.wrong;
+
+            correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
+
+            if (correctWordPosition === 'left') {
+                wordCardLeft.textContent = correctAnswer;
+                wordCardRight.textContent = wrongAnswer;
+            } else {
+                wordCardLeft.textContent = wrongAnswer;
+                wordCardRight.textContent = correctAnswer;
+            }
+            startTimer();
+        }
+
+        function handleSelection(selectedPosition) {
+            if (!gameInProgress) return;
+            clearInterval(timerInterval);
+            const isCorrect = selectedPosition === correctWordPosition;
+            const selectedCard = selectedPosition === 'left' ? wordCardLeft : wordCardRight;
+
+            if (isCorrect) {
+                playSound('correct');
+                selectedCard.classList.add('feedback-correct');
+                currentStreak++;
+                if (currentStreak > stats.bestStreak) {
+                    stats.bestStreak = currentStreak;
+                }
+                setTimeout(nextRound, 400);
+            } else {
+                playSound('incorrect');
+                selectedCard.classList.add('feedback-incorrect');
+                stats.totalMistakes += 1;
+                
+                loseLife();
+            }
+        }
+
+        function endGame() {
+            gameInProgress = false;
+            stats.totalCorrect += currentStreak;
+
+            document.getElementById('final-streak').textContent = currentStreak;
+            
+            const sessionAccuracy = ((currentStreak) / (currentStreak + 1)) * 100;
+            document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
+            
+            const evaluationEl = document.getElementById('evaluation-result');
+            if (sessionAccuracy > 0 && sessionAccuracy < 30) {
+                evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
+                evaluationEl.style.color = 'var(--error-color)';
+            } else if (sessionAccuracy >= 30 && sessionAccuracy < 50) {
+                evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
+                evaluationEl.style.color = 'var(--warning-color)';
+            } else if (sessionAccuracy >= 50 && sessionAccuracy < 70) {
+                evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
+                evaluationEl.style.color = 'var(--main-color)';
+            } else if (sessionAccuracy >= 70 && sessionAccuracy < 80) {
+                evaluationEl.textContent = "ລູກຊອດລາວ";
+                evaluationEl.style.color = 'var(--main-color)';
+            } else {
+                evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
+                evaluationEl.style.color = 'var(--correct-color)'; 
+            }
+
+            saveUserData();
+        }
+
+        function startTimer() {
+            if (!settings.timer) return;
+            
+            let timeLeft = 5000; // 5 seconds
+            const interval = 50;
+            
+            timerInterval = setInterval(() => {
+                timeLeft -= interval;
+                const percentage = Math.max(0, timeLeft / 5000);
+                timerBar.style.transform = `scaleX(${percentage})`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleSelection('timeout');
+                }
+            }, interval);
+        }
+
+        function playSound(type) {
+            if (!settings.sound) return;
+            
+            try {
+                const synth = new Tone.Synth().toDestination();
+                switch(type) {
+                    case 'correct':
+                        synth.triggerAttackRelease('C5', '0.1');
+                        break;
+                    case 'incorrect':
+                        synth.triggerAttackRelease('C3', '0.3');
+                        break;
+                    case 'start':
+                        synth.triggerAttackRelease('G4', '0.2');
+                        break;
+                }
+            } catch (error) {
+                console.log('Sound failed:', error);
+            }
+        }
+
+        // Navigation Functions
+        function playAgain() {
+            // Reset game state
+            currentStreak = 0;
+            stats.totalGames++;
+            gameInProgress = true;
+            resetLives();
+            
+            switchScreen('game');
+            nextRound();
+        }
+
+        function backToMenu() {
+            window.location.href = 'testing.html';
+        }
+
+        // URL Parameter Functions
+        function getURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            displayName = urlParams.get('player') || 'Player';
+            settings.difficulty = urlParams.get('difficulty') || 'easy';
+            settings.timer = urlParams.get('timer') === 'true';
+            settings.sound = urlParams.get('sound') === 'true';
+            settings.music = urlParams.get('music') === 'true';
+            
+            console.log('Loaded settings from URL:', settings);
+            console.log('Player name:', displayName);
+        }
+
+        // Event Listeners
+        document.getElementById('back-to-menu-btn').addEventListener('click', backToMenu);
+
+        wordCardLeft.addEventListener('click', () => handleSelection('left'));
+        wordCardRight.addEventListener('click', () => handleSelection('right'));
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameInProgress) return;
+            
+            if (e.key.toLowerCase() === 'a') {
+                wordCardLeft.classList.add('focused');
+                handleSelection('left');
+            } else if (e.key.toLowerCase() === 'd') {
+                wordCardRight.classList.add('focused');
+                handleSelection('right');
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key.toLowerCase() === 'a') wordCardLeft.classList.remove('focused');
+            if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
+        });
+
+        // Initialization
+        window.onload = async () => {
+            // Get parameters from URL
+            getURLParameters();
+            
+            // Initialize DOM references
+            heartsContainer = document.querySelector('.hearts');
+            lifeCountEl = document.querySelector('.life-count');
+            motivationText = document.querySelector('.motivation-text');
+            
+            // Initialize background music
+            initializeBackgroundMusic();
+            
+            // Load user data and word lists
+            loadUserData();
+            await loadWordListsFromGoogleSheets();
+            
+            // Set up game
+            gamePlayerName.textContent = displayName;
+            bestStreakEl.textContent = stats.bestStreak;
+            currentStreak = 0;
+            stats.totalGames++;
+            gameInProgress = true;
+            resetLives();
+            
+            // Start background music if enabled
+            toggleBackgroundMusic();
+            
+            // Start first round
+            nextRound();
+        };
+    </script>
+</body>
+</html>
