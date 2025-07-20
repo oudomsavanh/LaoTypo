@@ -377,6 +377,82 @@
             100% { transform: scale(1.05); }
         }
         
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+            border: 2px solid var(--main-color);
+        }
+        
+        .account-name {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        
+        .account-rank {
+            font-size: 0.8rem;
+            color: var(--sub-color);
+        }
+        
+        .quick-stats {
+            border-top: 1px solid rgba(226, 183, 20, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+        
+        .quick-stat .stat-label {
+            color: var(--sub-color);
+        }
+        
+        .quick-stat .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
         /* Toggle Switch Styles */
         .switch {
             position: relative;
@@ -654,7 +730,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.7.0 - Testing</p>
+                <p>Version: 1.7.2 - Testing</p>
             </div>
         </div>
 
@@ -717,135 +793,18 @@
             </div>
         </div>
 
-        <!-- Enhanced Account Screen -->
-        <div id="stats-screen" class="screen space-y-6 pb-8">
-            <!-- Profile Header -->
-            <div class="bg-gradient-to-r from-[#3e4043] to-[#2c2e31] p-6 rounded-xl border-2 border-main-color">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="profile-avatar" id="user-avatar">👤</div>
-                    <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-main-color" id="profile-display-name">ຜູ້ຫຼິ້ນ</h2>
-                        <p class="text-sub-color text-sm">ເລີ່ມຫຼິ້ນເມື່ອ: <span id="join-date">ມື້ນີ້</span></p>
-                        <button id="edit-profile-btn" class="text-xs text-main-color hover:underline mt-1">✏️ ແກ້ໄຂໂປຣໄຟລ໌</button>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-3xl font-bold text-main-color" id="current-rank">#-</div>
-                        <div class="text-xs text-sub-color">ອັນດັບປະຈຸບັນ</div>
-                    </div>
-                </div>
+        <!-- Simple Stats Screen (for backward compatibility) -->
+        <div id="stats-screen" class="screen space-y-6">
+            <h2 class="text-4xl font-bold text-main-color">ສະຖິຕິສ່ວນຕົວ</h2>
+            <div class="text-xl space-y-3 text-left max-w-md mx-auto bg-[#3e4043] p-6 rounded-lg">
+                <p>ຊື່: <span id="stats-display-name" class="font-bold text-white float-right"></span></p>
+                <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-bold text-white float-right">0</span></p>
+                <p>ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-bold text-white float-right">0</span></p>
+                <p>ຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-bold text-white float-right">0</span></p>
+                <p>ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-bold text-white float-right">0%</span></p>
             </div>
-
-            <!-- Achievement Badges -->
-            <div class="bg-[#3e4043] p-4 rounded-xl">
-                <h3 class="text-xl font-bold text-main-color mb-3">🏆 ລາງວັນທີ່ໄດ້ຮັບ</h3>
-                <div class="grid grid-cols-4 gap-2" id="achievement-badges">
-                    <div class="achievement-badge locked" data-achievement="first-game">
-                        <div class="badge-icon">🎮</div>
-                        <div class="badge-name">ເກມທຳອິດ</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="streak-5">
-                        <div class="badge-icon">🔥</div>
-                        <div class="badge-name">5 ຄຳຕິດຕໍ່</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="streak-10">
-                        <div class="badge-icon">⚡</div>
-                        <div class="badge-name">10 ຄຳຕິດຕໍ່</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="perfectionist">
-                        <div class="badge-icon">💯</div>
-                        <div class="badge-name">100% ແມ່ນຍຳ</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="difficulty-master">
-                        <div class="badge-icon">👑</div>
-                        <div class="badge-name">ເຊື່ອງ ທຸກ ລະດັບ</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="consistent-player">
-                        <div class="badge-icon">📅</div>
-                        <div class="badge-name">ຫຼິ້ນ 7 ມື້ຕິດ</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="word-master">
-                        <div class="badge-icon">📚</div>
-                        <div class="badge-name">500 ຄຳຖືກ</div>
-                    </div>
-                    <div class="achievement-badge locked" data-achievement="champion">
-                        <div class="badge-icon">🥇</div>
-                        <div class="badge-name">ແຊມ ອັນດັບ 1</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Stats with Visual Progress -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Personal Stats -->
-                <div class="bg-[#3e4043] p-4 rounded-xl">
-                    <h3 class="text-xl font-bold text-main-color mb-3">📊 ສະຖິຕິສ່ວນຕົວ</h3>
-                    <div class="space-y-3">
-                        <div class="stat-item">
-                            <div class="stat-label">ຄະແນນທີ່ດີທີ່ສຸດ</div>
-                            <div class="stat-value" id="stats-best-streak">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">ຈຳນວນເກມທັງໝົດ</div>
-                            <div class="stat-value" id="stats-total-games">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">ຄຳຕອບທີ່ຖືກຕ້ອງ</div>
-                            <div class="stat-value" id="stats-total-correct">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">ຄວາມຖືກຕ້ອງທັງໝົດ</div>
-                            <div class="stat-value-with-bar">
-                                <span id="stats-overall-accuracy">0%</span>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="accuracy-progress"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Difficulty Progress -->
-                <div class="bg-[#3e4043] p-4 rounded-xl">
-                    <h3 class="text-xl font-bold text-main-color mb-3">🎯 ຄວາມກ້າວໜ້າຕາມລະດັບ</h3>
-                    <div class="space-y-3">
-                        <div class="difficulty-progress">
-                            <div class="difficulty-header">
-                                <span class="difficulty-icon">🟢</span>
-                                <span class="difficulty-name">ງ່າຍ</span>
-                                <span class="difficulty-score" id="easy-best-score">0</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="easy-progress"></div>
-                            </div>
-                        </div>
-                        <div class="difficulty-progress">
-                            <div class="difficulty-header">
-                                <span class="difficulty-icon">🟡</span>
-                                <span class="difficulty-name">ປານກາງ</span>
-                                <span class="difficulty-score" id="medium-best-score">0</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="medium-progress"></div>
-                            </div>
-                        </div>
-                        <div class="difficulty-progress">
-                            <div class="difficulty-header">
-                                <span class="difficulty-icon">🔴</span>
-                                <span class="difficulty-name">ຍາກ</span>
-                                <span class="difficulty-score" id="hard-best-score">0</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="hard-progress"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-3 justify-center">
-                <button id="stats-back-btn" class="btn btn-secondary">ກັບຄືນ</button>
-                <button id="reset-progress-btn" class="btn btn-danger">ລຶບຂໍ້ມູນ</button>
+            <div>
+                <button id="stats-back-btn" class="btn">ກັບຄືນ</button>
             </div>
         </div>
     </div>
@@ -946,6 +905,49 @@
                 <div class="text-center">
                     <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-main-color">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name" id="account-display-name">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-rank">ອັນດັບ: <span id="account-rank">#-</span></div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">🏆 ຄະແນນດີສຸດ:</span>
+                        <span class="stat-value" id="account-best-streak">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🎯 ຄວາມແມ່ນຍຳ:</span>
+                        <span class="stat-value" id="account-accuracy">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🏅 ລາງວັນ:</span>
+                        <span class="stat-value" id="account-achievements">0/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
         </div>
     </div>
@@ -1719,34 +1721,35 @@
         });
         // Leaderboard is already handled by leaderboard-nav-btn
         document.getElementById('account-nav-btn').addEventListener('click', () => {
-            updateUI(); // Make sure stats screen shows latest name
-            switchScreen('stats');
+            updateAccountPanel(); // Update account panel with latest data
+            document.getElementById('account-panel').classList.remove('hidden');
         });
 
         // Enhanced Account Functions
         function updateEnhancedProfile() {
-            // Update profile info
-            document.getElementById('profile-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            // This function is kept for backward compatibility with stats screen
+            // The main account data is now handled by updateAccountPanel()
+        }
+        
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
             
-            // Update join date (from localStorage or set today)
-            const joinDate = localStorage.getItem('joinDate') || new Date().toLocaleDateString('lo-LA');
-            document.getElementById('join-date').textContent = joinDate;
-            if (!localStorage.getItem('joinDate')) {
-                localStorage.setItem('joinDate', joinDate);
-            }
-            
-            // Update current rank (mock calculation)
+            // Update rank
             const rank = calculateUserRank();
-            document.getElementById('current-rank').textContent = `#${rank}`;
+            document.getElementById('account-rank').textContent = `#${rank}`;
             
-            // Update progress bars
-            updateProgressBars();
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = stats.bestStreak;
             
-            // Update achievements
-            updateAchievements();
+            // Calculate accuracy
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
             
-            // Update difficulty scores
-            updateDifficultyScores();
+            // Calculate achievement count
+            const achievements = calculateAchievements();
+            document.getElementById('account-achievements').textContent = `${achievements.length}/8`;
         }
         
         function calculateUserRank() {
@@ -1880,6 +1883,26 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Account panel controls
+        const accountPanel = document.getElementById('account-panel');
+        document.getElementById('close-account-btn').addEventListener('click', () => accountPanel.classList.add('hidden'));
+        
+        document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+                updateAccountPanel();
+            }
+        });
+        
+        document.getElementById('view-full-profile-btn').addEventListener('click', () => {
+            // Close account panel and navigate to full profile page
+            accountPanel.classList.add('hidden');
+            window.location.href = 'player_account_info.html';
+        });
         
         // Enhanced account button handlers
         document.getElementById('edit-profile-btn').addEventListener('click', () => {

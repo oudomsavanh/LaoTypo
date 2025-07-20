@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cache Busting Headers v1.7.2 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ບັນຊີຜູ້ຫຼິ້ນ - LaoTypo</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e2b714">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'main-color': '#e2b714',
+                        'bg-color': '#2c2e31',
+                        'sub-color': '#646669',
+                        'text-color': '#d1d0c5',
+                        'correct-color': '#00ca4e',
+                        'incorrect-color': '#ca4754'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #e2b714;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --correct-color: #00ca4e;
+            --incorrect-color: #ca4754;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Noto Sans Lao', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .btn {
+            background-color: var(--sub-color);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #7a7c7e;
+        }
+        .btn-primary {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+        }
+        .btn-primary:hover {
+            background-color: #f5c93d;
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--sub-color);
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Enhanced Account Screen Styles */
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--bg-color);
+            border: 4px solid var(--main-color);
+        }
+        
+        .achievement-badge {
+            background: rgba(62, 64, 67, 0.5);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-color: var(--main-color);
+            box-shadow: 0 4px 12px rgba(226, 183, 20, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        .badge-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .badge-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .achievement-badge.unlocked .badge-name {
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 1rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .stat-value-with-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        
+        .progress-bar {
+            width: 120px;
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color) 0%, #f5c93d 100%);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .difficulty-progress {
+            margin-bottom: 16px;
+        }
+        
+        .difficulty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .difficulty-icon {
+            font-size: 1.5rem;
+        }
+        
+        .difficulty-name {
+            flex: 1;
+            margin-left: 12px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .difficulty-score {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        @keyframes achievementUnlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4">
+        <!-- Navigation Header -->
+        <nav class="mb-6">
+            <div class="flex items-center justify-between">
+                <button id="back-to-game-btn" class="btn btn-secondary">
+                    ← ກັບໄປເກມ
+                </button>
+                <h1 class="text-2xl font-bold text-main-color">ບັນຊີຜູ້ຫຼິ້ນ</h1>
+                <div></div>
+            </div>
+        </nav>
+
+        <!-- Enhanced Account Content -->
+        <div class="max-w-4xl mx-auto space-y-6">
+            <!-- Profile Header -->
+            <div class="bg-gradient-to-r from-[#3e4043] to-[#2c2e31] p-6 rounded-xl border-2 border-main-color">
+                <div class="flex items-center gap-6 mb-4">
+                    <div class="profile-avatar" id="user-avatar">👤</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-main-color" id="profile-display-name">ຜູ້ຫຼິ້ນ</h2>
+                        <p class="text-sub-color">ເລີ່ມຫຼິ້ນເມື່ອ: <span id="join-date">ມື້ນີ້</span></p>
+                        <button id="edit-profile-btn" class="text-sm text-main-color hover:underline mt-2">✏️ ແກ້ໄຂໂປຣໄຟລ໌</button>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-4xl font-bold text-main-color" id="current-rank">#-</div>
+                        <div class="text-sm text-sub-color">ອັນດັບປະຈຸບັນ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievement Badges -->
+            <div class="bg-[#3e4043] p-6 rounded-xl">
+                <h3 class="text-2xl font-bold text-main-color mb-4">🏆 ລາງວັນທີ່ໄດ້ຮັບ</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="achievement-badges">
+                    <div class="achievement-badge locked" data-achievement="first-game">
+                        <div class="badge-icon">🎮</div>
+                        <div class="badge-name">ເກມທຳອິດ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="streak-5">
+                        <div class="badge-icon">🔥</div>
+                        <div class="badge-name">5 ຄຳຕິດຕໍ່</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="streak-10">
+                        <div class="badge-icon">⚡</div>
+                        <div class="badge-name">10 ຄຳຕິດຕໍ່</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="perfectionist">
+                        <div class="badge-icon">💯</div>
+                        <div class="badge-name">100% ແມ່ນຍຳ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="difficulty-master">
+                        <div class="badge-icon">👑</div>
+                        <div class="badge-name">ເຊື່ອງ ທຸກ ລະດັບ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="consistent-player">
+                        <div class="badge-icon">📅</div>
+                        <div class="badge-name">ຫຼິ້ນ 7 ມື້ຕິດ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="word-master">
+                        <div class="badge-icon">📚</div>
+                        <div class="badge-name">500 ຄຳຖືກ</div>
+                    </div>
+                    <div class="achievement-badge locked" data-achievement="champion">
+                        <div class="badge-icon">🥇</div>
+                        <div class="badge-name">ແຊມ ອັນດັບ 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Stats with Visual Progress -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Personal Stats -->
+                <div class="bg-[#3e4043] p-6 rounded-xl">
+                    <h3 class="text-2xl font-bold text-main-color mb-4">📊 ສະຖິຕິສ່ວນຕົວ</h3>
+                    <div class="space-y-4">
+                        <div class="stat-item">
+                            <div class="stat-label">ຄະແນນທີ່ດີທີ່ສຸດ</div>
+                            <div class="stat-value" id="stats-best-streak">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຈຳນວນເກມທັງໝົດ</div>
+                            <div class="stat-value" id="stats-total-games">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຄຳຕອບທີ່ຖືກຕ້ອງ</div>
+                            <div class="stat-value" id="stats-total-correct">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">ຄວາມຖືກຕ້ອງທັງໝົດ</div>
+                            <div class="stat-value-with-bar">
+                                <span id="stats-overall-accuracy">0%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="accuracy-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Difficulty Progress -->
+                <div class="bg-[#3e4043] p-6 rounded-xl">
+                    <h3 class="text-2xl font-bold text-main-color mb-4">🎯 ຄວາມກ້າວໜ້າຕາມລະດັບ</h3>
+                    <div class="space-y-4">
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🟢</span>
+                                <span class="difficulty-name">ງ່າຍ</span>
+                                <span class="difficulty-score" id="easy-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="easy-progress"></div>
+                            </div>
+                        </div>
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🟡</span>
+                                <span class="difficulty-name">ປານກາງ</span>
+                                <span class="difficulty-score" id="medium-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="medium-progress"></div>
+                            </div>
+                        </div>
+                        <div class="difficulty-progress">
+                            <div class="difficulty-header">
+                                <span class="difficulty-icon">🔴</span>
+                                <span class="difficulty-name">ຍາກ</span>
+                                <span class="difficulty-score" id="hard-best-score">0</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="hard-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Management -->
+            <div class="bg-[#3e4043] p-6 rounded-xl">
+                <h3 class="text-2xl font-bold text-main-color mb-4">⚙️ ການຈັດການບັນຊີ</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button id="export-data-btn" class="btn btn-secondary">📤 ນຳອອກຂໍ້ມູນ</button>
+                    <button id="import-data-btn" class="btn btn-secondary">📥 ນຳເຂົ້າຂໍ້ມູນ</button>
+                    <button id="reset-progress-btn" class="btn btn-danger">🗑️ ລຶບຂໍ້ມູນທັງໝົດ</button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center text-sub-color text-sm">
+                <p>Version: 1.7.2 - Testing</p>
+                <p>LaoTypo - Player Account Information</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let displayName = localStorage.getItem('displayName') || '';
+        let stats = JSON.parse(localStorage.getItem('gameStats')) || {
+            bestStreak: 0,
+            totalGames: 0,
+            totalCorrect: 0,
+            totalMistakes: 0,
+            difficulties: {
+                easy: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                medium: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                hard: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 }
+            }
+        };
+
+        // Initialize page
+        window.onload = function() {
+            updateFullProfile();
+        };
+
+        function updateFullProfile() {
+            // Update profile info
+            document.getElementById('profile-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update join date
+            const joinDate = localStorage.getItem('joinDate') || new Date().toLocaleDateString('lo-LA');
+            document.getElementById('join-date').textContent = joinDate;
+            if (!localStorage.getItem('joinDate')) {
+                localStorage.setItem('joinDate', joinDate);
+            }
+            
+            // Update current rank
+            const rank = calculateUserRank();
+            document.getElementById('current-rank').textContent = `#${rank}`;
+            
+            // Update stats
+            document.getElementById('stats-best-streak').textContent = stats.bestStreak;
+            document.getElementById('stats-total-games').textContent = stats.totalGames;
+            document.getElementById('stats-total-correct').textContent = stats.totalCorrect;
+            
+            // Update accuracy with progress bar
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('stats-overall-accuracy').textContent = `${accuracy}%`;
+            
+            // Update difficulty scores and progress
+            updateDifficultyScores();
+            
+            // Update achievements
+            updateAchievements();
+            
+            // Animate progress bars
+            setTimeout(() => {
+                updateProgressBars();
+            }, 500);
+        }
+
+        function calculateUserRank() {
+            if (stats.bestStreak >= 50) return Math.floor(Math.random() * 10) + 1;
+            if (stats.bestStreak >= 25) return Math.floor(Math.random() * 25) + 10;
+            if (stats.bestStreak >= 10) return Math.floor(Math.random() * 50) + 25;
+            return Math.floor(Math.random() * 100) + 50;
+        }
+
+        function updateProgressBars() {
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // Update accuracy progress bar
+            const accuracyProgress = document.getElementById('accuracy-progress');
+            if (accuracyProgress) {
+                accuracyProgress.style.width = `${accuracy}%`;
+            }
+        }
+
+        function updateDifficultyScores() {
+            document.getElementById('easy-best-score').textContent = stats.difficulties?.easy?.bestStreak || 0;
+            document.getElementById('medium-best-score').textContent = stats.difficulties?.medium?.bestStreak || 0;
+            document.getElementById('hard-best-score').textContent = stats.difficulties?.hard?.bestStreak || 0;
+            
+            const maxScore = 20;
+            updateDifficultyProgress('easy', stats.difficulties?.easy?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('medium', stats.difficulties?.medium?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('hard', stats.difficulties?.hard?.bestStreak || 0, maxScore);
+        }
+
+        function updateDifficultyProgress(difficulty, score, maxScore) {
+            const progressBar = document.getElementById(`${difficulty}-progress`);
+            if (progressBar) {
+                const percentage = Math.min((score / maxScore) * 100, 100);
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 700);
+            }
+        }
+
+        function updateAchievements() {
+            const achievements = calculateAchievements();
+            achievements.forEach(achievement => {
+                const badge = document.querySelector(`[data-achievement="${achievement}"]`);
+                if (badge && !badge.classList.contains('unlocked')) {
+                    badge.classList.remove('locked');
+                    badge.classList.add('unlocked');
+                }
+            });
+        }
+
+        function calculateAchievements() {
+            const unlocked = [];
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            if (stats.totalGames >= 1) unlocked.push('first-game');
+            if (stats.bestStreak >= 5) unlocked.push('streak-5');
+            if (stats.bestStreak >= 10) unlocked.push('streak-10');
+            if (accuracy === 100 && stats.totalCorrect >= 5) unlocked.push('perfectionist');
+            if (stats.totalCorrect >= 50) unlocked.push('word-master');
+            if (stats.difficulties?.easy?.bestStreak > 0 && 
+                stats.difficulties?.medium?.bestStreak > 0 && 
+                stats.difficulties?.hard?.bestStreak > 0) {
+                unlocked.push('difficulty-master');
+            }
+            if (stats.totalGames >= 7) unlocked.push('consistent-player');
+            if (stats.bestStreak >= 50) unlocked.push('champion');
+            
+            return unlocked;
+        }
+
+        // Event handlers
+        document.getElementById('back-to-game-btn').addEventListener('click', () => {
+            window.location.href = 'testing.html';
+        });
+
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateFullProfile();
+            }
+        });
+
+        document.getElementById('export-data-btn').addEventListener('click', () => {
+            const data = {
+                displayName,
+                stats,
+                joinDate: localStorage.getItem('joinDate'),
+                settings: JSON.parse(localStorage.getItem('gameSettings') || '{}')
+            };
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `laotypo-data-${displayName || 'player'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('import-data-btn').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.displayName) displayName = data.displayName;
+                            if (data.stats) stats = data.stats;
+                            if (data.joinDate) localStorage.setItem('joinDate', data.joinDate);
+                            if (data.settings) localStorage.setItem('gameSettings', JSON.stringify(data.settings));
+                            
+                            localStorage.setItem('displayName', displayName);
+                            localStorage.setItem('gameStats', JSON.stringify(stats));
+                            
+                            updateFullProfile();
+                            alert('ນຳເຂົ້າຂໍ້ມູນສຳເລັດ!');
+                        } catch (err) {
+                            alert('ມີຂໍ້ຜິດພາດໃນການນຳເຂົ້າຂໍ້ມູນ!');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        });
+
+        document.getElementById('reset-progress-btn').addEventListener('click', () => {
+            if (confirm('ເຈົ້າແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້!')) {
+                stats = {
+                    bestStreak: 0,
+                    totalGames: 0,
+                    totalCorrect: 0,
+                    totalMistakes: 0,
+                    difficulties: {
+                        easy: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        medium: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        hard: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 }
+                    }
+                };
+                localStorage.removeItem('gameStats');
+                localStorage.removeItem('joinDate');
+                
+                document.querySelectorAll('.achievement-badge').forEach(badge => {
+                    badge.classList.remove('unlocked');
+                    badge.classList.add('locked');
+                });
+                
+                updateFullProfile();
+                alert('ຂໍ້ມູນທັງໝົດຖືກລຶບແລ້ວ!');
+            }
+        });
+    </script>
+</body>
+</html>
