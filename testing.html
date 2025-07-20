@@ -453,6 +453,26 @@
             font-weight: bold;
         }
         
+        /* Gecko Mascot */
+        .gecko-mascot {
+            position: fixed;
+            top: 80px; /* Below navigation bar */
+            left: 1rem;
+            z-index: 40; /* Below navigation but above content */
+            pointer-events: none; /* Don't interfere with clicks */
+        }
+        
+        .gecko-mascot img {
+            width: 60px;
+            height: 60px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gecko-mascot:hover img {
+            opacity: 1;
+        }
+        
         /* Toggle Switch Styles */
         .switch {
             position: relative;
@@ -677,6 +697,11 @@
         </div>
     </nav>
 
+    <!-- Gecko Mascot -->
+    <div class="gecko-mascot">
+        <img src="Gecko.png" alt="Gecko Mascot" class="w-15 h-15 object-contain">
+    </div>
+
     <div class="game-container">
         <!-- Start Screen -->
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
@@ -732,7 +757,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.7.2 - Testing</p>
+                <p>Version: 1.8.0 - Testing</p>
             </div>
         </div>
 
@@ -1707,15 +1732,30 @@
         wordCardLeft.addEventListener('click', () => handleSelection('left'));
         wordCardRight.addEventListener('click', () => handleSelection('right'));
 
-        // Panels and Tab Navigation
-        document.getElementById('leaderboard-nav-btn').addEventListener('click', showLeaderboard);
+        // Panels and Tab Navigation with toggle
+        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+            console.log('📊 Toggling leaderboard panel');
+            if (leaderboardPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                showLeaderboard();
+            } else {
+                leaderboardPanel.classList.add('hidden');
+            }
+        });
         document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
         
-        // Settings panel controls
+        // Settings panel controls with toggle
         const settingsPanel = document.getElementById('settings-panel');
         document.getElementById('open-settings-btn').addEventListener('click', () => {
-            console.log('🔧 Opening settings panel');
-            settingsPanel.classList.remove('hidden');
+            console.log('🔧 Toggling settings panel');
+            if (settingsPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                settingsPanel.classList.remove('hidden');
+            } else {
+                settingsPanel.classList.add('hidden');
+            }
         });
         document.getElementById('close-settings-btn').addEventListener('click', () => {
             console.log('🔧 Closing settings panel');
@@ -1723,9 +1763,24 @@
         });
         // Leaderboard is already handled by leaderboard-nav-btn
         document.getElementById('account-nav-btn').addEventListener('click', () => {
-            updateAccountPanel(); // Update account panel with latest data
-            document.getElementById('account-panel').classList.remove('hidden');
+            const accountPanel = document.getElementById('account-panel');
+            console.log('👤 Toggling account panel');
+            if (accountPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                updateAccountPanel(); // Update account panel with latest data
+                accountPanel.classList.remove('hidden');
+            } else {
+                accountPanel.classList.add('hidden');
+            }
         });
+
+        // Panel Management Functions
+        function closeAllPanels() {
+            document.getElementById('leaderboard-panel').classList.add('hidden');
+            document.getElementById('settings-panel').classList.add('hidden');
+            document.getElementById('account-panel').classList.add('hidden');
+        }
 
         // Enhanced Account Functions
         function updateEnhancedProfile() {
@@ -1984,8 +2039,13 @@
             updateUI();
             
             // Word loading now handled in gameplay.html
-            startGameBtn.disabled = false;
-            startGameBtn.textContent = 'ເລີ່ມເກມ';
+            if (startGameBtn) {
+                startGameBtn.disabled = false;
+                startGameBtn.textContent = 'ເລີ່ມເກມ';
+                console.log('✅ Start game button enabled');
+            } else {
+                console.error('❌ Start game button not found!');
+            }
         };
 
     </script>
