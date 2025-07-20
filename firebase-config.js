@@ -450,3 +450,8 @@ window.firebaseDb = db;
 window.firebaseAuth = auth;
 
 console.log('🔥 Firebase modules loaded and ready!');
+console.log('🔑 Available Firebase functions:');
+console.log('  - FirebaseAuthManager.loginWithGmail()');
+console.log('  - FirebaseAuthManager.getUserProfile(uid)');
+console.log('  - FirebasePlayerManager.savePlayerData()');
+console.log('  - FirebaseSyncManager.syncToCloud()');

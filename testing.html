@@ -835,7 +835,7 @@
                 <p id="user-type-display">👤 Guest Mode</p>
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 2.0.0 - Gmail Registration</p>
+                <p>Version: 2.0.1 - Gmail Registration Fixed</p>
             </div>
         </div>
 
@@ -1994,35 +1994,50 @@
         async function handleGmailLogin() {
             try {
                 console.log('🔐 Starting Gmail login...');
-                const loginResult = await FirebaseAuthManager.loginWithGmail();
                 
-                if (loginResult.success) {
-                    console.log('✅ Gmail login successful');
+                // Check if Firebase Auth Manager is available
+                if (typeof FirebaseAuthManager === 'undefined') {
+                    console.error('❌ FirebaseAuthManager not loaded');
+                    alert('Firebase ຍັງບໍ່ພ້ອມ ກະລຸນາລໍຖ້າ...');
+                    return;
+                }
+                
+                console.log('📧 Calling FirebaseAuthManager.loginWithGmail()...');
+                const loginResult = await FirebaseAuthManager.loginWithGmail();
+                console.log('📧 Login result:', loginResult);
+                
+                if (loginResult && loginResult.success) {
+                    console.log('✅ Gmail login successful:', loginResult.user);
                     
                     // Set user data
                     currentUser = loginResult.user;
                     userType = 'gmail';
                     
                     // Check if user profile exists
+                    console.log('👤 Checking existing profile for:', currentUser.uid);
                     const existingProfile = await FirebaseAuthManager.getUserProfile(currentUser.uid);
+                    console.log('👤 Existing profile:', existingProfile);
                     
                     if (existingProfile && existingProfile.name && existingProfile.age) {
                         // Complete profile exists, go to game
                         displayName = existingProfile.name;
                         userId = currentUser.uid;
                         await loadCloudUserData();
+                        updateUI();
                         switchToScreen('start-screen');
                     } else {
                         // Need to complete profile setup
+                        console.log('📝 Showing profile setup...');
                         showProfileSetup(currentUser);
                     }
                 } else {
-                    console.error('❌ Gmail login failed:', loginResult.error);
-                    alert('ເຂົ້າສູ່ລະບົບລົ້ມເຫລວ: ' + loginResult.error);
+                    console.error('❌ Gmail login failed:', loginResult ? loginResult.error : 'Unknown error');
+                    alert('ເຂົ້າສູ່ລະບົບລົ້ມເຫລວ: ' + (loginResult ? loginResult.error : 'ຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ'));
                 }
             } catch (error) {
                 console.error('❌ Gmail login error:', error);
-                alert('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ລະບົບ');
+                console.error('❌ Error details:', error.message, error.code);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ລະບົບ: ' + error.message);
             }
         }
         
@@ -2036,9 +2051,14 @@
             userId = 'guest_' + Math.random().toString(36).substring(2, 11);
             displayName = 'Guest Player';
             
+            console.log('👤 Guest user created:', { userId, displayName, userType });
+            
             // Load any existing local data
             loadUserData();
+            updateUI();
             switchToScreen('start-screen');
+            
+            console.log('✅ Guest mode activated successfully');
         }
         
         // Show profile setup screen
@@ -2152,9 +2172,28 @@
             }
         }
         
+        // Debug Firebase availability
+        function debugFirebaseStatus() {
+            console.log('🔍 Debugging Firebase Status:');
+            console.log('FirebaseAuthManager available:', typeof FirebaseAuthManager !== 'undefined');
+            console.log('FirebasePlayerManager available:', typeof FirebasePlayerManager !== 'undefined');
+            console.log('firebaseAuth available:', typeof firebaseAuth !== 'undefined');
+            
+            if (typeof FirebaseAuthManager !== 'undefined') {
+                console.log('✅ Firebase Auth Manager is ready');
+                return true;
+            } else {
+                console.error('❌ Firebase Auth Manager not available');
+                return false;
+            }
+        }
+        
         // Check authentication state on page load
         function checkAuthState() {
+            console.log('🔍 Checking authentication state...');
+            
             if (typeof FirebaseAuthManager !== 'undefined') {
+                console.log('✅ Setting up auth state listener...');
                 FirebaseAuthManager.onAuthStateChanged(async (user) => {
                     if (user) {
                         console.log('👤 User is signed in:', user.email);
@@ -2167,6 +2206,7 @@
                             displayName = profile.name;
                             userId = user.uid;
                             await loadCloudUserData();
+                            updateUI();
                             
                             // If we're on registration screen, move to start screen
                             if (document.getElementById('registration-screen').classList.contains('active')) {
@@ -2179,6 +2219,8 @@
                         userType = null;
                     }
                 });
+            } else {
+                console.warn('⚠️ FirebaseAuthManager not available, skipping auth state check');
             }
         }
 
@@ -2440,9 +2482,17 @@
             
             // Initialize Firebase sync and auth
             setTimeout(async () => {
+                console.log('🔄 Initializing Firebase...');
                 await initializeFirebaseSync();
-                checkAuthState(); // Check if user is already signed in
-            }, 1000); // Give Firebase modules time to load
+                
+                // Debug Firebase status
+                debugFirebaseStatus();
+                
+                // Check authentication state
+                checkAuthState();
+                
+                console.log('✅ Firebase initialization complete');
+            }, 2000); // Give Firebase modules more time to load
             
             // Word loading now handled in gameplay.html
             if (startGameBtn) {
