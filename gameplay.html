@@ -170,7 +170,7 @@
         
         /* CSS Pixel Heart - Simplified Design */
         .heart::before {
-            content: '🖤';
+            content: '❤️';
             position: absolute;
             font-size: 20px;
             left: 50%;
@@ -237,7 +237,7 @@
 <body>
     <div class="game-container">
         <!-- Back Button -->
-        <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ເມນູ</button>
+        <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ໜ້າຫຼັກ</button>
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen active">
@@ -261,14 +261,14 @@
             
             <!-- Player Name Header -->
             <div class="text-center mb-4">
-                <h2 class="text-3xl font-bold text-main-color">Player: <span id="game-player-name"></span></h2>
+                <h2 class="text-3xl font-bold text-main-color">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
                 <div class="text-sm text-sub-color mt-1">
-                    <span id="game-settings-display">Difficulty: ງ່າຍ | Timer: ປິດ</span>
+                    <span id="game-settings-display">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
                 </div>
             </div>
             
             <div class="flex justify-between items-center mb-6 text-xl">
-                <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
+                <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
                 <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
             </div>
             <div id="timer-container" class="h-2 mb-6">
@@ -314,22 +314,22 @@
 
              <!-- Personal Records -->
              <div class="bg-[#3e4043] rounded-lg p-6">
-                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">📊 Personal Records</h3>
+                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">📊 ສະຖິຕິຂອງທ່ານ</h3>
                  <div class="grid grid-cols-3 gap-4 text-sm">
                      <div class="text-center">
-                         <div class="text-correct-color font-bold">ງ່າຍ (Easy)</div>
+                         <div class="text-correct-color font-bold">ງ່າຍ</div>
                          <div id="easy-best-score" class="text-lg">0</div>
                          <div id="easy-best-accuracy" class="text-sub-color">0%</div>
                          <div id="easy-games-count" class="text-xs text-sub-color">0 games</div>
                      </div>
                      <div class="text-center">
-                         <div class="text-main-color font-bold">ປານກາງ (Medium)</div>
+                         <div class="text-main-color font-bold">ປານກາງ</div>
                          <div id="medium-best-score" class="text-lg">0</div>
                          <div id="medium-best-accuracy" class="text-sub-color">0%</div>
                          <div id="medium-games-count" class="text-xs text-sub-color">0 games</div>
                      </div>
                      <div class="text-center">
-                         <div class="text-error-color font-bold">ຍາກ (Hard)</div>
+                         <div class="text-error-color font-bold">ຍາກ</div>
                          <div id="hard-best-score" class="text-lg">0</div>
                          <div id="hard-best-accuracy" class="text-sub-color">0%</div>
                          <div id="hard-games-count" class="text-xs text-sub-color">0 games</div>
@@ -357,7 +357,7 @@
         <!-- Footer -->
         <div class="absolute bottom-4 right-4 text-xs text-sub-color">
             <p>Game Mode</p>
-            <p>Version: 1.4.1-Testing</p>
+            <p>Version: 1.5.0-Testing</p>
         </div>
     </div>
 
