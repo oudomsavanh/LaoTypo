@@ -1,18 +1,14 @@
 // 🔥 Firebase Configuration for LaoTypo Game
-// ⚠️  REPLACE WITH YOUR ACTUAL FIREBASE CONFIG FROM CONSOLE ⚠️
+// ✅ CONFIGURED WITH REAL FIREBASE PROJECT
 const firebaseConfig = {
-  apiKey: "YOUR_ACTUAL_API_KEY_FROM_FIREBASE_CONSOLE",
-  authDomain: "your-actual-project.firebaseapp.com", 
-  projectId: "your-actual-project-id",
-  storageBucket: "your-actual-project.appspot.com",
-  messagingSenderId: "your-actual-sender-id",
-  appId: "your-actual-app-id"
+  apiKey: "AIzaSyC-PtK5NdCnQi8JOJ8MvRwvGht-teE2vp8",
+  authDomain: "laotypo-a8e80.firebaseapp.com",
+  projectId: "laotypo-a8e80",
+  storageBucket: "laotypo-a8e80.firebasestorage.app",
+  messagingSenderId: "597772456731",
+  appId: "1:597772456731:web:7a476dee850b85227539be",
+  measurementId: "G-YRJCWZQTCZ"
 };
-
-// 🚨 IMPORTANT: The values above are still placeholders!
-// You MUST replace them with your real Firebase project config
-// Get your config from: https://console.firebase.google.com/
-// → Project Settings → Your apps → Web app config
 
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
