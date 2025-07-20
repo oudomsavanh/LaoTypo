@@ -332,7 +332,7 @@
         <!-- Footer -->
         <div class="absolute bottom-4 right-4 text-xs text-sub-color">
             <p>Game Mode</p>
-            <p>Version: 1.1.0-stable</p>
+            <p>Version: 1.1.1-stable</p>
         </div>
     </div>
 
@@ -467,11 +467,28 @@
                 console.log("Error details:", error.message);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
-                wordLoadingStatus.style.color = 'var(--error-color)';
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
+                wordLoadingStatus.style.color = 'var(--warning-color)';
                 
-                // No fallback data - game cannot start without words
-                throw error;
+                // Minimal fallback data for testing when Google Sheets fails
+                wordList = [
+                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+                    { context: 'ລາວ', correct: 'ລາວ', wrong: 'ລາຍ', difficulty: 1 },
+                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
+                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
+                    { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', wrong: 'ປະເທດລາຍ', difficulty: 2 },
+                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 },
+                    { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', wrong: 'ວິທະຍາສາຍ', difficulty: 3 },
+                    { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', wrong: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
+                ];
+                
+                console.log("Using fallback word list for testing:", wordList.length, "entries");
+                
+                // Hide loading status after fallback load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 3000);
             }
         }
 
@@ -1005,10 +1022,8 @@
              try {
                  await loadWordListsFromGoogleSheets();
              } catch (error) {
-                 console.error("Failed to load words, redirecting to main menu:", error);
-                 alert('ໂຫຼດຄຳສັບຜິດພາດ! ກັບໄປທີ່ເມນູຫຼັກ');
-                 window.location.href = 'testing.html';
-                 return;
+                 console.warn("Google Sheets loading failed, continuing with fallback data:", error);
+                 // Don't redirect - fallback data is handled in loadWordListsFromGoogleSheets()
              }
              
              // Initialize personal records display
