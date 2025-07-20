@@ -430,7 +430,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.0.0-beta</p>
+                <p>Version: 1.1.0-stable</p>
             </div>
         </div>
 
@@ -1185,16 +1185,22 @@
             // Save current settings and player data before navigation
             saveUserData();
             
-            // Navigate to gameplay page with parameters
+            // Navigate to gameplay page with enhanced parameters
+            console.log('🚀 Starting game with settings:', settings);
+            console.log('👤 Player name:', displayName);
+            
             const params = new URLSearchParams({
                 player: encodeURIComponent(displayName),
                 difficulty: settings.difficulty,
-                timer: settings.timer,
-                sound: settings.sound,
-                music: settings.music
+                timer: settings.timer.toString(),
+                sound: settings.sound.toString(),
+                music: settings.music.toString()
             });
             
-            window.location.href = `gameplay.html?${params.toString()}`;
+            const gameURL = `gameplay.html?${params.toString()}`;
+            console.log('🔗 Navigating to:', gameURL);
+            
+            window.location.href = gameURL;
         }
 
         function nextRound() {

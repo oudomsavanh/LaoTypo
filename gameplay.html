@@ -235,9 +235,16 @@
                 <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
             </div>
             
-            <div class="flex justify-between items-center mb-6 text-2xl">
+            <!-- Player Name Header -->
+            <div class="text-center mb-4">
+                <h2 class="text-3xl font-bold text-main-color">Player: <span id="game-player-name"></span></h2>
+                <div class="text-sm text-sub-color mt-1">
+                    <span id="game-settings-display">Difficulty: ງ່າຍ | Timer: ປິດ</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6 text-xl">
                 <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
-                <div class="text-sub-color text-center">Player: <span id="game-player-name" class="text-text-color font-bold"></span></div>
                 <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
             </div>
             <div id="timer-container" class="h-2 mb-6">
@@ -325,7 +332,7 @@
         <!-- Footer -->
         <div class="absolute bottom-4 right-4 text-xs text-sub-color">
             <p>Game Mode</p>
-            <p>Version: 1.0.0-beta</p>
+            <p>Version: 1.1.0-stable</p>
         </div>
     </div>
 
@@ -343,6 +350,7 @@
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
         const wordLoadingStatus = document.getElementById('word-loading-status');
+        const gameSettingsDisplay = document.getElementById('game-settings-display');
 
         // Game State & Settings - Will be populated from URL parameters
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
@@ -696,35 +704,50 @@
             if (screens[screenName]) screens[screenName].classList.add('active');
         }
 
-        function nextRound() {
-            currentStreakEl.textContent = currentStreak;
-            bestStreakEl.textContent = stats.bestStreak;
-            wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
-            wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
-            
-            const availableWords = filterWordsByDifficulty(settings.difficulty);
-            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
-            
-            contextDisplay.textContent = currentEntry.context;
-            
-            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
-            difficultyDisplay.textContent = difficultyInfo.text;
-            difficultyDisplay.style.color = difficultyInfo.color;
-            
-            correctAnswer = currentEntry.correct;
-            wrongAnswer = currentEntry.wrong;
+                 function nextRound() {
+             console.log('🎮 Starting new round with difficulty:', settings.difficulty);
+             
+             currentStreakEl.textContent = currentStreak;
+             bestStreakEl.textContent = stats.bestStreak;
+             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+             
+             // Get words filtered by selected difficulty
+             const availableWords = filterWordsByDifficulty(settings.difficulty);
+             console.log(`📚 Available words for ${settings.difficulty}:`, availableWords.length);
+             
+             if (availableWords.length === 0) {
+                 console.error('❌ No words available for difficulty:', settings.difficulty);
+                 alert(`ບໍ່ມີຄຳສັບສຳລັບລະດັບ ${settings.difficulty}!`);
+                 return;
+             }
+             
+             currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+             console.log('🎯 Selected word:', currentEntry);
+             
+             contextDisplay.textContent = currentEntry.context;
+             
+             const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+             difficultyDisplay.textContent = difficultyInfo.text;
+             difficultyDisplay.style.color = difficultyInfo.color;
+             
+             correctAnswer = currentEntry.correct;
+             wrongAnswer = currentEntry.wrong;
 
-            correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
+             correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
 
-            if (correctWordPosition === 'left') {
-                wordCardLeft.textContent = correctAnswer;
-                wordCardRight.textContent = wrongAnswer;
-            } else {
-                wordCardLeft.textContent = wrongAnswer;
-                wordCardRight.textContent = correctAnswer;
-            }
-            startTimer();
-        }
+             if (correctWordPosition === 'left') {
+                 wordCardLeft.textContent = correctAnswer;
+                 wordCardRight.textContent = wrongAnswer;
+                 console.log('🎯 Correct answer on LEFT:', correctAnswer);
+             } else {
+                 wordCardLeft.textContent = wrongAnswer;
+                 wordCardRight.textContent = correctAnswer;
+                 console.log('🎯 Correct answer on RIGHT:', correctAnswer);
+             }
+             
+             startTimer();
+         }
 
         function handleSelection(selectedPosition) {
             if (!gameInProgress) return;
@@ -806,23 +829,41 @@
              saveUserData();
          }
 
-        function startTimer() {
-            if (!settings.timer) return;
-            
-            let timeLeft = 5000; // 5 seconds
-            const interval = 50;
-            
-            timerInterval = setInterval(() => {
-                timeLeft -= interval;
-                const percentage = Math.max(0, timeLeft / 5000);
-                timerBar.style.transform = `scaleX(${percentage})`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    handleSelection('timeout');
-                }
-            }, interval);
-        }
+                 function startTimer() {
+             if (!settings.timer) {
+                 console.log('⏱️ Timer disabled, skipping countdown');
+                 timerBar.style.transform = 'scaleX(0)';
+                 return;
+             }
+             
+             console.log('⏱️ Starting 5-second timer...');
+             let timeLeft = 5000; // 5 seconds
+             const interval = 50; // Update every 50ms for smooth animation
+             
+             // Reset timer bar to full
+             timerBar.style.transform = 'scaleX(1)';
+             
+             timerInterval = setInterval(() => {
+                 timeLeft -= interval;
+                 const percentage = Math.max(0, timeLeft / 5000);
+                 timerBar.style.transform = `scaleX(${percentage})`;
+                 
+                 // Debug countdown
+                 if (timeLeft % 1000 < interval) {
+                     console.log(`⏱️ Timer: ${Math.ceil(timeLeft / 1000)} seconds left`);
+                 }
+                 
+                 if (timeLeft <= 0) {
+                     clearInterval(timerInterval);
+                     console.log('⏱️ Timer expired! Auto-selecting wrong answer');
+                     
+                     // When timer expires, treat as wrong answer (lose life)
+                     playSound('incorrect');
+                     stats.totalMistakes += 1;
+                     loseLife();
+                 }
+             }, interval);
+         }
 
         function playSound(type) {
             if (!settings.sound) return;
@@ -864,18 +905,61 @@
             window.location.href = 'testing.html';
         }
 
-        // URL Parameter Functions
+        // Enhanced URL Parameter Functions with validation and debugging
         function getURLParameters() {
+            console.log('🔗 Reading URL parameters...');
             const urlParams = new URLSearchParams(window.location.search);
+            console.log('📋 Raw URL params:', window.location.search);
             
-            displayName = urlParams.get('player') || 'Player';
-            settings.difficulty = urlParams.get('difficulty') || 'easy';
+            // Read and validate player name
+            const playerParam = urlParams.get('player');
+            displayName = playerParam ? decodeURIComponent(playerParam) : 'Anonymous Player';
+            console.log('👤 Player name:', displayName, '(from param:', playerParam, ')');
+            
+            // Read and validate difficulty
+            const difficultyParam = urlParams.get('difficulty');
+            const validDifficulties = ['easy', 'medium', 'hard'];
+            settings.difficulty = validDifficulties.includes(difficultyParam) ? difficultyParam : 'easy';
+            console.log('⚡ Difficulty:', settings.difficulty, '(from param:', difficultyParam, ')');
+            
+            // Read boolean settings
             settings.timer = urlParams.get('timer') === 'true';
             settings.sound = urlParams.get('sound') === 'true';
             settings.music = urlParams.get('music') === 'true';
             
-            console.log('Loaded settings from URL:', settings);
-            console.log('Player name:', displayName);
+            console.log('⏱️ Timer enabled:', settings.timer);
+            console.log('🔊 Sound enabled:', settings.sound);
+            console.log('🎵 Music enabled:', settings.music);
+            
+            // Validation check
+            if (!playerParam) {
+                console.warn('⚠️ No player name in URL, using default');
+            }
+            if (!difficultyParam || !validDifficulties.includes(difficultyParam)) {
+                console.warn('⚠️ Invalid/missing difficulty in URL, using easy');
+            }
+            
+            console.log('✅ Final settings loaded:', settings);
+            
+            // Update UI immediately
+            updateGameHeader();
+        }
+        
+        function updateGameHeader() {
+            // Update player name in header
+            gamePlayerName.textContent = displayName;
+            
+            // Update settings display
+            const difficultyText = {
+                'easy': 'ງ່າຍ',
+                'medium': 'ປານກາງ', 
+                'hard': 'ຍາກ'
+            }[settings.difficulty];
+            
+            const timerText = settings.timer ? 'ເປີດ (5 ວິ)' : 'ປິດ';
+            gameSettingsDisplay.textContent = `Difficulty: ${difficultyText} | Timer: ${timerText}`;
+            
+            console.log('🎯 Game header updated with player:', displayName, 'settings:', settings);
         }
 
         // Event Listeners
