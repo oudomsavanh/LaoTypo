@@ -27,10 +27,18 @@ import {
   where,
   serverTimestamp 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged 
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 console.log('🔥 Firebase initialized successfully');
 
@@ -342,11 +350,103 @@ class FirebaseSyncManager {
   }
 }
 
+// 🔐 AUTHENTICATION MANAGER
+class FirebaseAuthManager {
+  
+  // Login with Gmail
+  static async loginWithGmail() {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      console.log('✅ Gmail login successful:', user.email);
+      return {
+        success: true,
+        user: {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        }
+      };
+    } catch (error) {
+      console.error('❌ Gmail login failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
+  // Logout
+  static async logout() {
+    try {
+      await signOut(auth);
+      console.log('✅ User logged out');
+      return true;
+    } catch (error) {
+      console.error('❌ Logout failed:', error);
+      return false;
+    }
+  }
+  
+  // Get current user
+  static getCurrentUser() {
+    return auth.currentUser;
+  }
+  
+  // Listen to auth state changes
+  static onAuthStateChanged(callback) {
+    return onAuthStateChanged(auth, callback);
+  }
+  
+  // Create user profile in Firestore
+  static async createUserProfile(uid, profileData) {
+    try {
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        ...profileData,
+        createdAt: serverTimestamp(),
+        lastActive: serverTimestamp()
+      });
+      
+      console.log('✅ User profile created:', uid);
+      return true;
+    } catch (error) {
+      console.error('❌ Error creating user profile:', error);
+      return false;
+    }
+  }
+  
+  // Get user profile from Firestore
+  static async getUserProfile(uid) {
+    try {
+      const userRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        return userSnap.data();
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error getting user profile:', error);
+      return null;
+    }
+  }
+}
+
 // 🚀 EXPORT ALL MANAGERS
 window.FirebasePlayerManager = FirebasePlayerManager;
 window.FirebaseWordManager = FirebaseWordManager; 
 window.FirebaseLeaderboardManager = FirebaseLeaderboardManager;
 window.FirebaseSyncManager = FirebaseSyncManager;
+window.FirebaseAuthManager = FirebaseAuthManager;
 window.firebaseDb = db;
+window.firebaseAuth = auth;
 
 console.log('🔥 Firebase modules loaded and ready!');
