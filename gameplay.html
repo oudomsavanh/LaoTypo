@@ -216,6 +216,11 @@
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen active">
+            <!-- Word Loading Status -->
+            <div id="word-loading-status" class="text-center mb-4 text-main-color">
+                ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+            </div>
+            
             <!-- Life Bar System -->
             <div class="life-bar-header mb-6">
                 <div class="life-container">
@@ -325,8 +330,8 @@
     </div>
 
     <script>
-        // Google Sheets CSV URL
-        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1cAOkI1IxBNMRPaRF0dqtBNgc6fE-3dthHGOvmq_5i04/export?format=csv';
+        // Google Sheets CSV URL (same as testing.html)
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
 
         // DOM Elements
         const currentStreakEl = document.getElementById('current-streak');
@@ -337,6 +342,7 @@
         const contextDisplay = document.getElementById('context-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
+        const wordLoadingStatus = document.getElementById('word-loading-status');
 
         // Game State & Settings - Will be populated from URL parameters
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
@@ -402,19 +408,23 @@
             }
         }
 
-        // Load word lists from Google Sheets
+        // Enhanced word loading from Google Sheets (copied from testing.html, no fallback)
         async function loadWordListsFromGoogleSheets() {
             try {
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.style.color = 'var(--main-color)';
+                
                 const response = await fetch(GOOGLE_SHEETS_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+                
                 const csvText = await response.text();
                 const lines = csvText.split('\n');
-
+                
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty
                 wordList = lines
-                    .slice(1) // Skip header row
+                    .slice(1) // Skip header row (A1:D1)
                     .map(line => {
                         const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
                         if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
@@ -422,30 +432,38 @@
                                 context: columns[0],    // Column A - context to display
                                 correct: columns[1],    // Column B - correct answer
                                 wrong: columns[2],      // Column C - wrong answer
-                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty
+                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty (1=easy, 2=medium, 3=difficult)
                             };
                         }
                         return null;
                     })
-                    .filter(item => item !== null);
-
+                    .filter(item => item !== null); // Remove invalid entries
+                
                 console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
-
+                console.log("Sample entries:", wordList.slice(0, 3));
+                
                 if (wordList.length === 0) {
                     throw new Error("No valid entries found in the spreadsheet");
                 }
-
+                
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordList.length} ຄຳສັບ`;
+                wordLoadingStatus.style.color = 'var(--correct-color)';
+                
+                // Hide loading status after successful load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 2000);
+                
             } catch (error) {
                 console.error("Error loading word list from Google Sheets:", error);
-                // Fallback data
-                wordList = [
-                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
-                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
-                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
-                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
-                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 }
-                ];
-                console.log("Using fallback word list");
+                console.log("Error details:", error.message);
+                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
+                wordLoadingStatus.style.color = 'var(--error-color)';
+                
+                // No fallback data - game cannot start without words
+                throw error;
             }
         }
 
@@ -896,9 +914,18 @@
              // Initialize background music
              initializeBackgroundMusic();
              
-             // Load user data and word lists
+             // Load user data
              loadUserData();
-             await loadWordListsFromGoogleSheets();
+             
+             // Load word lists with error handling
+             try {
+                 await loadWordListsFromGoogleSheets();
+             } catch (error) {
+                 console.error("Failed to load words, redirecting to main menu:", error);
+                 alert('ໂຫຼດຄຳສັບຜິດພາດ! ກັບໄປທີ່ເມນູຫຼັກ');
+                 window.location.href = 'testing.html';
+                 return;
+             }
              
              // Initialize personal records display
              updatePersonalRecordsDisplay();
