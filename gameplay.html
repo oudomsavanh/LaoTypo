@@ -245,24 +245,69 @@
             <p class="text-sub-color">ໃຊ້ <kbd class="border-b-2 border-sub-color">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 border-sub-color">D</kbd> ສຳລັບຂວາ.</p>
         </div>
 
-        <!-- Results Screen -->
-        <div id="results-screen" class="screen space-y-6">
-            <h2 class="text-4xl font-bold text-main-color">ເກມຈົບ</h2>
-            <div class="text-2xl space-y-2">
-                <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
-                <p>ຄວາມແມ່ນຍຳ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
-            </div>
-            <div id="evaluation-result" class="text-xl font-bold"></div>
-            <div class="space-y-4">
-                <button onclick="playAgain()" class="btn text-xl px-8 py-3">ຫຼິ້ນອີກຄັ້ງ</button>
-                <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປທີ່ເມນູ</button>
-            </div>
-        </div>
+                 <!-- Results Screen -->
+         <div id="results-screen" class="screen space-y-6">
+             <h2 class="text-4xl font-bold text-main-color">ເກມຈົບ</h2>
+             
+             <!-- Game Stats -->
+             <div class="bg-[#3e4043] rounded-lg p-6 space-y-4">
+                 <div class="text-2xl space-y-2">
+                     <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
+                     <p>ຄວາມແມ່ນຍຳ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
+                 </div>
+                 <div id="evaluation-result" class="text-xl font-bold"></div>
+                 
+                 <!-- Personal Best Indicator -->
+                 <div id="personal-best-indicator" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-bold text-center">
+                     🏆 NEW PERSONAL BEST! 🏆
+                 </div>
+             </div>
+
+             <!-- MonkeyType-inspired Personal Records -->
+             <div class="bg-[#3e4043] rounded-lg p-6">
+                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">📊 Personal Records</h3>
+                 <div class="grid grid-cols-3 gap-4 text-sm">
+                     <div class="text-center">
+                         <div class="text-correct-color font-bold">ງ່າຍ (Easy)</div>
+                         <div id="easy-best-score" class="text-lg">0</div>
+                         <div id="easy-best-accuracy" class="text-sub-color">0%</div>
+                         <div id="easy-games-count" class="text-xs text-sub-color">0 games</div>
+                     </div>
+                     <div class="text-center">
+                         <div class="text-main-color font-bold">ປານກາງ (Medium)</div>
+                         <div id="medium-best-score" class="text-lg">0</div>
+                         <div id="medium-best-accuracy" class="text-sub-color">0%</div>
+                         <div id="medium-games-count" class="text-xs text-sub-color">0 games</div>
+                     </div>
+                     <div class="text-center">
+                         <div class="text-error-color font-bold">ຍາກ (Hard)</div>
+                         <div id="hard-best-score" class="text-lg">0</div>
+                         <div id="hard-best-accuracy" class="text-sub-color">0%</div>
+                         <div id="hard-games-count" class="text-xs text-sub-color">0 games</div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Global Ranking Preview -->
+             <div class="bg-[#3e4043] rounded-lg p-6">
+                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">🌍 Global Ranking Preview</h3>
+                 <div id="global-ranking-info" class="text-center text-sub-color">
+                     <p id="global-rank-text">Your rank: Calculating...</p>
+                     <p class="text-xs mt-2">🔄 Full leaderboard coming soon with cloud sync!</p>
+                 </div>
+             </div>
+
+             <!-- Action Buttons -->
+             <div class="space-y-4">
+                 <button onclick="playAgain()" class="btn text-xl px-8 py-3">ຫຼິ້ນອີກຄັ້ງ</button>
+                 <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປທີ່ເມນູ</button>
+             </div>
+         </div>
         
         <!-- Footer -->
         <div class="absolute bottom-4 right-4 text-xs text-sub-color">
             <p>Game Mode</p>
-            <p>Version demo16</p>
+            <p>Version: 1.0.0-beta</p>
         </div>
     </div>
 
@@ -302,12 +347,26 @@
             music: false,
         };
 
-        let stats = {
-            bestStreak: 0,
-            totalGames: 0,
-            totalCorrect: 0,
-            totalMistakes: 0,
-        };
+                 let stats = {
+             bestStreak: 0,
+             totalGames: 0,
+             totalCorrect: 0,
+             totalMistakes: 0,
+         };
+
+         // MonkeyType-inspired Personal Records
+         let personalRecords = {
+             easy: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
+             medium: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
+             hard: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 }
+         };
+
+         // Global Leaderboard (simulated for demo - would be real cloud in production)
+         let globalLeaderboard = {
+             easy: [],
+             medium: [],
+             hard: []
+         };
 
         // Background Music System
         let backgroundMusic = null;
@@ -482,33 +541,119 @@
             endGame();
         }
 
-        // Local Storage Functions
-        function loadUserData() {
-            try {
-                const savedData = localStorage.getItem('laoTypoGame_userData');
-                if (savedData) {
-                    const data = JSON.parse(savedData);
-                    stats = { ...stats, ...data.stats };
-                    displayName = data.displayName || '';
-                }
-            } catch (error) {
-                console.error("Error loading user data:", error);
-            }
-        }
+                 // Personal Records Functions
+         function updatePersonalRecords() {
+             const difficulty = settings.difficulty;
+             const currentScore = currentStreak;
+             const totalAnswers = currentStreak + stats.totalMistakes;
+             const currentAccuracy = totalAnswers > 0 ? (currentStreak / totalAnswers) * 100 : 0;
+             
+             const record = personalRecords[difficulty];
+             let isNewBest = false;
+             
+             // Update games played
+             record.gamesPlayed++;
+             record.totalScore += currentScore;
+             
+             // Check for new personal best score
+             if (currentScore > record.bestScore) {
+                 record.bestScore = currentScore;
+                 isNewBest = true;
+             }
+             
+             // Check for new personal best accuracy
+             if (currentAccuracy > record.bestAccuracy) {
+                 record.bestAccuracy = currentAccuracy;
+                 isNewBest = true;
+             }
+             
+             // Show personal best indicator
+             if (isNewBest) {
+                 document.getElementById('personal-best-indicator').classList.remove('hidden');
+             }
+             
+             // Update global ranking simulation
+             updateGlobalRanking(difficulty, currentScore, currentAccuracy);
+             
+             // Update UI display
+             updatePersonalRecordsDisplay();
+         }
 
-        function saveUserData() {
-            try {
-                const userData = {
-                    settings,
-                    stats,
-                    displayName,
-                    lastPlayed: new Date().toISOString()
-                };
-                localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
-            } catch (error) {
-                console.error("Error saving user data:", error);
-            }
-        }
+         function updatePersonalRecordsDisplay() {
+             // Update Easy records
+             document.getElementById('easy-best-score').textContent = personalRecords.easy.bestScore;
+             document.getElementById('easy-best-accuracy').textContent = `${personalRecords.easy.bestAccuracy.toFixed(1)}%`;
+             document.getElementById('easy-games-count').textContent = `${personalRecords.easy.gamesPlayed} games`;
+             
+             // Update Medium records
+             document.getElementById('medium-best-score').textContent = personalRecords.medium.bestScore;
+             document.getElementById('medium-best-accuracy').textContent = `${personalRecords.medium.bestAccuracy.toFixed(1)}%`;
+             document.getElementById('medium-games-count').textContent = `${personalRecords.medium.gamesPlayed} games`;
+             
+             // Update Hard records
+             document.getElementById('hard-best-score').textContent = personalRecords.hard.bestScore;
+             document.getElementById('hard-best-accuracy').textContent = `${personalRecords.hard.bestAccuracy.toFixed(1)}%`;
+             document.getElementById('hard-games-count').textContent = `${personalRecords.hard.gamesPlayed} games`;
+         }
+
+         function updateGlobalRanking(difficulty, score, accuracy) {
+             // Simulated global ranking - in production this would be cloud-based
+             const playerEntry = { name: displayName, score: score, accuracy: accuracy, timestamp: Date.now() };
+             
+             // Add to leaderboard
+             globalLeaderboard[difficulty].push(playerEntry);
+             
+             // Sort by score descending, then by accuracy
+             globalLeaderboard[difficulty].sort((a, b) => {
+                 if (b.score !== a.score) return b.score - a.score;
+                 return b.accuracy - a.accuracy;
+             });
+             
+             // Keep only top 100
+             globalLeaderboard[difficulty] = globalLeaderboard[difficulty].slice(0, 100);
+             
+             // Find player's rank
+             const playerRank = globalLeaderboard[difficulty].findIndex(entry => 
+                 entry.name === displayName && entry.timestamp === playerEntry.timestamp
+             ) + 1;
+             
+             // Update ranking display
+             const totalPlayers = Math.max(playerRank, Math.floor(Math.random() * 1000) + 500); // Simulated total
+             document.getElementById('global-rank-text').textContent = 
+                 `Your rank: #${playerRank} of ${totalPlayers} players`;
+         }
+
+         // Local Storage Functions
+         function loadUserData() {
+             try {
+                 const savedData = localStorage.getItem('laoTypoGame_userData');
+                 if (savedData) {
+                     const data = JSON.parse(savedData);
+                     stats = { ...stats, ...data.stats };
+                     personalRecords = { ...personalRecords, ...data.personalRecords };
+                     globalLeaderboard = { ...globalLeaderboard, ...data.globalLeaderboard };
+                     displayName = data.displayName || '';
+                 }
+             } catch (error) {
+                 console.error("Error loading user data:", error);
+             }
+         }
+
+         function saveUserData() {
+             try {
+                 const userData = {
+                     settings,
+                     stats,
+                     personalRecords,
+                     globalLeaderboard,
+                     displayName,
+                     lastPlayed: new Date().toISOString()
+                 };
+                 localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
+             } catch (error) {
+                 console.error("Error saving user data:", error);
+             }
+         }
 
         // Game Functions
         function switchScreen(screenName) {
@@ -573,35 +718,62 @@
             }
         }
 
-        function endGame() {
-            gameInProgress = false;
-            stats.totalCorrect += currentStreak;
+                 function endGame() {
+             gameInProgress = false;
+             stats.totalCorrect += currentStreak;
+             stats.totalGames++;
 
-            document.getElementById('final-streak').textContent = currentStreak;
-            
-            const sessionAccuracy = ((currentStreak) / (currentStreak + 1)) * 100;
-            document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
-            
-            const evaluationEl = document.getElementById('evaluation-result');
-            if (sessionAccuracy > 0 && sessionAccuracy < 30) {
-                evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
-                evaluationEl.style.color = 'var(--error-color)';
-            } else if (sessionAccuracy >= 30 && sessionAccuracy < 50) {
-                evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
-                evaluationEl.style.color = 'var(--warning-color)';
-            } else if (sessionAccuracy >= 50 && sessionAccuracy < 70) {
-                evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
-                evaluationEl.style.color = 'var(--main-color)';
-            } else if (sessionAccuracy >= 70 && sessionAccuracy < 80) {
-                evaluationEl.textContent = "ລູກຊອດລາວ";
-                evaluationEl.style.color = 'var(--main-color)';
-            } else {
-                evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
-                evaluationEl.style.color = 'var(--correct-color)'; 
-            }
+             document.getElementById('final-streak').textContent = currentStreak;
+             
+             // Calculate accuracy (avoid division by zero)
+             const totalAnswers = currentStreak + stats.totalMistakes;
+             const sessionAccuracy = totalAnswers > 0 ? (currentStreak / totalAnswers) * 100 : 0;
+             document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
+             
+             const evaluationEl = document.getElementById('evaluation-result');
+             
+             // Case 0: Game Over (lost all lives) - Use endGame evaluation
+             if (playerLives === 0) {
+                 if (currentStreak === 0) {
+                     evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
+                     evaluationEl.style.color = 'var(--error-color)';
+                 } else if (currentStreak < 5) {
+                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
+                     evaluationEl.style.color = 'var(--warning-color)';
+                 } else if (currentStreak < 10) {
+                     evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
+                     evaluationEl.style.color = 'var(--main-color)';
+                 } else if (currentStreak < 15) {
+                     evaluationEl.textContent = "ລູກຊອດລາວ";
+                     evaluationEl.style.color = 'var(--main-color)';
+                 } else {
+                     evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
+                     evaluationEl.style.color = 'var(--correct-color)'; 
+                 }
+             } else {
+                 // Manual quit or timer end - standard accuracy evaluation
+                 if (sessionAccuracy < 30) {
+                     evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
+                     evaluationEl.style.color = 'var(--error-color)';
+                 } else if (sessionAccuracy < 50) {
+                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
+                     evaluationEl.style.color = 'var(--warning-color)';
+                 } else if (sessionAccuracy < 70) {
+                     evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
+                     evaluationEl.style.color = 'var(--main-color)';
+                 } else if (sessionAccuracy < 85) {
+                     evaluationEl.textContent = "ລູກຊອດລາວ";
+                     evaluationEl.style.color = 'var(--main-color)';
+                 } else {
+                     evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
+                     evaluationEl.style.color = 'var(--correct-color)'; 
+                 }
+             }
 
-            saveUserData();
-        }
+             // Update personal records
+             updatePersonalRecords();
+             saveUserData();
+         }
 
         function startTimer() {
             if (!settings.timer) return;
@@ -642,17 +814,20 @@
             }
         }
 
-        // Navigation Functions
-        function playAgain() {
-            // Reset game state
-            currentStreak = 0;
-            stats.totalGames++;
-            gameInProgress = true;
-            resetLives();
-            
-            switchScreen('game');
-            nextRound();
-        }
+                 // Navigation Functions
+         function playAgain() {
+             // Reset game state
+             currentStreak = 0;
+             stats.totalMistakes = 0; // Reset mistakes counter for new game
+             gameInProgress = true;
+             resetLives();
+             
+             // Hide personal best indicator
+             document.getElementById('personal-best-indicator').classList.add('hidden');
+             
+             switchScreen('game');
+             nextRound();
+         }
 
         function backToMenu() {
             window.location.href = 'testing.html';
@@ -695,37 +870,39 @@
             if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
         });
 
-        // Initialization
-        window.onload = async () => {
-            // Get parameters from URL
-            getURLParameters();
-            
-            // Initialize DOM references
-            heartsContainer = document.querySelector('.hearts');
-            lifeCountEl = document.querySelector('.life-count');
-            motivationText = document.querySelector('.motivation-text');
-            
-            // Initialize background music
-            initializeBackgroundMusic();
-            
-            // Load user data and word lists
-            loadUserData();
-            await loadWordListsFromGoogleSheets();
-            
-            // Set up game
-            gamePlayerName.textContent = displayName;
-            bestStreakEl.textContent = stats.bestStreak;
-            currentStreak = 0;
-            stats.totalGames++;
-            gameInProgress = true;
-            resetLives();
-            
-            // Start background music if enabled
-            toggleBackgroundMusic();
-            
-            // Start first round
-            nextRound();
-        };
+                 // Initialization
+         window.onload = async () => {
+             // Get parameters from URL
+             getURLParameters();
+             
+             // Initialize DOM references
+             heartsContainer = document.querySelector('.hearts');
+             lifeCountEl = document.querySelector('.life-count');
+             motivationText = document.querySelector('.motivation-text');
+             
+             // Initialize background music
+             initializeBackgroundMusic();
+             
+             // Load user data and word lists
+             loadUserData();
+             await loadWordListsFromGoogleSheets();
+             
+             // Initialize personal records display
+             updatePersonalRecordsDisplay();
+             
+             // Set up game
+             gamePlayerName.textContent = displayName;
+             bestStreakEl.textContent = stats.bestStreak;
+             currentStreak = 0;
+             gameInProgress = true;
+             resetLives();
+             
+             // Start background music if enabled
+             toggleBackgroundMusic();
+             
+             // Start first round
+             nextRound();
+         };
     </script>
 </body>
 </html>
