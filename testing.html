@@ -207,20 +207,29 @@
         }
         
         /* Header Icon Buttons */
-        .btn-icon {
-            background: rgba(62, 64, 67, 0.9);
-            border: 1px solid var(--main-color);
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            font-size: 1.2rem;
+        .header-btn {
+            background: rgba(62, 64, 67, 0.95);
+            border: 2px solid var(--main-color);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            color: var(--main-color);
+            font-weight: bold;
+            min-width: 50px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .btn-icon:hover {
+        .header-btn:hover {
             background: var(--main-color);
-            transform: scale(1.1);
+            color: var(--bg-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(226, 183, 20, 0.4);
         }
         
         /* Independent Settings Panel */
@@ -478,9 +487,9 @@
 
     <div class="game-container">
         <!-- Header Buttons -->
-        <div class="absolute top-4 right-4 flex gap-2 z-20">
-            <button id="open-leaderboard-btn" class="btn-icon" title="📊 ສະຖິຕິ">📊</button>
-            <button id="open-settings-btn" class="btn-icon" title="⚙️ ຕັ້ງຄ່າ">⚙️</button>
+        <div class="absolute top-4 right-4 flex gap-3 z-20 p-2 bg-black bg-opacity-20 rounded-lg">
+            <button id="open-leaderboard-btn" class="header-btn" title="📊 ສະຖິຕິ">📊</button>
+            <button id="open-settings-btn" class="header-btn" title="⚙️ ຕັ້ງຄ່າ">⚙️</button>
         </div>
         
         <!-- Start Screen -->
