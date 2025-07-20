@@ -4,11 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ? (Testing)</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e2b714">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LaoTypo">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
     <style>
         :root {
             --bg-color: #2c2e31;
@@ -130,7 +143,7 @@
             transform-origin: left;
             transition: transform 0.1s linear;
         }
-        .settings-panel, .leaderboard-panel {
+        .leaderboard-panel {
             position: fixed;
             top: 0;
             left: 0;
@@ -141,6 +154,17 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            color: var(--main-color) !important;
+            border-bottom-color: var(--main-color) !important;
+        }
+        .tab-content {
+            min-height: 400px;
         }
         
         /* ADDED: Life Bar System Styles */
@@ -446,49 +470,135 @@
         </div>
     </div>
 
-    <!-- Settings Panel -->
-    <div id="settings-panel" class="settings-panel hidden">
-        <div class="panel-content space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-3xl font-bold text-main-color">ຕັ້ງຄ່າ</h2>
-                <button id="close-settings-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
-            </div>
-            <div class="text-left space-y-4">
-                <div class="flex justify-between items-center">
-                    <label>🔊 ສຽງປະກອບ</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="sound-toggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="flex justify-between items-center">
-                    <label>🎵 ບຣາວເຊີເສົາ</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="music-toggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="text-center">
-                <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leaderboard Panel -->
+    <!-- Combined Leaderboard & Settings Panel -->
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
         <div class="panel-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-main-color">ກະດານຈັດອັນດັບ</h2>
+                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ & ຕັ້ງຄ່າ</h2>
                 <button id="close-leaderboard-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
             </div>
-            <div id="leaderboard-container">
-                <!-- Leaderboard table will be injected here -->
+            
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-sub-color mb-6">
+                <button id="leaderboard-tab" class="tab-button active px-4 py-2 text-main-color border-b-2 border-main-color">
+                    🏆 ກະດານຈັດອັນດັບ
+                </button>
+                <button id="settings-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
+                    ⚙️ ຕັ້ງຄ່າ
+                </button>
+                <button id="personal-records-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
+                    📈 ບັນທຶກສ່ວນຕົວ
+                </button>
+            </div>
+
+            <!-- Leaderboard Tab Content -->
+            <div id="leaderboard-content" class="tab-content">
+                <div id="leaderboard-container">
+                    <!-- Firebase leaderboard will be injected here -->
+                    <div class="text-center text-sub-color py-8">
+                        <p>🔄 Loading global leaderboard...</p>
+                        <p class="text-xs mt-2">Syncing with Firebase</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab Content -->
+            <div id="settings-content" class="tab-content hidden">
+                <div class="space-y-6">
+                    <div class="text-left space-y-4">
+                        <div class="flex justify-between items-center">
+                            <label>🔊 ສຽງປະກອບ</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="sound-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label>🎵 ບຣາວເຊີເສົາ</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="music-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label>☁️ Firebase Sync</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="firebase-sync-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Records Tab Content -->
+            <div id="personal-records-content" class="tab-content hidden">
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-correct-color font-bold mb-2">ງ່າຍ (Easy)</div>
+                        <div id="easy-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="easy-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="easy-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-main-color font-bold mb-2">ປານກາງ (Medium)</div>
+                        <div id="medium-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="medium-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="medium-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-error-color font-bold mb-2">ຍາກ (Hard)</div>
+                        <div id="hard-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="hard-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="hard-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <button id="export-data-btn" class="btn btn-secondary">📁 Export Data</button>
+                    <button id="import-data-btn" class="btn btn-secondary ml-2">📂 Import Data</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
+        // --- PWA SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('🎉 PWA Service Worker registered:', registration.scope);
+                    
+                    // Handle updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 New version available');
+                                // Could show update notification here
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.warn('⚠️ PWA Service Worker registration failed:', error);
+                }
+            });
+        }
+
+        // --- FIREBASE INITIALIZATION ---
+        let firebaseSync = null;
+        
+        window.addEventListener('load', async () => {
+            const firebaseInitialized = await initializeFirebase();
+            if (firebaseInitialized) {
+                firebaseSync = new FirebaseSync();
+                console.log('🔥 Firebase sync ready');
+            }
+        });
+
         // --- DOM ELEMENTS ---
         const screens = {
             start: document.getElementById('start-screen'),
@@ -503,9 +613,9 @@
         const bestStreakEl = document.getElementById('best-streak');
         const timerContainer = document.getElementById('timer-container');
         const timerBar = document.getElementById('timer-bar');
-        const settingsPanel = document.getElementById('settings-panel');
         const leaderboardPanel = document.getElementById('leaderboard-panel');
         const leaderboardContainer = document.getElementById('leaderboard-container');
+        const firebaseSyncToggle = document.getElementById('firebase-sync-toggle');
         const mainDifficultySelect = document.getElementById('main-difficulty-select');
         const mainTimerToggle = document.getElementById('main-timer-toggle');
         const soundToggle = document.getElementById('sound-toggle');
@@ -834,10 +944,88 @@
 
         async function showLeaderboard() {
             leaderboardPanel.classList.remove('hidden');
+            switchTab('leaderboard');
+        }
+        
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-main-color', 'border-main-color');
+                btn.classList.add('text-sub-color');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const activeTab = document.getElementById(`${tabName}-tab`);
+            const activeContent = document.getElementById(`${tabName}-content`);
+            
+            if (activeTab && activeContent) {
+                activeTab.classList.add('active', 'text-main-color', 'border-main-color');
+                activeTab.classList.remove('text-sub-color');
+                activeContent.classList.remove('hidden');
+                
+                // Load content based on tab
+                if (tabName === 'leaderboard') {
+                    renderLeaderboard();
+                } else if (tabName === 'personal-records') {
+                    updatePersonalRecordsMainDisplay();
+                }
+            }
+        }
+        
+        function updatePersonalRecordsMainDisplay() {
+            // Update main panel personal records display
+            if (personalRecords.easy) {
+                document.getElementById('easy-best-score-main').textContent = personalRecords.easy.bestScore || 0;
+                document.getElementById('easy-best-accuracy-main').textContent = `${(personalRecords.easy.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('easy-games-count-main').textContent = `${personalRecords.easy.gamesPlayed || 0} games`;
+            }
+            
+            if (personalRecords.medium) {
+                document.getElementById('medium-best-score-main').textContent = personalRecords.medium.bestScore || 0;
+                document.getElementById('medium-best-accuracy-main').textContent = `${(personalRecords.medium.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('medium-games-count-main').textContent = `${personalRecords.medium.gamesPlayed || 0} games`;
+            }
+            
+            if (personalRecords.hard) {
+                document.getElementById('hard-best-score-main').textContent = personalRecords.hard.bestScore || 0;
+                document.getElementById('hard-best-accuracy-main').textContent = `${(personalRecords.hard.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('hard-games-count-main').textContent = `${personalRecords.hard.gamesPlayed || 0} games`;
+            }
+        }
+        
+        async function renderLeaderboard() {
             leaderboardContainer.innerHTML = '<p class="text-center">ກຳລັງໂຫຼດ...</p>';
 
             try {
-                const leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                let leaderboard = [];
+                
+                // Try Firebase first
+                if (firebaseSync && firebaseSync.enabled) {
+                    try {
+                        const difficulties = ['easy', 'medium', 'hard'];
+                        leaderboardContainer.innerHTML = '<p class="text-center">🔄 Loading from Firebase...</p>';
+                        
+                        for (const difficulty of difficulties) {
+                            const firebaseLeaderboard = await firebaseSync.getLeaderboard(difficulty, 50);
+                            leaderboard = leaderboard.concat(firebaseLeaderboard.map(entry => ({
+                                ...entry,
+                                difficulty: difficulty
+                            })));
+                        }
+                    } catch (error) {
+                        console.warn('Failed to load from Firebase, using local data');
+                    }
+                }
+                
+                // Fallback to localStorage
+                if (leaderboard.length === 0) {
+                    leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                }
                 
                 if (leaderboard.length === 0) {
                     leaderboardContainer.innerHTML = '<p class="text-center">ຍັງບໍ່ມີໃຜຕິດອັນດັບເທື່ອ!</p>';
@@ -1162,9 +1350,7 @@
         wordCardLeft.addEventListener('click', () => handleSelection('left'));
         wordCardRight.addEventListener('click', () => handleSelection('right'));
 
-        // Panels
-        document.getElementById('open-settings-btn').addEventListener('click', () => settingsPanel.classList.remove('hidden'));
-        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
+        // Panels and Tab Navigation
         document.getElementById('leaderboard-nav-btn').addEventListener('click', showLeaderboard);
         document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
         document.getElementById('account-nav-btn').addEventListener('click', () => {
@@ -1172,11 +1358,19 @@
             switchScreen('stats');
         });
         
+        // Tab Navigation
+        document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
+        document.getElementById('settings-tab').addEventListener('click', () => switchTab('settings'));
+        document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
+        
         document.getElementById('save-settings-btn').addEventListener('click', () => {
             settings.sound = soundToggle.checked;
             settings.music = musicToggle.checked;
+            if (firebaseSync) {
+                firebaseSync.setEnabled(firebaseSyncToggle.checked);
+            }
             saveUserData();
-            settingsPanel.classList.add('hidden');
+            leaderboardPanel.classList.add('hidden');
         });
         
         // Main page controls event listeners

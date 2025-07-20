@@ -1,0 +1,50 @@
+{
+  "name": "Lao Typo Game - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?",
+  "short_name": "LaoTypo",
+  "description": "Test your Lao language spelling skills with this fun typing game",
+  "start_url": "/testing.html",
+  "display": "standalone",
+  "background_color": "#2c2e31",
+  "theme_color": "#e2b714",
+  "orientation": "portrait-primary",
+  "categories": ["games", "education"],
+  "lang": "lo",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "screenshot-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "features": [
+    "Cross Platform",
+    "Low Latency ✅",
+    "Google Sheets Integration",
+    "Firebase Cloud Sync",
+    "Personal Records Tracking",
+    "Global Leaderboard",
+    "Life System",
+    "Sound Effects"
+  ]
+}
