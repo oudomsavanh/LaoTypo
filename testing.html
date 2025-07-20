@@ -443,12 +443,106 @@
             font-size: 1.2rem;
             margin: 1rem 0;
         }
+        
+        /* Gecko Mascot */
+        .gecko-mascot {
+            position: fixed;
+            top: 80px; /* Below navigation bar */
+            left: 1rem;
+            z-index: 40; /* Below navigation but above content */
+            pointer-events: none; /* Don't interfere with clicks */
+        }
+        
+        .gecko-mascot img {
+            width: 100px;
+            height: 100px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gecko-mascot:hover img {
+            opacity: 1;
+        }
+        
+        /* Account Statistics Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .account-content h2 {
+            color: var(--main-color);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 0.95rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--sub-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .close-btn:hover {
+            color: var(--text-color);
+        }
     </style>
 </head>
 <body>
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" id="home-btn" class="text-2xl font-bold text-main-color">LaoTypo (Testing)</a>
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
             <div class="flex items-center space-x-2 md:space-x-4">
                 <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 100-13.5h9a9 9 0 100 13.5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 100-13.5h9a9 9 0 100 13.5zM12 15V9m-4 6h8" /></svg>
@@ -463,12 +557,14 @@
         </div>
     </nav>
 
+    <!-- Gecko Mascot -->
+    <div class="gecko-mascot">
+        <img src="Gecko.png" alt="Gecko Mascot" class="w-15 h-15 object-contain">
+    </div>
+
     <div class="game-container">
         <!-- Start Screen -->
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
-            <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
-            <p class="text-lg text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
-            <p class="text-sm text-sub-color">(Testing Version)</p>
             
 
             
@@ -518,7 +614,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.6.1 - Testing</p>
+                <p>Version: 1.7.1 - Testing</p>
             </div>
         </div>
 
@@ -693,6 +789,48 @@
                 </div>
                 <div class="text-center">
                     <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Statistics Panel -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">ສະຖິຕິສ່ວນຕົວ</h2>
+                <button id="close-account-btn" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="space-y-0">
+                <div class="stat-row">
+                    <span class="stat-label">ຊື່:</span>
+                    <span class="stat-value" id="player-name-display">Ekward</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">ຄະແນນທີ່ດີທີ່ສຸດ:</span>
+                    <span class="stat-value" id="best-score-display">7</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">ຈຳນວນເກມທັງໝົດ:</span>
+                    <span class="stat-value" id="total-games-display">14</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ:</span>
+                    <span class="stat-value" id="correct-answers-display">26</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">ຈຳນວນຄຳຕອບທີ່ຜິດ:</span>
+                    <span class="stat-value" id="wrong-answers-display">3</span>
+                </div>
+                
+                <div class="stat-row">
+                    <span class="stat-label">ຄວາມຖືກຕ້ອງທັງໝົດ:</span>
+                    <span class="stat-value" id="accuracy-display">89.7%</span>
                 </div>
             </div>
         </div>
@@ -1460,8 +1598,14 @@
         });
         // Leaderboard is already handled by leaderboard-nav-btn
         document.getElementById('account-nav-btn').addEventListener('click', () => {
-            updateUI(); // Make sure stats screen shows latest name
-            switchScreen('stats');
+            console.log('👤 Opening account statistics panel');
+            const accountPanel = document.getElementById('account-panel');
+            accountPanel.classList.toggle('hidden');
+        });
+        
+        document.getElementById('close-account-btn').addEventListener('click', () => {
+            console.log('👤 Closing account statistics panel');
+            document.getElementById('account-panel').classList.add('hidden');
         });
         
         // Tab Navigation
