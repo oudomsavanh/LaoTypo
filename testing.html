@@ -226,18 +226,18 @@
         /* Independent Settings Panel */
         .settings-panel {
             position: fixed;
-            top: 20%;
-            right: 2rem;
+            top: 15%;
+            right: 1rem;
             background: var(--bg-color);
-            border: 2px solid var(--main-color);
+            border: 3px solid var(--main-color);
             border-radius: 1rem;
             padding: 0;
             min-width: 320px;
             max-width: 380px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            max-height: 70vh;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
             overflow-y: auto;
         }
         
@@ -532,10 +532,12 @@
             <div>
                 <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
             </div>
-             <div class="absolute bottom-4 right-4 text-xs text-sub-color">
+            
+            <!-- Footer moved below start game button -->
+            <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.5.0 - Testing</p>
+                <p>Version: 1.6.1 - Testing</p>
             </div>
         </div>
 
@@ -1467,8 +1469,14 @@
         
         // Settings panel controls
         const settingsPanel = document.getElementById('settings-panel');
-        document.getElementById('open-settings-btn').addEventListener('click', () => settingsPanel.classList.remove('hidden'));
-        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
+        document.getElementById('open-settings-btn').addEventListener('click', () => {
+            console.log('🔧 Opening settings panel');
+            settingsPanel.classList.remove('hidden');
+        });
+        document.getElementById('close-settings-btn').addEventListener('click', () => {
+            console.log('🔧 Closing settings panel');
+            settingsPanel.classList.add('hidden');
+        });
         document.getElementById('open-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.remove('hidden'));
         document.getElementById('account-nav-btn').addEventListener('click', () => {
             updateUI(); // Make sure stats screen shows latest name
@@ -1481,6 +1489,7 @@
         document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
         
         document.getElementById('save-settings-btn').addEventListener('click', () => {
+            console.log('💾 Saving settings and closing panel');
             settings.sound = soundToggle.checked;
             settings.music = musicToggle.checked;
             if (firebaseSync) {
