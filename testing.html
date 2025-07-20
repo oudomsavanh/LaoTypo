@@ -463,8 +463,8 @@
         }
         
         .gecko-mascot img {
-            width: 60px;
-            height: 60px;
+            width: 100px;
+            height: 100px;
             opacity: 0.8;
             transition: opacity 0.3s ease;
         }
@@ -681,7 +681,7 @@
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
-                <img src="LaoTypo-logo.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
             </a>
             <div class="flex items-center space-x-2 md:space-x-4">
                 <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
@@ -757,7 +757,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.8.0 - Testing</p>
+                <p>Version: 1.8.1 - Testing (Debug)</p>
             </div>
         </div>
 
@@ -1041,7 +1041,7 @@
         const gamePlayerName = document.getElementById('game-player-name');
 
         // --- GAME STATE & SETTINGS ---
-        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
+        let userId = 'local_user_' + Math.random().toString(36).substring(2, 11);
         let currentStreak = 0;
         let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
         let timerInterval;
@@ -1542,20 +1542,28 @@
             musicToggle.checked = settings.music;
             
             // Display user ID in footer
-            console.log('DEBUG: Updating user ID display, userId =', userId);
+            console.log('🆔 Updating user ID display, userId =', userId);
+            console.log('🆔 userId length:', userId ? userId.length : 'undefined');
             const userIdElement = document.getElementById('user-id-display');
             if (userIdElement) {
                 const displayText = '...' + userId.slice(-6);
                 userIdElement.textContent = displayText;
-                console.log('DEBUG: Set user ID display to:', displayText);
+                console.log('✅ Set user ID display to:', displayText);
+                console.log('✅ Element content:', userIdElement.textContent);
             } else {
-                console.error('DEBUG: user-id-display element not found!');
+                console.error('❌ user-id-display element not found!');
             }
         }
 
         function startGame() {
+            console.log('🚀 startGame() called');
+            console.log('📝 Player name input value:', playerNameInput.value);
+            console.log('⚙️ Current settings:', settings);
+            console.log('👤 Current userId:', userId);
+            
             const newName = playerNameInput.value.trim();
             if (!newName) {
+                console.log('❌ No name provided');
                 playerNameInput.classList.add('input-error', 'feedback-incorrect');
                 playerNameInput.placeholder = "ກະລຸນາໃສ່ຊື່ກ່ອນ!";
                 setTimeout(() => {
@@ -1723,7 +1731,12 @@
         
         // --- EVENT LISTENERS ---
         document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
-        document.getElementById('start-game-btn').addEventListener('click', startGame);
+        document.getElementById('start-game-btn').addEventListener('click', function(e) {
+            console.log('🖱️ Start game button clicked!');
+            console.log('🖱️ Button disabled?', this.disabled);
+            console.log('🖱️ Event target:', e.target);
+            startGame();
+        });
         document.getElementById('restart-game-btn').addEventListener('click', startGame);
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
             switchScreen('start');
