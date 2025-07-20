@@ -300,11 +300,11 @@
              
              <!-- Game Stats -->
              <div class="bg-[#3e4043] rounded-lg p-6 space-y-4">
+                <div id="evaluation-result" class="text-xl font-bold"></div>
                  <div class="text-2xl space-y-2">
                      <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
                      <p>ຄວາມແມ່ນຍຳ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
                  </div>
-                 <div id="evaluation-result" class="text-xl font-bold"></div>
                  
                  <!-- Personal Best Indicator -->
                  <div id="personal-best-indicator" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-bold text-center">
@@ -582,15 +582,15 @@
         function updateMotivationText() {
             switch(playerLives) {
                 case 3:
-                    motivationText.textContent = "You've got 3 lives—spend them wisely!";
+                    motivationText.textContent = "ເຈົ້າມີ 3 ຊີວິດ, ໃຊ້ໃຫ້ມັນຄຸ້ມ!";
                     motivationText.style.color = 'var(--correct-color)';
                     break;
                 case 2:
-                    motivationText.textContent = "Be careful! 2 lives remaining.";
+                    motivationText.textContent = "ລະວັງເດີ້! ເຈົ້າເຫຼືອແຕ່ 2 ຊິວິດແລ້ວໃດ";
                     motivationText.style.color = 'var(--main-color)';
                     break;
                 case 1:
-                    motivationText.textContent = "Last chance! Don't waste it!";
+                    motivationText.textContent = "ໂອກາດສຸດທ້າຍແລ້ວ! ຢ່າໃຫ້ພາດ!";
                     motivationText.style.color = 'var(--error-color)';
                     break;
                 case 0:
