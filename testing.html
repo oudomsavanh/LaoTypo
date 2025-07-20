@@ -678,6 +678,9 @@
     </style>
 </head>
 <body>
+    <!-- 🔥 Firebase Integration -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="migrate-words-to-firebase.js"></script>
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -757,7 +760,7 @@
             <div class="text-center text-xs text-sub-color mt-4">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.8.1 - Testing (Debug)</p>
+                <p>Version: 1.9.0 - Firebase Ready</p>
             </div>
         </div>
 
@@ -1575,7 +1578,7 @@
 
             if (newName !== displayName) {
                 displayName = newName;
-                saveUserData();
+                await saveUserDataWithSync();
             }
 
             // Display player name in game screen
@@ -1584,7 +1587,7 @@
             playSound('start');
             
             // Save current settings and player data before navigation
-            saveUserData();
+            await saveUserDataWithSync();
             
             // Navigate to gameplay page with enhanced parameters
             console.log('🚀 Starting game with settings:', settings);
@@ -1795,6 +1798,89 @@
             document.getElementById('account-panel').classList.add('hidden');
         }
 
+        // 🔥 FIREBASE INTEGRATION FUNCTIONS
+        let firebaseEnabled = false;
+        
+        // Initialize Firebase connection
+        async function initializeFirebaseSync() {
+            try {
+                // Check if Firebase managers are available
+                if (typeof FirebaseSyncManager !== 'undefined') {
+                    const isConnected = await FirebaseSyncManager.checkConnection();
+                    if (isConnected) {
+                        firebaseEnabled = true;
+                        console.log('🔥 Firebase sync enabled');
+                        
+                        // Try to sync existing local data to cloud
+                        await syncLocalDataToFirebase();
+                        
+                        // Try to load cloud data
+                        await syncCloudDataToLocal();
+                    } else {
+                        console.warn('🔌 Firebase connection failed, using local mode');
+                    }
+                } else {
+                    console.warn('🔥 Firebase not loaded, using local mode');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                firebaseEnabled = false;
+            }
+        }
+        
+        // Sync local data to Firebase
+        async function syncLocalDataToFirebase() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const localData = {
+                    displayName: displayName,
+                    settings: settings,
+                    stats: stats,
+                    personalRecords: personalRecords
+                };
+                
+                const success = await FirebaseSyncManager.syncToCloud(userId, localData);
+                if (success) {
+                    console.log('☁️ Local data synced to Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Error syncing to Firebase:', error);
+            }
+        }
+        
+        // Sync Firebase data to local
+        async function syncCloudDataToLocal() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const cloudData = await FirebaseSyncManager.syncFromCloud(userId);
+                if (cloudData) {
+                    // Merge cloud data with local data (cloud takes priority)
+                    displayName = cloudData.displayName || displayName;
+                    settings = { ...settings, ...cloudData.settings };
+                    stats = { ...stats, ...cloudData.stats };
+                    personalRecords = { ...personalRecords, ...cloudData.personalRecords };
+                    
+                    console.log('📥 Cloud data synced to local');
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('❌ Error syncing from Firebase:', error);
+            }
+        }
+        
+        // Enhanced save function with Firebase sync
+        async function saveUserDataWithSync() {
+            // Always save locally first
+            saveUserData();
+            
+            // Then sync to Firebase if enabled
+            if (firebaseEnabled) {
+                await syncLocalDataToFirebase();
+            }
+        }
+        
         // Enhanced Account Functions
         function updateEnhancedProfile() {
             // This function is kept for backward compatibility with stats screen
@@ -2050,6 +2136,11 @@
             
             loadUserData();
             updateUI();
+            
+            // Initialize Firebase sync
+            setTimeout(async () => {
+                await initializeFirebaseSync();
+            }, 1000); // Give Firebase modules time to load
             
             // Word loading now handled in gameplay.html
             if (startGameBtn) {
