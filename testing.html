@@ -171,6 +171,86 @@
             min-height: 400px;
         }
         
+        /* Difficulty Card Styles */
+        .difficulty-card {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 2px solid transparent;
+            border-radius: 1rem;
+            padding: 1rem;
+            min-width: 80px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .difficulty-card:hover {
+            border-color: var(--main-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .difficulty-card.active {
+            border-color: var(--main-color);
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            color: var(--bg-color);
+        }
+        
+        .difficulty-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .difficulty-label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        /* Header Icon Buttons */
+        .btn-icon {
+            background: rgba(62, 64, 67, 0.9);
+            border: 1px solid var(--main-color);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-icon:hover {
+            background: var(--main-color);
+            transform: scale(1.1);
+        }
+        
+        /* Independent Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            background: rgba(46, 48, 52, 0.98);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-panel.hidden {
+            opacity: 0;
+            transform: translateY(-50%) translateX(100%);
+            pointer-events: none;
+        }
+        
+        .settings-content {
+            padding: 1.5rem;
+        }
+        
         /* Toggle Switch Styles */
         .switch {
             position: relative;
@@ -391,6 +471,12 @@
     </nav>
 
     <div class="game-container">
+        <!-- Header Buttons -->
+        <div class="absolute top-4 right-4 flex gap-2 z-20">
+            <button id="open-leaderboard-btn" class="btn-icon" title="📊 ສະຖິຕິ">📊</button>
+            <button id="open-settings-btn" class="btn-icon" title="⚙️ ຕັ້ງຄ່າ">⚙️</button>
+        </div>
+        
         <!-- Start Screen -->
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
             <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
@@ -408,13 +494,22 @@
             </div>
             
             <!-- ADDED: Difficulty Setting (moved from settings panel) -->
-            <div class="flex flex-col items-center space-y-2">
-                <label for="main-difficulty-select" class="text-lg text-sub-color">ລະດັບຄວາມຍາກ:</label>
-                <select id="main-difficulty-select" class="bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-2 px-4 text-lg">
-                    <option value="easy">ງ່າຍ</option>
-                    <option value="medium">ປານກາງ</option>
-                    <option value="hard">ຍາກ</option>
-                </select>
+            <div class="flex flex-col items-center space-y-4">
+                <label class="text-lg text-sub-color">ລະດັບຄວາມຍາກ:</label>
+                <div class="flex gap-4">
+                    <div class="difficulty-card" data-difficulty="easy">
+                        <div class="difficulty-icon">🟢</div>
+                        <div class="difficulty-label">ງ່າຍ</div>
+                    </div>
+                    <div class="difficulty-card" data-difficulty="medium">
+                        <div class="difficulty-icon">🟡</div>
+                        <div class="difficulty-label">ປານກາງ</div>
+                    </div>
+                    <div class="difficulty-card" data-difficulty="hard">
+                        <div class="difficulty-icon">🔴</div>
+                        <div class="difficulty-label">ຍາກ</div>
+                    </div>
+                </div>
             </div>
             
             <!-- ADDED: Timer Setting (moved from settings panel) -->
@@ -434,7 +529,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.4.0-Testing</p>
+                <p>Version: 1.5.0-Testing</p>
             </div>
         </div>
 
@@ -514,21 +609,18 @@
         </div>
     </div>
 
-    <!-- Combined Leaderboard & Settings Panel -->
+    <!-- Leaderboard Panel (Separated from Settings) -->
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
         <div class="panel-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ & ຕັ້ງຄ່າ</h2>
+                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ</h2>
                 <button id="close-leaderboard-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
             </div>
             
-            <!-- Tab Navigation -->
+            <!-- Tab Navigation (Removed Settings Tab) -->
             <div class="flex border-b border-sub-color mb-6">
                 <button id="leaderboard-tab" class="tab-button active px-4 py-2 text-main-color border-b-2 border-main-color">
                     🏆 ກະດານຈັດອັນດັບ
-                </button>
-                <button id="settings-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
-                    ⚙️ ຕັ້ງຄ່າ
                 </button>
                 <button id="personal-records-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
                     📈 ບັນທຶກສ່ວນຕົວ
@@ -546,37 +638,7 @@
                 </div>
             </div>
 
-            <!-- Settings Tab Content -->
-            <div id="settings-content" class="tab-content hidden">
-                <div class="space-y-6">
-                    <div class="text-left space-y-4">
-                        <div class="flex justify-between items-center">
-                            <label>🔊 ສຽງປະກອບ</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="sound-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <label>🎵 ບຣາວເຊີເສົາ</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="music-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <label>☁️ Firebase Sync</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="firebase-sync-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Personal Records Tab Content -->
             <div id="personal-records-content" class="tab-content hidden">
@@ -603,6 +665,45 @@
                 <div class="mt-6 text-center">
                     <button id="export-data-btn" class="btn btn-secondary">📁 Export Data</button>
                     <button id="import-data-btn" class="btn btn-secondary ml-2">📂 Import Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Independent Settings Panel (Floating) -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-main-color">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-2xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="text-left space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label>🔊 ສຽງປະກອບ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>🎵 ບຣາວເຊີເສົາ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="music-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>☁️ Firebase Sync</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="firebase-sync-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
                 </div>
             </div>
         </div>
@@ -660,7 +761,7 @@
         const leaderboardPanel = document.getElementById('leaderboard-panel');
         const leaderboardContainer = document.getElementById('leaderboard-container');
         const firebaseSyncToggle = document.getElementById('firebase-sync-toggle');
-        const mainDifficultySelect = document.getElementById('main-difficulty-select');
+        const difficultyCards = document.querySelectorAll('.difficulty-card');
         const mainTimerToggle = document.getElementById('main-timer-toggle');
         const soundToggle = document.getElementById('sound-toggle');
         const musicToggle = document.getElementById('music-toggle');
@@ -1143,7 +1244,22 @@
             const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
             document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
             
-            mainDifficultySelect.value = settings.difficulty;
+            // Update difficulty cards
+            difficultyCards.forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.difficulty === settings.difficulty) {
+                    card.classList.add('active');
+                }
+            });
+            
+            // Set default difficulty if none selected
+            if (!document.querySelector('.difficulty-card.active')) {
+                const defaultCard = document.querySelector('.difficulty-card[data-difficulty="easy"]');
+                if (defaultCard) {
+                    defaultCard.classList.add('active');
+                    settings.difficulty = 'easy';
+                }
+            }
             mainTimerToggle.checked = settings.timer;
             soundToggle.checked = settings.sound;
             musicToggle.checked = settings.music;
@@ -1342,6 +1458,12 @@
         // Panels and Tab Navigation
         document.getElementById('leaderboard-nav-btn').addEventListener('click', showLeaderboard);
         document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
+        
+        // Settings panel controls
+        const settingsPanel = document.getElementById('settings-panel');
+        document.getElementById('open-settings-btn').addEventListener('click', () => settingsPanel.classList.remove('hidden'));
+        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
+        document.getElementById('open-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.remove('hidden'));
         document.getElementById('account-nav-btn').addEventListener('click', () => {
             updateUI(); // Make sure stats screen shows latest name
             switchScreen('stats');
@@ -1349,7 +1471,7 @@
         
         // Tab Navigation
         document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
-        document.getElementById('settings-tab').addEventListener('click', () => switchTab('settings'));
+
         document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
         
         document.getElementById('save-settings-btn').addEventListener('click', () => {
@@ -1363,9 +1485,14 @@
         });
         
         // Main page controls event listeners
-        mainDifficultySelect.addEventListener('change', () => {
-            settings.difficulty = mainDifficultySelect.value;
-            saveUserData();
+        // Difficulty card selection
+        difficultyCards.forEach(card => {
+            card.addEventListener('click', () => {
+                difficultyCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                settings.difficulty = card.dataset.difficulty;
+                saveUserData();
+            });
         });
         
         mainTimerToggle.addEventListener('change', () => {
