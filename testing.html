@@ -142,6 +142,80 @@
             justify-content: center;
             z-index: 100;
         }
+        
+        /* ADDED: Life Bar System Styles */
+        .life-bar-header {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .life-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hearts {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .heart {
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .heart.active {
+            animation: heartPulse 3s infinite;
+        }
+        
+        .heart.lost {
+            opacity: 0.3;
+            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            transform: scale(0.8);
+        }
+        
+        .heart.losing {
+            animation: heartBreak 0.6s ease-in-out forwards;
+        }
+        
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes heartBreak {
+            0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+            25% { transform: scale(1.2) rotate(5deg); color: #ff4444; }
+            50% { transform: scale(1.3) rotate(-5deg); color: #ff0000; }
+            75% { transform: scale(0.9) rotate(2deg); opacity: 0.7; }
+            100% { transform: scale(0.8); opacity: 0.3; filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        }
+        
+        @keyframes lifeBarFlash {
+            0%, 100% { background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%); }
+            50% { background: linear-gradient(135deg, #ca4754 0%, #8b2635 100%); }
+        }
+        
+        .motivation-text {
+            font-size: 1rem;
+            color: var(--sub-color);
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .life-text, .life-count {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
         .panel-content {
             background-color: var(--bg-color);
             padding: 2rem;
@@ -273,12 +347,26 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo14</p>
+                <p>Version demo15</p>
             </div>
         </div>
 
         <!-- Game Screen -->
         <div id="game-screen" class="screen">
+            <!-- ADDED: Life Bar System -->
+            <div class="life-bar-header mb-6">
+                <div class="life-container">
+                    <span class="life-text">Lives:</span>
+                    <div class="hearts">
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                    </div>
+                    <span class="life-count">3/3</span>
+                </div>
+                <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
+            </div>
+            
             <div class="flex justify-between items-center mb-6 text-2xl">
                 <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
                 <div class="text-sub-color text-center">Player: <span id="game-player-name" class="text-text-color font-bold"></span></div>
@@ -423,6 +511,11 @@
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
+        
+        // --- LIFE SYSTEM ---
+        let playerLives = 3;
+        let maxLives = 3;
+        let heartsContainer, lifeCountEl, motivationText;
 
         let settings = {
             difficulty: 'easy',
@@ -528,6 +621,101 @@
             
             const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
             return filtered.length > 0 ? filtered : wordList; // Fallback to all if none found
+        }
+
+        // --- LIFE SYSTEM FUNCTIONS ---
+        function updateLifeDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            lifeCountEl.textContent = `${playerLives}/${maxLives}`;
+            
+            hearts.forEach((heart, index) => {
+                if (index < playerLives) {
+                    heart.classList.remove('lost');
+                    heart.classList.add('active');
+                } else {
+                    heart.classList.add('lost');
+                    heart.classList.remove('active');
+                }
+            });
+            
+            updateMotivationText();
+        }
+
+        function loseLife() {
+            if (playerLives > 0) {
+                playerLives--;
+                
+                // Animate the heart breaking
+                const hearts = heartsContainer.querySelectorAll('.heart');
+                const heartToBreak = hearts[playerLives];
+                heartToBreak.classList.add('losing');
+                
+                setTimeout(() => {
+                    heartToBreak.classList.remove('losing');
+                    updateLifeDisplay();
+                    
+                    // Check if game over
+                    if (playerLives === 0) {
+                        gameOver();
+                    } else {
+                        showLifeWarning();
+                        // Continue to next round after a delay
+                        setTimeout(nextRound, 1500);
+                    }
+                }, 600);
+            }
+        }
+
+        function updateMotivationText() {
+            switch(playerLives) {
+                case 3:
+                    motivationText.textContent = "You've got 3 lives—spend them wisely!";
+                    motivationText.style.color = 'var(--correct-color)';
+                    break;
+                case 2:
+                    motivationText.textContent = "Be careful! 2 lives remaining.";
+                    motivationText.style.color = 'var(--main-color)';
+                    break;
+                case 1:
+                    motivationText.textContent = "Last chance! Don't waste it!";
+                    motivationText.style.color = 'var(--error-color)';
+                    break;
+                case 0:
+                    motivationText.textContent = "Game Over! No lives left.";
+                    motivationText.style.color = 'var(--error-color)';
+                    break;
+            }
+        }
+
+        function showLifeWarning() {
+            const lifeBar = document.querySelector('.life-bar-header');
+            lifeBar.style.animation = 'lifeBarFlash 0.5s ease-in-out 2';
+            
+            setTimeout(() => {
+                lifeBar.style.animation = '';
+            }, 1000);
+        }
+
+        function resetLives() {
+            playerLives = maxLives;
+            updateLifeDisplay();
+        }
+
+        function gameOver() {
+            gameInProgress = false;
+            clearInterval(timerInterval);
+            
+            // Show results screen with final stats
+            switchScreen('results');
+            
+            // Update final stats
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('accuracy-stat').textContent = '0.0%';
+            
+            // Update evaluation for game over due to no lives
+            const evaluationEl = document.getElementById('evaluation-result');
+            evaluationEl.textContent = "No lives left! Better luck next time!";
+            evaluationEl.style.color = 'var(--error-color)';
         }
 
         // --- LOCAL STORAGE DATA PERSISTENCE ---
@@ -788,6 +976,10 @@
             currentStreak = 0;
             stats.totalGames++;
             gameInProgress = true;
+            
+            // Initialize life system
+            resetLives();
+            
             switchScreen('game');
             nextRound();
         }
@@ -846,8 +1038,12 @@
             } else {
                 playSound('incorrect');
                 selectedCard.classList.add('feedback-incorrect');
-                gameInProgress = false;
-                setTimeout(endGame, 500);
+                stats.totalMistakes += 1;
+                
+                // Lose a life instead of ending game immediately
+                loseLife();
+                
+                // Note: loseLife() handles the rest (next round or game over)
             }
         }
 
@@ -972,6 +1168,11 @@
 
         // --- INITIALIZATION ---
         window.onload = async () => {
+            // Initialize DOM references for life system
+            heartsContainer = document.querySelector('.hearts');
+            lifeCountEl = document.querySelector('.life-count');
+            motivationText = document.querySelector('.motivation-text');
+            
             loadUserData();
             updateUI();
             await loadWordListsFromGoogleSheets();
