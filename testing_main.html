@@ -40,16 +40,30 @@
             font-family: 'Noto Sans Lao Looped', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
             padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        nav {
-            background-color: #222426;
+        
+        /* Header Navigation */
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #222426 0%, #2c2e31 100%);
+            border-bottom: 2px solid var(--main-color);
+            padding: 1rem 0;
+            z-index: 1000;
+        }
+        
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
         }
         .nav-link {
             color: var(--sub-color);
@@ -239,6 +253,238 @@
         .settings-content label {
             color: var(--text-color);
             font-weight: 500;
+        }
+        
+        /* Enhanced Account Screen Styles */
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--bg-color);
+            border: 3px solid var(--main-color);
+        }
+        
+        .achievement-badge {
+            background: rgba(62, 64, 67, 0.5);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-color: var(--main-color);
+            box-shadow: 0 4px 12px rgba(226, 183, 20, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        .badge-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .achievement-badge.unlocked .badge-name {
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .stat-value-with-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color) 0%, #f5c93d 100%);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .difficulty-progress {
+            margin-bottom: 12px;
+        }
+        
+        .difficulty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .difficulty-icon {
+            font-size: 1.2rem;
+        }
+        
+        .difficulty-name {
+            flex: 1;
+            margin-left: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .difficulty-score {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        @keyframes achievementUnlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.05); }
+        }
+        
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+            border: 2px solid var(--main-color);
+        }
+        
+        .account-name {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        
+        .account-rank {
+            font-size: 0.8rem;
+            color: var(--sub-color);
+        }
+        
+        .quick-stats {
+            border-top: 1px solid rgba(226, 183, 20, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+        
+        .quick-stat .stat-label {
+            color: var(--sub-color);
+        }
+        
+        .quick-stat .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        /* Gecko Mascot */
+        .gecko-mascot {
+            position: fixed;
+            top: 80px; /* Below navigation bar */
+            left: 1rem;
+            z-index: 40; /* Below navigation but above content */
+            pointer-events: none; /* Don't interfere with clicks */
+        }
+        
+        .gecko-mascot img {
+            width: 100px;
+            height: 100px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gecko-mascot:hover img {
+            opacity: 1;
         }
         
         /* Toggle Switch Styles */
@@ -446,9 +692,15 @@
     </style>
 </head>
 <body>
+    <!-- 🔥 Firebase Integration (Player Data Only) -->
+    <script type="module" src="firebase-config.js"></script>
+    <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> -->
+    <script type="module" src="test-firebase-player-sync.js"></script>
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" id="home-btn" class="text-2xl font-bold text-main-color">LaoTypo (Testing)</a>
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
             <div class="flex items-center space-x-2 md:space-x-4">
                 <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 100-13.5h9a9 9 0 100 13.5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9 9 0 100-13.5h9a9 9 0 100 13.5zM12 15V9m-4 6h8" /></svg>
@@ -463,7 +715,14 @@
         </div>
     </nav>
 
+    <!-- Gecko Mascot -->
+    <div class="gecko-mascot">
+        <img src="Gecko.png" alt="Gecko Mascot" class="w-15 h-15 object-contain">
+    </div>
+
     <div class="game-container">
+
+
         <!-- Start Screen -->
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
             <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
@@ -516,9 +775,10 @@
             
             <!-- Footer moved below start game button -->
             <div class="text-center text-xs text-sub-color mt-4">
+                <p id="user-type-display">👤 Guest Mode</p>
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 1.6.1 - Testing</p>
+                <p>Version: 2.1.0 - Phase 1: 4-Page System Implemented</p>
             </div>
         </div>
 
@@ -581,15 +841,14 @@
             </div>
         </div>
 
-        <!-- Stats Screen -->
+        <!-- Simple Stats Screen (for backward compatibility) -->
         <div id="stats-screen" class="screen space-y-6">
             <h2 class="text-4xl font-bold text-main-color">ສະຖິຕິສ່ວນຕົວ</h2>
             <div class="text-xl space-y-3 text-left max-w-md mx-auto bg-[#3e4043] p-6 rounded-lg">
                 <p>ຊື່: <span id="stats-display-name" class="font-bold text-white float-right"></span></p>
                 <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-bold text-white float-right">0</span></p>
                 <p>ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຜິດ: <span id="stats-total-mistakes" class="font-bold text-white float-right">0</span></p>
+                <p>ຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-bold text-white float-right">0</span></p>
                 <p>ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-bold text-white float-right">0%</span></p>
             </div>
             <div>
@@ -698,6 +957,49 @@
         </div>
     </div>
 
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-main-color">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name" id="account-display-name">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-rank">ອັນດັບ: <span id="account-rank">#-</span></div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">🏆 ຄະແນນດີສຸດ:</span>
+                        <span class="stat-value" id="account-best-streak">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🎯 ຄວາມແມ່ນຍຳ:</span>
+                        <span class="stat-value" id="account-accuracy">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🏅 ລາງວັນ:</span>
+                        <span class="stat-value" id="account-achievements">0/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         // --- PWA SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
@@ -759,8 +1061,69 @@
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
 
+        // --- AUTHENTICATION STATE ---
+        let currentUser = null;
+        let userType = null; // 'gmail' or 'guest'
+        
+        // --- AUTHENTICATION GUARD ---
+        function checkUserAuthentication() {
+            // Check for guest user in sessionStorage
+            const guestUser = sessionStorage.getItem('guestUser');
+            const storedUserType = sessionStorage.getItem('userType');
+            
+            // Check for Gmail user data in localStorage
+            const gmailUserData = localStorage.getItem('firebaseUser');
+            
+            if (guestUser && storedUserType === 'guest') {
+                console.log('👤 Guest user found');
+                userType = 'guest';
+                const userData = JSON.parse(guestUser);
+                displayName = userData.name;
+                userId = userData.id;
+                updateUserDisplay();
+                return true;
+            } else if (gmailUserData) {
+                console.log('📧 Gmail user data found');
+                userType = 'gmail';
+                // Will be fully loaded by Firebase auth listener
+                return true;
+            } else {
+                console.log('🔐 No authenticated user found - redirecting to registration');
+                redirectToRegistration();
+                return false;
+            }
+        }
+        
+        function redirectToRegistration() {
+            console.log('🔀 Redirecting to registration page...');
+            window.location.href = 'registration.html';
+        }
+        
+        function updateUserDisplay() {
+            const userTypeElement = document.getElementById('user-type-display');
+            const userIdElement = document.getElementById('user-id-display');
+            
+            if (userType === 'guest') {
+                userTypeElement.textContent = '👤 Guest Mode';
+                userIdElement.textContent = userId || 'guest_user';
+            } else if (userType === 'gmail' && currentUser) {
+                userTypeElement.textContent = `📧 ${currentUser.email}`;
+                userIdElement.textContent = currentUser.uid;
+            }
+            
+            // Update account nav link visibility
+            const accountNavLink = document.getElementById('account-nav-link');
+            if (accountNavLink) {
+                if (userType === 'gmail') {
+                    accountNavLink.style.display = 'block';
+                } else {
+                    accountNavLink.style.display = 'none';
+                }
+            }
+        }
+        
         // --- GAME STATE & SETTINGS ---
-        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
+        let userId = 'local_user_' + Math.random().toString(36).substring(2, 11);
         let currentStreak = 0;
         let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
         let timerInterval;
@@ -1223,12 +1586,19 @@
 
         function updateUI() {
             bestStreakEl.textContent = stats.bestStreak;
-            document.getElementById('stats-display-name').textContent = displayName || 'ບໍ່ມີຊື່';
+            
+            // Update enhanced profile
+            updateEnhancedProfile();
+            
+            // Update original stats elements (for compatibility)
+            const statsDisplayName = document.getElementById('stats-display-name');
+            if (statsDisplayName) statsDisplayName.textContent = displayName || 'ບໍ່ມີຊື່';
+            
             document.getElementById('stats-best-streak').textContent = stats.bestStreak;
             document.getElementById('results-best-streak').textContent = stats.bestStreak;
             document.getElementById('stats-total-games').textContent = stats.totalGames;
             document.getElementById('stats-total-correct').textContent = stats.totalCorrect;
-            document.getElementById('stats-total-mistakes').textContent = stats.totalMistakes;
+            
             const totalPlays = stats.totalCorrect + stats.totalMistakes;
             const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
             document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
@@ -1254,20 +1624,38 @@
             musicToggle.checked = settings.music;
             
             // Display user ID in footer
-            console.log('DEBUG: Updating user ID display, userId =', userId);
+            console.log('🆔 Updating user ID display, userId =', userId);
+            console.log('🆔 userId length:', userId ? userId.length : 'undefined');
             const userIdElement = document.getElementById('user-id-display');
             if (userIdElement) {
                 const displayText = '...' + userId.slice(-6);
                 userIdElement.textContent = displayText;
-                console.log('DEBUG: Set user ID display to:', displayText);
+                console.log('✅ Set user ID display to:', displayText);
+                console.log('✅ Element content:', userIdElement.textContent);
             } else {
-                console.error('DEBUG: user-id-display element not found!');
+                console.error('❌ user-id-display element not found!');
+            }
+            
+            // Update user type display
+            const userTypeElement = document.getElementById('user-type-display');
+            if (userTypeElement) {
+                if (userType === 'gmail' && currentUser) {
+                    userTypeElement.textContent = `📧 ${currentUser.email}`;
+                } else {
+                    userTypeElement.textContent = '👤 Guest Mode';
+                }
             }
         }
 
         function startGame() {
+            console.log('🚀 startGame() called');
+            console.log('📝 Player name input value:', playerNameInput.value);
+            console.log('⚙️ Current settings:', settings);
+            console.log('👤 Current userId:', userId);
+            
             const newName = playerNameInput.value.trim();
             if (!newName) {
+                console.log('❌ No name provided');
                 playerNameInput.classList.add('input-error', 'feedback-incorrect');
                 playerNameInput.placeholder = "ກະລຸນາໃສ່ຊື່ກ່ອນ!";
                 setTimeout(() => {
@@ -1279,7 +1667,7 @@
 
             if (newName !== displayName) {
                 displayName = newName;
-                saveUserData();
+                await saveUserDataWithSync();
             }
 
             // Display player name in game screen
@@ -1288,7 +1676,7 @@
             playSound('start');
             
             // Save current settings and player data before navigation
-            saveUserData();
+            await saveUserDataWithSync();
             
             // Navigate to gameplay page with enhanced parameters
             console.log('🚀 Starting game with settings:', settings);
@@ -1433,9 +1821,16 @@
             }, duration);
         }
         
+        // --- AUTHENTICATION EVENT LISTENERS --- (REMOVED - Now handled in registration.html)
+
         // --- EVENT LISTENERS ---
         document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
-        document.getElementById('start-game-btn').addEventListener('click', startGame);
+        document.getElementById('start-game-btn').addEventListener('click', function(e) {
+            console.log('🖱️ Start game button clicked!');
+            console.log('🖱️ Button disabled?', this.disabled);
+            console.log('🖱️ Event target:', e.target);
+            startGame();
+        });
         document.getElementById('restart-game-btn').addEventListener('click', startGame);
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
             switchScreen('start');
@@ -1444,15 +1839,30 @@
         wordCardLeft.addEventListener('click', () => handleSelection('left'));
         wordCardRight.addEventListener('click', () => handleSelection('right'));
 
-        // Panels and Tab Navigation
-        document.getElementById('leaderboard-nav-btn').addEventListener('click', showLeaderboard);
+        // Panels and Tab Navigation with toggle
+        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+            console.log('📊 Toggling leaderboard panel');
+            if (leaderboardPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                showLeaderboard();
+            } else {
+                leaderboardPanel.classList.add('hidden');
+            }
+        });
         document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
         
-        // Settings panel controls
+        // Settings panel controls with toggle
         const settingsPanel = document.getElementById('settings-panel');
         document.getElementById('open-settings-btn').addEventListener('click', () => {
-            console.log('🔧 Opening settings panel');
-            settingsPanel.classList.remove('hidden');
+            console.log('🔧 Toggling settings panel');
+            if (settingsPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                settingsPanel.classList.remove('hidden');
+            } else {
+                settingsPanel.classList.add('hidden');
+            }
         });
         document.getElementById('close-settings-btn').addEventListener('click', () => {
             console.log('🔧 Closing settings panel');
@@ -1460,9 +1870,324 @@
         });
         // Leaderboard is already handled by leaderboard-nav-btn
         document.getElementById('account-nav-btn').addEventListener('click', () => {
-            updateUI(); // Make sure stats screen shows latest name
-            switchScreen('stats');
+            const accountPanel = document.getElementById('account-panel');
+            console.log('👤 Toggling account panel');
+            if (accountPanel.classList.contains('hidden')) {
+                // Close other panels first
+                closeAllPanels();
+                updateAccountPanel(); // Update account panel with latest data
+                accountPanel.classList.remove('hidden');
+            } else {
+                accountPanel.classList.add('hidden');
+            }
         });
+
+        // Panel Management Functions
+        function closeAllPanels() {
+            document.getElementById('leaderboard-panel').classList.add('hidden');
+            document.getElementById('settings-panel').classList.add('hidden');
+            document.getElementById('account-panel').classList.add('hidden');
+        }
+
+        // 🔥 FIREBASE INTEGRATION FUNCTIONS
+        let firebaseEnabled = false;
+        
+        // Initialize Firebase connection
+        async function initializeFirebaseSync() {
+            try {
+                // Check if Firebase managers are available
+                if (typeof FirebaseSyncManager !== 'undefined') {
+                    const isConnected = await FirebaseSyncManager.checkConnection();
+                    if (isConnected) {
+                        firebaseEnabled = true;
+                        console.log('🔥 Firebase sync enabled');
+                        
+                        // Try to sync existing local data to cloud
+                        await syncLocalDataToFirebase();
+                        
+                        // Try to load cloud data
+                        await syncCloudDataToLocal();
+                    } else {
+                        console.warn('🔌 Firebase connection failed, using local mode');
+                    }
+                } else {
+                    console.warn('🔥 Firebase not loaded, using local mode');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                firebaseEnabled = false;
+            }
+        }
+        
+        // Sync local data to Firebase
+        async function syncLocalDataToFirebase() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const localData = {
+                    displayName: displayName,
+                    settings: settings,
+                    stats: stats,
+                    personalRecords: personalRecords
+                };
+                
+                const success = await FirebaseSyncManager.syncToCloud(userId, localData);
+                if (success) {
+                    console.log('☁️ Local data synced to Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Error syncing to Firebase:', error);
+            }
+        }
+        
+        // Sync Firebase data to local
+        async function syncCloudDataToLocal() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const cloudData = await FirebaseSyncManager.syncFromCloud(userId);
+                if (cloudData) {
+                    // Merge cloud data with local data (cloud takes priority)
+                    displayName = cloudData.displayName || displayName;
+                    settings = { ...settings, ...cloudData.settings };
+                    stats = { ...stats, ...cloudData.stats };
+                    personalRecords = { ...personalRecords, ...cloudData.personalRecords };
+                    
+                    console.log('📥 Cloud data synced to local');
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('❌ Error syncing from Firebase:', error);
+            }
+        }
+        
+        // Enhanced save function with Firebase sync
+        async function saveUserDataWithSync() {
+            // Always save locally first
+            saveUserData();
+            
+            // Then sync to Firebase if enabled
+            if (firebaseEnabled) {
+                await syncLocalDataToFirebase();
+            }
+        }
+        
+        // 🔐 AUTHENTICATION FUNCTIONS
+        
+        // Switch between screens
+        function switchToScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // --- AUTHENTICATION FUNCTIONS MOVED TO registration.html ---
+        
+        // Load cloud user data
+        async function loadCloudUserData() {
+            if (userType === 'gmail' && currentUser) {
+                try {
+                    const cloudData = await FirebaseSyncManager.syncFromCloud(userId);
+                    if (cloudData) {
+                        displayName = cloudData.displayName || displayName;
+                        settings = { ...settings, ...cloudData.settings };
+                        stats = { ...stats, ...cloudData.stats };
+                        personalRecords = { ...personalRecords, ...cloudData.personalRecords };
+                        console.log('📥 Cloud data loaded successfully');
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading cloud data:', error);
+                }
+            }
+        }
+        
+        // Initialize cloud user data for new users
+        async function initializeCloudUserData(profileData) {
+            try {
+                const initialData = {
+                    displayName: profileData.name,
+                    settings: settings,
+                    stats: stats,
+                    personalRecords: personalRecords
+                };
+                
+                await FirebaseSyncManager.syncToCloud(userId, initialData);
+                console.log('☁️ Initial cloud data synced');
+            } catch (error) {
+                console.error('❌ Error initializing cloud data:', error);
+            }
+        }
+        
+        // Debug Firebase availability
+        function debugFirebaseStatus() {
+            console.log('🔍 Debugging Firebase Status:');
+            console.log('FirebaseAuthManager available:', typeof FirebaseAuthManager !== 'undefined');
+            console.log('FirebasePlayerManager available:', typeof FirebasePlayerManager !== 'undefined');
+            console.log('firebaseAuth available:', typeof firebaseAuth !== 'undefined');
+            
+            if (typeof FirebaseAuthManager !== 'undefined') {
+                console.log('✅ Firebase Auth Manager is ready');
+                return true;
+            } else {
+                console.error('❌ Firebase Auth Manager not available');
+                return false;
+            }
+        }
+        
+        // Check authentication state on page load
+        function checkAuthState() {
+            console.log('🔍 Checking authentication state...');
+            
+            if (typeof FirebaseAuthManager !== 'undefined') {
+                console.log('✅ Setting up auth state listener...');
+                FirebaseAuthManager.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        console.log('👤 User is signed in:', user.email);
+                        currentUser = user;
+                        userType = 'gmail';
+                        
+                        // Check if profile is complete
+                        const profile = await FirebaseAuthManager.getUserProfile(user.uid);
+                        if (profile && profile.name && profile.age) {
+                            displayName = profile.name;
+                            userId = user.uid;
+                            await loadCloudUserData();
+                            updateUI();
+                            
+                            // If we're on registration screen, move to start screen
+                            if (document.getElementById('registration-screen').classList.contains('active')) {
+                                switchToScreen('start-screen');
+                            }
+                        }
+                    } else {
+                        console.log('👤 User is signed out');
+                        currentUser = null;
+                        userType = null;
+                    }
+                });
+            } else {
+                console.warn('⚠️ FirebaseAuthManager not available, skipping auth state check');
+            }
+        }
+
+        // Enhanced Account Functions
+        function updateEnhancedProfile() {
+            // This function is kept for backward compatibility with stats screen
+            // The main account data is now handled by updateAccountPanel()
+        }
+        
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update rank
+            const rank = calculateUserRank();
+            document.getElementById('account-rank').textContent = `#${rank}`;
+            
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = stats.bestStreak;
+            
+            // Calculate accuracy
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
+            
+            // Calculate achievement count
+            const achievements = calculateAchievements();
+            document.getElementById('account-achievements').textContent = `${achievements.length}/8`;
+        }
+        
+        function calculateUserRank() {
+            // Simple rank calculation based on best streak
+            if (stats.bestStreak >= 50) return Math.floor(Math.random() * 10) + 1;
+            if (stats.bestStreak >= 25) return Math.floor(Math.random() * 25) + 10;
+            if (stats.bestStreak >= 10) return Math.floor(Math.random() * 50) + 25;
+            return Math.floor(Math.random() * 100) + 50;
+        }
+        
+        function updateProgressBars() {
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // Update accuracy progress bar
+            const accuracyProgress = document.getElementById('accuracy-progress');
+            if (accuracyProgress) {
+                setTimeout(() => {
+                    accuracyProgress.style.width = `${accuracy}%`;
+                }, 100);
+            }
+        }
+        
+        function updateDifficultyScores() {
+            // Update difficulty best scores from stats
+            document.getElementById('easy-best-score').textContent = stats.difficulties?.easy?.bestStreak || 0;
+            document.getElementById('medium-best-score').textContent = stats.difficulties?.medium?.bestStreak || 0;
+            document.getElementById('hard-best-score').textContent = stats.difficulties?.hard?.bestStreak || 0;
+            
+            // Update difficulty progress bars
+            const maxScore = 20; // Assuming max target score is 20
+            updateDifficultyProgress('easy', stats.difficulties?.easy?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('medium', stats.difficulties?.medium?.bestStreak || 0, maxScore);
+            updateDifficultyProgress('hard', stats.difficulties?.hard?.bestStreak || 0, maxScore);
+        }
+        
+        function updateDifficultyProgress(difficulty, score, maxScore) {
+            const progressBar = document.getElementById(`${difficulty}-progress`);
+            if (progressBar) {
+                const percentage = Math.min((score / maxScore) * 100, 100);
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 200);
+            }
+        }
+        
+        function updateAchievements() {
+            const achievements = calculateAchievements();
+            achievements.forEach(achievement => {
+                const badge = document.querySelector(`[data-achievement="${achievement}"]`);
+                if (badge && !badge.classList.contains('unlocked')) {
+                    badge.classList.remove('locked');
+                    badge.classList.add('unlocked');
+                    // Add unlock animation
+                    badge.style.animation = 'achievementUnlock 0.6s ease';
+                }
+            });
+        }
+        
+        function calculateAchievements() {
+            const unlocked = [];
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // First game
+            if (stats.totalGames >= 1) unlocked.push('first-game');
+            
+            // Streak achievements
+            if (stats.bestStreak >= 5) unlocked.push('streak-5');
+            if (stats.bestStreak >= 10) unlocked.push('streak-10');
+            
+            // Perfect accuracy
+            if (accuracy === 100 && stats.totalCorrect >= 5) unlocked.push('perfectionist');
+            
+            // Word master
+            if (stats.totalCorrect >= 50) unlocked.push('word-master');
+            
+            // Difficulty master (played all levels)
+            if (stats.difficulties?.easy?.bestStreak > 0 && 
+                stats.difficulties?.medium?.bestStreak > 0 && 
+                stats.difficulties?.hard?.bestStreak > 0) {
+                unlocked.push('difficulty-master');
+            }
+            
+            // Consistent player (7 days - mock for now)
+            if (stats.totalGames >= 7) unlocked.push('consistent-player');
+            
+            // Champion (top rank - mock)
+            if (stats.bestStreak >= 50) unlocked.push('champion');
+            
+            return unlocked;
+        }
         
         // Tab Navigation
         document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
@@ -1504,6 +2229,64 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Account panel controls
+        const accountPanel = document.getElementById('account-panel');
+        document.getElementById('close-account-btn').addEventListener('click', () => accountPanel.classList.add('hidden'));
+        
+        document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+                updateAccountPanel();
+            }
+        });
+        
+        document.getElementById('view-full-profile-btn').addEventListener('click', () => {
+            // Close account panel and navigate to full profile page
+            accountPanel.classList.add('hidden');
+            window.location.href = 'player_account_info.html';
+        });
+        
+        // Enhanced account button handlers
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+            }
+        });
+        
+        document.getElementById('reset-progress-btn').addEventListener('click', () => {
+            if (confirm('ເຈົ້າແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້!')) {
+                // Reset all stats
+                stats = {
+                    bestStreak: 0,
+                    totalGames: 0,
+                    totalCorrect: 0,
+                    totalMistakes: 0,
+                    difficulties: {
+                        easy: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        medium: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
+                        hard: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 }
+                    }
+                };
+                localStorage.removeItem('gameStats');
+                localStorage.removeItem('joinDate');
+                
+                // Reset achievement badges
+                document.querySelectorAll('.achievement-badge').forEach(badge => {
+                    badge.classList.remove('unlocked');
+                    badge.classList.add('locked');
+                });
+                
+                updateUI();
+                alert('ຂໍ້ມູນທັງໝົດຖືກລຶບແລ້ວ!');
+            }
+        });
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Escape') {
@@ -1533,6 +2316,13 @@
 
         // --- INITIALIZATION ---
         window.onload = async () => {
+            console.log('🎯 Page loaded - Initializing LaoTypo Homepage Phase 1 v2.1.0');
+            
+            // First check authentication - redirect if not authenticated
+            if (!checkUserAuthentication()) {
+                return; // Stop initialization if redirecting
+            }
+            
             // Initialize DOM references for life system
             heartsContainer = document.querySelector('.hearts');
             lifeCountEl = document.querySelector('.life-count');
@@ -1544,9 +2334,30 @@
             loadUserData();
             updateUI();
             
+            // Initialize Firebase sync and auth
+            setTimeout(async () => {
+                console.log('🔄 Initializing Firebase...');
+                await initializeFirebaseSync();
+                
+                // Debug Firebase status
+                debugFirebaseStatus();
+                
+                // Check authentication state for Gmail users
+                if (userType === 'gmail') {
+                    checkAuthState();
+                }
+                
+                console.log('✅ Firebase initialization complete');
+            }, 2000); // Give Firebase modules more time to load
+            
             // Word loading now handled in gameplay.html
-            startGameBtn.disabled = false;
-            startGameBtn.textContent = 'ເລີ່ມເກມ';
+            if (startGameBtn) {
+                startGameBtn.disabled = false;
+                startGameBtn.textContent = 'ເລີ່ມເກມ';
+                console.log('✅ Start game button enabled');
+            } else {
+                console.error('❌ Start game button not found!');
+            }
         };
 
     </script>
