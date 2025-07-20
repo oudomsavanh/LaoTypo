@@ -334,6 +334,25 @@
                     <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors">
                 </div>
             </div>
+            
+            <!-- ADDED: Difficulty Setting (moved from settings panel) -->
+            <div class="flex flex-col items-center space-y-2">
+                <label for="main-difficulty-select" class="text-lg text-sub-color">ລະດັບຄວາມຍາກ:</label>
+                <select id="main-difficulty-select" class="bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-2 px-4 text-lg">
+                    <option value="easy">ງ່າຍ</option>
+                    <option value="medium">ປານກາງ</option>
+                    <option value="hard">ຍາກ</option>
+                </select>
+            </div>
+            
+            <!-- ADDED: Timer Setting (moved from settings panel) -->
+            <div class="flex flex-col items-center space-y-2">
+                <label for="main-timer-toggle" class="text-lg text-sub-color">⏱️ ຈັບເວລາ (5 ວິນາທີ)</label>
+                <label class="switch">
+                    <input type="checkbox" id="main-timer-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
             <div class="flex justify-center items-center space-x-4">
                 <button id="open-settings-btn" class="btn-icon" title="ຕັ້ງຄ່າ">
@@ -347,7 +366,7 @@
              <div class="absolute bottom-4 right-4 text-xs text-sub-color">
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version demo15</p>
+                <p>Version demo16</p>
             </div>
         </div>
 
@@ -436,24 +455,16 @@
             </div>
             <div class="text-left space-y-4">
                 <div class="flex justify-between items-center">
-                    <label for="difficulty-select">ລະດັບຄວາມຍາກ</label>
-                    <select id="difficulty-select" class="btn bg-sub-color">
-                        <option value="easy">ງ່າຍ</option>
-                        <option value="medium">ປານກາງ</option>
-                        <option value="hard">ຍາກ</option>
-                    </select>
-                </div>
-                <div class="flex justify-between items-center">
-                    <label>ຈັບເວລາ (5 ວິນາທີ)</label>
+                    <label>🔊 ສຽງປະກອບ</label>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="timer-toggle">
+                        <input type="checkbox" id="sound-toggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="flex justify-between items-center">
-                    <label>ສຽງປະກອບ</label>
+                    <label>🎵 ບຣາວເຊີເສົາ</label>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="sound-toggle" checked>
+                        <input type="checkbox" id="music-toggle">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -495,9 +506,10 @@
         const settingsPanel = document.getElementById('settings-panel');
         const leaderboardPanel = document.getElementById('leaderboard-panel');
         const leaderboardContainer = document.getElementById('leaderboard-container');
-        const difficultySelect = document.getElementById('difficulty-select');
-        const timerToggle = document.getElementById('timer-toggle');
+        const mainDifficultySelect = document.getElementById('main-difficulty-select');
+        const mainTimerToggle = document.getElementById('main-timer-toggle');
         const soundToggle = document.getElementById('sound-toggle');
+        const musicToggle = document.getElementById('music-toggle');
         const wordLoadingStatus = document.getElementById('word-loading-status');
         const startGameBtn = document.getElementById('start-game-btn');
         const contextDisplay = document.getElementById('context-display');
@@ -516,11 +528,35 @@
         let playerLives = 3;
         let maxLives = 3;
         let heartsContainer, lifeCountEl, motivationText;
+        
+        // --- BACKGROUND MUSIC SYSTEM ---
+        let backgroundMusic = null;
+        
+        function initializeBackgroundMusic() {
+            // Create audio element for background music
+            backgroundMusic = document.createElement('audio');
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.3; // 30% volume
+            backgroundMusic.preload = 'none';
+            // Note: Music file will be added later - prepared for .wav format
+            // backgroundMusic.src = 'background-music.wav';
+        }
+        
+        function toggleBackgroundMusic() {
+            if (!backgroundMusic) return;
+            
+            if (settings.music && backgroundMusic.src) {
+                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
+            } else {
+                backgroundMusic.pause();
+            }
+        }
 
         let settings = {
             difficulty: 'easy',
             timer: false,
             sound: true,
+            music: false,
         };
 
         let stats = {
@@ -932,9 +968,10 @@
             const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
             document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
             
-            difficultySelect.value = settings.difficulty;
-            timerToggle.checked = settings.timer;
+            mainDifficultySelect.value = settings.difficulty;
+            mainTimerToggle.checked = settings.timer;
             soundToggle.checked = settings.sound;
+            musicToggle.checked = settings.music;
             
             // Display user ID in footer
             console.log('DEBUG: Updating user ID display, userId =', userId);
@@ -973,15 +1010,20 @@
                 return;
             }
             playSound('start');
-            currentStreak = 0;
-            stats.totalGames++;
-            gameInProgress = true;
             
-            // Initialize life system
-            resetLives();
+            // Save current settings and player data before navigation
+            saveUserData();
             
-            switchScreen('game');
-            nextRound();
+            // Navigate to gameplay page with parameters
+            const params = new URLSearchParams({
+                player: encodeURIComponent(displayName),
+                difficulty: settings.difficulty,
+                timer: settings.timer,
+                sound: settings.sound,
+                music: settings.music
+            });
+            
+            window.location.href = `gameplay.html?${params.toString()}`;
         }
 
         function nextRound() {
@@ -1131,11 +1173,28 @@
         });
         
         document.getElementById('save-settings-btn').addEventListener('click', () => {
-            settings.difficulty = difficultySelect.value;
-            settings.timer = timerToggle.checked;
             settings.sound = soundToggle.checked;
+            settings.music = musicToggle.checked;
             saveUserData();
             settingsPanel.classList.add('hidden');
+        });
+        
+        // Main page controls event listeners
+        mainDifficultySelect.addEventListener('change', () => {
+            settings.difficulty = mainDifficultySelect.value;
+            saveUserData();
+        });
+        
+        mainTimerToggle.addEventListener('change', () => {
+            settings.timer = mainTimerToggle.checked;
+            saveUserData();
+        });
+        
+        // Music toggle event listener  
+        musicToggle.addEventListener('change', () => {
+            settings.music = musicToggle.checked;
+            saveUserData();
+            toggleBackgroundMusic();
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
@@ -1172,6 +1231,9 @@
             heartsContainer = document.querySelector('.hearts');
             lifeCountEl = document.querySelector('.life-count');
             motivationText = document.querySelector('.motivation-text');
+            
+            // Initialize background music system
+            initializeBackgroundMusic();
             
             loadUserData();
             updateUI();
