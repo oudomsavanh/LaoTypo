@@ -138,18 +138,18 @@
         .life-bar-header {
             background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
             border: 2px solid var(--main-color);
-            border-radius: 1rem;
-            padding: 1rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
         .life-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
         }
         
         .hearts {
@@ -158,18 +158,114 @@
         }
         
         .heart {
-            font-size: 1.8rem;
+            width: 24px;
+            height: 24px;
+            position: relative;
             transition: all 0.3s ease;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        /* CSS Pixel Heart */
+        .heart::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #000000;
+            box-shadow: 
+                /* Heart shape using pixel technique */
+                0px 0px 0 2px #000000,
+                2px 0px 0 2px #000000,
+                4px 0px 0 2px #000000,
+                6px 2px 0 2px #000000,
+                8px 4px 0 2px #000000,
+                10px 6px 0 2px #000000,
+                12px 8px 0 2px #000000,
+                10px 10px 0 2px #000000,
+                8px 12px 0 2px #000000,
+                6px 14px 0 2px #000000,
+                4px 16px 0 2px #000000,
+                2px 18px 0 2px #000000,
+                0px 20px 0 2px #000000,
+                -2px 18px 0 2px #000000,
+                -4px 16px 0 2px #000000,
+                -6px 14px 0 2px #000000,
+                -8px 12px 0 2px #000000,
+                -10px 10px 0 2px #000000,
+                -12px 8px 0 2px #000000,
+                -10px 6px 0 2px #000000,
+                -8px 4px 0 2px #000000,
+                -6px 2px 0 2px #000000,
+                -4px 0px 0 2px #000000,
+                -2px 0px 0 2px #000000;
+            transform: scale(0.6);
         }
         
         .heart.active {
             animation: heartPulse 3s infinite;
         }
         
+        .heart.active::before {
+            background: #000000;
+            box-shadow: 
+                0px 0px 0 1px #000000,
+                1px 0px 0 1px #000000,
+                2px 0px 0 1px #000000,
+                3px 1px 0 1px #000000,
+                4px 2px 0 1px #000000,
+                5px 3px 0 1px #000000,
+                6px 4px 0 1px #000000,
+                5px 5px 0 1px #000000,
+                4px 6px 0 1px #000000,
+                3px 7px 0 1px #000000,
+                2px 8px 0 1px #000000,
+                1px 9px 0 1px #000000,
+                0px 10px 0 1px #000000,
+                -1px 9px 0 1px #000000,
+                -2px 8px 0 1px #000000,
+                -3px 7px 0 1px #000000,
+                -4px 6px 0 1px #000000,
+                -5px 5px 0 1px #000000,
+                -6px 4px 0 1px #000000,
+                -5px 3px 0 1px #000000,
+                -4px 2px 0 1px #000000,
+                -3px 1px 0 1px #000000,
+                -2px 0px 0 1px #000000,
+                -1px 0px 0 1px #000000;
+        }
+        
+        .heart.lost::before {
+            background: #333333;
+            box-shadow: 
+                0px 0px 0 1px #333333,
+                1px 0px 0 1px #333333,
+                2px 0px 0 1px #333333,
+                3px 1px 0 1px #333333,
+                4px 2px 0 1px #333333,
+                5px 3px 0 1px #333333,
+                6px 4px 0 1px #333333,
+                5px 5px 0 1px #333333,
+                4px 6px 0 1px #333333,
+                3px 7px 0 1px #333333,
+                2px 8px 0 1px #333333,
+                1px 9px 0 1px #333333,
+                0px 10px 0 1px #333333,
+                -1px 9px 0 1px #333333,
+                -2px 8px 0 1px #333333,
+                -3px 7px 0 1px #333333,
+                -4px 6px 0 1px #333333,
+                -5px 5px 0 1px #333333,
+                -6px 4px 0 1px #333333,
+                -5px 3px 0 1px #333333,
+                -4px 2px 0 1px #333333,
+                -3px 1px 0 1px #333333,
+                -2px 0px 0 1px #333333,
+                -1px 0px 0 1px #333333;
+            opacity: 0.4;
+            transform: scale(0.5);
+        }
+        
         .heart.lost {
-            opacity: 0.3;
-            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            opacity: 0.4;
             transform: scale(0.8);
         }
         
@@ -183,11 +279,11 @@
         }
         
         @keyframes heartBreak {
-            0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-            25% { transform: scale(1.2) rotate(5deg); color: #ff4444; }
-            50% { transform: scale(1.3) rotate(-5deg); color: #ff0000; }
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2) rotate(5deg); }
+            50% { transform: scale(1.3) rotate(-5deg); }
             75% { transform: scale(0.9) rotate(2deg); opacity: 0.7; }
-            100% { transform: scale(0.8); opacity: 0.3; filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+            100% { transform: scale(0.8); opacity: 0.4; }
         }
         
         @keyframes lifeBarFlash {
@@ -196,7 +292,7 @@
         }
         
         .motivation-text {
-            font-size: 1rem;
+            font-size: 0.875rem;
             color: var(--sub-color);
             font-style: italic;
             font-weight: 500;
@@ -226,9 +322,9 @@
                 <div class="life-container">
                     <span class="life-text">Lives:</span>
                     <div class="hearts">
-                        <span class="heart active">❤️</span>
-                        <span class="heart active">❤️</span>
-                        <span class="heart active">❤️</span>
+                        <span class="heart active"></span>
+                        <span class="heart active"></span>
+                        <span class="heart active"></span>
                     </div>
                     <span class="life-count">3/3</span>
                 </div>
