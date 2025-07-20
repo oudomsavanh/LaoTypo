@@ -47,6 +47,37 @@
             color: var(--text-color);
             font-family: 'Noto Sans Lao', sans-serif;
             min-height: 100vh;
+            padding-top: 80px; /* Space for fixed nav */
+        }
+        
+        /* Header Navigation */
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #222426 0%, #2c2e31 100%);
+            border-bottom: 2px solid var(--main-color);
+            padding: 1rem 0;
+            z-index: 1000;
+        }
+        
+        .nav-link {
+            color: var(--sub-color);
+            transition: color 0.2s ease-in-out;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-color);
+            background-color: rgba(226, 183, 20, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--main-color);
+            background-color: rgba(226, 183, 20, 0.2);
         }
         
         .btn {
@@ -213,12 +244,32 @@
     </style>
 </head>
 <body>
+    <!-- Header Navigation -->
+    <header class="header-nav">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between">
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center space-x-2">
+                        <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="h-8 w-auto">
+                        <span class="text-main-color font-bold text-xl">LaoTypo</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="registration.html" class="nav-link">🔐 ເຂົ້າສູ່ລະບົບ</a>
+                    <a href="testing.html" class="nav-link">🏠 ໜ້າຫຼັກ</a>
+                    <a href="player_account_info.html" class="nav-link active">👤 ບັນຊີ</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
     <div class="min-h-screen p-4">
         <!-- Navigation Header -->
         <nav class="mb-6">
             <div class="flex items-center justify-between">
                 <button id="back-to-game-btn" class="btn btn-secondary">
-                    ← ກັບໄປເກມ
+                    ← ກັບໄປໜ້າຫຼັກ
                 </button>
                 <h1 class="text-2xl font-bold text-main-color">ບັນຊີຜູ້ຫຼິ້ນ</h1>
                 <div></div>

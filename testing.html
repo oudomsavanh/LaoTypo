@@ -40,16 +40,30 @@
             font-family: 'Noto Sans Lao Looped', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
             padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        nav {
-            background-color: #222426;
+        
+        /* Header Navigation */
+        .header-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #222426 0%, #2c2e31 100%);
+            border-bottom: 2px solid var(--main-color);
+            padding: 1rem 0;
+            z-index: 1000;
+        }
+        
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+            padding: 2rem;
         }
         .nav-link {
             color: var(--sub-color);
@@ -707,81 +721,10 @@
     </div>
 
     <div class="game-container">
-        <!-- Registration Screen -->
-        <div id="registration-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
-            <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight text-center">ຍິນດີຕ້ອນຮັບສູ່<br>LaoTypo!</h1>
-            <p class="text-lg text-sub-color text-center">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ</p>
-            
-            <!-- Gmail Login Option -->
-            <div class="w-full max-w-sm space-y-4">
-                <button id="gmail-login-btn" class="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors border-2 border-gray-200">
-                    <svg width="20" height="20" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    ເຂົ້າສູ່ລະບົບດ້ວຍ Gmail
-                </button>
-                
-                <!-- OR Separator -->
-                <div class="flex items-center">
-                    <div class="flex-1 border-t border-sub-color"></div>
-                    <div class="px-4 text-sub-color text-sm">ຫຼື</div>
-                    <div class="flex-1 border-t border-sub-color"></div>
-                </div>
-                
-                <!-- Guest Mode Option -->
-                <button id="guest-mode-btn" class="w-full bg-transparent border-2 border-main-color text-main-color font-semibold py-3 px-6 rounded-lg hover:bg-main-color hover:text-white transition-colors">
-                    👤 ຫຼິ້ນແບບແຂກ (Guest)
-                </button>
-            </div>
-            
-            <p class="text-xs text-sub-color text-center max-w-md">
-                Gmail: ບັນທຶກຄະແນນສາມາດເຂົ້າໄດ້ທຸກອຸປະກອນ<br>
-                Guest: ບັນທຶກເຉພາະໃນອຸປະກອນນີ້ເທົ່ານັ້ນ
-            </p>
-        </div>
 
-        <!-- Profile Setup Screen -->
-        <div id="profile-setup-screen" class="screen flex flex-col justify-center items-center h-full space-y-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-main-color text-center">ຕັ້ງຄ່າໂປຣໄຟລ໌</h1>
-            <p class="text-lg text-sub-color text-center">ກະລຸນາໃສ່ຂໍ້ມູນຂອງເຈົ້າ</p>
-            
-            <div class="w-full max-w-sm space-y-4">
-                <!-- User Info Display -->
-                <div id="user-info-display" class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
-                    <img id="user-photo" src="" alt="User" class="w-10 h-10 rounded-full" style="display: none;">
-                    <div>
-                        <p id="user-email" class="text-sm text-sub-color"></p>
-                    </div>
-                </div>
-                
-                <!-- Name Input -->
-                <div>
-                    <label for="profile-name" class="block text-sm text-sub-color mb-2">ຊື່ຂອງເຈົ້າ *</label>
-                    <input type="text" id="profile-name" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-white">
-                </div>
-                
-                <!-- Age Input -->
-                <div>
-                    <label for="profile-age" class="block text-sm text-sub-color mb-2">ອາຍຸ *</label>
-                    <input type="number" id="profile-age" placeholder="ໃສ່ອາຍຸຂອງເຈົ້າ..." min="5" max="100" class="w-full bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-white">
-                </div>
-                
-                <!-- Complete Registration Button -->
-                <button id="complete-registration-btn" class="w-full btn btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    ສຳເລັດການລົງທະບຽນ
-                </button>
-            </div>
-            
-            <button id="back-to-registration" class="text-sub-color hover:text-main-color transition-colors">
-                ← ກັບໄປເລືອກວິທີເຂົ້າສູ່ລະບົບ
-            </button>
-        </div>
 
         <!-- Start Screen -->
-        <div id="start-screen" class="screen flex flex-col justify-center items-center h-full space-y-6">
+        <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
             <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
             <p class="text-lg text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
             <p class="text-sm text-sub-color">(Testing Version)</p>
@@ -835,7 +778,7 @@
                 <p id="user-type-display">👤 Guest Mode</p>
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
                 <p>Fixed Mode</p>
-                <p>Version: 2.0.1 - Gmail Registration Fixed</p>
+                <p>Version: 2.1.0 - Phase 1: 4-Page System Implemented</p>
             </div>
         </div>
 
@@ -1121,6 +1064,63 @@
         // --- AUTHENTICATION STATE ---
         let currentUser = null;
         let userType = null; // 'gmail' or 'guest'
+        
+        // --- AUTHENTICATION GUARD ---
+        function checkUserAuthentication() {
+            // Check for guest user in sessionStorage
+            const guestUser = sessionStorage.getItem('guestUser');
+            const storedUserType = sessionStorage.getItem('userType');
+            
+            // Check for Gmail user data in localStorage
+            const gmailUserData = localStorage.getItem('firebaseUser');
+            
+            if (guestUser && storedUserType === 'guest') {
+                console.log('👤 Guest user found');
+                userType = 'guest';
+                const userData = JSON.parse(guestUser);
+                displayName = userData.name;
+                userId = userData.id;
+                updateUserDisplay();
+                return true;
+            } else if (gmailUserData) {
+                console.log('📧 Gmail user data found');
+                userType = 'gmail';
+                // Will be fully loaded by Firebase auth listener
+                return true;
+            } else {
+                console.log('🔐 No authenticated user found - redirecting to registration');
+                redirectToRegistration();
+                return false;
+            }
+        }
+        
+        function redirectToRegistration() {
+            console.log('🔀 Redirecting to registration page...');
+            window.location.href = 'registration.html';
+        }
+        
+        function updateUserDisplay() {
+            const userTypeElement = document.getElementById('user-type-display');
+            const userIdElement = document.getElementById('user-id-display');
+            
+            if (userType === 'guest') {
+                userTypeElement.textContent = '👤 Guest Mode';
+                userIdElement.textContent = userId || 'guest_user';
+            } else if (userType === 'gmail' && currentUser) {
+                userTypeElement.textContent = `📧 ${currentUser.email}`;
+                userIdElement.textContent = currentUser.uid;
+            }
+            
+            // Update account nav link visibility
+            const accountNavLink = document.getElementById('account-nav-link');
+            if (accountNavLink) {
+                if (userType === 'gmail') {
+                    accountNavLink.style.display = 'block';
+                } else {
+                    accountNavLink.style.display = 'none';
+                }
+            }
+        }
         
         // --- GAME STATE & SETTINGS ---
         let userId = 'local_user_' + Math.random().toString(36).substring(2, 11);
@@ -1821,15 +1821,7 @@
             }, duration);
         }
         
-        // --- AUTHENTICATION EVENT LISTENERS ---
-        document.getElementById('gmail-login-btn').addEventListener('click', handleGmailLogin);
-        document.getElementById('guest-mode-btn').addEventListener('click', handleGuestMode);
-        document.getElementById('complete-registration-btn').addEventListener('click', completeRegistration);
-        document.getElementById('back-to-registration').addEventListener('click', () => switchToScreen('registration-screen'));
-        
-        // Profile form validation
-        document.getElementById('profile-name').addEventListener('input', validateProfileForm);
-        document.getElementById('profile-age').addEventListener('input', validateProfileForm);
+        // --- AUTHENTICATION EVENT LISTENERS --- (REMOVED - Now handled in registration.html)
 
         // --- EVENT LISTENERS ---
         document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
@@ -1990,152 +1982,7 @@
             document.getElementById(screenId).classList.add('active');
         }
         
-        // Gmail login handler
-        async function handleGmailLogin() {
-            try {
-                console.log('🔐 Starting Gmail login...');
-                
-                // Check if Firebase Auth Manager is available
-                if (typeof FirebaseAuthManager === 'undefined') {
-                    console.error('❌ FirebaseAuthManager not loaded');
-                    alert('Firebase ຍັງບໍ່ພ້ອມ ກະລຸນາລໍຖ້າ...');
-                    return;
-                }
-                
-                console.log('📧 Calling FirebaseAuthManager.loginWithGmail()...');
-                const loginResult = await FirebaseAuthManager.loginWithGmail();
-                console.log('📧 Login result:', loginResult);
-                
-                if (loginResult && loginResult.success) {
-                    console.log('✅ Gmail login successful:', loginResult.user);
-                    
-                    // Set user data
-                    currentUser = loginResult.user;
-                    userType = 'gmail';
-                    
-                    // Check if user profile exists
-                    console.log('👤 Checking existing profile for:', currentUser.uid);
-                    const existingProfile = await FirebaseAuthManager.getUserProfile(currentUser.uid);
-                    console.log('👤 Existing profile:', existingProfile);
-                    
-                    if (existingProfile && existingProfile.name && existingProfile.age) {
-                        // Complete profile exists, go to game
-                        displayName = existingProfile.name;
-                        userId = currentUser.uid;
-                        await loadCloudUserData();
-                        updateUI();
-                        switchToScreen('start-screen');
-                    } else {
-                        // Need to complete profile setup
-                        console.log('📝 Showing profile setup...');
-                        showProfileSetup(currentUser);
-                    }
-                } else {
-                    console.error('❌ Gmail login failed:', loginResult ? loginResult.error : 'Unknown error');
-                    alert('ເຂົ້າສູ່ລະບົບລົ້ມເຫລວ: ' + (loginResult ? loginResult.error : 'ຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ'));
-                }
-            } catch (error) {
-                console.error('❌ Gmail login error:', error);
-                console.error('❌ Error details:', error.message, error.code);
-                alert('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ລະບົບ: ' + error.message);
-            }
-        }
-        
-        // Guest mode handler
-        function handleGuestMode() {
-            console.log('👤 Starting guest mode...');
-            userType = 'guest';
-            currentUser = null;
-            
-            // Generate guest user ID
-            userId = 'guest_' + Math.random().toString(36).substring(2, 11);
-            displayName = 'Guest Player';
-            
-            console.log('👤 Guest user created:', { userId, displayName, userType });
-            
-            // Load any existing local data
-            loadUserData();
-            updateUI();
-            switchToScreen('start-screen');
-            
-            console.log('✅ Guest mode activated successfully');
-        }
-        
-        // Show profile setup screen
-        function showProfileSetup(user) {
-            // Display user info
-            document.getElementById('user-email').textContent = user.email;
-            
-            if (user.photoURL) {
-                const userPhoto = document.getElementById('user-photo');
-                userPhoto.src = user.photoURL;
-                userPhoto.style.display = 'block';
-            }
-            
-            // Pre-fill name if available from Google
-            if (user.displayName) {
-                document.getElementById('profile-name').value = user.displayName;
-            }
-            
-            switchToScreen('profile-setup-screen');
-            validateProfileForm();
-        }
-        
-        // Validate profile form
-        function validateProfileForm() {
-            const name = document.getElementById('profile-name').value.trim();
-            const age = document.getElementById('profile-age').value.trim();
-            const submitBtn = document.getElementById('complete-registration-btn');
-            
-            if (name && age && parseInt(age) >= 5 && parseInt(age) <= 100) {
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.disabled = true;
-            }
-        }
-        
-        // Complete registration
-        async function completeRegistration() {
-            const name = document.getElementById('profile-name').value.trim();
-            const age = parseInt(document.getElementById('profile-age').value);
-            
-            if (!name || !age) {
-                alert('ກະລຸນາໃສ່ຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
-                return;
-            }
-            
-            try {
-                console.log('💾 Saving user profile...');
-                
-                const profileData = {
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    name: name,
-                    age: age,
-                    userType: 'gmail',
-                    photoURL: currentUser.photoURL || null
-                };
-                
-                const success = await FirebaseAuthManager.createUserProfile(currentUser.uid, profileData);
-                
-                if (success) {
-                    // Set global variables
-                    displayName = name;
-                    userId = currentUser.uid;
-                    
-                    // Initialize user data in Firebase
-                    await initializeCloudUserData(profileData);
-                    
-                    console.log('✅ Registration completed successfully');
-                    switchToScreen('start-screen');
-                } else {
-                    alert('ການບັນທຶກຂໍ້ມູນລົ້ມເຫລວ ລອງໃໝ່ອີກຄັ້ງ');
-                }
-            } catch (error) {
-                console.error('❌ Registration error:', error);
-                alert('ເກີດຂໍ້ຜິດພາດໃນການລົງທະບຽນ');
-            }
-        }
+        // --- AUTHENTICATION FUNCTIONS MOVED TO registration.html ---
         
         // Load cloud user data
         async function loadCloudUserData() {
@@ -2469,6 +2316,13 @@
 
         // --- INITIALIZATION ---
         window.onload = async () => {
+            console.log('🎯 Page loaded - Initializing LaoTypo Homepage Phase 1 v2.1.0');
+            
+            // First check authentication - redirect if not authenticated
+            if (!checkUserAuthentication()) {
+                return; // Stop initialization if redirecting
+            }
+            
             // Initialize DOM references for life system
             heartsContainer = document.querySelector('.hearts');
             lifeCountEl = document.querySelector('.life-count');
@@ -2488,8 +2342,10 @@
                 // Debug Firebase status
                 debugFirebaseStatus();
                 
-                // Check authentication state
-                checkAuthState();
+                // Check authentication state for Gmail users
+                if (userType === 'gmail') {
+                    checkAuthState();
+                }
                 
                 console.log('✅ Firebase initialization complete');
             }, 2000); // Give Firebase modules more time to load
