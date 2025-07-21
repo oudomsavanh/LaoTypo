@@ -41,16 +41,21 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             min-height: 100vh;
-            padding: 1rem;
+            margin: 0;
+            padding: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         .game-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 100%;
             max-width: 900px;
+            margin: 0 auto;
             padding: 2rem;
             text-align: center;
         }
@@ -236,10 +241,11 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- Back Button -->
-        <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ໜ້າຫຼັກ</button>
+        <div class="w-full">
+            <!-- Back Button -->
+            <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ໜ້າຫຼັກ</button>
 
-        <!-- Game Screen -->
+            <!-- Game Screen -->
         <div id="game-screen" class="screen active">
             <!-- Word Loading Status -->
             <div id="word-loading-status" class="text-center mb-4 text-main-color">
@@ -353,13 +359,14 @@
                  <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
              </div>
          </div>
-        
-        <!-- Footer -->
-        <div class="absolute bottom-4 right-4 text-xs text-sub-color">
-            <p>Game Mode</p>
-                            <p>Version: 1.6.0 - Testing</p>
         </div>
     </div>
+    
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-sub-color bg-[#2c2e31] border-t border-[#4a4d50]">
+        <p>Game Mode</p>
+        <p>Version: 1.7.0 - Updated Footer Layout</p>
+    </footer>
 
     <script>
         // Google Sheets CSV URL (same as testing.html)
