@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v1.3.0 -->
+    <!-- Cache Busting Headers v2.0.0 - Major Game Logic Overhaul: Progressive Difficulty System -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -89,19 +89,7 @@
             background-color: var(--sub-color);
             color: var(--text-color);
         }
-        .btn-back {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background-color: var(--sub-color);
-            color: var(--text-color);
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-        .btn-back:hover {
-            background-color: var(--main-color);
-            color: var(--bg-color);
-        }
+        /* v2.0.0: Removed back button - players must complete progressive levels */
         .word-card {
             background-color: #3e4043;
             border: 2px solid #4a4d50;
@@ -227,9 +215,13 @@
         
         .motivation-text {
             font-size: 0.875rem;
-            color: var(--sub-color);
+            color: #000000; /* v2.0.0: Changed to black for normal messages */
             font-style: italic;
             font-weight: 500;
+        }
+        
+        .motivation-text.critical {
+            color: var(--error-color); /* Red color for critical messages only */
         }
         
         .life-text {
@@ -237,13 +229,34 @@
             color: #ffffff;
             font-size: 1.1rem;
         }
+        
+        /* v2.0.0: Custom responsive typography */
+        .context-display-custom {
+            font-size: 1.5rem; /* Mobile: 1.5rem */
+            font-weight: bold;
+        }
+        
+        .results-header-custom {
+            font-size: 1.8rem; /* Mobile: 1.8rem */
+            font-weight: bold;
+        }
+        
+        /* Desktop responsive sizes */
+        @media (min-width: 768px) {
+            .context-display-custom {
+                font-size: 2rem; /* Desktop: 2rem (calculated best fit) */
+            }
+            
+            .results-header-custom {
+                font-size: 2.4rem; /* Desktop: 2.4rem (calculated best fit) */
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="w-full">
-            <!-- Back Button -->
-            <button id="back-to-menu-btn" class="btn-back">← ກັບໄປທີ່ໜ້າຫຼັກ</button>
+            <!-- v2.0.0: Removed back button for progressive difficulty system -->
 
             <!-- Game Screen -->
         <div id="game-screen" class="screen active">
@@ -252,17 +265,17 @@
                 ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
             </div>
             
-            <!-- Life Bar System -->
+            <!-- v2.0.0: Progressive Level System WITH Life System -->
             <div class="life-bar-header mb-6">
                 <div class="life-container">
-                    <span class="life-text">ຊິວິດ:</span>
+                    <span class="life-text">ຄວາມກ້າວໜ້າ:</span>
                     <div class="hearts">
                         <span class="heart active"></span>
                         <span class="heart active"></span>
                         <span class="heart active"></span>
                     </div>
                 </div>
-                <div class="motivation-text">ເຈົ້າມີ 3 ຊີວິດ, ຈົ່ງໃຊ້ໃຫ້ຄຸ້ມຄ່າທີ່ສຸດ</div>
+                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ | 3/3 ຊິວິດ</div>
             </div>
             
             <!-- Player Name Header -->
@@ -284,7 +297,7 @@
             <!-- Context display area for showing word from Google Sheets Column A -->
             <div class="mb-6 text-center">
                 <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
-                <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+                <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
             </div>
             
             <!-- Difficulty level display with color coding -->
@@ -302,7 +315,7 @@
 
                  <!-- Results Screen -->
          <div id="results-screen" class="screen space-y-6">
-             <h2 class="text-4xl font-bold text-main-color">ຜົນການປະເມີນ ບອກວ່າ...</h2>
+             <h2 class="results-header-custom text-main-color">ຜົນການປະເມີນ ບອກວ່າ...</h2>
              
              <!-- Game Stats -->
              <div class="bg-[#3e4043] rounded-lg p-6 space-y-4">
@@ -365,7 +378,7 @@
     <!-- Footer -->
     <footer class="w-full text-center py-4 text-xs text-sub-color bg-[#2c2e31] border-t border-[#4a4d50]">
         <p>Game Mode</p>
-        <p>Version: 1.7.1</p>
+        <p>Version: 2.0.0 - Progressive Difficulty System</p>
     </footer>
 
     <script>
@@ -384,7 +397,7 @@
         const wordLoadingStatus = document.getElementById('word-loading-status');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
 
-        // Game State & Settings - Will be populated from URL parameters
+        // v2.0.0: Progressive Difficulty Game State
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
         let currentStreak = 0;
         let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
@@ -393,7 +406,13 @@
         let displayName = '';
         let wordList = [];
         
-        // Life System
+        // v2.0.0: Progressive Level System WITH Life System
+        let currentLevel = 1; // 1=easy, 2=medium, 3=hard
+        let wordsAnsweredInLevel = 0;
+        let maxWordsPerLevel = 30;
+        let usedWords = new Set(); // Track used words to prevent repeats
+        
+        // Life System (restored)
         let playerLives = 3;
         let maxLives = 3;
         let heartsContainer, motivationText;
@@ -546,10 +565,18 @@
             return filtered.length > 0 ? filtered : wordList;
         }
 
-        // Life System Functions
+        // v2.0.0: Progressive Level System Functions WITH Life System
+        function updateLevelDisplay() {
+            const levelNames = { 1: 'ງ່າຍ', 2: 'ປານກາງ', 3: 'ຍາກ' };
+            const progress = `${wordsAnsweredInLevel}/${maxWordsPerLevel}`;
+            const livesInfo = `${playerLives}/3 ຊິວິດ`;
+            motivationText.textContent = `ລະດັບ ${levelNames[currentLevel]}: ${progress} ຄຳ | ${livesInfo}`;
+            updateMotivationTextColor(); // Update color based on lives
+        }
+
+        // Restored Life System Functions
         function updateLifeDisplay() {
             const hearts = heartsContainer.querySelectorAll('.heart');
-
             
             hearts.forEach((heart, index) => {
                 if (index < playerLives) {
@@ -561,7 +588,14 @@
                 }
             });
             
-            updateMotivationText();
+            updateLevelDisplay(); // Update the combined display
+        }
+
+        function updateMotivationTextColor() {
+            motivationText.classList.remove('critical');
+            if (playerLives === 1) {
+                motivationText.classList.add('critical'); // Red for last life only
+            }
         }
 
         function loseLife() {
@@ -577,32 +611,12 @@
                     updateLifeDisplay();
                     
                     if (playerLives === 0) {
-                        gameOver();
+                        gameOver(); // Game ends if all lives lost
                     } else {
                         showLifeWarning();
                         setTimeout(nextRound, 1500);
                     }
                 }, 600);
-            }
-        }
-
-        function updateMotivationText() {
-            switch(playerLives) {
-                case 3:
-                    motivationText.textContent = "ເຈົ້າມີ 3 ຊີວິດ, ໃຊ້ໃຫ້ມັນຄຸ້ມ!";
-                    motivationText.style.color = 'var(--correct-color)';
-                    break;
-                case 2:
-                    motivationText.textContent = "ລະວັງເດີ້! ເຈົ້າເຫຼືອແຕ່ 2 ຊິວິດແລ້ວໃດ";
-                    motivationText.style.color = 'var(--main-color)';
-                    break;
-                case 1:
-                    motivationText.textContent = "ໂອກາດສຸດທ້າຍແລ້ວ! ຢ່າໃຫ້ພາດ!";
-                    motivationText.style.color = 'var(--error-color)';
-                    break;
-                case 0:
-                    // This case will use endGame() evaluation instead
-                    break;
             }
         }
 
@@ -624,7 +638,111 @@
             gameInProgress = false;
             clearInterval(timerInterval);
             
-            // Show results screen with endGame() evaluation for case 0
+            // Show results screen - game ended due to losing all lives
+            switchScreen('results');
+            endGame();
+        }
+
+        function handleCorrectAnswer() {
+            wordsAnsweredInLevel++;
+            currentStreak++;
+            
+            if (currentStreak > stats.bestStreak) {
+                stats.bestStreak = currentStreak;
+            }
+            
+            updateLevelDisplay();
+            
+            // Check if level completed
+            if (wordsAnsweredInLevel >= maxWordsPerLevel) {
+                completeLevelSuccess();
+            } else {
+                setTimeout(nextRound, 400);
+            }
+        }
+
+        function handleIncorrectAnswer() {
+            // v2.0.0: Wrong answer loses a life (not immediate game end)
+            stats.totalMistakes += 1;
+            loseLife(); // Use life system - game ends only when all lives lost
+        }
+
+        function completeLevelSuccess() {
+            gameInProgress = false;
+            clearInterval(timerInterval);
+            
+            if (currentLevel === 1) {
+                // Easy level completed
+                showLevelCompletionMessage("ປາຕິໂທ໊! ຕອບບໍ່ຜິດຈັກຂໍ້ເລີຍ. ແຕ່ຂອງແທ້ຢູ່ 'ລະດັບກາງ' ພຸ້ນເດີ້, ກ້າບໍ່?", 2);
+            } else if (currentLevel === 2) {
+                // Medium level completed
+                showLevelCompletionMessage("ບໍ່ທຳມະດາ! ແຕ່ຢ່າຟ້າວດີໃຈ... 'ລະດັບຍາກ' ກຳລັງລໍຖ້າທົດສອບ ຄວາມສາມາດທີ່ແທ້ຈິງຂອງເຈົ້າຢູ່!", 3);
+            } else if (currentLevel === 3) {
+                // Hard level completed - game finished!
+                showFinalCompletionMessage();
+            }
+        }
+
+        function showLevelCompletionMessage(message, nextLevel) {
+            // Create completion screen
+            const completionScreen = document.createElement('div');
+            completionScreen.className = 'screen active space-y-6 text-center';
+            completionScreen.innerHTML = `
+                <h2 class="results-header-custom text-main-color">ຍິນດີ!</h2>
+                <div class="bg-[#3e4043] rounded-lg p-6">
+                    <p class="text-xl text-text-color mb-4">${message}</p>
+                    <div class="space-y-4">
+                        <button onclick="continueToNextLevel(${nextLevel})" class="btn text-xl px-8 py-3">ຕໍ່ໄປລະດັບຕໍ່ໄປ</button>
+                        <button onclick="endGameSuccess()" class="btn btn-secondary text-xl px-8 py-3">ຈົບເກມ</button>
+                    </div>
+                </div>
+            `;
+            
+            // Replace current screen
+            document.querySelector('.screen.active').classList.remove('active');
+            document.querySelector('.w-full').appendChild(completionScreen);
+        }
+
+        function showFinalCompletionMessage() {
+            const completionScreen = document.createElement('div');
+            completionScreen.className = 'screen active space-y-6 text-center';
+            completionScreen.innerHTML = `
+                <h2 class="results-header-custom text-main-color">ສຳເລັດແລ້ວ!</h2>
+                <div class="bg-[#3e4043] rounded-lg p-6">
+                    <p class="text-xl text-text-color mb-4">ເຈົ້າເກັ່ງໂພດແລ້ວ!ພາລະກິດໃໝ່ຂອງເຈົ້າ ແມ່ນການຊ່ວຍຊາດ ໂດຍໄປຕື່ມ 'ຄຳສັບ' ທີ່ຄິດວ່າຄົນລາວໃຊ້ຜິດເລື້ອຍໆ ຢູ່ທີ່ 'ປ່ອງຮັບຄຳຜິດ'</p>
+                    <div class="space-y-4">
+                        <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
+                        <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປເມນູ</button>
+                    </div>
+                </div>
+            `;
+            
+            // Replace current screen
+            document.querySelector('.screen.active').classList.remove('active');
+            document.querySelector('.w-full').appendChild(completionScreen);
+        }
+
+        function continueToNextLevel(nextLevel) {
+            currentLevel = nextLevel;
+            wordsAnsweredInLevel = 0;
+            gameInProgress = true;
+            
+            // Reset lives for new level
+            resetLives();
+            
+            // Remove completion screen and show game screen
+            document.querySelector('.screen.active').remove();
+            document.getElementById('game-screen').classList.add('active');
+            
+            // Update settings difficulty for word filtering
+            const difficultyMap = { 1: 'easy', 2: 'medium', 3: 'hard' };
+            settings.difficulty = difficultyMap[currentLevel];
+            
+            nextRound();
+        }
+
+        function endGameSuccess() {
+            // Show results screen with success evaluation
             switchScreen('results');
             endGame();
         }
@@ -753,26 +871,32 @@
             if (screens[screenName]) screens[screenName].classList.add('active');
         }
 
-                 function nextRound() {
-             console.log('🎮 Starting new round with difficulty:', settings.difficulty);
+         // v2.0.0: Updated nextRound with word tracking and level progression
+         function nextRound() {
+             console.log('🎮 Starting new round - Level:', currentLevel, 'Progress:', `${wordsAnsweredInLevel}/${maxWordsPerLevel}`);
              
              currentStreakEl.textContent = currentStreak;
              bestStreakEl.textContent = stats.bestStreak;
              wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
              wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
              
-             // Get words filtered by selected difficulty
+             // Get words filtered by current level difficulty
              const availableWords = filterWordsByDifficulty(settings.difficulty);
-             console.log(`📚 Available words for ${settings.difficulty}:`, availableWords.length);
              
-             if (availableWords.length === 0) {
-                 console.error('❌ No words available for difficulty:', settings.difficulty);
-                 alert(`ບໍ່ມີຄຳສັບສຳລັບລະດັບ ${settings.difficulty}!`);
+             // Filter out already used words to prevent repeats
+             const unusedWords = availableWords.filter(word => !usedWords.has(word.context));
+             console.log(`📚 Available unused words for level ${currentLevel}:`, unusedWords.length);
+             
+             if (unusedWords.length === 0) {
+                 console.error('❌ No unused words available for level:', currentLevel);
+                 // If we run out of words, complete the level early
+                 completeLevelSuccess();
                  return;
              }
              
-             currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
-             console.log('🎯 Selected word:', currentEntry);
+             currentEntry = unusedWords[Math.floor(Math.random() * unusedWords.length)];
+             usedWords.add(currentEntry.context); // Mark as used
+             console.log('🎯 Selected word:', currentEntry.context, '- Total used:', usedWords.size);
              
              contextDisplay.textContent = currentEntry.context;
              
@@ -795,9 +919,13 @@
                  console.log('🎯 Correct answer on RIGHT:', correctAnswer);
              }
              
+             // Update level display
+             updateLevelDisplay();
+             
              startTimer();
          }
 
+        // v2.0.0: Updated handleSelection for progressive difficulty system
         function handleSelection(selectedPosition) {
             if (!gameInProgress) return;
             clearInterval(timerInterval);
@@ -807,17 +935,11 @@
             if (isCorrect) {
                 playSound('correct');
                 selectedCard.classList.add('feedback-correct');
-                currentStreak++;
-                if (currentStreak > stats.bestStreak) {
-                    stats.bestStreak = currentStreak;
-                }
-                setTimeout(nextRound, 400);
+                handleCorrectAnswer(); // Use new progressive logic
             } else {
                 playSound('incorrect');
                 selectedCard.classList.add('feedback-incorrect');
-                stats.totalMistakes += 1;
-                
-                loseLife();
+                handleIncorrectAnswer(); // Use new failure logic (immediate game end)
             }
         }
 
@@ -906,7 +1028,7 @@
                      clearInterval(timerInterval);
                      console.log('⏱️ Timer expired! Auto-selecting wrong answer');
                      
-                     // When timer expires, treat as wrong answer (lose life)
+                     // v2.0.0: When timer expires, treat as wrong answer (lose life)
                      playSound('incorrect');
                      stats.totalMistakes += 1;
                      loseLife();
@@ -1015,8 +1137,7 @@
             console.log('🎯 Game header updated with player:', displayName, 'settings:', settings);
         }
 
-        // Event Listeners
-        document.getElementById('back-to-menu-btn').addEventListener('click', backToMenu);
+        // v2.0.0: Event Listeners (removed back button for progressive system)
 
         wordCardLeft.addEventListener('click', () => handleSelection('left'));
         wordCardRight.addEventListener('click', () => handleSelection('right'));
@@ -1038,12 +1159,12 @@
             if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
         });
 
-                 // Initialization
+         // v2.0.0: Updated Initialization for Progressive Difficulty System
          window.onload = async () => {
              // Get parameters from URL
              getURLParameters();
              
-             // Initialize DOM references
+             // Initialize DOM references for combined system
              heartsContainer = document.querySelector('.hearts');
              motivationText = document.querySelector('.motivation-text');
              
@@ -1058,18 +1179,25 @@
                  await loadWordListsFromGoogleSheets();
              } catch (error) {
                  console.warn("Google Sheets loading failed, continuing with fallback data:", error);
-                 // Don't redirect - fallback data is handled in loadWordListsFromGoogleSheets()
              }
              
              // Initialize personal records display
              updatePersonalRecordsDisplay();
              
-             // Set up game
+             // Set up progressive game system with life system
              gamePlayerName.textContent = displayName;
              bestStreakEl.textContent = stats.bestStreak;
              currentStreak = 0;
+             currentLevel = 1; // Start at easy level
+             wordsAnsweredInLevel = 0;
+             usedWords.clear(); // Reset used words tracker
              gameInProgress = true;
+             
+             // Initialize life system
              resetLives();
+             
+             // Set initial difficulty to easy
+             settings.difficulty = 'easy';
              
              // Start background music if enabled
              toggleBackgroundMusic();
