@@ -265,12 +265,17 @@
                 ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
             </div>
             
-            <!-- v2.0.0: Progressive Level System Display -->
+            <!-- v2.0.0: Progressive Level System WITH Life System -->
             <div class="life-bar-header mb-6">
                 <div class="life-container">
                     <span class="life-text">ຄວາມກ້າວໜ້າ:</span>
+                    <div class="hearts">
+                        <span class="heart active"></span>
+                        <span class="heart active"></span>
+                        <span class="heart active"></span>
+                    </div>
                 </div>
-                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ</div>
+                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ | 3/3 ຊິວິດ</div>
             </div>
             
             <!-- Player Name Header -->
@@ -401,11 +406,15 @@
         let displayName = '';
         let wordList = [];
         
-        // v2.0.0: Progressive Level System (removed life system)
+        // v2.0.0: Progressive Level System WITH Life System
         let currentLevel = 1; // 1=easy, 2=medium, 3=hard
         let wordsAnsweredInLevel = 0;
         let maxWordsPerLevel = 30;
         let usedWords = new Set(); // Track used words to prevent repeats
+        
+        // Life System (restored)
+        let playerLives = 3;
+        let maxLives = 3;
         let heartsContainer, motivationText;
         
         // Settings from URL parameters
@@ -556,12 +565,82 @@
             return filtered.length > 0 ? filtered : wordList;
         }
 
-        // v2.0.0: Progressive Level System Functions
+        // v2.0.0: Progressive Level System Functions WITH Life System
         function updateLevelDisplay() {
             const levelNames = { 1: 'ງ່າຍ', 2: 'ປານກາງ', 3: 'ຍາກ' };
             const progress = `${wordsAnsweredInLevel}/${maxWordsPerLevel}`;
-            motivationText.textContent = `ລະດັບ ${levelNames[currentLevel]}: ${progress} ຄຳ`;
-            motivationText.style.color = '#000000'; // Always black as requested
+            const livesInfo = `${playerLives}/3 ຊິວິດ`;
+            motivationText.textContent = `ລະດັບ ${levelNames[currentLevel]}: ${progress} ຄຳ | ${livesInfo}`;
+            updateMotivationTextColor(); // Update color based on lives
+        }
+
+        // Restored Life System Functions
+        function updateLifeDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            
+            hearts.forEach((heart, index) => {
+                if (index < playerLives) {
+                    heart.classList.remove('lost');
+                    heart.classList.add('active');
+                } else {
+                    heart.classList.add('lost');
+                    heart.classList.remove('active');
+                }
+            });
+            
+            updateLevelDisplay(); // Update the combined display
+        }
+
+        function updateMotivationTextColor() {
+            motivationText.classList.remove('critical');
+            if (playerLives === 1) {
+                motivationText.classList.add('critical'); // Red for last life only
+            }
+        }
+
+        function loseLife() {
+            if (playerLives > 0) {
+                playerLives--;
+                
+                const hearts = heartsContainer.querySelectorAll('.heart');
+                const heartToBreak = hearts[playerLives];
+                heartToBreak.classList.add('losing');
+                
+                setTimeout(() => {
+                    heartToBreak.classList.remove('losing');
+                    updateLifeDisplay();
+                    
+                    if (playerLives === 0) {
+                        gameOver(); // Game ends if all lives lost
+                    } else {
+                        showLifeWarning();
+                        setTimeout(nextRound, 1500);
+                    }
+                }, 600);
+            }
+        }
+
+        function showLifeWarning() {
+            const lifeBar = document.querySelector('.life-bar-header');
+            lifeBar.style.animation = 'lifeBarFlash 0.5s ease-in-out 2';
+            
+            setTimeout(() => {
+                lifeBar.style.animation = '';
+            }, 1000);
+        }
+
+        function resetLives() {
+            playerLives = maxLives;
+            updateLifeDisplay();
+        }
+
+        function gameOver() {
+            gameInProgress = false;
+            clearInterval(timerInterval);
+            
+            // Show results screen - game ended due to losing all lives
+            switchScreen('results');
+            endGame();
         }
 
         function handleCorrectAnswer() {
@@ -583,14 +662,9 @@
         }
 
         function handleIncorrectAnswer() {
-            // v2.0.0: Any wrong answer ends the game immediately
-            gameInProgress = false;
-            clearInterval(timerInterval);
+            // v2.0.0: Wrong answer loses a life (not immediate game end)
             stats.totalMistakes += 1;
-            
-            // Show failure message and end game
-            switchScreen('results');
-            endGame();
+            loseLife(); // Use life system - game ends only when all lives lost
         }
 
         function completeLevelSuccess() {
@@ -652,6 +726,9 @@
             currentLevel = nextLevel;
             wordsAnsweredInLevel = 0;
             gameInProgress = true;
+            
+            // Reset lives for new level
+            resetLives();
             
             // Remove completion screen and show game screen
             document.querySelector('.screen.active').remove();
@@ -951,9 +1028,10 @@
                      clearInterval(timerInterval);
                      console.log('⏱️ Timer expired! Auto-selecting wrong answer');
                      
-                     // v2.0.0: When timer expires, treat as wrong answer (immediate game end)
+                     // v2.0.0: When timer expires, treat as wrong answer (lose life)
                      playSound('incorrect');
-                     handleIncorrectAnswer();
+                     stats.totalMistakes += 1;
+                     loseLife();
                  }
              }, interval);
          }
@@ -1086,7 +1164,8 @@
              // Get parameters from URL
              getURLParameters();
              
-             // Initialize DOM references for new system
+             // Initialize DOM references for combined system
+             heartsContainer = document.querySelector('.hearts');
              motivationText = document.querySelector('.motivation-text');
              
              // Initialize background music
@@ -1105,7 +1184,7 @@
              // Initialize personal records display
              updatePersonalRecordsDisplay();
              
-             // Set up progressive game system
+             // Set up progressive game system with life system
              gamePlayerName.textContent = displayName;
              bestStreakEl.textContent = stats.bestStreak;
              currentStreak = 0;
@@ -1113,6 +1192,9 @@
              wordsAnsweredInLevel = 0;
              usedWords.clear(); // Reset used words tracker
              gameInProgress = true;
+             
+             // Initialize life system
+             resetLives();
              
              // Set initial difficulty to easy
              settings.difficulty = 'easy';
