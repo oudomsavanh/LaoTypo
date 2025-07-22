@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v1.3.0 -->
+    <!-- Cache Busting Headers v1.8.0 - Updated Gecko position and typography -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -444,10 +444,10 @@
             margin: 1rem 0;
         }
         
-        /* Gecko Mascot */
+        /* Gecko Mascot - v1.8.0: Moved from top-left to bottom-left */
         .gecko-mascot {
             position: fixed;
-            top: 80px; /* Below navigation bar */
+            bottom: 1rem; /* Changed from top to bottom positioning */
             left: 1rem;
             z-index: 40; /* Below navigation but above content */
             pointer-events: none; /* Don't interfere with clicks */
@@ -462,6 +462,29 @@
         
         .gecko-mascot:hover img {
             opacity: 1;
+        }
+        
+        /* v1.8.0: Custom responsive typography for main title and subtitle */
+        .main-title-custom {
+            font-size: 1.8rem; /* Mobile: 1.8rem */
+            line-height: 1.2;
+            font-weight: bold;
+        }
+        
+        .subtitle-custom {
+            font-size: 1rem; /* Mobile: 1rem */
+            line-height: 1.4;
+        }
+        
+        /* Desktop responsive sizes */
+        @media (min-width: 768px) {
+            .main-title-custom {
+                font-size: 2.4rem; /* Desktop: 2.4rem (calculated best fit) */
+            }
+            
+            .subtitle-custom {
+                font-size: 1.2rem; /* Desktop: 1.2rem (calculated best fit) */
+            }
         }
         
         /* Account Statistics Panel */
@@ -565,8 +588,8 @@
     <div class="game-container">
         <!-- Start Screen -->
         <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
-            <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
-            <p class="text-lg text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
+            <h1 class="main-title-custom text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
+            <p class="subtitle-custom text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
             <p class="text-sm text-sub-color">(Testing Version)</p>
 
             
