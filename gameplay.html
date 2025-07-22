@@ -268,14 +268,14 @@
             <!-- v2.0.0: Progressive Level System WITH Life System -->
             <div class="life-bar-header mb-6">
                 <div class="life-container">
-                    <span class="life-text">ຄວາມກ້າວໜ້າ:</span>
+                    <span class="life-text">ຊິວິດ:</span>
                     <div class="hearts">
                         <span class="heart active"></span>
                         <span class="heart active"></span>
                         <span class="heart active"></span>
                     </div>
                 </div>
-                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ | 3/3 ຊິວິດ</div>
+                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ </div>
             </div>
             
             <!-- Player Name Header -->
@@ -322,7 +322,7 @@
                 <div id="evaluation-result" class="text-xl font-bold"></div>
                  <div class="text-2xl space-y-2">
                      <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
-                     <p>ຄວາມແມ່ນຍຳ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
+                     <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
                  </div>
                  
                  <!-- Personal Best Indicator -->
@@ -361,7 +361,7 @@
                  <h3 class="text-xl font-bold text-main-color mb-4 text-center">🌍 ອັນດັບປະເທດ</h3>
                  <div id="global-ranking-info" class="text-center text-sub-color">
                      <p id="global-rank-text">ອັນດັບຂອງທ່ານ: ກຳລັງປະເມີນຜົນ...</p>
-                     <p class="text-xs mt-2">🔄 ກະດານກຽດຕິຍົດແບບເຕັມໆ ຈະຕາມມາທີຫຼັງເດີ້~ </p>
+                     <p class="text-xs mt-2">🔄  ກະດານກຽດຕິຍົດແບບເຕັມໆ ຈະມາຕາມຫຼັງເດີ້!</p>
                  </div>
              </div>
 
@@ -378,7 +378,7 @@
     <!-- Footer -->
     <footer class="w-full text-center py-4 text-xs text-sub-color bg-[#2c2e31] border-t border-[#4a4d50]">
         <p>Game Mode</p>
-        <p>Version: 2.0.0 - Progressive Difficulty System</p>
+        <p>Version: 2.0.0</p>
     </footer>
 
     <script>
@@ -963,13 +963,13 @@
                      evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
                      evaluationEl.style.color = 'var(--error-color)';
                  } else if (currentStreak < 5) {
-                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
+                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ💖'";
                      evaluationEl.style.color = 'var(--warning-color)';
                  } else if (currentStreak < 10) {
                      evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
                      evaluationEl.style.color = 'var(--main-color)';
                  } else if (currentStreak < 15) {
-                     evaluationEl.textContent = "ລູກຊອດລາວ";
+                     evaluationEl.textContent = "ເຈົ້າແມ່ນລູກຊອດລາວ";
                      evaluationEl.style.color = 'var(--main-color)';
                  } else {
                      evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
@@ -987,7 +987,7 @@
                      evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
                      evaluationEl.style.color = 'var(--main-color)';
                  } else if (sessionAccuracy < 85) {
-                     evaluationEl.textContent = "ລູກຊອດລາວ";
+                     evaluationEl.textContent = "ເຈົ້າແມ່ນລູກຊອດລາວ";
                      evaluationEl.style.color = 'var(--main-color)';
                  } else {
                      evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
