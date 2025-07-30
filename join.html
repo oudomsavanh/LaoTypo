@@ -3,31 +3,494 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Session</title>
+    <title>Join Session - Session Manager</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase Configuration -->
+    <script type="module" src="firebase-config.js"></script>
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --error: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .session-code-input {
+            @apply font-mono text-3xl text-center tracking-widest uppercase;
+        }
+        
+        .player-card {
+            @apply bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200;
+        }
+        
+        .btn {
+            @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2;
+        }
+        
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 disabled:bg-gray-400 disabled:cursor-not-allowed;
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-4 focus:ring-gray-200;
+        }
+        
+        .btn-danger {
+            @apply bg-red-600 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-200;
+        }
+        
+        .spinner {
+            @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin;
+        }
+        
+        .toast {
+            @apply fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white font-medium transform translate-y-full transition-transform duration-300 z-50;
+        }
+        
+        .toast.show {
+            @apply translate-y-0;
+        }
+        
+        .toast.error {
+            @apply bg-red-600;
+        }
+        
+        .toast.success {
+            @apply bg-green-600;
+        }
+        
+        .status-badge {
+            @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+        }
+        
+        .status-active {
+            @apply bg-green-100 text-green-800;
+        }
+        
+        .status-waiting {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        
+        .status-ended {
+            @apply bg-gray-100 text-gray-800;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden;
+        }
+        
+        .loading-overlay.show {
+            @apply flex;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">Join Session</h1>
-            <p class="text-gray-600 mb-6">Welcome! You have successfully logged in as a Player.</p>
-            <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                <p class="text-sm text-gray-600" id="player-info">Loading player info...</p>
+<body>
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="LaoTypo-logo-04.png" alt="Logo" class="h-8 w-auto">
+                    <h1 class="text-xl font-semibold text-gray-800">Join Session</h1>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-600" id="player-display">Guest Player</span>
+                    <button onclick="window.location.href='/registration.html'" class="text-gray-600 hover:text-gray-800">
+                        Back to Login
+                    </button>
+                </div>
             </div>
-            <p class="text-sm text-gray-500">This is a placeholder page. The session joining functionality will be implemented soon.</p>
-            <button onclick="window.location.href='/registration.html'" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Back to Login
-            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Join Session Form -->
+        <div id="join-form-section" class="max-w-md mx-auto mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Enter Session Code</h2>
+                
+                <form id="join-form" class="space-y-6">
+                    <div>
+                        <input 
+                            type="text" 
+                            id="session-code" 
+                            name="sessionCode"
+                            placeholder="ABC123"
+                            maxlength="6"
+                            required
+                            class="session-code-input w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                        <p class="text-sm text-gray-600 mt-2 text-center">
+                            Ask your host for the 6-character session code
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-full">
+                        Join Session
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Session Info (Hidden Initially) -->
+        <div id="session-info-section" class="max-w-2xl mx-auto hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8 mb-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2" id="session-name">Loading...</h2>
+                    <p class="text-gray-600">Session Code: <span id="session-code-display" class="font-mono font-bold">------</span></p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Status</p>
+                        <span id="session-status" class="status-badge status-waiting">Waiting</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Players</p>
+                        <p class="font-semibold" id="player-count">0/0</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="leave-session-btn" class="btn btn-danger flex-1">
+                        Leave Session
+                    </button>
+                    <button id="ready-btn" class="btn btn-primary flex-1" disabled>
+                        Ready to Start
+                    </button>
+                </div>
+            </div>
+
+            <!-- Players List -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Players in Session</h3>
+                <div id="players-list" class="space-y-2">
+                    <!-- Players will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="bg-white rounded-lg p-8 text-center">
+            <div class="spinner w-12 h-12 border-4 mx-auto mb-4"></div>
+            <p class="text-gray-600">Joining session...</p>
         </div>
     </div>
-    
-    <script>
-        // Display player info from session storage
-        const playerInfo = JSON.parse(sessionStorage.getItem('playerInfo') || '{}');
-        if (playerInfo.displayName) {
-            document.getElementById('player-info').textContent = 
-                `Player Name: ${playerInfo.displayName} | Guest Mode: ${playerInfo.isGuest ? 'Yes' : 'No'}`;
-        }
+
+    <!-- Toast Container -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script type="module">
+        window.addEventListener('load', async () => {
+            // Get Firebase instances
+            const auth = window.firebaseAuth;
+            const db = window.firebaseDb;
+            
+            // Import Firestore functions
+            const { 
+                doc, 
+                getDoc, 
+                updateDoc,
+                onSnapshot,
+                arrayUnion,
+                arrayRemove
+            } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            
+            // State
+            let playerInfo = null;
+            let currentSession = null;
+            let sessionUnsubscribe = null;
+            
+            // DOM Elements
+            const playerDisplay = document.getElementById('player-display');
+            const joinFormSection = document.getElementById('join-form-section');
+            const sessionInfoSection = document.getElementById('session-info-section');
+            const joinForm = document.getElementById('join-form');
+            const sessionCodeInput = document.getElementById('session-code');
+            const sessionName = document.getElementById('session-name');
+            const sessionCodeDisplay = document.getElementById('session-code-display');
+            const sessionStatus = document.getElementById('session-status');
+            const playerCount = document.getElementById('player-count');
+            const playersList = document.getElementById('players-list');
+            const leaveSessionBtn = document.getElementById('leave-session-btn');
+            const readyBtn = document.getElementById('ready-btn');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const toast = document.getElementById('toast');
+            
+            // Initialize
+            function init() {
+                // Get player info from session storage
+                const storedPlayerInfo = sessionStorage.getItem('playerInfo');
+                if (storedPlayerInfo) {
+                    playerInfo = JSON.parse(storedPlayerInfo);
+                    playerDisplay.textContent = playerInfo.displayName;
+                } else {
+                    // No player info, redirect to registration
+                    window.location.href = '/registration.html';
+                    return;
+                }
+                
+                // Check if returning to an existing session
+                const existingSessionCode = sessionStorage.getItem('currentSessionCode');
+                if (existingSessionCode) {
+                    sessionCodeInput.value = existingSessionCode;
+                    joinSession(existingSessionCode);
+                }
+            }
+            
+            // Utility Functions
+            function showToast(message, type = 'success') {
+                toast.textContent = message;
+                toast.className = `toast ${type} show`;
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            function showLoading(show = true) {
+                if (show) {
+                    loadingOverlay.classList.add('show');
+                } else {
+                    loadingOverlay.classList.remove('show');
+                }
+            }
+            
+            // Join Session
+            async function joinSession(code) {
+                showLoading(true);
+                
+                try {
+                    // Get session document
+                    const sessionDoc = await getDoc(doc(db, 'sessions', code));
+                    
+                    if (!sessionDoc.exists()) {
+                        throw new Error('Session not found');
+                    }
+                    
+                    const sessionData = sessionDoc.data();
+                    
+                    // Check if session is joinable
+                    if (sessionData.status === 'ended') {
+                        throw new Error('This session has ended');
+                    }
+                    
+                    if (sessionData.players && sessionData.players.length >= sessionData.maxPlayers) {
+                        throw new Error('Session is full');
+                    }
+                    
+                    // Check if player is already in session
+                    const existingPlayer = sessionData.players?.find(p => p.displayName === playerInfo.displayName);
+                    if (!existingPlayer) {
+                        // Add player to session
+                        await updateDoc(doc(db, 'sessions', code), {
+                            players: arrayUnion({
+                                displayName: playerInfo.displayName,
+                                isGuest: playerInfo.isGuest,
+                                joinedAt: new Date().toISOString(),
+                                isReady: false
+                            })
+                        });
+                    }
+                    
+                    // Store session code
+                    sessionStorage.setItem('currentSessionCode', code);
+                    
+                    // Subscribe to session updates
+                    subscribeToSession(code);
+                    
+                    // Update UI
+                    joinFormSection.classList.add('hidden');
+                    sessionInfoSection.classList.remove('hidden');
+                    
+                    showToast('Successfully joined session!', 'success');
+                } catch (error) {
+                    console.error('Error joining session:', error);
+                    showToast(error.message || 'Failed to join session', 'error');
+                } finally {
+                    showLoading(false);
+                }
+            }
+            
+            // Subscribe to Session Updates
+            function subscribeToSession(code) {
+                if (sessionUnsubscribe) {
+                    sessionUnsubscribe();
+                }
+                
+                sessionUnsubscribe = onSnapshot(doc(db, 'sessions', code), (doc) => {
+                    if (doc.exists()) {
+                        currentSession = { id: doc.id, ...doc.data() };
+                        updateSessionUI();
+                    } else {
+                        // Session was deleted
+                        handleSessionEnded();
+                    }
+                }, (error) => {
+                    console.error('Error listening to session:', error);
+                    showToast('Lost connection to session', 'error');
+                });
+            }
+            
+            // Update Session UI
+            function updateSessionUI() {
+                if (!currentSession) return;
+                
+                // Update session info
+                sessionName.textContent = currentSession.name;
+                sessionCodeDisplay.textContent = currentSession.code;
+                
+                // Update status
+                sessionStatus.className = `status-badge status-${currentSession.status}`;
+                sessionStatus.textContent = currentSession.status.charAt(0).toUpperCase() + currentSession.status.slice(1);
+                
+                // Update player count
+                const playerCount = currentSession.players?.length || 0;
+                document.getElementById('player-count').textContent = `${playerCount}/${currentSession.maxPlayers}`;
+                
+                // Update players list
+                if (currentSession.players && currentSession.players.length > 0) {
+                    playersList.innerHTML = currentSession.players.map(player => `
+                        <div class="player-card flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="w-2 h-2 rounded-full ${player.isReady ? 'bg-green-500' : 'bg-gray-400'}"></span>
+                                <span class="font-medium">${player.displayName}</span>
+                                ${player.isGuest ? '<span class="text-xs text-gray-500">(Guest)</span>' : ''}
+                            </div>
+                            ${player.isReady ? '<span class="text-green-600 text-sm">Ready</span>' : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    playersList.innerHTML = '<p class="text-gray-500 text-center">No players yet</p>';
+                }
+                
+                // Enable/disable ready button based on session status
+                readyBtn.disabled = currentSession.status !== 'waiting';
+                
+                // Check if game has started
+                if (currentSession.status === 'active') {
+                    handleGameStarted();
+                }
+            }
+            
+            // Leave Session
+            async function leaveSession() {
+                if (!currentSession || !playerInfo) return;
+                
+                if (!confirm('Are you sure you want to leave this session?')) return;
+                
+                try {
+                    // Remove player from session
+                    await updateDoc(doc(db, 'sessions', currentSession.code), {
+                        players: arrayRemove({
+                            displayName: playerInfo.displayName,
+                            isGuest: playerInfo.isGuest,
+                            joinedAt: playerInfo.joinedAt,
+                            isReady: false
+                        })
+                    });
+                    
+                    // Clear session data
+                    sessionStorage.removeItem('currentSessionCode');
+                    if (sessionUnsubscribe) {
+                        sessionUnsubscribe();
+                    }
+                    
+                    // Reset UI
+                    joinFormSection.classList.remove('hidden');
+                    sessionInfoSection.classList.add('hidden');
+                    joinForm.reset();
+                    
+                    showToast('Left session', 'success');
+                } catch (error) {
+                    console.error('Error leaving session:', error);
+                    showToast('Failed to leave session', 'error');
+                }
+            }
+            
+            // Toggle Ready Status
+            async function toggleReady() {
+                if (!currentSession || !playerInfo) return;
+                
+                try {
+                    // Find current player
+                    const playerIndex = currentSession.players.findIndex(p => p.displayName === playerInfo.displayName);
+                    if (playerIndex === -1) return;
+                    
+                    const updatedPlayers = [...currentSession.players];
+                    updatedPlayers[playerIndex].isReady = !updatedPlayers[playerIndex].isReady;
+                    
+                    // Update in Firestore
+                    await updateDoc(doc(db, 'sessions', currentSession.code), {
+                        players: updatedPlayers
+                    });
+                    
+                    showToast(updatedPlayers[playerIndex].isReady ? 'Ready!' : 'Not ready', 'success');
+                } catch (error) {
+                    console.error('Error updating ready status:', error);
+                    showToast('Failed to update status', 'error');
+                }
+            }
+            
+            // Handle Session Ended
+            function handleSessionEnded() {
+                showToast('Session has ended', 'error');
+                sessionStorage.removeItem('currentSessionCode');
+                if (sessionUnsubscribe) {
+                    sessionUnsubscribe();
+                }
+                
+                // Reset UI
+                joinFormSection.classList.remove('hidden');
+                sessionInfoSection.classList.add('hidden');
+                joinForm.reset();
+            }
+            
+            // Handle Game Started
+            function handleGameStarted() {
+                showToast('Game is starting!', 'success');
+                // Redirect to game page (to be implemented)
+                setTimeout(() => {
+                    window.location.href = `/game.html?session=${currentSession.code}`;
+                }, 2000);
+            }
+            
+            // Event Listeners
+            joinForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const code = sessionCodeInput.value.trim().toUpperCase();
+                if (code.length === 6) {
+                    await joinSession(code);
+                } else {
+                    showToast('Please enter a valid 6-character code', 'error');
+                }
+            });
+            
+            // Auto-uppercase session code input
+            sessionCodeInput.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase();
+            });
+            
+            leaveSessionBtn.addEventListener('click', leaveSession);
+            readyBtn.addEventListener('click', toggleReady);
+            
+            // Initialize the page
+            init();
+        });
     </script>
 </body>
 </html>

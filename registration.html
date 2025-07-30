@@ -304,30 +304,12 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { 
-            initializeApp 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            signInWithPopup,
-            signInAnonymously,
-            onAuthStateChanged,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc,
-            serverTimestamp 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        // Initialize Firebase (config is loaded from firebase-config.js)
-        const auth = getAuth();
-        const db = getFirestore();
-        const googleProvider = new GoogleAuthProvider();
+        // Wait for Firebase to be initialized from firebase-config.js
+        window.addEventListener('load', async () => {
+            // Get Firebase instances from the global scope
+            const auth = window.firebaseAuth;
+            const db = window.firebaseDb;
+            const FirebaseAuthManager = window.FirebaseAuthManager;
 
         // DOM Elements
         const hostTab = document.getElementById('host-tab');
@@ -388,9 +370,9 @@
         // Check User Role
         async function checkUserRole(user) {
             try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists() && userDoc.data().role) {
-                    return userDoc.data().role;
+                const userProfile = await FirebaseAuthManager.getUserProfile(user.uid);
+                if (userProfile && userProfile.role) {
+                    return userProfile.role;
                 }
                 return null;
             } catch (error) {
@@ -402,14 +384,15 @@
         // Save User Role
         async function saveUserRole(user, role) {
             try {
-                await setDoc(doc(db, 'users', user.uid), {
+                const profileData = {
                     role: role,
-                    createdAt: serverTimestamp(),
                     email: user.email,
                     displayName: user.displayName,
                     photoURL: user.photoURL
-                }, { merge: true });
-                return true;
+                };
+                
+                const success = await FirebaseAuthManager.createUserProfile(user.uid, profileData);
+                return success;
             } catch (error) {
                 console.error('Error saving user role:', error);
                 showToast('Error saving user role', 'error');
@@ -419,7 +402,9 @@
 
         // Handle Authentication Result
         async function handleAuthResult(user) {
-            const role = await checkUserRole(user);
+            // For the auth result from our managers, we need to get the actual auth user
+            const authUser = auth.currentUser || user;
+            const role = await checkUserRole(authUser);
             
             if (!role) {
                 // First time user - show role selection
@@ -444,8 +429,12 @@
             setLoading(googleSignInBtn, true);
             
             try {
-                const result = await signInWithPopup(auth, googleProvider);
-                await handleAuthResult(result.user);
+                const result = await FirebaseAuthManager.loginWithGmail();
+                if (result.success) {
+                    await handleAuthResult(result.user);
+                } else {
+                    throw new Error(result.error || 'Sign in failed');
+                }
             } catch (error) {
                 console.error('Google sign in error:', error);
                 showToast(error.message || 'Sign in failed', 'error');
@@ -468,8 +457,12 @@
             setLoading(guestSignInBtn, true);
             
             try {
-                const result = await signInAnonymously(auth);
-                await handleAuthResult(result.user);
+                const result = await FirebaseAuthManager.loginAnonymously();
+                if (result.success) {
+                    await handleAuthResult(result.user);
+                } else {
+                    throw new Error(result.error || 'Guest sign in failed');
+                }
             } catch (error) {
                 console.error('Guest sign in error:', error);
                 showToast(error.message || 'Guest sign in failed', 'error');
@@ -578,7 +571,7 @@
         });
 
         // Check auth state on load
-        onAuthStateChanged(auth, (user) => {
+        FirebaseAuthManager.onAuthStateChanged((user) => {
             if (user && window.location.hash === '#role-selection') {
                 handleAuthResult(user);
             }
@@ -589,6 +582,7 @@
             e.preventDefault();
             showToast('Host profile setup coming soon!', 'info');
         });
+    });
     </script>
 </body>
 </html>
