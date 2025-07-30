@@ -382,6 +382,33 @@ class FirebaseAuthManager {
     }
   }
   
+  // Login anonymously
+  static async loginAnonymously() {
+    try {
+      const { signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+      const result = await signInAnonymously(auth);
+      const user = result.user;
+      
+      console.log('✅ Anonymous login successful:', user.uid);
+      return {
+        success: true,
+        user: {
+          uid: user.uid,
+          email: null,
+          displayName: 'Guest User',
+          photoURL: null,
+          isAnonymous: true
+        }
+      };
+    } catch (error) {
+      console.error('❌ Anonymous login failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  
   // Logout
   static async logout() {
     try {
