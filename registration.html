@@ -433,7 +433,7 @@
                 <div class="logo-section">
                     <div class="logo-container">
                         <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="logo-img">
-                        <img src="gecko-mascot.png" alt="Gecko Mascot" class="gecko-mascot">
+                        <img src="Gecko.png" alt="Gecko Mascot" class="gecko-mascot">
                     </div>
                     <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">
                         ຍິນດີຕ້ອນຮັບສູ່<br>LaoTypo!
@@ -713,6 +713,27 @@
             try {
                 console.log('👤 Starting guest mode...');
                 isGuest = true;
+                
+                // Option 1: Direct redirect to testing.html without profile setup
+                // Uncomment the lines below if you want immediate redirect
+                
+                sessionStorage.setItem('userType', 'guest');
+                sessionStorage.setItem('guestUser', JSON.stringify({
+                    id: 'guest_' + Math.random().toString(36).substring(2, 11),
+                    name: 'Guest User',
+                    age: 0,
+                    createdAt: new Date().toISOString(),
+                    userType: 'guest'
+                }));
+                showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ! ກຳລັງໄປໜ້າທົດສອບ...');
+                setTimeout(() => {
+                    window.location.href = 'testing.html';
+                }, 1000);
+                return;
+                
+                
+                // Option 2: Show profile setup (current behavior)
+                /*
                 showGuestWarning();
                 switchToProfileSetup();
                 
@@ -721,9 +742,10 @@
                 
                 showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ');
                 validateProfileForm();
+                */
             } catch (error) {
                 console.error('❌ Guest mode error:', error);
-                showError('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ໂໝດແຂກ');
+                showError('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ໂໝດແຂກ: ' + error.message);
             }
         }
 
@@ -798,6 +820,12 @@
         gmailLoginBtn.addEventListener('click', handleGmailLogin);
         guestModeBtn.addEventListener('click', handleGuestMode);
         backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+        
+        // Debug: Ensure guest button is found
+        console.log('Guest button found:', guestModeBtn);
+        if (!guestModeBtn) {
+            console.error('Guest mode button not found!');
+        }
         
         profileForm.addEventListener('submit', (e) => {
             e.preventDefault();
