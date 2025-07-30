@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v1.8.0 - Updated Gecko position and typography -->
+    <!-- Cache Busting Headers v2.1.0 - Enhanced with authentication and scoring -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -494,7 +494,143 @@
             }
         }
         
-        /* Account Statistics Panel */
+        /* Enhanced Account Screen Styles */
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--bg-color);
+            border: 3px solid var(--main-color);
+        }
+        
+        .achievement-badge {
+            background: rgba(62, 64, 67, 0.5);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-color: var(--main-color);
+            box-shadow: 0 4px 12px rgba(226, 183, 20, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        .badge-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .achievement-badge.unlocked .badge-name {
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .stat-value-with-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color) 0%, #f5c93d 100%);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .difficulty-progress {
+            margin-bottom: 12px;
+        }
+        
+        .difficulty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .difficulty-icon {
+            font-size: 1.2rem;
+        }
+        
+        .difficulty-name {
+            flex: 1;
+            margin-left: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .difficulty-score {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        @keyframes achievementUnlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.05); }
+        }
+        
+        /* Small Account Panel */
         .account-panel {
             position: fixed;
             top: 15%;
@@ -503,8 +639,8 @@
             border: 3px solid var(--main-color);
             border-radius: 1rem;
             padding: 0;
-            min-width: 320px;
-            max-width: 380px;
+            min-width: 300px;
+            max-width: 350px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
             transition: all 0.4s ease;
@@ -523,51 +659,59 @@
             color: var(--text-color);
         }
         
-        .account-content h2 {
-            color: var(--main-color);
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+            border: 2px solid var(--main-color);
         }
         
-        .stat-row {
+        .account-name {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        
+        .account-rank {
+            font-size: 0.8rem;
+            color: var(--sub-color);
+        }
+        
+        .quick-stats {
+            border-top: 1px solid rgba(226, 183, 20, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .quick-stat {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 0;
+            font-size: 0.9rem;
         }
         
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-        
-        .stat-label {
+        .quick-stat .stat-label {
             color: var(--sub-color);
-            font-size: 0.95rem;
         }
         
-        .stat-value {
+        .quick-stat .stat-value {
             color: var(--main-color);
             font-weight: bold;
-            font-size: 1rem;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--sub-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        
-        .close-btn:hover {
-            color: var(--text-color);
         }
     </style>
 </head>
 <body>
+    <!-- 🔥 Firebase Integration (Player Data Only) -->
+    <script type="module" src="firebase-config.js"></script>
+    <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> -->
+    <script type="module" src="test-firebase-player-sync.js"></script>
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -644,8 +788,10 @@
             
             <!-- Footer moved below start game button -->
             <div class="text-center text-xs text-sub-color mt-4">
+                <p id="user-type-display">👤 Guest Mode</p>
                 <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
-                <p>Version: 1.8.0 - Testing</p>
+                <p>Fixed Mode</p>
+                <p>Version: 2.1.0 - Phase 1: 4-Page System Implemented</p>
             </div>
         </div>
 
@@ -702,6 +848,9 @@
                 <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-bold text-white">0%</span></p>
                 <p>ຜົນການປະເມີນ: <span id="evaluation-result" class="font-bold"></span></p>
             </div>
+            
+            <!-- NEW: Score Breakdown -->
+            <div id="score-breakdown"></div>
             <div class="flex justify-center space-x-4">
                 <button id="restart-game-btn" class="btn btn-primary">ຫຼິ້ນອີກຄັ້ງ</button>
                 <button id="back-to-menu-btn" class="btn">ເມນູຫຼັກ</button>
@@ -806,6 +955,13 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                    <div class="flex justify-between items-center">
+                        <label>☁️ Firebase Sync</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="firebase-sync-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
                 <div class="text-center">
                     <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
@@ -814,44 +970,45 @@
         </div>
     </div>
 
-    <!-- Account Statistics Panel -->
+    <!-- Small Account Panel (Floating) -->
     <div id="account-panel" class="account-panel hidden">
         <div class="account-content">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">ສະຖິຕິສ່ວນຕົວ</h2>
-                <button id="close-account-btn" class="close-btn">&times;</button>
+                <h2 class="text-xl font-bold text-main-color">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl text-sub-color hover:text-text-color">&times;</button>
             </div>
             
-            <div class="space-y-0">
-                <div class="stat-row">
-                    <span class="stat-label">ຊື່:</span>
-                    <span class="stat-value" id="player-name-display">Gecko</span>
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name" id="account-display-name">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-rank">ອັນດັບ: <span id="account-rank">#-</span></div>
+                    </div>
                 </div>
                 
-                <div class="stat-row">
-                    <span class="stat-label">ຄະແນນທີ່ດີທີ່ສຸດ:</span>
-                    <span class="stat-value" id="best-score-display">7</span>
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">🏆 ຄະແນນດີສຸດ:</span>
+                        <span class="stat-value" id="account-best-streak">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🎯 ຄວາມແມ່ນຍຳ:</span>
+                        <span class="stat-value" id="account-accuracy">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">🏅 ລາງວັນ:</span>
+                        <span class="stat-value" id="account-achievements">0/8</span>
+                    </div>
                 </div>
-                
-                <div class="stat-row">
-                    <span class="stat-label">ຈຳນວນເກມທັງໝົດ:</span>
-                    <span class="stat-value" id="total-games-display">14</span>
-                </div>
-                
-                <div class="stat-row">
-                    <span class="stat-label">ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ:</span>
-                    <span class="stat-value" id="correct-answers-display">26</span>
-                </div>
-                
-                <div class="stat-row">
-                    <span class="stat-label">ຈຳນວນຄຳຕອບທີ່ຜິດ:</span>
-                    <span class="stat-value" id="wrong-answers-display">3</span>
-                </div>
-                
-                <div class="stat-row">
-                    <span class="stat-label">ຄວາມຖືກຕ້ອງທັງໝົດ:</span>
-                    <span class="stat-value" id="accuracy-display">89.7%</span>
-                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
         </div>
     </div>
@@ -917,6 +1074,10 @@
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
 
+        // --- AUTHENTICATION STATE ---
+        let currentUser = null;
+        let userType = null; // 'gmail' or 'guest'
+        
         // --- GAME STATE & SETTINGS ---
         let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
         let currentStreak = 0;
@@ -924,6 +1085,13 @@
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
+        
+        // NEW: Tracking for new scoring system
+        let levelScores = {
+            easy: { correct: 0, total: 0, completed: false },
+            medium: { correct: 0, total: 0, completed: false },
+            hard: { correct: 0, total: 0, completed: false }
+        };
         
         // --- LIFE SYSTEM ---
         let playerLives = 3;
@@ -1412,18 +1580,30 @@
             musicToggle.checked = settings.music;
             
             // Display user ID in footer
-            console.log('DEBUG: Updating user ID display, userId =', userId);
+            console.log('🆔 Updating user ID display, userId =', userId);
+            console.log('🆔 userId length:', userId ? userId.length : 'undefined');
             const userIdElement = document.getElementById('user-id-display');
             if (userIdElement) {
                 const displayText = '...' + userId.slice(-6);
                 userIdElement.textContent = displayText;
-                console.log('DEBUG: Set user ID display to:', displayText);
+                console.log('✅ Set user ID display to:', displayText);
+                console.log('✅ Element content:', userIdElement.textContent);
             } else {
-                console.error('DEBUG: user-id-display element not found!');
+                console.error('❌ user-id-display element not found!');
+            }
+            
+            // Update user type display
+            const userTypeElement = document.getElementById('user-type-display');
+            if (userTypeElement) {
+                if (userType === 'gmail' && currentUser) {
+                    userTypeElement.textContent = `📧 ${currentUser.email}`;
+                } else {
+                    userTypeElement.textContent = '👤 Guest Mode';
+                }
             }
         }
 
-        function startGame() {
+        async function startGame() {
             const newName = playerNameInput.value.trim();
             if (!newName) {
                 playerNameInput.classList.add('input-error', 'feedback-incorrect');
@@ -1437,7 +1617,7 @@
 
             if (newName !== displayName) {
                 displayName = newName;
-                saveUserData();
+                await saveUserDataWithSync();
             }
 
             // Display player name in game screen
@@ -1446,7 +1626,7 @@
             playSound('start');
             
             // Save current settings and player data before navigation
-            saveUserData();
+            await saveUserDataWithSync();
             
             // Navigate to gameplay page with enhanced parameters
             console.log('🚀 Starting game with settings:', settings);
@@ -1513,6 +1693,12 @@
                 playSound('correct');
                 selectedCard.classList.add('feedback-correct');
                 currentStreak++;
+                
+                // NEW: Track score for current level
+                const levelName = settings.difficulty;
+                levelScores[levelName].correct++;
+                levelScores[levelName].total++;
+                
                 if (currentStreak > stats.bestStreak) {
                     stats.bestStreak = currentStreak;
                 }
@@ -1521,6 +1707,10 @@
                 playSound('incorrect');
                 selectedCard.classList.add('feedback-incorrect');
                 stats.totalMistakes += 1;
+                
+                // NEW: Track incorrect answer for current level
+                const levelName = settings.difficulty;
+                levelScores[levelName].total++;
                 
                 // Lose a life instead of ending game immediately
                 loseLife();
@@ -1537,26 +1727,18 @@
             switchScreen('results');
             document.getElementById('final-streak').textContent = currentStreak;
             
-            const sessionAccuracy = ((currentStreak) / (currentStreak + 1)) * 100;
-            document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
+            // NEW: Calculate weighted score
+            const scoreResult = calculateWeightedScore();
+            
+            // Update accuracy display with weighted percentage
+            document.getElementById('accuracy-stat').textContent = `${scoreResult.percentage.toFixed(1)}%`;
+            
+            // NEW: Display score breakdown
+            displayScoreBreakdown(scoreResult);
             
             const evaluationEl = document.getElementById('evaluation-result');
-            if (sessionAccuracy > 0 && sessionAccuracy < 30) {
-                evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
-                evaluationEl.style.color = 'var(--error-color)';
-            } else if (sessionAccuracy >= 30 && sessionAccuracy < 50) {
-                evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
-                evaluationEl.style.color = 'var(--warning-color)';
-            } else if (sessionAccuracy >= 50 && sessionAccuracy < 70) {
-                evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
-                evaluationEl.style.color = 'var(--main-color)';
-            } else if (sessionAccuracy >= 70 && sessionAccuracy < 80) {
-                evaluationEl.textContent = "ລູກຊອດລາວ";
-                evaluationEl.style.color = 'var(--main-color)';
-            } else {
-                evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
-                evaluationEl.style.color = 'var(--correct-color)'; 
-            }
+            evaluationEl.textContent = scoreResult.evaluation.text;
+            evaluationEl.style.color = scoreResult.evaluation.color;
 
             if (currentStreak > 0) {
                updateLeaderboard(currentStreak);
@@ -1645,7 +1827,12 @@
             settingsPanel.classList.add('hidden');
             
             // Toggle account panel
-            accountPanel.classList.toggle('hidden');
+            if (isHidden) {
+                updateAccountPanel(); // Update account panel with latest data
+                accountPanel.classList.remove('hidden');
+            } else {
+                accountPanel.classList.add('hidden');
+            }
         });
         
         // Close buttons
@@ -1693,6 +1880,23 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Account panel controls
+        document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+                updateAccountPanel();
+            }
+        });
+        
+        document.getElementById('view-full-profile-btn').addEventListener('click', () => {
+            // Close account panel and navigate to full profile page
+            accountPanel.classList.add('hidden');
+            window.location.href = 'player_account_info.html';
+        });
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Escape') {
@@ -1723,6 +1927,11 @@
 
         // --- INITIALIZATION ---
         window.onload = async () => {
+            // Check authentication first
+            if (!checkUserAuthentication()) {
+                return; // Will redirect to registration
+            }
+            
             // Initialize DOM references for life system
             heartsContainer = document.querySelector('.hearts');
             lifeCountEl = document.querySelector('.life-count');
@@ -1730,6 +1939,9 @@
             
             // Initialize background music system
             initializeBackgroundMusic();
+            
+            // Initialize Firebase sync
+            await initializeFirebaseSync();
             
             loadUserData();
             updateUI();
@@ -1739,6 +1951,321 @@
             startGameBtn.textContent = 'ເລີ່ມເກມ';
         };
 
+        // --- AUTHENTICATION GUARD ---
+        function checkUserAuthentication() {
+            // Check for guest user in sessionStorage
+            const guestUser = sessionStorage.getItem('guestUser');
+            const storedUserType = sessionStorage.getItem('userType');
+            
+            // Check for Gmail user data in localStorage
+            const gmailUserData = localStorage.getItem('firebaseUser');
+            
+            if (guestUser && storedUserType === 'guest') {
+                console.log('👤 Guest user found');
+                userType = 'guest';
+                const userData = JSON.parse(guestUser);
+                displayName = userData.name;
+                userId = userData.id;
+                updateUserDisplay();
+                return true;
+            } else if (gmailUserData) {
+                console.log('📧 Gmail user data found');
+                userType = 'gmail';
+                // Will be fully loaded by Firebase auth listener
+                return true;
+            } else {
+                console.log('🔐 No authenticated user found - redirecting to registration');
+                redirectToRegistration();
+                return false;
+            }
+        }
+        
+        function redirectToRegistration() {
+            console.log('🔀 Redirecting to registration page...');
+            window.location.href = 'registration.html';
+        }
+        
+        function updateUserDisplay() {
+            const userTypeElement = document.getElementById('user-type-display');
+            const userIdElement = document.getElementById('user-id-display');
+            
+            if (userType === 'guest') {
+                userTypeElement.textContent = '👤 Guest Mode';
+                userIdElement.textContent = userId || 'guest_user';
+            } else if (userType === 'gmail' && currentUser) {
+                userTypeElement.textContent = `📧 ${currentUser.email}`;
+                userIdElement.textContent = currentUser.uid;
+            }
+            
+            // Update account nav link visibility
+            const accountNavLink = document.getElementById('account-nav-link');
+            if (accountNavLink) {
+                if (userType === 'gmail') {
+                    accountNavLink.style.display = 'block';
+                } else {
+                    accountNavLink.style.display = 'none';
+                }
+            }
+        }
+
+        // NEW: Calculate weighted score based on new scoring system
+        function calculateWeightedScore() {
+            let rawScore = 0;
+            let maxPossibleScore = 0;
+            
+            // Calculate raw score with weights
+            if (levelScores.easy.total > 0) {
+                rawScore += levelScores.easy.correct * 1; // Easy = 1 point each
+                maxPossibleScore += levelScores.easy.total * 1; // Max points for attempted questions
+            }
+            
+            if (levelScores.medium.total > 0) {
+                rawScore += levelScores.medium.correct * 2; // Medium = 2 points each
+                maxPossibleScore += levelScores.medium.total * 2; // Max points for attempted questions
+            }
+            
+            if (levelScores.hard.total > 0) {
+                rawScore += levelScores.hard.correct * 3; // Hard = 3 points each
+                maxPossibleScore += levelScores.hard.total * 3; // Max points for attempted questions
+            }
+            
+            // Calculate percentage
+            const percentage = maxPossibleScore > 0 ? (rawScore / maxPossibleScore) * 100 : 0;
+            
+            return {
+                rawScore,
+                maxPossibleScore,
+                percentage,
+                evaluation: getEvaluationTier(percentage)
+            };
+        }
+        
+        // NEW: Get evaluation tier based on percentage
+        function getEvaluationTier(percentage) {
+            if (percentage >= 90) {
+                return {
+                    text: "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ",
+                    color: 'var(--correct-color)'
+                };
+            } else if (percentage >= 70) {
+                return {
+                    text: "ເຈົ້າແມ່ນລູກຊອດລາວ 75%",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 40) {
+                return {
+                    text: "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 20) {
+                return {
+                    text: "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ \"ຈຣິງໃຈ\"",
+                    color: 'var(--warning-color)'
+                };
+            } else {
+                return {
+                    text: "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ",
+                    color: 'var(--error-color)'
+                };
+            }
+        }
+        
+        // NEW: Display score breakdown in results
+        function displayScoreBreakdown(scoreResult) {
+            const breakdownEl = document.getElementById('score-breakdown');
+            if (!breakdownEl) return;
+            
+            let breakdownHTML = '<div class="bg-[#3e4043] rounded-lg p-4 mt-4">';
+            breakdownHTML += '<h3 class="text-lg font-bold mb-3">ຄະແນນລາຍລະອຽດ:</h3>';
+            
+            // Show each level's performance
+            if (levelScores.easy.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--correct-color)">ງ່າຍ:</span> 
+                        ${levelScores.easy.correct}/${levelScores.easy.total} ຖືກ 
+                        (${levelScores.easy.correct} × 1 = ${levelScores.easy.correct} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.medium.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--main-color)">ປານກາງ:</span> 
+                        ${levelScores.medium.correct}/${levelScores.medium.total} ຖືກ 
+                        (${levelScores.medium.correct} × 2 = ${levelScores.medium.correct * 2} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.hard.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--error-color)">ຍາກ:</span> 
+                        ${levelScores.hard.correct}/${levelScores.hard.total} ຖືກ 
+                        (${levelScores.hard.correct} × 3 = ${levelScores.hard.correct * 3} ຄະແນນ)
+                    </div>`;
+            }
+            
+            breakdownHTML += `
+                <div class="mt-3 pt-3 border-t border-gray-600">
+                    <div class="font-bold">ຄະແນນລວມ: ${scoreResult.rawScore}/${scoreResult.maxPossibleScore}</div>
+                    <div class="font-bold text-main-color">ເປີເຊັນ: ${scoreResult.percentage.toFixed(1)}%</div>
+                </div>
+            </div>`;
+            
+            breakdownEl.innerHTML = breakdownHTML;
+        }
+        
+        // ... existing code ...
+        
+        // Enhanced Account Functions
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update rank
+            const rank = calculateUserRank();
+            document.getElementById('account-rank').textContent = `#${rank}`;
+            
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = stats.bestStreak;
+            
+            // Calculate accuracy
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
+            
+            // Calculate achievement count
+            const achievements = calculateAchievements();
+            document.getElementById('account-achievements').textContent = `${achievements.length}/8`;
+        }
+        
+        function calculateUserRank() {
+            // Simple rank calculation based on best streak
+            if (stats.bestStreak >= 50) return Math.floor(Math.random() * 10) + 1;
+            if (stats.bestStreak >= 25) return Math.floor(Math.random() * 25) + 10;
+            if (stats.bestStreak >= 10) return Math.floor(Math.random() * 50) + 25;
+            return Math.floor(Math.random() * 100) + 50;
+        }
+        
+        function calculateAchievements() {
+            const unlocked = [];
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // First game
+            if (stats.totalGames >= 1) unlocked.push('first-game');
+            
+            // Streak achievements
+            if (stats.bestStreak >= 5) unlocked.push('streak-5');
+            if (stats.bestStreak >= 10) unlocked.push('streak-10');
+            
+            // Perfect accuracy
+            if (accuracy === 100 && stats.totalCorrect >= 5) unlocked.push('perfectionist');
+            
+            // Word master
+            if (stats.totalCorrect >= 50) unlocked.push('word-master');
+            
+            // Difficulty master (played all levels)
+            if (stats.difficulties?.easy?.bestStreak > 0 && 
+                stats.difficulties?.medium?.bestStreak > 0 && 
+                stats.difficulties?.hard?.bestStreak > 0) {
+                unlocked.push('difficulty-master');
+            }
+            
+            // Consistent player (7 days - mock for now)
+            if (stats.totalGames >= 7) unlocked.push('consistent-player');
+            
+            // Champion (top rank - mock)
+            if (stats.bestStreak >= 50) unlocked.push('champion');
+            
+            return unlocked;
+        }
+        
+        // 🔥 FIREBASE INTEGRATION FUNCTIONS
+        let firebaseEnabled = false;
+        
+        // Initialize Firebase connection
+        async function initializeFirebaseSync() {
+            try {
+                // Check if Firebase managers are available
+                if (typeof FirebaseSyncManager !== 'undefined') {
+                    const isConnected = await FirebaseSyncManager.checkConnection();
+                    if (isConnected) {
+                        firebaseEnabled = true;
+                        console.log('🔥 Firebase sync enabled');
+                        
+                        // Try to sync existing local data to cloud
+                        await syncLocalDataToFirebase();
+                        
+                        // Try to load cloud data
+                        await syncCloudDataToLocal();
+                    } else {
+                        console.warn('🔌 Firebase connection failed, using local mode');
+                    }
+                } else {
+                    console.warn('🔥 Firebase not loaded, using local mode');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                firebaseEnabled = false;
+            }
+        }
+        
+        // Sync local data to Firebase
+        async function syncLocalDataToFirebase() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const localData = {
+                    displayName: displayName,
+                    settings: settings,
+                    stats: stats,
+                    personalRecords: personalRecords
+                };
+                
+                const success = await FirebaseSyncManager.syncToCloud(userId, localData);
+                if (success) {
+                    console.log('☁️ Local data synced to Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Error syncing to Firebase:', error);
+            }
+        }
+        
+        // Sync Firebase data to local
+        async function syncCloudDataToLocal() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const cloudData = await FirebaseSyncManager.syncFromCloud(userId);
+                if (cloudData) {
+                    // Merge cloud data with local data (cloud takes priority)
+                    displayName = cloudData.displayName || displayName;
+                    settings = { ...settings, ...cloudData.settings };
+                    stats = { ...stats, ...cloudData.stats };
+                    personalRecords = { ...personalRecords, ...cloudData.personalRecords };
+                    
+                    console.log('📥 Cloud data synced to local');
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('❌ Error syncing from Firebase:', error);
+            }
+        }
+        
+        // Enhanced save function with Firebase sync
+        async function saveUserDataWithSync() {
+            // Always save locally first
+            saveUserData();
+            
+            // Then sync to Firebase if enabled
+            if (firebaseEnabled) {
+                await syncLocalDataToFirebase();
+            }
+        }
+        
+        // ... existing code ...
     </script>
 </body>
 </html>
