@@ -1,5 +1,9 @@
 # SPEC-001-LaoTypo Phase 1
 
+> **⚠️ CONFIDENTIAL - INTERNAL USE ONLY**  
+> This document contains sensitive technical specifications and implementation details.  
+> Do not distribute outside the development team.
+
 ## Background
 
 LaoTypo is a web-based, real-time multiplayer word-selection race game adapted to the Lao language. In this word-selection format, players click on the correct word buttons in sequence to progress through a predefined passage. A host (teacher or administrator) creates a session by selecting or uploading a text passage. Players join via a QR code or link, then compete to click each correct word in order as quickly and accurately as possible. The game displays per-player progress, shows a live leaderboard by score, and generates post-game reports.
