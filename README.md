@@ -18,7 +18,7 @@ LaoTypo is an educational word-selection race game where players compete in real
 
 ### Core Gameplay
 - **Real-time Multiplayer**: Low-latency updates (<200ms) for seamless competition
-- **Word-Selection Mechanics**: Click correct words in sequence (not typing)
+- **Word-Selection Mechanics**: Click correct words in sequence 
 - **Three Difficulty Levels**: 
   - Easy (1 point per correct answer)
   - Medium (2 points per correct answer)  
@@ -38,7 +38,7 @@ LaoTypo is an educational word-selection race game where players compete in real
 ### User Experience
 - **Two User Roles**: Host/Admin and Player/Student
 - **Easy Session Join**: QR code or link-based entry
-- **Progressive Web App**: Install on mobile devices for app-like experience
+- **Progressive Web App**: Install on mobile devices for an app-like experience
 - **Responsive Design**: Works seamlessly on desktop and mobile browsers
 - **Social Sharing**: Share results on social platforms
 
@@ -161,7 +161,7 @@ Open the HTML files directly in your browser for development:
 2. **Players Join**
    - Scan QR code or enter session code
    - Enter display name
-   - Wait in lobby for host to start
+   - Wait in the lobby for the host to start
 
 3. **Gameplay**
    - Click correct words in sequence
@@ -183,23 +183,8 @@ Open the HTML files directly in your browser for development:
 - PWA capabilities
 
 ### Phase 2 (Planned)
-- [ ] Denormalized leaderboard snapshots
-- [ ] Player progress checkpoints
-- [ ] Session analytics dashboard
-- [ ] Custom passages library
-- [ ] Team mode
-- [ ] Advanced security rules
-- [ ] TTL indexes for automatic cleanup
 
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- TBC 🫡🫡🫡
 
 ## 📄 License
 
@@ -209,7 +194,6 @@ This project is open source and available under the MIT License.
 
 - Designed for educational use in teaching the Lao language
 - Built with Firebase's generous free tier
-- Inspired by typing games adapted for word-selection mechanics
 
 ## 📞 Support
 
