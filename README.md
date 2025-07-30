@@ -93,6 +93,12 @@ This application uses modern web technologies with a focus on real-time performa
 - Continuous improvements
 - Security enhancements
 
+### 🚀 Planned Migration to Firebase Hosting
+- **Timeline**: Q1 2025
+- **Benefits**: Enhanced security, better integration with Firebase services, custom domain support
+- **New URL**: Will be available at `https://laotypo-a8e80.web.app`
+- **Current URL**: Will continue to work during transition period
+
 <!-- Remove specific license information for closed source -->
 ## 📄 Project Status
 

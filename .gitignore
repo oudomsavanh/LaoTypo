@@ -5,9 +5,11 @@
 .env.development
 firebase-config.js
 config.js
-*.config.js
 credentials.json
 serviceAccountKey.json
+
+# Keep the example config file
+!firebase-config.example.js
 
 # Firebase
 .firebase/
