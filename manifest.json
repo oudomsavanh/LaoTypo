@@ -5,7 +5,7 @@
   "start_url": "/testing.html",
   "display": "standalone",
   "background_color": "#2c2e31",
-  "theme_color": "#e2b714",
+  "theme_color": "#f8af3c",
   "orientation": "portrait-primary",
   "categories": ["games", "education"],
   "lang": "lo",
