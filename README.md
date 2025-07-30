@@ -1,208 +1,223 @@
-# Word Game with Google Sheets Integration
+# LaoTypo - Real-time Multiplayer Word-Selection Race Game
 
-A fun, interactive word game that uses Google Sheets as a database. Players choose between left and right options, trying to match a random result to score points.
+<div align="center">
+  <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" width="200">
+  
+  A web-based, real-time multiplayer word-selection race game adapted for the Lao language
+  
+  [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+  [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+</div>
 
-## 🎮 Game Features
+## 🎮 Overview
 
-- **Player Name Input**: Personalized gaming experience
-- **Context Display**: Shows word context from your Google Sheets database
-- **Left/Right Choice**: Simple, engaging gameplay mechanics
-- **Random Matching**: Players score when their choice matches the random result
-- **Level Progression**: Displays difficulty levels from your database
-- **Score Tracking**: Real-time score updates and level progression
-- **Google Sheets Integration**: Dynamic content from your spreadsheet
+LaoTypo is an educational word-selection race game where players compete in real-time by clicking the correct Lao words in sequence to progress through predefined passages. Teachers or administrators can host sessions, and students join via QR codes or links to compete for the highest score and fastest completion time.
 
-## 🗃️ Database Structure
+## ✨ Key Features
 
-Your Google Sheets should have these columns:
+### Core Gameplay
+- **Real-time Multiplayer**: Low-latency updates (<200ms) for seamless competition
+- **Word-Selection Mechanics**: Click correct words in sequence (not typing)
+- **Three Difficulty Levels**: 
+  - Easy (1 point per correct answer)
+  - Medium (2 points per correct answer)  
+  - Hard (3 points per correct answer)
+- **Lives System**: 3 lives per level, reset when advancing levels
+- **Live Leaderboard**: Real-time ranking by score with time-based tiebreakers
 
-| Column | Description | Example |
-|--------|-------------|---------|
-| context | The word or phrase to display | "The capital of France" |
-| true | True option text | "Paris" |
-| false | False option text | "London" |
-| level | Difficulty level (1-10) | 1 |
-| remark | Additional notes or hints | "Basic geography question" |
+### Scoring & Evaluation
+- **Percentage-based Scoring**: (Raw Score / Max Possible Score) × 100
+- **Humorous Evaluation Tiers**:
+  - 90%–100%: "You were Lao in a past life, and you are in this one too."
+  - 70%–89%: "You are 75% Lao."
+  - 40%–69%: "You were born in Laos but grew up abroad."
+  - 20%–39%: "At least you're not 'insincere.'"
+  - 0%–19%: "You're a foreigner who missed their flight."
 
-## 🚀 Quick Start
+### User Experience
+- **Two User Roles**: Host/Admin and Player/Student
+- **Easy Session Join**: QR code or link-based entry
+- **Progressive Web App**: Install on mobile devices for app-like experience
+- **Responsive Design**: Works seamlessly on desktop and mobile browsers
+- **Social Sharing**: Share results on social platforms
 
-### Option 1: Demo Mode (No Setup Required)
-1. Open `word-game.html` in your web browser
-2. The game will run with sample data
-3. Enter your name and start playing!
+## 🏗️ Architecture
 
-### Option 2: Connect to Google Sheets
-1. Follow the [Google Sheets Setup Guide](google-sheets-setup-guide.md)
-2. Update the configuration in `word-game.html`
-3. Test your connection and play!
+### Technology Stack
 
-## 🎯 How to Play
+#### Frontend
+- **HTML5, CSS3** with Tailwind CSS for responsive design
+- **JavaScript ES6** for game logic
+- **Tone.js** for sound effects
+- **Progressive Web App** with service worker for offline capabilities
 
-1. **Enter Your Name**: Start by entering your player name
-2. **View Context**: Read the word context displayed from your database
-3. **Make Your Choice**: Click either LEFT ⬅️ or RIGHT ➡️
-4. **Random Result**: The game generates a random left/right result
-5. **Score Points**: Get +10 points when your choice matches the random result
-6. **Level Up**: Progress through levels as you score more points
-7. **Complete Rounds**: Play through 10 rounds to finish the game
+#### Backend & Services
+- **Firebase Authentication**: User management and role-based access
+- **Cloud Firestore**: Structured data storage (sessions, passages, results)
+- **Firebase Realtime Database**: Low-latency live game events and leaderboard
+- **Firebase Cloud Functions**: Serverless business logic
+- **Firebase Cloud Storage**: Media assets (images, audio)
+- **Firebase Hosting**: Web app deployment
 
-## 🔧 Technical Details
+### Database Schema
 
-### Files Structure
+#### Firestore Collections
 ```
-├── word-game.html              # Main game file
-├── google-sheets-setup-guide.md # Setup instructions
-└── README.md                   # This file
+passages/
+├── passageId
+│   ├── title (string)
+│   ├── content (string)
+│   ├── level (string: "Easy"|"Medium"|"Hard")
+│   └── createdAt (timestamp)
+
+sessions/
+├── sessionId
+│   ├── hostId (string)
+│   ├── passageId (string)
+│   ├── level (string)
+│   ├── maxLives (number)
+│   ├── status (string: "waiting"|"active"|"completed")
+│   └── timestamps
+
+players/
+├── playerId
+│   ├── sessionId (string)
+│   ├── userId (string)
+│   ├── displayName (string)
+│   └── joinedAt (timestamp)
+
+results/
+├── resultId
+│   ├── sessionId (string)
+│   ├── playerId (string)
+│   ├── rawScore (number)
+│   ├── percentageScore (number)
+│   ├── evaluationTier (string)
+│   └── completedAt (timestamp)
 ```
 
-### Technologies Used
-- **HTML5**: Game structure
-- **CSS3**: Styling with Tailwind CSS
-- **JavaScript**: Game logic and API integration
-- **Google Sheets API**: Database connectivity
+#### Realtime Database Structure
+```
+/sessions/{sessionId}/
+├── status: "active"
+├── leaderboard/
+│   └── {playerId}/
+│       ├── rawScore
+│       ├── percentage
+│       └── lastClickTs
+└── players/
+    └── {playerId}/
+        ├── currentIndex
+        └── remainingLives
+```
 
-### Game Logic
-- Random selection between left/right choices
-- Score calculation: +10 points for correct matches
-- Level progression: Every 50 points increases level
-- 10 rounds per game session
+## 🚀 Getting Started
 
-## 📊 Google Sheets Integration
+### Prerequisites
+- Node.js (v14 or higher)
+- Firebase account (free tier is sufficient)
+- Modern web browser
 
-### Benefits
-✅ **Easy Content Management**: Update words by editing your spreadsheet  
-✅ **Real-time Updates**: Changes reflect immediately in the game  
-✅ **Collaboration**: Multiple people can contribute to the word database  
-✅ **No Database Setup**: Use Google Sheets as your backend  
-✅ **Scalable**: Add unlimited words and categories  
+### Installation
 
-### Connection Methods
-1. **Public Sheet**: Simple setup, no API key required
-2. **API Integration**: More secure, requires Google Cloud setup
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/laotypo.git
+   cd laotypo
+   ```
 
-## 🛠️ Setup Instructions
+2. **Set up Firebase**
+   - Create a new Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+   - Enable Authentication, Firestore, Realtime Database, and Storage
+   - Copy your Firebase configuration
 
-### For Public Google Sheets (Easiest)
-1. Create a Google Sheet with the required columns
-2. Make it public ("Anyone with the link can view")
-3. Copy the sheet ID from the URL
-4. Update the configuration in the game file
+3. **Configure the app**
+   - Update `firebase-config.js` with your Firebase credentials
+   - Ensure all Firebase services are properly initialized
 
-### For Private Sheets (More Secure)
-1. Set up a Google Cloud project
-2. Enable Google Sheets API
-3. Create API credentials
-4. Configure the game with your credentials
+4. **Deploy to Firebase Hosting**
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase init
+   firebase deploy
+   ```
 
-See the [detailed setup guide](google-sheets-setup-guide.md) for step-by-step instructions.
+### Local Development
+Open the HTML files directly in your browser for development:
+- `registration.html` - User registration/login
+- `gameplay.html` - Main game interface
+- `testing.html` - Testing interface for development
 
-## 🎨 Customization
+## 📱 Game Flow
 
-### Styling
-The game uses Tailwind CSS for responsive design. You can customize:
-- Colors and themes
-- Button styles
-- Layout and spacing
-- Animations and transitions
+1. **Host Creates Session**
+   - Sign in as host
+   - Select a Lao passage
+   - Choose difficulty level
+   - Generate join code/QR
 
-### Game Mechanics
-Easily modify:
-- Number of rounds (default: 10)
-- Points per correct answer (default: 10)
-- Level progression thresholds
-- Random choice algorithms
+2. **Players Join**
+   - Scan QR code or enter session code
+   - Enter display name
+   - Wait in lobby for host to start
 
-### Data Structure
-Add more columns to your Google Sheet:
-- Categories
-- Difficulty ratings
-- Hints or explanations
-- Media URLs (images, sounds)
+3. **Gameplay**
+   - Click correct words in sequence
+   - Track lives and score
+   - View real-time leaderboard
 
-## 🔍 Troubleshooting
+4. **Results**
+   - See final scores and rankings
+   - Get evaluation tier
+   - Share results on social media
 
-### Common Issues
+## 🛠️ Development Roadmap
 
-**Game shows "Demo Mode"**
-- This is normal if Google Sheets isn't configured
-- Follow the setup guide to connect your sheet
+### Phase 1 (MVP) ✅
+- Core gameplay mechanics
+- Firebase integration
+- Basic scoring and leaderboard
+- Mobile-responsive design
+- PWA capabilities
 
-**"No data found" error**
-- Check your Google Sheet has data starting from row 2
-- Verify the range in your configuration
-
-**API connection fails**
-- Ensure your API key is valid
-- Check that Google Sheets API is enabled
-- Verify sheet sharing permissions
-
-### Debug Mode
-Open browser console and check for error messages. The game provides detailed logging for troubleshooting.
-
-## 🌟 Advanced Features
-
-### Planned Enhancements
-- [ ] Category filtering
-- [ ] Difficulty selection
-- [ ] Multiplayer support
-- [ ] Leaderboards
-- [ ] Sound effects
-- [ ] Achievement system
-- [ ] Data analytics
-
-### Extending the Game
-The codebase is designed for easy extension:
-- Add new game modes
-- Implement different scoring systems
-- Create themed word sets
-- Add multimedia content
-
-## 📱 Compatibility
-
-### Browser Support
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
-
-### Device Support
-- Desktop computers
-- Tablets
-- Mobile phones (responsive design)
+### Phase 2 (Planned)
+- [ ] Denormalized leaderboard snapshots
+- [ ] Player progress checkpoints
+- [ ] Session analytics dashboard
+- [ ] Custom passages library
+- [ ] Team mode
+- [ ] Advanced security rules
+- [ ] TTL indexes for automatic cleanup
 
 ## 🤝 Contributing
 
-Want to improve the game? Here's how:
+We welcome contributions! Please follow these steps:
 
-1. **Add Word Data**: Contribute to the sample database
-2. **Report Bugs**: Open issues for any problems found
-3. **Suggest Features**: Share ideas for new functionality
-4. **Code Improvements**: Submit pull requests for enhancements
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
 This project is open source and available under the MIT License.
 
-## 🎓 Educational Use
+## 🙏 Acknowledgments
 
-Perfect for:
-- **Language Learning**: Vocabulary building
-- **Education**: Quiz games for any subject
-- **Training**: Corporate training modules
-- **Assessment**: Quick knowledge checks
+- Designed for educational use in teaching the Lao language
+- Built with Firebase's generous free tier
+- Inspired by typing games adapted for word-selection mechanics
 
 ## 📞 Support
 
-Need help? Check these resources:
-1. [Setup Guide](google-sheets-setup-guide.md)
-2. Browser console for error messages
-3. Google Sheets API documentation
-4. Community forums and discussions
-
-## 🎉 Get Started
-
-Ready to play? Open `word-game.html` in your browser and start your word game adventure!
+For questions or support:
+- Open an issue on GitHub
+- Check the [detailed specification](README_Phase1.md)
+- Review Firebase documentation for service-specific questions
 
 ---
 
-**Made with ❤️ for educators, gamers, and anyone who loves interactive learning!** 
+**Made with ❤️ for Lao language learners and educators worldwide!** 
