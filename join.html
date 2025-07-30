@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Session</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Join Session</h1>
+            <p class="text-gray-600 mb-6">Welcome! You have successfully logged in as a Player.</p>
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <p class="text-sm text-gray-600" id="player-info">Loading player info...</p>
+            </div>
+            <p class="text-sm text-gray-500">This is a placeholder page. The session joining functionality will be implemented soon.</p>
+            <button onclick="window.location.href='/registration.html'" class="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Back to Login
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Display player info from session storage
+        const playerInfo = JSON.parse(sessionStorage.getItem('playerInfo') || '{}');
+        if (playerInfo.displayName) {
+            document.getElementById('player-info').textContent = 
+                `Player Name: ${playerInfo.displayName} | Guest Mode: ${playerInfo.isGuest ? 'Yes' : 'No'}`;
+        }
+    </script>
+</body>
+</html>
