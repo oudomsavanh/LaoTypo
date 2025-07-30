@@ -325,6 +325,9 @@
                      <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
                  </div>
                  
+                 <!-- NEW: Score Breakdown -->
+                 <div id="score-breakdown"></div>
+                 
                  <!-- Personal Best Indicator -->
                  <div id="personal-best-indicator" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-bold text-center">
                      🏆 ສະຖິຕິໃໝ່ຂອງທ່ານເອງງງ! 🏆
@@ -411,6 +414,13 @@
         let wordsAnsweredInLevel = 0;
         let maxWordsPerLevel = 30;
         let usedWords = new Set(); // Track used words to prevent repeats
+        
+        // NEW: Tracking for new scoring system
+        let levelScores = {
+            easy: { correct: 0, total: 0, completed: false },
+            medium: { correct: 0, total: 0, completed: false },
+            hard: { correct: 0, total: 0, completed: false }
+        };
         
         // Life System (restored)
         let playerLives = 3;
@@ -543,6 +553,114 @@
             }
         }
 
+        // NEW: Calculate weighted score based on new scoring system
+        function calculateWeightedScore() {
+            let rawScore = 0;
+            let maxPossibleScore = 0;
+            
+            // Calculate raw score with weights
+            if (levelScores.easy.total > 0) {
+                rawScore += levelScores.easy.correct * 1; // Easy = 1 point each
+                maxPossibleScore += 30 * 1; // Max 30 points for easy
+            }
+            
+            if (levelScores.medium.total > 0) {
+                rawScore += levelScores.medium.correct * 2; // Medium = 2 points each
+                maxPossibleScore += 30 * 2; // Max 60 points for medium
+            }
+            
+            if (levelScores.hard.total > 0) {
+                rawScore += levelScores.hard.correct * 3; // Hard = 3 points each
+                maxPossibleScore += 30 * 3; // Max 90 points for hard
+            }
+            
+            // Calculate percentage
+            const percentage = maxPossibleScore > 0 ? (rawScore / maxPossibleScore) * 100 : 0;
+            
+            return {
+                rawScore,
+                maxPossibleScore,
+                percentage,
+                evaluation: getEvaluationTier(percentage)
+            };
+        }
+        
+        // NEW: Get evaluation tier based on percentage
+        function getEvaluationTier(percentage) {
+            if (percentage >= 90) {
+                return {
+                    text: "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ",
+                    color: 'var(--correct-color)'
+                };
+            } else if (percentage >= 70) {
+                return {
+                    text: "ເຈົ້າແມ່ນລູກຊອດລາວ 75%",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 40) {
+                return {
+                    text: "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 20) {
+                return {
+                    text: "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ \"ຈຣິງໃຈ\"",
+                    color: 'var(--warning-color)'
+                };
+            } else {
+                return {
+                    text: "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ",
+                    color: 'var(--error-color)'
+                };
+            }
+        }
+        
+        // NEW: Display score breakdown in results
+        function displayScoreBreakdown(scoreResult) {
+            const breakdownEl = document.getElementById('score-breakdown');
+            if (!breakdownEl) return;
+            
+            let breakdownHTML = '<div class="bg-[#3e4043] rounded-lg p-4 mt-4">';
+            breakdownHTML += '<h3 class="text-lg font-bold mb-3">ຄະແນນລາຍລະອຽດ:</h3>';
+            
+            // Show each level's performance
+            if (levelScores.easy.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--correct-color)">ງ່າຍ:</span> 
+                        ${levelScores.easy.correct}/${levelScores.easy.total} ຖືກ 
+                        (${levelScores.easy.correct} × 1 = ${levelScores.easy.correct} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.medium.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--main-color)">ປານກາງ:</span> 
+                        ${levelScores.medium.correct}/${levelScores.medium.total} ຖືກ 
+                        (${levelScores.medium.correct} × 2 = ${levelScores.medium.correct * 2} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.hard.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--error-color)">ຍາກ:</span> 
+                        ${levelScores.hard.correct}/${levelScores.hard.total} ຖືກ 
+                        (${levelScores.hard.correct} × 3 = ${levelScores.hard.correct * 3} ຄະແນນ)
+                    </div>`;
+            }
+            
+            breakdownHTML += `
+                <div class="mt-3 pt-3 border-t border-gray-600">
+                    <div class="font-bold">ຄະແນນລວມ: ${scoreResult.rawScore}/${scoreResult.maxPossibleScore}</div>
+                    <div class="font-bold text-main-color">ເປີເຊັນ: ${scoreResult.percentage.toFixed(1)}%</div>
+                </div>
+            </div>`;
+            
+            breakdownEl.innerHTML = breakdownHTML;
+        }
+
         function getDifficultyLabel(level) {
             switch(level) {
                 case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
@@ -647,6 +765,11 @@
             wordsAnsweredInLevel++;
             currentStreak++;
             
+            // NEW: Track score for current level
+            const levelName = ['easy', 'medium', 'hard'][currentLevel - 1];
+            levelScores[levelName].correct++;
+            levelScores[levelName].total++;
+            
             if (currentStreak > stats.bestStreak) {
                 stats.bestStreak = currentStreak;
             }
@@ -655,6 +778,7 @@
             
             // Check if level completed
             if (wordsAnsweredInLevel >= maxWordsPerLevel) {
+                levelScores[levelName].completed = true;
                 completeLevelSuccess();
             } else {
                 setTimeout(nextRound, 400);
@@ -664,6 +788,11 @@
         function handleIncorrectAnswer() {
             // v2.0.0: Wrong answer loses a life (not immediate game end)
             stats.totalMistakes += 1;
+            
+            // NEW: Track incorrect answer for current level
+            const levelName = ['easy', 'medium', 'hard'][currentLevel - 1];
+            levelScores[levelName].total++;
+            
             loseLife(); // Use life system - game ends only when all lives lost
         }
 
@@ -709,7 +838,7 @@
             completionScreen.innerHTML = `
                 <h2 class="results-header-custom text-main-color">ສຳເລັດແລ້ວ!</h2>
                 <div class="bg-[#3e4043] rounded-lg p-6">
-                    <p class="text-xl text-text-color mb-4">ເຈົ້າເກັ່ງໂພດແລ້ວ!ພາລະກິດໃໝ່ຂອງເຈົ້າ ແມ່ນການຊ່ວຍຊາດ ໂດຍໄປຕື່ມ 'ຄຳສັບ' ທີ່ຄິດວ່າຄົນລາວໃຊ້ຜິດເລື້ອຍໆ ຢູ່ທີ່ 'ປ່ອງຮັບຄຳຜິດ'</p>
+                    <p class="text-xl text-text-color mb-4">ເຈົ້າເກັ່ງໂພດແລ້ວ! ພາລະກິດໃໝ່ຂອງເຈົ້າ ແມ່ນການຊ່ວຍຊາດ ໂດຍໄປຕື່ມ 'ຄຳສັບ' ທີ່ຄິດວ່າຄົນລາວໃຊ້ຜິດເລື້ອຍໆ ຢູ່ທີ່ 'ປ່ອງຮັບຄຳຜິດ'.</p>
                     <div class="space-y-4">
                         <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
                         <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປເມນູ</button>
@@ -948,52 +1077,20 @@
              stats.totalCorrect += currentStreak;
              stats.totalGames++;
 
+             // NEW: Calculate weighted score
+             const scoreResult = calculateWeightedScore();
+             
              document.getElementById('final-streak').textContent = currentStreak;
              
-             // Calculate accuracy (avoid division by zero)
-             const totalAnswers = currentStreak + stats.totalMistakes;
-             const sessionAccuracy = totalAnswers > 0 ? (currentStreak / totalAnswers) * 100 : 0;
-             document.getElementById('accuracy-stat').textContent = `${sessionAccuracy.toFixed(1)}%`;
+             // Update accuracy display with weighted percentage
+             document.getElementById('accuracy-stat').textContent = `${scoreResult.percentage.toFixed(1)}%`;
+             
+             // NEW: Display score breakdown
+             displayScoreBreakdown(scoreResult);
              
              const evaluationEl = document.getElementById('evaluation-result');
-             
-             // Case 0: Game Over (lost all lives) - Use endGame evaluation
-             if (playerLives === 0) {
-                 if (currentStreak === 0) {
-                     evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
-                     evaluationEl.style.color = 'var(--error-color)';
-                 } else if (currentStreak < 5) {
-                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ💖'";
-                     evaluationEl.style.color = 'var(--warning-color)';
-                 } else if (currentStreak < 10) {
-                     evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
-                     evaluationEl.style.color = 'var(--main-color)';
-                 } else if (currentStreak < 15) {
-                     evaluationEl.textContent = "ເຈົ້າແມ່ນລູກຊອດລາວ";
-                     evaluationEl.style.color = 'var(--main-color)';
-                 } else {
-                     evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
-                     evaluationEl.style.color = 'var(--correct-color)'; 
-                 }
-             } else {
-                 // Manual quit or timer end - standard accuracy evaluation
-                 if (sessionAccuracy < 30) {
-                     evaluationEl.textContent = "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກ🛩";
-                     evaluationEl.style.color = 'var(--error-color)';
-                 } else if (sessionAccuracy < 50) {
-                     evaluationEl.textContent = "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ 'ຈຣິງໃຈ'";
-                     evaluationEl.style.color = 'var(--warning-color)';
-                 } else if (sessionAccuracy < 70) {
-                     evaluationEl.textContent = "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ";
-                     evaluationEl.style.color = 'var(--main-color)';
-                 } else if (sessionAccuracy < 85) {
-                     evaluationEl.textContent = "ເຈົ້າແມ່ນລູກຊອດລາວ";
-                     evaluationEl.style.color = 'var(--main-color)';
-                 } else {
-                     evaluationEl.textContent = "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ"; 
-                     evaluationEl.style.color = 'var(--correct-color)'; 
-                 }
-             }
+             evaluationEl.textContent = scoreResult.evaluation.text;
+             evaluationEl.style.color = scoreResult.evaluation.color;
 
              // Update personal records
              updatePersonalRecords();
@@ -1064,6 +1161,17 @@
              stats.totalMistakes = 0; // Reset mistakes counter for new game
              gameInProgress = true;
              resetLives();
+             
+             // NEW: Reset level scores and start from level 1
+             levelScores = {
+                 easy: { correct: 0, total: 0, completed: false },
+                 medium: { correct: 0, total: 0, completed: false },
+                 hard: { correct: 0, total: 0, completed: false }
+             };
+             currentLevel = 1;
+             wordsAnsweredInLevel = 0;
+             usedWords.clear();
+             settings.difficulty = 'easy';
              
              // Hide personal best indicator
              document.getElementById('personal-best-indicator').classList.add('hidden');
@@ -1193,6 +1301,13 @@
              usedWords.clear(); // Reset used words tracker
              gameInProgress = true;
              
+             // NEW: Reset level scores
+             levelScores = {
+                 easy: { correct: 0, total: 0, completed: false },
+                 medium: { correct: 0, total: 0, completed: false },
+                 hard: { correct: 0, total: 0, completed: false }
+             };
+             
              // Initialize life system
              resetLives();
              
@@ -1206,5 +1321,15 @@
              nextRound();
          };
     </script>
+    
+    <!-- 
+    Version Update: v2.1.0 - New Weighted Scoring System (Updated: 2024-01-09)
+    Changes:
+    - Implemented weighted scoring: Easy=1pt, Medium=2pts, Hard=3pts per correct answer
+    - Score calculation based on percentage of maximum possible score from played levels only
+    - New evaluation tiers: 90%+, 70-89%, 40-69%, 20-39%, 0-19%
+    - Added detailed score breakdown showing performance per difficulty level
+    - Updated evaluation messages to match new requirements
+    -->
 </body>
 </html>
