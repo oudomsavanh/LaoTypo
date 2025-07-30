@@ -544,17 +544,8 @@
         let isGuest = false;
 
         // --- DOM ELEMENTS ---
-        const gmailLoginBtn = document.getElementById('gmail-login-btn');
-        const guestModeBtn = document.getElementById('guest-mode-btn');
-        const registrationOptions = document.getElementById('registration-options');
-        const profileSetup = document.getElementById('profile-setup');
-        const profileForm = document.getElementById('profile-form');
-        const completeBtn = document.getElementById('complete-registration-btn');
-        const backToOptionsBtn = document.getElementById('back-to-options-btn');
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
-        const guestWarningBanner = document.getElementById('guest-warning-banner');
-        const networkStatus = document.getElementById('network-status');
+        let gmailLoginBtn, guestModeBtn, registrationOptions, profileSetup, profileForm;
+        let completeBtn, backToOptionsBtn, errorMessage, successMessage, guestWarningBanner, networkStatus;
 
         // --- UTILITY FUNCTIONS ---
         function showError(message) {
@@ -623,9 +614,64 @@
             alert(networkStatus.textContent);
         };
 
+        // --- DOM INITIALIZATION ---
+        function initializeDOMElements() {
+            gmailLoginBtn = document.getElementById('gmail-login-btn');
+            guestModeBtn = document.getElementById('guest-mode-btn');
+            registrationOptions = document.getElementById('registration-options');
+            profileSetup = document.getElementById('profile-setup');
+            profileForm = document.getElementById('profile-form');
+            completeBtn = document.getElementById('complete-registration-btn');
+            backToOptionsBtn = document.getElementById('back-to-options-btn');
+            errorMessage = document.getElementById('error-message');
+            successMessage = document.getElementById('success-message');
+            guestWarningBanner = document.getElementById('guest-warning-banner');
+            networkStatus = document.getElementById('network-status');
+            
+            // Setup event listeners
+            if (gmailLoginBtn) {
+                gmailLoginBtn.addEventListener('click', handleGmailLogin);
+            }
+            
+            if (guestModeBtn) {
+                console.log('Setting up guest mode button listener');
+                guestModeBtn.addEventListener('click', handleGuestMode);
+                // Add debug listener
+                guestModeBtn.addEventListener('click', function() {
+                    console.log('Guest button click event fired!');
+                });
+            } else {
+                console.error('Guest mode button not found!');
+            }
+            
+            if (backToOptionsBtn) {
+                backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+            }
+            
+            if (profileForm) {
+                profileForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    completeRegistration();
+                });
+            }
+            
+            // Real-time validation
+            const profileNameInput = document.getElementById('profile-name');
+            const profileAgeInput = document.getElementById('profile-age');
+            if (profileNameInput) {
+                profileNameInput.addEventListener('input', validateProfileForm);
+            }
+            if (profileAgeInput) {
+                profileAgeInput.addEventListener('input', validateProfileForm);
+            }
+        }
+
         // --- FIREBASE INITIALIZATION ---
         async function initializeApp() {
             try {
+                // Initialize DOM elements first
+                initializeDOMElements();
+                
                 updateNetworkStatus();
                 
                 if (navigator.onLine) {
@@ -712,11 +758,13 @@
         function handleGuestMode() {
             try {
                 console.log('👤 Starting guest mode...');
+                console.log('Guest button clicked - function called');
                 isGuest = true;
                 
                 // Option 1: Direct redirect to testing.html without profile setup
                 // Uncomment the lines below if you want immediate redirect
                 
+                console.log('Setting sessionStorage...');
                 sessionStorage.setItem('userType', 'guest');
                 sessionStorage.setItem('guestUser', JSON.stringify({
                     id: 'guest_' + Math.random().toString(36).substring(2, 11),
@@ -725,9 +773,18 @@
                     createdAt: new Date().toISOString(),
                     userType: 'guest'
                 }));
+                console.log('SessionStorage set successfully');
                 showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ! ກຳລັງໄປໜ້າທົດສອບ...');
+                console.log('Success message shown, waiting 1 second before redirect...');
                 setTimeout(() => {
-                    window.location.href = 'testing.html';
+                    console.log('Redirecting to testing.html...');
+                    try {
+                        window.location.href = 'testing.html';
+                    } catch (e) {
+                        console.error('Redirect failed:', e);
+                        // Fallback: try different redirect methods
+                        window.location.assign('testing.html');
+                    }
                 }, 1000);
                 return;
                 
@@ -745,7 +802,9 @@
                 */
             } catch (error) {
                 console.error('❌ Guest mode error:', error);
+                console.error('Error stack:', error.stack);
                 showError('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ໂໝດແຂກ: ' + error.message);
+                alert('Guest mode error: ' + error.message);
             }
         }
 
@@ -817,25 +876,8 @@
         }
 
         // --- EVENT LISTENERS ---
-        gmailLoginBtn.addEventListener('click', handleGmailLogin);
-        guestModeBtn.addEventListener('click', handleGuestMode);
-        backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+        // Event listeners are now set up in initializeDOMElements()
         
-        // Debug: Ensure guest button is found
-        console.log('Guest button found:', guestModeBtn);
-        if (!guestModeBtn) {
-            console.error('Guest mode button not found!');
-        }
-        
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            completeRegistration();
-        });
-
-        // Real-time validation
-        document.getElementById('profile-name').addEventListener('input', validateProfileForm);
-        document.getElementById('profile-age').addEventListener('input', validateProfileForm);
-
         // Network status listeners
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
