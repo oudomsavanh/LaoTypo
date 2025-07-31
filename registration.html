@@ -73,6 +73,61 @@
             background-color: rgba(226, 183, 20, 0.2);
         }
         
+        /* Tab Styles */
+        .tab-list {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--sub-color);
+            padding-bottom: 0;
+        }
+        
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: var(--sub-color);
+            padding: 1rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        
+        .tab-button:hover {
+            color: var(--text-color);
+            background-color: rgba(226, 183, 20, 0.1);
+        }
+        
+        .tab-button[aria-selected="true"] {
+            color: var(--main-color);
+            background-color: rgba(226, 183, 20, 0.2);
+        }
+        
+        .tab-button[aria-selected="true"]::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--main-color);
+        }
+        
+        .tab-panel {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .tab-panel[aria-hidden="true"] {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         /* Main Container */
         .main-container {
             flex: 1;
@@ -109,7 +164,7 @@
             border: 3px solid var(--main-color);
             border-radius: 2rem;
             padding: 3rem;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
@@ -297,6 +352,15 @@
             color: var(--sub-color);
         }
         
+        /* Session Code Input */
+        .session-code-input {
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+        }
+        
         /* User Info Display */
         .user-info {
             background: #4a4c4f;
@@ -396,6 +460,11 @@
             .logo-img {
                 height: 60px;
             }
+            
+            .tab-button {
+                padding: 0.75rem 1.25rem;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -438,84 +507,152 @@
                     <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">
                         ຍິນດີຕ້ອນຮັບສູ່<br>LaoTypo!
                     </h1>
-                    <p class="text-lg text-sub-color">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ</p>
+                    <p class="text-lg text-sub-color">ເລືອກບົດບາດຂອງເຈົ້າ</p>
                 </div>
 
                 <!-- Error/Success Messages -->
                 <div id="error-message" class="error-message"></div>
                 <div id="success-message" class="success-message"></div>
 
-                <!-- Registration Options -->
-                <div id="registration-options" class="space-y-6">
-                    <!-- Gmail Login Button -->
-                    <button id="gmail-login-btn" class="w-full btn btn-gmail text-lg py-4">
-                        <svg width="24" height="24" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        ເຂົ້າສູ່ລະບົບດ້ວຍ Gmail
+                <!-- Tab Navigation -->
+                <div role="tablist" class="tab-list" aria-label="ເລືອກບົດບາດ">
+                    <button 
+                        role="tab" 
+                        id="host-tab" 
+                        class="tab-button" 
+                        aria-selected="true" 
+                        aria-controls="host-panel"
+                        tabindex="0"
+                    >
+                        🎯 Host/Admin
                     </button>
-                    
-                    <!-- OR Separator -->
-                    <div class="flex items-center">
-                        <div class="flex-1 border-t border-sub-color"></div>
-                        <div class="px-4 text-sub-color text-sm">ຫຼື</div>
-                        <div class="flex-1 border-t border-sub-color"></div>
-                    </div>
-                    
-                    <!-- Guest Mode Button -->
-                    <button id="guest-mode-btn" class="w-full btn btn-secondary text-lg py-4">
-                        👤 ຫຼິ້ນແບບແຂກ (Guest)
+                    <button 
+                        role="tab" 
+                        id="player-tab" 
+                        class="tab-button" 
+                        aria-selected="false" 
+                        aria-controls="player-panel"
+                        tabindex="-1"
+                    >
+                        🎮 Player/Guest
                     </button>
-                    
-                    <!-- Information Text -->
-                    <div class="text-xs text-sub-color text-center space-y-2 max-w-md">
-                        <p><strong>📧 Gmail:</strong> ບັນທຶກຄະແນນສາມາດເຂົ້າໄດ້ທຸກອຸປະກອນ</p>
-                        <p><strong>👤 Guest:</strong> ບັນທຶກເຉພາະໃນອຸປະກອນນີ້ເທົ່ານັ້ນ</p>
-                        <p class="text-warning-color"><strong>⚠️ ຂໍ້ມູນ Guest ຈະຫາຍເມື່ອປິດແທັບ</strong></p>
-                    </div>
                 </div>
 
-                <!-- Profile Setup (Hidden Initially) -->
-                <div id="profile-setup" class="profile-setup">
-                    <h2 class="text-2xl font-bold text-main-color mb-4">ຕັ້ງຄ່າໂປຣໄຟລ໌</h2>
-                    <p class="text-sub-color mb-6">ກະລຸນາໃສ່ຂໍ້ມູນຂອງເຈົ້າ</p>
-                    
-                    <!-- User Info Display (for Gmail users) -->
-                    <div id="user-info" class="user-info" style="display: none;">
-                        <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
-                        <div class="user-details">
-                            <div id="user-name-display" class="user-name"></div>
-                            <div id="user-email-display" class="user-email"></div>
+                <!-- Host Tab Panel -->
+                <section 
+                    role="tabpanel" 
+                    id="host-panel" 
+                    aria-labelledby="host-tab"
+                    aria-hidden="false"
+                    class="tab-panel"
+                >
+                    <div id="host-registration-options" class="space-y-6">
+                        <!-- Gmail Login Button -->
+                        <button id="gmail-login-btn" class="w-full btn btn-gmail text-lg py-4">
+                            <svg width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            ເຂົ້າສູ່ລະບົບດ້ວຍ Gmail
+                        </button>
+                        
+                        <!-- Information Text -->
+                        <div class="text-sm text-sub-color text-center space-y-2">
+                            <p><strong>📧 Host/Admin:</strong> ສ້າງແລະຈັດການເກມ</p>
+                            <p>ຕ້ອງໃຊ້ບັນຊີ Gmail ເພື່ອຄວາມປອດໄພ</p>
                         </div>
                     </div>
-                    
-                    <form id="profile-form" class="space-y-4">
-                        <!-- Name Input -->
-                        <div class="form-group">
-                            <label for="profile-name" class="form-label">ຊື່ຂອງເຈົ້າ *</label>
-                            <input type="text" id="profile-name" class="form-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." required>
+
+                    <!-- Host Profile Setup (Hidden Initially) -->
+                    <div id="host-profile-setup" class="profile-setup">
+                        <h2 class="text-2xl font-bold text-main-color mb-4">ຕັ້ງຄ່າໂປຣໄຟລ໌ Host</h2>
+                        <p class="text-sub-color mb-6">ກະລຸນາໃສ່ຂໍ້ມູນຂອງເຈົ້າ</p>
+                        
+                        <!-- User Info Display (for Gmail users) -->
+                        <div id="user-info" class="user-info" style="display: none;">
+                            <img id="user-avatar" src="" alt="User Avatar" class="user-avatar">
+                            <div class="user-details">
+                                <div id="user-name-display" class="user-name"></div>
+                                <div id="user-email-display" class="user-email"></div>
+                            </div>
                         </div>
                         
-                        <!-- Age Input -->
-                        <div class="form-group">
-                            <label for="profile-age" class="form-label">ອາຍຸ *</label>
-                            <input type="number" id="profile-age" class="form-input" placeholder="ໃສ່ອາຍຸຂອງເຈົ້າ..." min="5" max="100" required>
-                        </div>
+                        <form id="host-profile-form" class="space-y-4">
+                            <!-- Name Input -->
+                            <div class="form-group">
+                                <label for="host-profile-name" class="form-label">ຊື່ຂອງເຈົ້າ *</label>
+                                <input type="text" id="host-profile-name" class="form-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." required>
+                            </div>
+                            
+                            <!-- Age Input -->
+                            <div class="form-group">
+                                <label for="host-profile-age" class="form-label">ອາຍຸ *</label>
+                                <input type="number" id="host-profile-age" class="form-input" placeholder="ໃສ່ອາຍຸຂອງເຈົ້າ..." min="5" max="100" required>
+                            </div>
+                            
+                            <!-- Complete Button -->
+                            <button type="submit" id="complete-host-registration-btn" class="w-full btn btn-primary text-lg py-4" disabled>
+                                ສຳເລັດການລົງທະບຽນ Host
+                            </button>
+                        </form>
                         
-                        <!-- Complete Button -->
-                        <button type="submit" id="complete-registration-btn" class="w-full btn btn-primary text-lg py-4" disabled>
-                            ສຳເລັດການລົງທະບຽນ
+                        <!-- Back Button -->
+                        <button id="host-back-to-options-btn" class="mt-4 text-sub-color hover:text-main-color transition-colors">
+                            ← ກັບໄປເລືອກວິທີເຂົ້າສູ່ລະບົບ
                         </button>
-                    </form>
-                    
-                    <!-- Back Button -->
-                    <button id="back-to-options-btn" class="mt-4 text-sub-color hover:text-main-color transition-colors">
-                        ← ກັບໄປເລືອກວິທີເຂົ້າສູ່ລະບົບ
-                    </button>
-                </div>
+                    </div>
+                </section>
+
+                <!-- Player Tab Panel -->
+                <section 
+                    role="tabpanel" 
+                    id="player-panel" 
+                    aria-labelledby="player-tab"
+                    aria-hidden="true"
+                    class="tab-panel"
+                >
+                    <div class="space-y-6">
+                        <!-- Session Code Input -->
+                        <div class="form-group">
+                            <label for="session-code" class="form-label text-center block">ລະຫັດເກມ (6 ຕົວອັກສອນ)</label>
+                            <input 
+                                type="text" 
+                                id="session-code" 
+                                class="form-input session-code-input" 
+                                placeholder="ABC123" 
+                                maxlength="6"
+                                pattern="[A-Z0-9]{6}"
+                                required
+                            >
+                        </div>
+
+                        <!-- Join Button -->
+                        <button id="join-session-btn" class="w-full btn btn-primary text-lg py-4">
+                            🎮 ເຂົ້າຮ່ວມເກມ
+                        </button>
+
+                        <!-- OR Separator -->
+                        <div class="flex items-center">
+                            <div class="flex-1 border-t border-sub-color"></div>
+                            <div class="px-4 text-sub-color text-sm">ຫຼື</div>
+                            <div class="flex-1 border-t border-sub-color"></div>
+                        </div>
+                        
+                        <!-- Guest Mode Button -->
+                        <button id="guest-mode-btn" class="w-full btn btn-secondary text-lg py-4">
+                            👤 ຫຼິ້ນແບບແຂກ (Guest)
+                        </button>
+                        
+                        <!-- Information Text -->
+                        <div class="text-xs text-sub-color text-center space-y-2 max-w-md mx-auto">
+                            <p><strong>🎮 Player:</strong> ເຂົ້າຮ່ວມເກມດ້ວຍລະຫັດ</p>
+                            <p><strong>👤 Guest:</strong> ຫຼິ້ນແບບບໍ່ຕ້ອງລົງທະບຽນ</p>
+                            <p class="text-warning-color"><strong>⚠️ ຂໍ້ມູນ Guest ຈະຫາຍເມື່ອປິດແທັບ</strong></p>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </main>
@@ -525,7 +662,7 @@
         <div class="space-y-1">
             <p>LaoTypo - ເກມທົດສອບພາສາລາວ</p>
             <p id="network-status">📡 ກຳລັງກວດສອບການເຊື່ອມຕໍ່...</p>
-            <p>Version: 2.1.0 - Phase 1 Registration System</p>
+            <p>Version: 2.2.0 - Tabbed Auth System</p>
         </div>
     </footer>
 
@@ -542,19 +679,102 @@
         let playerManager = null;
         let currentUser = null;
         let isGuest = false;
+        let activeTab = 'host'; // Track active tab
 
         // --- DOM ELEMENTS ---
+        const hostTab = document.getElementById('host-tab');
+        const playerTab = document.getElementById('player-tab');
+        const hostPanel = document.getElementById('host-panel');
+        const playerPanel = document.getElementById('player-panel');
         const gmailLoginBtn = document.getElementById('gmail-login-btn');
         const guestModeBtn = document.getElementById('guest-mode-btn');
-        const registrationOptions = document.getElementById('registration-options');
-        const profileSetup = document.getElementById('profile-setup');
-        const profileForm = document.getElementById('profile-form');
-        const completeBtn = document.getElementById('complete-registration-btn');
-        const backToOptionsBtn = document.getElementById('back-to-options-btn');
+        const joinSessionBtn = document.getElementById('join-session-btn');
+        const sessionCodeInput = document.getElementById('session-code');
+        const hostRegistrationOptions = document.getElementById('host-registration-options');
+        const hostProfileSetup = document.getElementById('host-profile-setup');
+        const hostProfileForm = document.getElementById('host-profile-form');
+        const completeHostBtn = document.getElementById('complete-host-registration-btn');
+        const hostBackToOptionsBtn = document.getElementById('host-back-to-options-btn');
         const errorMessage = document.getElementById('error-message');
         const successMessage = document.getElementById('success-message');
         const guestWarningBanner = document.getElementById('guest-warning-banner');
         const networkStatus = document.getElementById('network-status');
+
+        // --- TAB NAVIGATION FUNCTIONS ---
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            if (tabName === 'host') {
+                // Show host tab
+                hostTab.setAttribute('aria-selected', 'true');
+                hostTab.setAttribute('tabindex', '0');
+                playerTab.setAttribute('aria-selected', 'false');
+                playerTab.setAttribute('tabindex', '-1');
+                
+                hostPanel.setAttribute('aria-hidden', 'false');
+                playerPanel.setAttribute('aria-hidden', 'true');
+                
+                // Focus first interactive element
+                setTimeout(() => {
+                    if (hostProfileSetup.classList.contains('show')) {
+                        document.getElementById('host-profile-name').focus();
+                    } else {
+                        gmailLoginBtn.focus();
+                    }
+                }, 100);
+            } else {
+                // Show player tab
+                playerTab.setAttribute('aria-selected', 'true');
+                playerTab.setAttribute('tabindex', '0');
+                hostTab.setAttribute('aria-selected', 'false');
+                hostTab.setAttribute('tabindex', '-1');
+                
+                playerPanel.setAttribute('aria-hidden', 'false');
+                hostPanel.setAttribute('aria-hidden', 'true');
+                
+                // Focus first interactive element
+                setTimeout(() => {
+                    sessionCodeInput.focus();
+                }, 100);
+            }
+        }
+
+        // Tab click handlers
+        hostTab.addEventListener('click', () => switchTab('host'));
+        playerTab.addEventListener('click', () => switchTab('player'));
+
+        // Keyboard navigation for tabs
+        function handleTabKeyboard(event) {
+            const currentTab = event.target;
+            let nextTab = null;
+
+            switch (event.key) {
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    nextTab = currentTab === playerTab ? hostTab : playerTab;
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    nextTab = currentTab === hostTab ? playerTab : hostTab;
+                    break;
+                case 'Home':
+                    event.preventDefault();
+                    nextTab = hostTab;
+                    break;
+                case 'End':
+                    event.preventDefault();
+                    nextTab = playerTab;
+                    break;
+            }
+
+            if (nextTab) {
+                nextTab.click();
+                nextTab.focus();
+            }
+        }
+
+        hostTab.addEventListener('keydown', handleTabKeyboard);
+        playerTab.addEventListener('keydown', handleTabKeyboard);
 
         // --- UTILITY FUNCTIONS ---
         function showError(message) {
@@ -574,18 +794,23 @@
         function setLoading(element, loading) {
             if (loading) {
                 element.classList.add('loading');
+                const originalText = element.textContent;
+                element.dataset.originalText = originalText;
                 element.innerHTML = '<div class="spinner"></div> ກຳລັງໂຫຼດ...';
             } else {
                 element.classList.remove('loading');
+                if (element.dataset.originalText) {
+                    element.textContent = element.dataset.originalText;
+                }
             }
         }
 
-        function validateProfileForm() {
-            const name = document.getElementById('profile-name').value.trim();
-            const age = document.getElementById('profile-age').value;
+        function validateHostProfileForm() {
+            const name = document.getElementById('host-profile-name').value.trim();
+            const age = document.getElementById('host-profile-age').value;
             
             const isValid = name.length >= 2 && age >= 5 && age <= 100;
-            completeBtn.disabled = !isValid;
+            completeHostBtn.disabled = !isValid;
             
             return isValid;
         }
@@ -598,14 +823,14 @@
             guestWarningBanner.classList.remove('show');
         }
 
-        function switchToProfileSetup() {
-            registrationOptions.style.display = 'none';
-            profileSetup.classList.add('show');
+        function switchToHostProfileSetup() {
+            hostRegistrationOptions.style.display = 'none';
+            hostProfileSetup.classList.add('show');
         }
 
-        function switchToRegistrationOptions() {
-            profileSetup.classList.remove('show');
-            registrationOptions.style.display = 'block';
+        function switchToHostRegistrationOptions() {
+            hostProfileSetup.classList.remove('show');
+            hostRegistrationOptions.style.display = 'block';
             hideGuestWarning();
         }
 
@@ -684,11 +909,11 @@
                     
                     // Pre-fill name if available
                     if (currentUser.displayName) {
-                        document.getElementById('profile-name').value = currentUser.displayName;
+                        document.getElementById('host-profile-name').value = currentUser.displayName;
                     }
                     
-                    switchToProfileSetup();
-                    validateProfileForm();
+                    switchToHostProfileSetup();
+                    validateHostProfileForm();
                 } else {
                     throw new Error(result.error || 'Gmail ເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ');
                 }
@@ -714,9 +939,6 @@
                 console.log('👤 Starting guest mode...');
                 isGuest = true;
                 
-                // Option 1: Direct redirect to testing.html without profile setup
-                // Uncomment the lines below if you want immediate redirect
-                
                 sessionStorage.setItem('userType', 'guest');
                 sessionStorage.setItem('guestUser', JSON.stringify({
                     id: 'guest_' + Math.random().toString(36).substring(2, 11),
@@ -729,85 +951,88 @@
                 setTimeout(() => {
                     window.location.href = 'testing.html';
                 }, 1000);
-                return;
-                
-                
-                // Option 2: Show profile setup (current behavior)
-                /*
-                showGuestWarning();
-                switchToProfileSetup();
-                
-                // Hide Gmail user info for guest
-                document.getElementById('user-info').style.display = 'none';
-                
-                showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ');
-                validateProfileForm();
-                */
             } catch (error) {
                 console.error('❌ Guest mode error:', error);
                 showError('ເກີດຂໍ້ຜິດພາດໃນການເຂົ້າສູ່ໂໝດແຂກ: ' + error.message);
             }
         }
 
-        // --- PROFILE COMPLETION ---
-        async function completeRegistration() {
+        async function handleJoinSession() {
             try {
-                const name = document.getElementById('profile-name').value.trim();
-                const age = parseInt(document.getElementById('profile-age').value);
+                const sessionCode = sessionCodeInput.value.trim().toUpperCase();
                 
-                if (!validateProfileForm()) {
+                if (!sessionCode || sessionCode.length !== 6) {
+                    throw new Error('ກະລຸນາໃສ່ລະຫັດເກມ 6 ຕົວອັກສອນ');
+                }
+
+                setLoading(joinSessionBtn, true);
+                
+                // For now, just save the session code and redirect
+                sessionStorage.setItem('sessionCode', sessionCode);
+                sessionStorage.setItem('userType', 'player');
+                
+                showSuccess(`ກຳລັງເຂົ້າຮ່ວມເກມ ${sessionCode}...`);
+                
+                setTimeout(() => {
+                    window.location.href = `/join?code=${sessionCode}`;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Join session error:', error);
+                showError(error.message);
+            } finally {
+                setLoading(joinSessionBtn, false);
+            }
+        }
+
+        // --- HOST PROFILE COMPLETION ---
+        async function completeHostRegistration() {
+            try {
+                const name = document.getElementById('host-profile-name').value.trim();
+                const age = parseInt(document.getElementById('host-profile-age').value);
+                
+                if (!validateHostProfileForm()) {
                     throw new Error('ກະລຸນາໃສ່ຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
                 }
 
-                setLoading(completeBtn, true);
+                setLoading(completeHostBtn, true);
 
                 const userData = {
                     name: name,
                     age: age,
                     createdAt: new Date().toISOString(),
-                    userType: isGuest ? 'guest' : 'gmail'
+                    userType: 'host',
+                    role: 'host'
                 };
 
-                if (isGuest) {
-                    // Save guest data to sessionStorage
-                    const guestId = 'guest_' + Math.random().toString(36).substring(2, 11);
-                    userData.id = guestId;
-                    
-                    sessionStorage.setItem('guestUser', JSON.stringify(userData));
-                    sessionStorage.setItem('userType', 'guest');
-                    
-                    console.log('👤 Guest registration completed:', userData);
-                    showSuccess('ລົງທະບຽນແຂກສຳເລັດ');
-                } else {
-                    // Save Gmail user data to Firebase
-                    if (!currentUser || !playerManager) {
-                        throw new Error('Firebase ບໍ່ພ້ອມ');
-                    }
-
-                    userData.email = currentUser.email;
-                    userData.photoURL = currentUser.photoURL;
-                    userData.id = currentUser.uid;
-
-                    const result = await playerManager.createPlayer(currentUser.uid, userData);
-                    if (!result.success) {
-                        throw new Error(result.error || 'ບໍ່ສາມາດບັນທຶກຂໍ້ມູນໄດ້');
-                    }
-
-                    console.log('📧 Gmail registration completed:', userData);
-                    showSuccess('ລົງທະບຽນ Gmail ສຳເລັດ');
+                // Save Gmail user data to Firebase
+                if (!currentUser || !playerManager) {
+                    throw new Error('Firebase ບໍ່ພ້ອມ');
                 }
+
+                userData.email = currentUser.email;
+                userData.photoURL = currentUser.photoURL;
+                userData.id = currentUser.uid;
+
+                const result = await playerManager.createPlayer(currentUser.uid, userData);
+                if (!result.success) {
+                    throw new Error(result.error || 'ບໍ່ສາມາດບັນທຶກຂໍ້ມູນໄດ້');
+                }
+
+                console.log('📧 Host registration completed:', userData);
+                showSuccess('ລົງທະບຽນ Host ສຳເລັດ');
 
                 // Redirect after short delay
                 setTimeout(() => {
-                    redirectToHomepage();
+                    redirectToHostDashboard();
                 }, 1500);
 
             } catch (error) {
-                console.error('❌ Registration completion error:', error);
+                console.error('❌ Host registration error:', error);
                 showError(`ລົງທະບຽນບໍ່ສຳເລັດ: ${error.message}`);
             } finally {
-                setLoading(completeBtn, false);
-                completeBtn.textContent = 'ສຳເລັດການລົງທະບຽນ';
+                setLoading(completeHostBtn, false);
+                completeHostBtn.textContent = 'ສຳເລັດການລົງທະບຽນ Host';
             }
         }
 
@@ -816,25 +1041,30 @@
             window.location.href = 'testing.html';
         }
 
+        function redirectToHostDashboard() {
+            console.log('🎯 Redirecting to host dashboard...');
+            window.location.href = '/host/dashboard';
+        }
+
         // --- EVENT LISTENERS ---
         gmailLoginBtn.addEventListener('click', handleGmailLogin);
         guestModeBtn.addEventListener('click', handleGuestMode);
-        backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+        joinSessionBtn.addEventListener('click', handleJoinSession);
+        hostBackToOptionsBtn.addEventListener('click', switchToHostRegistrationOptions);
         
-        // Debug: Ensure guest button is found
-        console.log('Guest button found:', guestModeBtn);
-        if (!guestModeBtn) {
-            console.error('Guest mode button not found!');
-        }
-        
-        profileForm.addEventListener('submit', (e) => {
+        hostProfileForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            completeRegistration();
+            completeHostRegistration();
+        });
+
+        // Session code input formatting
+        sessionCodeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         });
 
         // Real-time validation
-        document.getElementById('profile-name').addEventListener('input', validateProfileForm);
-        document.getElementById('profile-age').addEventListener('input', validateProfileForm);
+        document.getElementById('host-profile-name').addEventListener('input', validateHostProfileForm);
+        document.getElementById('host-profile-age').addEventListener('input', validateHostProfileForm);
 
         // Network status listeners
         window.addEventListener('online', updateNetworkStatus);
@@ -843,7 +1073,7 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', initializeApp);
 
-        console.log('🚀 Registration page loaded - Phase 1 System');
+        console.log('🚀 Tabbed Auth page loaded - Version 2.2.0');
     </script>
 </body>
 </html>
