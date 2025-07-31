@@ -440,6 +440,115 @@
             border-top: 1px solid #3e4043;
         }
         
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 3px solid var(--main-color);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--sub-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-color);
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .radio-option {
+            background: #4a4c4f;
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .radio-option:hover {
+            border-color: var(--main-color);
+            background: #5a5c5f;
+        }
+        
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--main-color);
+        }
+        
+        .radio-option.selected {
+            border-color: var(--main-color);
+            background: #5a5c5f;
+        }
+        
+        .radio-label {
+            flex: 1;
+        }
+        
+        .radio-title {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+        
+        .radio-description {
+            font-size: 0.875rem;
+            color: var(--sub-color);
+        }
+
         /* Responsive Design */
         @media (max-width: 640px) {
             .registration-card {
@@ -464,6 +573,11 @@
             .tab-button {
                 padding: 0.75rem 1.25rem;
                 font-size: 1rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                width: 95%;
             }
         }
     </style>
@@ -558,10 +672,23 @@
                             ເຂົ້າສູ່ລະບົບດ້ວຍ Gmail
                         </button>
                         
+                        <!-- OR Separator -->
+                        <div class="flex items-center">
+                            <div class="flex-1 border-t border-sub-color"></div>
+                            <div class="px-4 text-sub-color text-sm">ຫຼື</div>
+                            <div class="flex-1 border-t border-sub-color"></div>
+                        </div>
+                        
+                        <!-- Anonymous Sign In Button -->
+                        <button id="anonymous-login-btn" class="w-full btn btn-secondary text-lg py-4">
+                            👤 ເຂົ້າສູ່ລະບົບແບບບໍ່ລະບຸຕົວຕົນ
+                        </button>
+                        
                         <!-- Information Text -->
                         <div class="text-sm text-sub-color text-center space-y-2">
                             <p><strong>📧 Host/Admin:</strong> ສ້າງແລະຈັດການເກມ</p>
-                            <p>ຕ້ອງໃຊ້ບັນຊີ Gmail ເພື່ອຄວາມປອດໄພ</p>
+                            <p>ໃຊ້ Gmail ສຳລັບບັນຊີຖາວອນ ຫຼື ແບບບໍ່ລະບຸຕົວຕົນສຳລັບທົດລອງ</p>
+                            <p><a href="#" id="first-time-link" class="text-main-color hover:underline">ໃໝ່ກັບ LaoTypo? ຄລິກທີ່ນີ້</a></p>
                         </div>
                     </div>
 
@@ -614,6 +741,19 @@
                     class="tab-panel"
                 >
                     <div class="space-y-6">
+                        <!-- Display Name Input -->
+                        <div class="form-group">
+                            <label for="player-name" class="form-label text-center block">ຊື່ຂອງເຈົ້າ</label>
+                            <input 
+                                type="text" 
+                                id="player-name" 
+                                class="form-input" 
+                                placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." 
+                                maxlength="20"
+                                required
+                            >
+                        </div>
+
                         <!-- Session Code Input -->
                         <div class="form-group">
                             <label for="session-code" class="form-label text-center block">ລະຫັດເກມ (6 ຕົວອັກສອນ)</label>
@@ -662,9 +802,45 @@
         <div class="space-y-1">
             <p>LaoTypo - ເກມທົດສອບພາສາລາວ</p>
             <p id="network-status">📡 ກຳລັງກວດສອບການເຊື່ອມຕໍ່...</p>
-            <p>Version: 2.2.0 - Tabbed Auth System</p>
+            <p>Version: 2.3.0 - Enhanced Auth with Anonymous & Role Selection</p>
         </div>
     </footer>
+
+    <!-- First Time User Modal -->
+    <div id="role-modal" class="modal-overlay" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h2 id="modal-title" class="text-2xl font-bold text-main-color">ຍິນດີຕ້ອນຮັບສູ່ LaoTypo!</h2>
+                <button class="modal-close" aria-label="ປິດ" id="modal-close">&times;</button>
+            </div>
+            
+            <p class="text-sub-color mb-4">ກະລຸນາເລືອກບົດບາດຂອງເຈົ້າເພື່ອເລີ່ມຕົ້ນ:</p>
+            
+            <form id="role-selection-form">
+                <div class="radio-group" role="radiogroup" aria-labelledby="modal-title">
+                    <label class="radio-option" for="role-host">
+                        <input type="radio" id="role-host" name="role" value="host" required>
+                        <div class="radio-label">
+                            <div class="radio-title">🎯 Host/Admin</div>
+                            <div class="radio-description">ສ້າງແລະຈັດການເກມສຳລັບຜູ້ຫຼິ້ນອື່ນ</div>
+                        </div>
+                    </label>
+                    
+                    <label class="radio-option" for="role-player">
+                        <input type="radio" id="role-player" name="role" value="player" required>
+                        <div class="radio-label">
+                            <div class="radio-title">🎮 Player</div>
+                            <div class="radio-description">ເຂົ້າຮ່ວມແລະຫຼິ້ນເກມທີ່ Host ສ້າງໄວ້</div>
+                        </div>
+                    </label>
+                </div>
+                
+                <button type="submit" class="w-full btn btn-primary text-lg py-4 mt-6" id="save-role-btn">
+                    ບັນທຶກແລະສືບຕໍ່
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script type="module">
         // Import Firebase modules
@@ -687,9 +863,11 @@
         const hostPanel = document.getElementById('host-panel');
         const playerPanel = document.getElementById('player-panel');
         const gmailLoginBtn = document.getElementById('gmail-login-btn');
+        const anonymousLoginBtn = document.getElementById('anonymous-login-btn');
         const guestModeBtn = document.getElementById('guest-mode-btn');
         const joinSessionBtn = document.getElementById('join-session-btn');
         const sessionCodeInput = document.getElementById('session-code');
+        const playerNameInput = document.getElementById('player-name');
         const hostRegistrationOptions = document.getElementById('host-registration-options');
         const hostProfileSetup = document.getElementById('host-profile-setup');
         const hostProfileForm = document.getElementById('host-profile-form');
@@ -699,6 +877,10 @@
         const successMessage = document.getElementById('success-message');
         const guestWarningBanner = document.getElementById('guest-warning-banner');
         const networkStatus = document.getElementById('network-status');
+        const firstTimeLink = document.getElementById('first-time-link');
+        const roleModal = document.getElementById('role-modal');
+        const modalClose = document.getElementById('modal-close');
+        const roleSelectionForm = document.getElementById('role-selection-form');
 
         // --- TAB NAVIGATION FUNCTIONS ---
         function switchTab(tabName) {
@@ -834,6 +1016,33 @@
             hideGuestWarning();
         }
 
+        // --- MODAL FUNCTIONS ---
+        function showModal() {
+            roleModal.classList.add('show');
+            roleModal.setAttribute('aria-hidden', 'false');
+            // Focus trap
+            setTimeout(() => {
+                document.getElementById('role-host').focus();
+            }, 100);
+        }
+
+        function hideModal() {
+            roleModal.classList.remove('show');
+            roleModal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Handle radio option selection visual feedback
+        function updateRadioSelection() {
+            document.querySelectorAll('.radio-option').forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                if (radio.checked) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
         // --- NETWORK STATUS ---
         function updateNetworkStatus() {
             const online = navigator.onLine;
@@ -934,15 +1143,54 @@
             }
         }
 
+        async function handleAnonymousLogin() {
+            try {
+                if (!navigator.onLine) {
+                    throw new Error('ບໍ່ມີການເຊື່ອມຕໍ່ອິນເຕີເນັດ');
+                }
+
+                if (!authManager) {
+                    throw new Error('Firebase ບໍ່ໄດ້ເຊັດອັບ');
+                }
+
+                setLoading(anonymousLoginBtn, true);
+                
+                console.log('🔄 Starting anonymous login...');
+                const result = await authManager.loginAnonymously();
+                
+                if (result.success) {
+                    currentUser = result.user;
+                    console.log('✅ Anonymous login successful:', currentUser.uid);
+                    
+                    // Show guest warning for anonymous users
+                    showGuestWarning();
+                    
+                    // Switch to profile setup
+                    switchToHostProfileSetup();
+                    validateHostProfileForm();
+                } else {
+                    throw new Error(result.error || 'Anonymous login failed');
+                }
+            } catch (error) {
+                console.error('❌ Anonymous login error:', error);
+                showError(`ເຂົ້າສູ່ລະບົບແບບບໍ່ລະບຸຕົວຕົນບໍ່ສຳເລັດ: ${error.message}`);
+            } finally {
+                setLoading(anonymousLoginBtn, false);
+            }
+        }
+
         function handleGuestMode() {
             try {
                 console.log('👤 Starting guest mode...');
                 isGuest = true;
                 
+                // Get player name if provided
+                const playerName = playerNameInput.value.trim() || 'Guest User';
+                
                 sessionStorage.setItem('userType', 'guest');
                 sessionStorage.setItem('guestUser', JSON.stringify({
                     id: 'guest_' + Math.random().toString(36).substring(2, 11),
-                    name: 'Guest User',
+                    name: playerName,
                     age: 0,
                     createdAt: new Date().toISOString(),
                     userType: 'guest'
@@ -960,6 +1208,11 @@
         async function handleJoinSession() {
             try {
                 const sessionCode = sessionCodeInput.value.trim().toUpperCase();
+                const playerName = playerNameInput.value.trim();
+                
+                if (!playerName) {
+                    throw new Error('ກະລຸນາໃສ່ຊື່ຂອງເຈົ້າ');
+                }
                 
                 if (!sessionCode || sessionCode.length !== 6) {
                     throw new Error('ກະລຸນາໃສ່ລະຫັດເກມ 6 ຕົວອັກສອນ');
@@ -967,14 +1220,15 @@
 
                 setLoading(joinSessionBtn, true);
                 
-                // For now, just save the session code and redirect
+                // Save player info and session code
                 sessionStorage.setItem('sessionCode', sessionCode);
                 sessionStorage.setItem('userType', 'player');
+                sessionStorage.setItem('playerName', playerName);
                 
                 showSuccess(`ກຳລັງເຂົ້າຮ່ວມເກມ ${sessionCode}...`);
                 
                 setTimeout(() => {
-                    window.location.href = `/join?code=${sessionCode}`;
+                    window.location.href = `/join?code=${sessionCode}&name=${encodeURIComponent(playerName)}`;
                 }, 1000);
                 
             } catch (error) {
@@ -1005,7 +1259,7 @@
                     role: 'host'
                 };
 
-                // Save Gmail user data to Firebase
+                // Save user data to Firebase
                 if (!currentUser || !playerManager) {
                     throw new Error('Firebase ບໍ່ພ້ອມ');
                 }
@@ -1017,6 +1271,14 @@
                 const result = await playerManager.createPlayer(currentUser.uid, userData);
                 if (!result.success) {
                     throw new Error(result.error || 'ບໍ່ສາມາດບັນທຶກຂໍ້ມູນໄດ້');
+                }
+
+                // Also save role to Firestore users collection
+                if (firebase.firestore) {
+                    await firebase.firestore().collection('users').doc(currentUser.uid).set({
+                        role: 'host',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
                 }
 
                 console.log('📧 Host registration completed:', userData);
@@ -1036,6 +1298,40 @@
             }
         }
 
+        // --- ROLE SELECTION MODAL ---
+        async function handleRoleSelection(event) {
+            event.preventDefault();
+            
+            try {
+                const selectedRole = document.querySelector('input[name="role"]:checked');
+                if (!selectedRole) {
+                    throw new Error('ກະລຸນາເລືອກບົດບາດ');
+                }
+
+                const role = selectedRole.value;
+                console.log('📝 Selected role:', role);
+
+                // Save role preference
+                localStorage.setItem('preferredRole', role);
+                
+                // Hide modal
+                hideModal();
+                
+                // Switch to appropriate tab
+                if (role === 'host') {
+                    switchTab('host');
+                } else {
+                    switchTab('player');
+                }
+                
+                showSuccess(`ເລືອກບົດບາດ ${role === 'host' ? 'Host' : 'Player'} ສຳເລັດ`);
+                
+            } catch (error) {
+                console.error('❌ Role selection error:', error);
+                showError(error.message);
+            }
+        }
+
         function redirectToHomepage() {
             console.log('🏠 Redirecting to homepage...');
             window.location.href = 'testing.html';
@@ -1048,13 +1344,33 @@
 
         // --- EVENT LISTENERS ---
         gmailLoginBtn.addEventListener('click', handleGmailLogin);
+        anonymousLoginBtn.addEventListener('click', handleAnonymousLogin);
         guestModeBtn.addEventListener('click', handleGuestMode);
         joinSessionBtn.addEventListener('click', handleJoinSession);
         hostBackToOptionsBtn.addEventListener('click', switchToHostRegistrationOptions);
+        firstTimeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal();
+        });
         
         hostProfileForm.addEventListener('submit', (e) => {
             e.preventDefault();
             completeHostRegistration();
+        });
+
+        // Modal event listeners
+        modalClose.addEventListener('click', hideModal);
+        roleModal.addEventListener('click', (e) => {
+            if (e.target === roleModal) {
+                hideModal();
+            }
+        });
+        
+        roleSelectionForm.addEventListener('submit', handleRoleSelection);
+        
+        // Radio option visual feedback
+        document.querySelectorAll('input[name="role"]').forEach(radio => {
+            radio.addEventListener('change', updateRadioSelection);
         });
 
         // Session code input formatting
@@ -1069,11 +1385,35 @@
         // Network status listeners
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
+        
+        // Modal keyboard trap
+        roleModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideModal();
+            }
+            
+            // Tab trap within modal
+            if (e.key === 'Tab') {
+                const focusableElements = roleModal.querySelectorAll(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+                const firstFocusable = focusableElements[0];
+                const lastFocusable = focusableElements[focusableElements.length - 1];
+                
+                if (e.shiftKey && document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+        });
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', initializeApp);
 
-        console.log('🚀 Tabbed Auth page loaded - Version 2.2.0');
+        console.log('🚀 Tabbed Auth page loaded - Version 2.3.0');
     </script>
 </body>
 </html>
