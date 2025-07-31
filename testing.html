@@ -1953,6 +1953,17 @@
 
         // --- AUTHENTICATION GUARD ---
         function checkUserAuthentication() {
+            // Check if we're in test mode (bypass authentication)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('testmode') === 'true') {
+                console.log('🧪 Test mode enabled - bypassing authentication');
+                userType = 'guest';
+                displayName = 'Test User';
+                userId = 'test_user_' + Math.random().toString(36).substr(2, 9);
+                updateUserDisplay();
+                return true;
+            }
+            
             // Check for guest user in sessionStorage
             const guestUser = sessionStorage.getItem('guestUser');
             const storedUserType = sessionStorage.getItem('userType');
@@ -1974,9 +1985,32 @@
                 // Will be fully loaded by Firebase auth listener
                 return true;
             } else {
-                console.log('🔐 No authenticated user found - redirecting to registration');
-                redirectToRegistration();
-                return false;
+                // For testing purposes, create a temporary guest session instead of redirecting
+                console.log('🔐 No authenticated user found - creating temporary test session');
+                
+                // Uncomment the next line to enable auto-redirect to registration
+                // redirectToRegistration();
+                // return false;
+                
+                // Create temporary guest session for testing
+                const tempUser = {
+                    id: 'temp_guest_' + Math.random().toString(36).substr(2, 9),
+                    name: 'Temporary Guest',
+                    age: 0,
+                    createdAt: new Date().toISOString(),
+                    userType: 'guest'
+                };
+                
+                sessionStorage.setItem('guestUser', JSON.stringify(tempUser));
+                sessionStorage.setItem('userType', 'guest');
+                
+                userType = 'guest';
+                displayName = tempUser.name;
+                userId = tempUser.id;
+                updateUserDisplay();
+                
+                console.log('✅ Temporary guest session created for testing');
+                return true;
             }
         }
         
