@@ -1,0 +1,148 @@
+// ===== FIRESTORE SECURITY RULES =====
+// firestore.rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isHost() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'host' || 
+         request.auth.token.email.matches('.*@gmail[.]com'));
+    }
+    
+    function isSessionHost(sessionId) {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/sessions_meta/$(sessionId)).data.hostId == request.auth.uid;
+    }
+    
+    // Passages collection - read-only for all authenticated users
+    match /passages/{passageId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Admin only via server
+    }
+    
+    // Sessions metadata
+    match /sessions_meta/{sessionId} {
+      allow read: if true; // Public read for joining
+      allow create: if isHost();
+      allow update: if isSessionHost(sessionId);
+      allow delete: if isSessionHost(sessionId);
+      
+      // Leaderboard snapshots subcollection
+      match /leaderboardSnapshots/{snapshotId} {
+        allow read: if true;
+        allow write: if false; // Server only
+      }
+    }
+    
+    // Results collection
+    match /results/{resultId} {
+      allow read: if true; // Public leaderboard
+      allow write: if false; // Server only
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Analytics collection
+    match /analytics/{document=**} {
+      allow read: if isHost();
+      allow write: if false; // Server only
+    }
+  }
+}
+
+// ===== REALTIME DATABASE SECURITY RULES =====
+// database.rules.json
+
+{
+  "rules": {
+    "sessions": {
+      "$sessionId": {
+        // Read access for all (public games)
+        ".read": true,
+        
+        // Session status - only server can update
+        "status": {
+          ".write": false
+        },
+        
+        // Next word index - server managed
+        "nextWordIndex": {
+          ".write": false
+        },
+        
+        // Players node
+        "players": {
+          "$playerId": {
+            // Players can update their own data
+            ".write": "auth != null && (auth.uid == $playerId || !data.exists())",
+            
+            // Validate player data structure
+            ".validate": "newData.hasChildren(['name', 'currentIndex', 'remainingLives'])",
+            
+            "name": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+            },
+            "currentIndex": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "remainingLives": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10"
+            }
+          }
+        },
+        
+        // Game events - players can only add, not modify
+        "gameEvents": {
+          "$eventId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['playerId', 'wordIndex', 'correct', 'timestamp'])",
+            
+            "playerId": {
+              ".validate": "newData.val() == auth.uid || newData.val().beginsWith('guest_')"
+            },
+            "wordIndex": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "correct": {
+              ".validate": "newData.isBoolean()"
+            },
+            "timestamp": {
+              ".validate": "newData.val() == now"
+            }
+          }
+        },
+        
+        // Leaderboard - server managed
+        "leaderboard": {
+          ".write": false
+        },
+        
+        // Chat messages
+        "messages": {
+          "$messageId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['playerId', 'playerName', 'text', 'timestamp'])",
+            
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+            },
+            "timestamp": {
+              ".validate": "newData.val() == now"
+            }
+          }
+        }
+      }
+    }
+  }
+}
