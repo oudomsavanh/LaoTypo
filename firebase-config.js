@@ -31,6 +31,7 @@ import {
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
+  signInAnonymously,
   signOut, 
   onAuthStateChanged 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -39,6 +40,13 @@ import {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
+// Make firebase available globally for compatibility
+window.firebase = {
+  auth: () => auth,
+  firestore: () => db,
+  app: () => app
+};
 
 console.log('🔥 Firebase initialized successfully');
 
@@ -385,7 +393,6 @@ class FirebaseAuthManager {
   // Login anonymously
   static async loginAnonymously() {
     try {
-      const { signInAnonymously } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
       const result = await signInAnonymously(auth);
       const user = result.user;
       
@@ -423,7 +430,12 @@ class FirebaseAuthManager {
   
   // Get current user
   static getCurrentUser() {
-    return auth.currentUser;
+    return new Promise((resolve) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe();
+        resolve(user);
+      });
+    });
   }
   
   // Listen to auth state changes
@@ -476,9 +488,27 @@ window.FirebaseAuthManager = FirebaseAuthManager;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
 
+// Initialize Firebase function for compatibility
+export async function initializeFirebase() {
+  // Firebase is already initialized at the top of this file
+  return true;
+}
+
+// Also export the managers as ES6 modules
+export { 
+  FirebasePlayerManager, 
+  FirebaseWordManager, 
+  FirebaseLeaderboardManager, 
+  FirebaseSyncManager, 
+  FirebaseAuthManager,
+  db as firebaseDb,
+  auth as firebaseAuth
+};
+
 console.log('🔥 Firebase modules loaded and ready!');
 console.log('🔑 Available Firebase functions:');
 console.log('  - FirebaseAuthManager.loginWithGmail()');
+console.log('  - FirebaseAuthManager.loginAnonymously()');
 console.log('  - FirebaseAuthManager.getUserProfile(uid)');
 console.log('  - FirebasePlayerManager.savePlayerData()');
 console.log('  - FirebaseSyncManager.syncToCloud()');
