@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Report - LaoTypo</title>
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #e2b714;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+        }
+        
+        body {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .results-table {
+            background: #3e4043;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        
+        .results-table th {
+            background: #2c2e31;
+            color: var(--main-color);
+            font-weight: bold;
+            text-align: left;
+            padding: 1rem;
+        }
+        
+        .results-table td {
+            padding: 1rem;
+            border-top: 1px solid #2c2e31;
+        }
+        
+        .results-table tr:hover {
+            background: #4a4c4f;
+        }
+        
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+        
+        .chart-container {
+            background: #3e4043;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .share-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .share-facebook {
+            background: #1877f2;
+            color: white;
+        }
+        
+        .share-facebook:hover {
+            background: #166fe5;
+        }
+        
+        .share-twitter {
+            background: #1da1f2;
+            color: white;
+        }
+        
+        .share-twitter:hover {
+            background: #1a91da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-yellow-500 mb-2">🏆 Game Complete!</h1>
+            <p class="text-gray-400">Session Code: <span id="session-code" class="text-yellow-500 font-bold">------</span></p>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold mb-4">Final Rankings</h2>
+            <div class="results-table">
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="w-16">Rank</th>
+                            <th>Player</th>
+                            <th class="text-center">Score</th>
+                            <th class="text-center">Accuracy</th>
+                            <th class="text-center">Time</th>
+                            <th class="text-center">Tier</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        <!-- Results will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Score Timeline Chart -->
+            <div class="chart-container">
+                <h3 class="text-xl font-bold mb-4">Score Timeline</h3>
+                <canvas id="timeline-chart"></canvas>
+            </div>
+            
+            <!-- Accuracy Breakdown Chart -->
+            <div class="chart-container">
+                <h3 class="text-xl font-bold mb-4">Accuracy by Difficulty</h3>
+                <canvas id="accuracy-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button id="export-csv" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg transition font-medium">
+                📊 Export CSV
+            </button>
+            <a href="#" id="share-facebook" class="share-button share-facebook">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Share on Facebook
+            </a>
+            <a href="#" id="share-twitter" class="share-button share-twitter">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+                Share on Twitter
+            </a>
+            <button id="play-again" class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition font-medium">
+                🎮 Play Again
+            </button>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { initializeFirebase } from './firebase-config.js';
+        
+        let sessionId = null;
+        let sessionData = null;
+        let resultsData = [];
+        
+        async function loadReportData() {
+            // Get session ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionId = urlParams.get('session');
+            
+            if (!sessionId) {
+                alert('No session ID provided');
+                window.location.href = '/';
+                return;
+            }
+            
+            // Initialize Firebase
+            await initializeFirebase();
+            const firestore = firebase.firestore();
+            
+            try {
+                // Load session metadata
+                const sessionDoc = await firestore
+                    .collection('sessions_meta')
+                    .doc(sessionId)
+                    .get();
+                
+                if (!sessionDoc.exists) {
+                    throw new Error('Session not found');
+                }
+                
+                sessionData = sessionDoc.data();
+                document.getElementById('session-code').textContent = sessionData.code;
+                
+                // Load results
+                const resultsSnapshot = await firestore
+                    .collection('results')
+                    .where('sessionId', '==', sessionId)
+                    .get();
+                
+                resultsData = [];
+                resultsSnapshot.forEach(doc => {
+                    resultsData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by score
+                resultsData.sort((a, b) => b.rawScore - a.rawScore);
+                
+                // Render results
+                renderResultsTable();
+                renderCharts();
+                
+            } catch (error) {
+                console.error('Error loading report data:', error);
+                alert('Failed to load game results');
+            }
+        }
+        
+        function renderResultsTable() {
+            const tbody = document.getElementById('results-tbody');
+            tbody.innerHTML = '';
+            
+            resultsData.forEach((result, index) => {
+                const rank = index + 1;
+                const tr = document.createElement('tr');
+                
+                // Determine tier based on percentage
+                let tier = 'Beginner';
+                let tierColor = 'text-gray-400';
+                if (result.percentage >= 90) {
+                    tier = 'ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ';
+                    tierColor = 'text-green-500';
+                } else if (result.percentage >= 70) {
+                    tier = 'ລູກຊອດລາວ 75%';
+                    tierColor = 'text-yellow-500';
+                } else if (result.percentage >= 40) {
+                    tier = 'ໄປໃຫຍ່ຕ່າງປະເທດ';
+                    tierColor = 'text-orange-500';
+                }
+                
+                tr.innerHTML = `
+                    <td class="text-center font-bold ${rank <= 3 ? `rank-${rank}` : ''}">
+                        ${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}
+                    </td>
+                    <td>${result.playerName || 'Unknown'}</td>
+                    <td class="text-center font-bold">${result.rawScore}</td>
+                    <td class="text-center">${result.percentage.toFixed(1)}%</td>
+                    <td class="text-center">${formatTime(result.completionTime)}</td>
+                    <td class="text-center ${tierColor}">${tier}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function renderCharts() {
+            // Score Timeline Chart
+            const timelineCtx = document.getElementById('timeline-chart').getContext('2d');
+            new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: resultsData.map((_, i) => `Player ${i + 1}`),
+                    datasets: [{
+                        label: 'Final Score',
+                        data: resultsData.map(r => r.rawScore),
+                        borderColor: '#e2b714',
+                        backgroundColor: 'rgba(226, 183, 20, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#d1d0c5' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#d1d0c5' },
+                            grid: { color: '#3e4043' }
+                        },
+                        x: {
+                            ticks: { color: '#d1d0c5' },
+                            grid: { color: '#3e4043' }
+                        }
+                    }
+                }
+            });
+            
+            // Accuracy Breakdown Chart
+            const accuracyCtx = document.getElementById('accuracy-chart').getContext('2d');
+            
+            // Calculate average accuracy by difficulty
+            const difficultyData = {
+                Easy: { correct: 0, total: 0 },
+                Medium: { correct: 0, total: 0 },
+                Hard: { correct: 0, total: 0 }
+            };
+            
+            // Mock data for demonstration
+            const mockAccuracy = [85, 65, 45];
+            
+            new Chart(accuracyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Easy', 'Medium', 'Hard'],
+                    datasets: [{
+                        label: 'Average Accuracy %',
+                        data: mockAccuracy,
+                        backgroundColor: [
+                            'rgba(114, 180, 131, 0.8)',
+                            'rgba(226, 183, 20, 0.8)',
+                            'rgba(202, 71, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            '#72b483',
+                            '#e2b714',
+                            '#ca4754'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#d1d0c5' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#d1d0c5' },
+                            grid: { color: '#3e4043' }
+                        },
+                        x: {
+                            ticks: { color: '#d1d0c5' },
+                            grid: { color: '#3e4043' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function formatTime(seconds) {
+            if (!seconds) return 'N/A';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function exportCSV() {
+            let csv = 'Rank,Player,Score,Accuracy,Time,Tier\n';
+            
+            resultsData.forEach((result, index) => {
+                const rank = index + 1;
+                csv += `${rank},${result.playerName},${result.rawScore},${result.percentage}%,${formatTime(result.completionTime)},${result.tier}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `laotypo-results-${sessionData.code}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Event Listeners
+        document.getElementById('export-csv').addEventListener('click', exportCSV);
+        
+        document.getElementById('play-again').addEventListener('click', () => {
+            window.location.href = '/host/dashboard';
+        });
+        
+        // Social sharing
+        document.getElementById('share-facebook').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(`I just played LaoTypo! Check out the results for session ${sessionData.code}`);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+        });
+        
+        document.getElementById('share-twitter').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent(`Just finished a LaoTypo game! 🎮 Session: ${sessionData.code} #LaoTypo #LanguageLearning`);
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+        });
+        
+        // Load data when page loads
+        window.addEventListener('load', loadReportData);
+    </script>
+</body>
+</html>

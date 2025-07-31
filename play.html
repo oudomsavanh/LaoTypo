@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaoTypo - Multiplayer Game</title>
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #e2b714;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+        }
+        
+        body {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .word-button {
+            background-color: #3e4043;
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .word-button:hover {
+            background-color: #4a4c4f;
+            border-color: var(--main-color);
+            transform: translateY(-2px);
+        }
+        
+        .word-button.correct {
+            background-color: var(--correct-color);
+            color: white;
+            animation: pulse-correct 0.5s ease;
+        }
+        
+        .word-button.incorrect {
+            background-color: var(--error-color);
+            color: white;
+            animation: shake 0.5s ease;
+        }
+        
+        .word-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse-correct {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .player-progress {
+            background: #3e4043;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #2c2e31;
+            border-radius: 4px;
+            overflow: hidden;
+            flex: 1;
+            margin: 0 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--main-color);
+            transition: width 0.3s ease;
+        }
+        
+        .lives {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .heart {
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .heart.lost {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+        
+        .leaderboard-overlay {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(44, 46, 49, 0.95);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            min-width: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .leaderboard-overlay.hidden {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Game Header -->
+        <div class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-yellow-500 mb-2">
+                <span id="passage-title">Loading...</span>
+            </h1>
+            <div class="text-gray-400">
+                Session Code: <span id="session-code" class="text-yellow-500 font-bold">------</span>
+            </div>
+        </div>
+        
+        <!-- Player Progress Section -->
+        <div id="players-progress" class="mb-6">
+            <!-- Player progress bars will be inserted here -->
+        </div>
+        
+        <!-- Current Word Display -->
+        <div class="mb-6 text-center">
+            <div class="text-xl text-gray-400 mb-2">Find and click:</div>
+            <div id="target-word" class="text-4xl font-bold text-yellow-500 bg-gray-800 rounded-lg py-4 px-6 inline-block">
+                Loading...
+            </div>
+        </div>
+        
+        <!-- Word Grid -->
+        <div id="word-grid" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+            <!-- Word buttons will be inserted here -->
+        </div>
+        
+        <!-- Game Controls -->
+        <div class="flex justify-center gap-4">
+            <button id="toggle-leaderboard" class="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+                🏆 Leaderboard
+            </button>
+            <button id="leave-game" class="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition">
+                Leave Game
+            </button>
+        </div>
+    </div>
+    
+    <!-- Live Leaderboard Overlay -->
+    <div id="leaderboard-overlay" class="leaderboard-overlay hidden">
+        <h3 class="text-xl font-bold text-yellow-500 mb-3">🏆 Live Rankings</h3>
+        <div id="leaderboard-content">
+            <!-- Leaderboard entries will be inserted here -->
+        </div>
+    </div>
+    
+    <script type="module">
+        // Firebase configuration
+        import { initializeFirebase } from './firebase-config.js';
+        
+        // Game state
+        let sessionId = null;
+        let playerId = null;
+        let playerName = null;
+        let currentWordIndex = 0;
+        let passageWords = [];
+        let gameState = null;
+        let playersData = {};
+        
+        // Firebase references
+        let database = null;
+        let sessionRef = null;
+        let playersRef = null;
+        let gameEventsRef = null;
+        let leaderboardRef = null;
+        
+        // Initialize game
+        async function initGame() {
+            // Get session ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionId = urlParams.get('session');
+            
+            if (!sessionId) {
+                alert('No session ID provided');
+                window.location.href = '/';
+                return;
+            }
+            
+            // Get player info from session storage
+            playerId = sessionStorage.getItem('playerId') || 'player_' + Math.random().toString(36).substr(2, 9);
+            playerName = sessionStorage.getItem('playerName') || 'Anonymous';
+            
+            // Initialize Firebase
+            await initializeFirebase();
+            database = firebase.database();
+            
+            // Set up Firebase references
+            sessionRef = database.ref(`sessions/${sessionId}`);
+            playersRef = database.ref(`sessions/${sessionId}/players`);
+            gameEventsRef = database.ref(`sessions/${sessionId}/gameEvents`);
+            leaderboardRef = database.ref(`sessions/${sessionId}/leaderboard`);
+            
+            // Load session data
+            await loadSessionData();
+            
+            // Set up real-time listeners
+            setupRealtimeListeners();
+            
+            // Join the game
+            await joinGame();
+        }
+        
+        async function loadSessionData() {
+            try {
+                // Get session metadata from Firestore
+                const sessionDoc = await firebase.firestore()
+                    .collection('sessions_meta')
+                    .doc(sessionId)
+                    .get();
+                
+                if (!sessionDoc.exists) {
+                    throw new Error('Session not found');
+                }
+                
+                const sessionData = sessionDoc.data();
+                document.getElementById('session-code').textContent = sessionData.code;
+                
+                // Load passage
+                const passageDoc = await firebase.firestore()
+                    .collection('passages')
+                    .doc(sessionData.passageId)
+                    .get();
+                
+                if (passageDoc.exists) {
+                    const passage = passageDoc.data();
+                    document.getElementById('passage-title').textContent = passage.title;
+                    passageWords = passage.content.split(' ');
+                    renderWordGrid();
+                }
+            } catch (error) {
+                console.error('Error loading session:', error);
+                alert('Failed to load session data');
+            }
+        }
+        
+        function setupRealtimeListeners() {
+            // Listen for game state changes
+            sessionRef.on('value', (snapshot) => {
+                gameState = snapshot.val();
+                if (gameState) {
+                    updateGameState();
+                }
+            });
+            
+            // Listen for player updates
+            playersRef.on('value', (snapshot) => {
+                playersData = snapshot.val() || {};
+                updatePlayerProgress();
+            });
+            
+            // Listen for leaderboard updates
+            leaderboardRef.on('value', (snapshot) => {
+                const leaderboard = snapshot.val() || {};
+                updateLeaderboard(leaderboard);
+            });
+        }
+        
+        async function joinGame() {
+            // Add player to the game
+            await playersRef.child(playerId).set({
+                name: playerName,
+                currentIndex: 0,
+                remainingLives: 3,
+                joinedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+        }
+        
+        function renderWordGrid() {
+            const grid = document.getElementById('word-grid');
+            grid.innerHTML = '';
+            
+            passageWords.forEach((word, index) => {
+                const button = document.createElement('button');
+                button.className = 'word-button';
+                button.textContent = word;
+                button.dataset.index = index;
+                button.addEventListener('click', () => handleWordClick(index, word));
+                grid.appendChild(button);
+            });
+        }
+        
+        async function handleWordClick(index, word) {
+            const playerData = playersData[playerId];
+            if (!playerData) return;
+            
+            const expectedIndex = playerData.currentIndex || 0;
+            const isCorrect = index === expectedIndex;
+            
+            // Visual feedback
+            const button = document.querySelector(`[data-index="${index}"]`);
+            if (isCorrect) {
+                button.classList.add('correct');
+                
+                // Update player progress
+                await playersRef.child(playerId).update({
+                    currentIndex: expectedIndex + 1
+                });
+                
+                // Record game event
+                await gameEventsRef.push({
+                    playerId: playerId,
+                    wordIndex: index,
+                    correct: true,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+            } else {
+                button.classList.add('incorrect');
+                
+                // Lose a life
+                const newLives = Math.max(0, (playerData.remainingLives || 3) - 1);
+                await playersRef.child(playerId).update({
+                    remainingLives: newLives
+                });
+                
+                // Record game event
+                await gameEventsRef.push({
+                    playerId: playerId,
+                    wordIndex: index,
+                    correct: false,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                
+                if (newLives === 0) {
+                    // Player is out
+                    alert('No more lives! Game over.');
+                    handleLeaveGame();
+                }
+            }
+            
+            setTimeout(() => {
+                button.classList.remove('correct', 'incorrect');
+            }, 500);
+        }
+        
+        function updateGameState() {
+            if (gameState.status === 'completed') {
+                // Redirect to report page
+                window.location.href = `/report.html?session=${sessionId}`;
+            }
+            
+            // Update current word display
+            if (gameState.nextWordIndex !== undefined) {
+                const targetWord = passageWords[gameState.nextWordIndex] || 'Complete!';
+                document.getElementById('target-word').textContent = targetWord;
+            }
+        }
+        
+        function updatePlayerProgress() {
+            const container = document.getElementById('players-progress');
+            container.innerHTML = '';
+            
+            Object.entries(playersData).forEach(([pid, player]) => {
+                const progress = (player.currentIndex / passageWords.length) * 100;
+                const isCurrentPlayer = pid === playerId;
+                
+                const progressDiv = document.createElement('div');
+                progressDiv.className = 'player-progress' + (isCurrentPlayer ? ' border-2 border-yellow-500' : '');
+                
+                progressDiv.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium ${isCurrentPlayer ? 'text-yellow-500' : ''}">${player.name}</span>
+                        <div class="lives">
+                            ${Array(3).fill(0).map((_, i) => 
+                                `<span class="heart ${i >= player.remainingLives ? 'lost' : ''}">❤️</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <span class="text-sm text-gray-400">${player.currentIndex}/${passageWords.length}</span>
+                `;
+                
+                container.appendChild(progressDiv);
+            });
+        }
+        
+        function updateLeaderboard(leaderboardData) {
+            const content = document.getElementById('leaderboard-content');
+            content.innerHTML = '';
+            
+            // Convert to array and sort
+            const sorted = Object.entries(leaderboardData)
+                .map(([pid, data]) => ({ playerId: pid, ...data }))
+                .sort((a, b) => {
+                    if (b.rawScore !== a.rawScore) return b.rawScore - a.rawScore;
+                    return a.lastClickTs - b.lastClickTs;
+                });
+            
+            sorted.forEach((entry, index) => {
+                const player = playersData[entry.playerId];
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center py-2 ' + 
+                    (entry.playerId === playerId ? 'text-yellow-500 font-bold' : '');
+                
+                div.innerHTML = `
+                    <span>${index + 1}. ${player?.name || 'Unknown'}</span>
+                    <span>${entry.rawScore || 0} pts</span>
+                `;
+                
+                content.appendChild(div);
+            });
+        }
+        
+        function handleLeaveGame() {
+            if (confirm('Are you sure you want to leave the game?')) {
+                // Remove player from game
+                playersRef.child(playerId).remove();
+                window.location.href = '/';
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('toggle-leaderboard').addEventListener('click', () => {
+            const overlay = document.getElementById('leaderboard-overlay');
+            overlay.classList.toggle('hidden');
+        });
+        
+        document.getElementById('leave-game').addEventListener('click', handleLeaveGame);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'l' || e.key === 'L') {
+                document.getElementById('leaderboard-overlay').classList.toggle('hidden');
+            }
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
