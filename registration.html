@@ -44,33 +44,43 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         
-        /* Header Navigation */
-        .header-nav {
-            background: linear-gradient(90deg, #222426 0%, #2c2e31 100%);
-            border-bottom: 2px solid var(--main-color);
-            padding: 1rem 0;
+        /* Navigation */
+        nav {
+            background-color: #222426;
         }
         
         .nav-link {
             color: var(--sub-color);
             transition: color 0.2s ease-in-out;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
         }
         
         .nav-link:hover {
             color: var(--text-color);
-            background-color: rgba(226, 183, 20, 0.1);
         }
         
-        .nav-link.active {
-            color: var(--main-color);
-            background-color: rgba(226, 183, 20, 0.2);
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 9999px; /* circle */
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+        }
+        
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
         }
         
         /* Main Container */
@@ -405,25 +415,37 @@
         ⚠️ ໂໝດແຂກ: ຂໍ້ມູນຂອງເຈົ້າຈະຫາຍໄປເມື່ອປິດແທັບເວັບໄຊທ໌ - ສະໝັກເຂົ້າ Gmail ເພື່ອບັນທຶກຂໍ້ມູນຖາວອນ
     </div>
 
-    <!-- Header Navigation -->
-    <header class="header-nav">
-        <div class="container mx-auto px-4">
-            <nav class="flex items-center justify-between">
-                <div class="flex items-center space-x-6">
-                    <div class="flex items-center space-x-2">
-                        <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="h-8 w-auto">
-                        <span class="text-main-color font-bold text-xl">LaoTypo</span>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="registration.html" class="nav-link active">🔐 ເຂົ້າສູ່ລະບົບ</a>
-                    <a href="testing.html" class="nav-link">🏠 ໜ້າຫຼັກ</a>
-                    <a href="#" class="nav-link" onclick="showNetworkStatus()">📡 ສະຖານະ</a>
-                </div>
-            </nav>
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
         </div>
-    </header>
+    </nav>
 
     <!-- Main Registration Container -->
     <main class="main-container">
@@ -432,13 +454,10 @@
                 <!-- Logo and Mascot Section -->
                 <div class="logo-section">
                     <div class="logo-container">
-                        <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="logo-img">
                         <img src="Gecko.png" alt="Gecko Mascot" class="gecko-mascot">
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">
-                        ຍິນດີຕ້ອນຮັບສູ່<br>LaoTypo!
-                    </h1>
-                    <p class="text-lg text-sub-color">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ</p>
+                    <h2>ສະຖິຕິຂອງທ່ານຍັງບໍ່ໄດ້ຮັບ<br>ການບັນທຶກເຂົ້າໃນລະບົບ</h2>
+                    <p class="text-lg text-sub-color">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ<br>ເພື່ອເກັບບັນທຶກສະຖິຕິການຫຼິ້ນຂອງທ່ານ</p>
                 </div>
 
                 <!-- Error/Success Messages -->
