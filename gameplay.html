@@ -175,12 +175,12 @@
         
         /* Redesigned Life Bar with Better Visual Design */
         .life-bar-container {
-            background: linear-gradient(135deg, #1e1e20 0%, #2a2a2d 100%);
-            border: 2px solid var(--main-color);
+            background: linear-gradient(135deg, var(--main-color) 0%, rgba(248, 175, 60, 0.7) 50%, var(--main-color) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 1rem;
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -192,8 +192,12 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--main-color), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
             animation: shimmer 3s infinite;
+        }
+        
+        .life-bar-container h2 {
+            margin: 0;
         }
         
         @keyframes shimmer {
@@ -210,10 +214,10 @@
         }
         
         .life-label {
-            color: var(--main-color);
+            color: var(--bg-color);
             font-weight: bold;
             font-size: 1.1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
         }
         
         .hearts-container {
@@ -290,25 +294,28 @@
         
         .motivation-text {
             text-align: center;
-            color: var(--text-color);
-            font-weight: 500;
+            color: var(--bg-color);
+            font-weight: 600;
             font-style: italic;
             font-size: 0.9rem;
-            opacity: 0.8;
+            opacity: 0.9;
             transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
         }
         
         .motivation-text.warning {
-            color: var(--warning-color);
+            color: #1f2937;
             opacity: 1;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
         }
         
         .motivation-text.critical {
-            color: var(--error-color);
+            color: #7f1d1d;
             opacity: 1;
-            font-weight: 700;
+            font-weight: 800;
             animation: pulse 1s infinite;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
         }
         
         @keyframes pulse {
@@ -384,6 +391,9 @@
                 
                 <!-- Redesigned Life Bar with Enhanced Visual Design -->
                 <div class="life-bar-container">
+                    <div class="text-center mb-2">
+                        <h2 class="text-xl font-bold" style="color: var(--bg-color); text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
+                    </div>
                     <div class="life-hearts-row">
                         <span class="life-label">ຊີວິດ:</span>
                         <div class="hearts-container" id="hearts-container">
@@ -395,17 +405,13 @@
                     <div class="motivation-text" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
                 </div>
                 
-                <!-- Player Name Header -->
-                <div class="text-center mb-4">
-                    <h2 class="text-3xl font-bold text-main-color">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
-                    <div class="text-sm text-sub-color mt-1">
-                        <span id="game-settings-display">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
-                    </div>
+                <div class="flex justify-between items-center mb-6 text-xl">
+                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span> / <span id="level-progress" class="text-text-color">30</span></div>
+                    <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
                 </div>
                 
-                <div class="flex justify-between items-center mb-6 text-xl">
-                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
-                    <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+                <div class="text-center mb-4">
+                    <span id="game-settings-display" class="text-sm text-sub-color">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
                 </div>
                 <div id="timer-container" class="h-2 mb-6">
                     <div id="timer-bar" class="timer-bar"></div>
@@ -541,7 +547,7 @@
             // Update UI with settings
             gamePlayerNameEl.textContent = playerName;
             const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
-            gameSettingsDisplay.textContent = `ລະດັບຄຳສັບ: ${levelNames[0]} | ຈຳກັດເວລາ: ${timerText}`;
+            gameSettingsDisplay.textContent = `ລະດັບ ${levelNames[0]} | ຈຳກັດເວລາ: ${timerText}`;
             updateDifficultyDisplay();
         }
 
@@ -727,10 +733,22 @@
 
         // Update level display
         function updateLevelDisplay() {
-            const progress = `${levelProgress}/${levelThresholds[currentLevel]}`;
-            const livesInfo = `${playerLives}/3 ຊີວິດ`;
-            motivationText.textContent = `ລະດັບ ${levelNames[currentLevel]}: ${progress} ຄຳ | ${livesInfo}`;
-            updateMotivationTextColor();
+            // Update the progress display in the score section
+            const progressEl = document.getElementById('level-progress');
+            if (progressEl) {
+                progressEl.textContent = levelThresholds[currentLevel];
+            }
+            
+            // Update difficulty display
+            const difficultyText = `ລະດັບ ${levelNames[currentLevel]}`;
+            const settingsDisplay = document.getElementById('game-settings-display');
+            if (settingsDisplay) {
+                const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
+                settingsDisplay.textContent = `${difficultyText} | ຈຳກັດເວລາ: ${timerText}`;
+            }
+            
+            // Motivation text no longer shows score/lives
+            updateMotivationalText();
         }
 
         // Update life display with new motivational text
