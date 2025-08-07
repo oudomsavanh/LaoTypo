@@ -44,70 +44,25 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 0;
-            margin: 0;
+            padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        
-        /* Mobile-first design container */
-        .mobile-container {
-            width: 100%;
-            max-width: 400px;
-            min-height: 100vh;
-            background-color: var(--bg-color);
-            position: relative;
-            display: flex;
-            flex-direction: column;
+        nav {
+            background-color: #222426;
         }
-        
-        /* Header with home icon label */
-        .header {
-            padding: 1rem;
-            text-align: center;
-            position: relative;
-        }
-        
-        .home-icon-label {
-            color: var(--main-color);
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-        
-        .nav-icons {
-            display: flex;
-            gap: 0.5rem;
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        
-        .nav-icon {
-            width: 24px;
-            height: 24px;
+        .nav-link {
             color: var(--sub-color);
-            cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s ease-in-out;
         }
-        
-        .nav-icon:hover {
+        .nav-link:hover {
             color: var(--text-color);
         }
         .game-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
             text-align: center;
-            overflow-y: auto;
         }
         .screen {
             display: none;
@@ -828,25 +783,29 @@
     <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> 
     <script type="module" src="test-firebase-player-sync.js"></script>
     
-    <div class="mobile-container">
-        <!-- Header -->
-        <div class="header">
-            <div class="home-icon-label">home icon</div>
-            <div class="logo-container">
-                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-10 w-auto object-contain">
-                <div class="nav-icons">
-                    <button id="leaderboard-nav-btn" class="nav-icon" title="ກະດານຄະແນນ">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75a1.5 1.5 0 01-1.5 1.5H9a1.5 1.5 0 01-1.5-1.5V18a1.5 1.5 0 011.5-1.5h6a1.5 1.5 0 011.5 1.5v.75zM16.5 18.75V18a1.5 1.5 0 011.5-1.5h1.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75H18a1.5 1.5 0 01-1.5-1.5V6.75a3 3 0 00-3-3h-3a3 3 0 00-3 3v3.75A1.5 1.5 0 016 12H4.5a.75.75 0 00-.75.75v3a.75.75 0 00.75.75H6a1.5 1.5 0 011.5 1.5v.75M12 9.75v1.5m0 3V18" /></svg>
-                    </button>
-                    <button id="open-settings-btn" class="nav-icon" title="⚙️ ຕັ້ງຄ່າ">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    </button>
-                    <button id="account-nav-btn" class="nav-icon" title="ບັນຊີ/ສະຖິຕິ">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    </button>
-                </div>
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75a1.5 1.5 0 01-1.5 1.5H9a1.5 1.5 0 01-1.5-1.5V18a1.5 1.5 0 011.5-1.5h6a1.5 1.5 0 011.5 1.5v.75zM16.5 18.75V18a1.5 1.5 0 011.5-1.5h1.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75H18a1.5 1.5 0 01-1.5-1.5V6.75a3 3 0 00-3-3h-3a3 3 0 00-3 3v3.75A1.5 1.5 0 016 12H4.5a.75.75 0 00-.75.75v3a.75.75 0 00.75.75H6a1.5 1.5 0 011.5 1.5v.75M12 9.75v1.5m0 3V18" /></svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
             </div>
         </div>
+    </nav>
 
     <div class="game-container">
         <!-- Start Screen -->
@@ -972,7 +931,6 @@
             </div>
         </div>
     </div>
-    </div> <!-- End mobile-container -->
 
     <!-- Leaderboard Panel (Separated from Settings) -->
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
@@ -1854,6 +1812,8 @@
         }
         
         // --- EVENT LISTENERS ---
+        document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
+        document.getElementById('home-nav-btn').addEventListener('click', () => switchScreen('start'));
         document.getElementById('start-game-btn').addEventListener('click', startGame);
         document.getElementById('restart-game-btn').addEventListener('click', startGame);
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
