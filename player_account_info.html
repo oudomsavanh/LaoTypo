@@ -536,40 +536,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Account Management -->
-            <div class="stat-card">
-                <h3 class="text-2xl font-bold text-main-color mb-6 flex items-center gap-2">
-                    <span>⚙️</span>
-                    <span>ການຈັດການບັນຊີ</span>
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <button id="export-data-btn" class="btn btn-secondary">
-                        <span class="flex items-center justify-center gap-2">
-                            <span>📤</span>
-                            <span>ນຳອອກຂໍ້ມູນ</span>
-                        </span>
-                    </button>
-                    <button id="import-data-btn" class="btn btn-secondary">
-                        <span class="flex items-center justify-center gap-2">
-                            <span>📥</span>
-                            <span>ນຳເຂົ້າຂໍ້ມູນ</span>
-                        </span>
-                    </button>
-                    <button id="reset-progress-btn" class="btn btn-danger">
-                        <span class="flex items-center justify-center gap-2">
-                            <span>🗑️</span>
-                            <span>ລຶບຂໍ້ມູນທັງໝົດ</span>
-                        </span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="text-center text-sub-color text-sm pt-8 pb-4">
-                <p>Version: 2.1.0 - Enhanced</p>
-                <p>LaoTypo - Player Account Information</p>
-            </div>
         </div>
     </div>
 
@@ -609,6 +575,10 @@
             </div>
             <div class="text-center py-8">
                 <p style="color: var(--sub-color)">ທ່ານຢູ່ໃນໜ້າບັນຊີແລ້ວ</p>
+            </div>
+            <div class="text-center text-sub-color text-sm mt-6 pt-4 border-t border-sub-color border-opacity-20">
+                <p>Version: 2.1.0 - Enhanced</p>
+                <p>LaoTypo - Player Account Information</p>
             </div>
         </div>
     </div>
@@ -800,80 +770,6 @@
                 displayName = newName.trim();
                 localStorage.setItem('displayName', displayName);
                 updateFullProfile();
-            }
-        });
-
-        document.getElementById('export-data-btn').addEventListener('click', () => {
-            const data = {
-                displayName,
-                stats,
-                joinDate: localStorage.getItem('joinDate'),
-                settings: JSON.parse(localStorage.getItem('gameSettings') || '{}')
-            };
-            const dataStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `laotypo-data-${displayName || 'player'}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('import-data-btn').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (data.displayName) displayName = data.displayName;
-                            if (data.stats) stats = data.stats;
-                            if (data.joinDate) localStorage.setItem('joinDate', data.joinDate);
-                            if (data.settings) localStorage.setItem('gameSettings', JSON.stringify(data.settings));
-                            
-                            localStorage.setItem('displayName', displayName);
-                            localStorage.setItem('gameStats', JSON.stringify(stats));
-                            
-                            updateFullProfile();
-                            alert('ນຳເຂົ້າຂໍ້ມູນສຳເລັດ!');
-                        } catch (err) {
-                            alert('ມີຂໍ້ຜິດພາດໃນການນຳເຂົ້າຂໍ້ມູນ!');
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            };
-            input.click();
-        });
-
-        document.getElementById('reset-progress-btn').addEventListener('click', () => {
-            if (confirm('ເຈົ້າແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດຍົກເລີກໄດ້!')) {
-                stats = {
-                    bestStreak: 0,
-                    totalGames: 0,
-                    totalCorrect: 0,
-                    totalMistakes: 0,
-                    difficulties: {
-                        easy: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
-                        medium: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 },
-                        hard: { bestStreak: 0, totalCorrect: 0, totalMistakes: 0 }
-                    }
-                };
-                localStorage.removeItem('gameStats');
-                localStorage.removeItem('joinDate');
-                
-                document.querySelectorAll('.achievement-badge').forEach(badge => {
-                    badge.classList.remove('unlocked');
-                    badge.classList.add('locked');
-                });
-                
-                updateFullProfile();
-                alert('ຂໍ້ມູນທັງໝົດຖືກລຶບແລ້ວ!');
             }
         });
     </script>
