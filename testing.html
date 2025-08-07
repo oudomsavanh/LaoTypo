@@ -783,6 +783,31 @@
             color: var(--main-color);
             font-weight: bold;
         }
+        
+        /* Version Info Styling */
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--sub-color), transparent);
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+        
+        .version-details {
+            text-align: center;
+            color: var(--sub-color);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .version-details p {
+            margin: 0.25rem 0;
+        }
     </style>
 </head>
 <body>
@@ -866,13 +891,7 @@
                 <button id="start-game-btn" class="start-button" disabled>ເລີ່ມເກມ</button>
             </div>
             
-            <!-- Footer -->
-            <div class="text-center text-xs text-sub-color mt-4">
-                <p id="user-type-display">👤 Guest Mode</p>
-                <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
-                <p>Fixed Mode</p>
-                <p>Version: 2.1.0 - Phase 1: 4-Page System Implemented</p>
-            </div>
+
         </div>
 
         <!-- Game Screen -->
@@ -1089,6 +1108,15 @@
             <div class="flex flex-col gap-2 mt-4">
                 <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
                 <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
+            </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details">
+                    <p>📦 Version 2.1.0</p>
+                    <p>Status: Testing</p>
+                </div>
             </div>
         </div>
     </div>
