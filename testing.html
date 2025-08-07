@@ -50,14 +50,9 @@
         }
         nav {
             background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
         }
-        .nav-link {
-            color: var(--sub-color);
-            transition: color 0.2s ease-in-out;
-        }
-        .nav-link:hover {
-            color: var(--text-color);
-        }
+
         .game-container {
             width: 100%;
             max-width: 900px;
@@ -76,17 +71,29 @@
             padding: 2rem 1.5rem;
             font-size: 2.25rem;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             border: 2px solid transparent;
             user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 150px;
+            transform-origin: center;
         }
         .word-card:hover, .word-card.focused {
             background-color: #4a4c4f;
             border-color: var(--main-color);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(248, 175, 60, 0.3);
+        }
+        .word-card:active {
+            transform: scale(0.98);
+        }
+        .word-card.animate-slide-in-left {
+            animation: slide-in-left 0.5s ease-out;
+        }
+        .word-card.animate-slide-in-right {
+            animation: slide-in-right 0.5s ease-out;
         }
         .btn {
             background-color: var(--sub-color);
@@ -114,15 +121,22 @@
             color: var(--sub-color);
             padding: 0.5rem;
             border-radius: 9999px; /* circle */
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
         }
         .btn-icon:hover {
             color: var(--text-color);
             background-color: #3e4043;
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+        }
+        .btn-icon:active {
+            transform: scale(0.95);
         }
         .btn-icon svg {
             width: 1.5rem;
             height: 1.5rem;
+            transition: transform 0.3s ease;
         }
         .feedback-correct {
             animation: glow-correct 0.5s ease;
@@ -159,15 +173,20 @@
             max-width: 380px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.4s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 80vh;
             overflow-y: auto;
+            transform-origin: right center;
         }
         
         .leaderboard-panel.hidden {
             opacity: 0;
-            transform: translateX(100%);
+            transform: translateX(120%) scale(0.95);
             pointer-events: none;
+        }
+        
+        .leaderboard-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
         }
         .tab-button {
             transition: all 0.2s ease-in-out;
@@ -197,8 +216,18 @@
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             color: var(--text-color);
+            transform-origin: center;
+        }
+        
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .difficulty-btn:active {
+            transform: scale(0.95);
         }
         
         .difficulty-btn.easy {
@@ -246,6 +275,8 @@
             outline: none;
             border-color: var(--main-color);
             border-style: solid;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(248, 175, 60, 0.3);
         }
         
         .custom-input::placeholder {
@@ -262,18 +293,24 @@
             font-size: 1.25rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             margin-top: 2rem;
+            transform-origin: center;
         }
         
         .start-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(248, 175, 60, 0.4);
+        }
+        
+        .start-button:active:not(:disabled) {
+            transform: scale(0.98);
         }
         
         .start-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: scale(1);
         }
         
 
@@ -290,14 +327,19 @@
             max-width: 380px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.4s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 80vh;
             overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .settings-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
         }
         
         .settings-panel.hidden {
             opacity: 0;
-            transform: translateX(100%);
+            transform: translateX(120%) scale(0.95);
             pointer-events: none;
         }
         
@@ -398,10 +440,30 @@
             font-size: 1.8rem;
             transition: all 0.3s ease;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            display: inline-block;
         }
         
         .heart.active {
             animation: heartPulse 3s infinite;
+        }
+        
+        .heart.losing-life {
+            animation: heartBreak 0.6s ease-out forwards;
+        }
+        
+        @keyframes heartBreak {
+            0% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(-15deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0.8) rotate(0);
+                opacity: 0.3;
+            }
         }
         
         .heart.lost {
@@ -561,6 +623,7 @@
             font-weight: bold;
             color: var(--text-color);
             margin-bottom: 1rem;
+            animation: fade-in-down 1s ease-out;
         }
         
         .subtitle {
@@ -568,6 +631,7 @@
             line-height: 1.4;
             color: var(--sub-color);
             margin-bottom: 0.5rem;
+            animation: fade-in-up 1s ease-out 0.3s both;
         }
         
 
@@ -721,14 +785,19 @@
             max-width: 350px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.4s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 80vh;
             overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .account-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
         }
         
         .account-panel.hidden {
             opacity: 0;
-            transform: translateX(100%);
+            transform: translateX(120%) scale(0.95);
             pointer-events: none;
         }
         
@@ -807,6 +876,199 @@
         
         .version-details p {
             margin: 0.25rem 0;
+        }
+        
+        /* Custom animations for enhanced UI */
+        @keyframes fade-in-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slide-in-left {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slide-in-right {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes gentle-bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes scale-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Animation utility classes */
+        .animate-fade-in-down {
+            animation: fade-in-down 0.6s ease-out;
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+            animation: slide-in-left 0.5s ease-out;
+        }
+        
+        .animate-slide-in-right {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .animate-gentle-bounce {
+            animation: gentle-bounce 2s ease-in-out infinite;
+        }
+        
+        .animate-scale-in {
+            animation: scale-in 0.4s ease-out;
+        }
+        
+        /* Enhanced navigation animations */
+        .nav-link {
+            color: var(--sub-color);
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-color);
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        /* Logo animation */
+        #home-btn img {
+            transition: transform 0.5s ease;
+        }
+        
+        #home-btn:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Gecko mascot animation */
+        .gecko-mascot {
+            animation: gentle-bounce 3s ease-in-out infinite;
+        }
+        
+        /* Score animation */
+        .score-update {
+            animation: scorePopup 0.6s ease-out;
+        }
+        
+        /* Close button animation */
+        .panel-content button[id$="-btn"]:hover {
+            transition: all 0.2s ease;
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Results screen animations */
+        #results-screen.active > * {
+            animation: fade-in-up 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        #results-screen.active > *:nth-child(1) { animation-delay: 0.1s; }
+        #results-screen.active > *:nth-child(2) { animation-delay: 0.3s; }
+        #results-screen.active > *:nth-child(3) { animation-delay: 0.5s; }
+        #results-screen.active > *:nth-child(4) { animation-delay: 0.7s; }
+        
+        @keyframes scorePopup {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+                color: var(--main-color);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .timer-bar {
+            height: 5px;
+            background-color: var(--main-color);
+            width: 100%;
+            transform-origin: left;
+            transition: transform 0.1s linear;
+        }
+        
+        .timer-bar.warning {
+            animation: pulse 0.5s ease-in-out infinite;
+            background-color: var(--error-color);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--sub-color);
+            border-radius: 50%;
+            border-top-color: var(--main-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toggle switch animation */
+        .switch input:checked + .slider {
+            transition: all 0.3s ease;
+        }
+        
+        .switch input:checked + .slider:before {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -2403,6 +2665,78 @@
             if (firebaseEnabled) {
                 await syncLocalDataToFirebase();
             }
+        }
+        
+        // Animation Enhancements
+        
+        // Animate word cards when new words appear
+        function animateWordCards() {
+            const leftCard = document.getElementById('word-card-left');
+            const rightCard = document.getElementById('word-card-right');
+            
+            if (leftCard && rightCard) {
+                leftCard.classList.add('animate-slide-in-left');
+                rightCard.classList.add('animate-slide-in-right');
+                
+                setTimeout(() => {
+                    leftCard.classList.remove('animate-slide-in-left');
+                    rightCard.classList.remove('animate-slide-in-right');
+                }, 500);
+            }
+        }
+        
+        // Animate score on update
+        function animateScore() {
+            const scoreElement = document.getElementById('current-streak');
+            if (scoreElement) {
+                scoreElement.classList.add('score-update');
+                setTimeout(() => {
+                    scoreElement.classList.remove('score-update');
+                }, 600);
+            }
+        }
+        
+        // Animate heart loss
+        function animateHeartLoss(heartIndex) {
+            const hearts = document.querySelectorAll('.heart');
+            if (hearts[heartIndex]) {
+                hearts[heartIndex].classList.add('losing-life');
+                setTimeout(() => {
+                    hearts[heartIndex].classList.remove('active');
+                    hearts[heartIndex].classList.add('lost');
+                }, 600);
+            }
+        }
+        
+        // Add warning pulse to timer when < 2 seconds
+        function updateTimerWarning(remainingTime) {
+            const timerBar = document.getElementById('timer-bar');
+            if (timerBar) {
+                if (remainingTime < 2000) {
+                    timerBar.classList.add('warning');
+                } else {
+                    timerBar.classList.remove('warning');
+                }
+            }
+        }
+        
+        // Hook animations into existing game functions
+        const originalShowNewWords = window.showNewWords;
+        if (originalShowNewWords) {
+            window.showNewWords = function(...args) {
+                const result = originalShowNewWords.apply(this, args);
+                animateWordCards();
+                return result;
+            };
+        }
+        
+        const originalUpdateScore = window.updateScore;
+        if (originalUpdateScore) {
+            window.updateScore = function(...args) {
+                const result = originalUpdateScore.apply(this, args);
+                animateScore();
+                return result;
+            };
         }
         
         // ... existing code ...

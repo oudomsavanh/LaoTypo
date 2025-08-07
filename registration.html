@@ -44,33 +44,44 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         
-        /* Header Navigation */
-        .header-nav {
-            background: linear-gradient(90deg, #222426 0%, #2c2e31 100%);
+        /* Navigation */
+        nav {
+            background-color: #222426;
             border-bottom: 2px solid var(--main-color);
-            padding: 1rem 0;
         }
         
         .nav-link {
             color: var(--sub-color);
             transition: color 0.2s ease-in-out;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
         }
         
         .nav-link:hover {
             color: var(--text-color);
-            background-color: rgba(226, 183, 20, 0.1);
         }
         
-        .nav-link.active {
-            color: var(--main-color);
-            background-color: rgba(226, 183, 20, 0.2);
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 9999px; /* circle */
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+        }
+        
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
         }
         
         /* Main Container */
@@ -216,6 +227,11 @@
         .btn-secondary:hover {
             background: var(--main-color);
             color: var(--bg-color);
+        }
+        
+        .btn.text-sm {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
         }
         
         .btn-gmail {
@@ -367,13 +383,232 @@
             animation: slideIn 0.5s ease-out;
         }
         
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 1rem;
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #e2b714 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+            border: 2px solid var(--main-color);
+        }
+        
+        .account-name {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        
+        .account-rank {
+            font-size: 0.8rem;
             color: var(--sub-color);
+        }
+        
+        .quick-stats {
+            border-top: 1px solid rgba(226, 183, 20, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+        
+        .quick-stat .stat-label {
+            color: var(--sub-color);
+        }
+        
+        .quick-stat .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        /* Version Info Styling */
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--sub-color), transparent);
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+        
+        .version-details {
+            text-align: center;
+            color: var(--sub-color);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .version-details p {
+            margin: 0.25rem 0;
+        }
+        
+        /* Leaderboard Panel */
+        .leaderboard-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .panel-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-button.active {
+            color: var(--main-color) !important;
+            border-bottom-color: var(--main-color) !important;
+        }
+        
+        .tab-content {
+            min-height: 400px;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        .leaderboard-table th {
+            color: var(--sub-color);
+            font-weight: bold;
+            text-transform: uppercase;
             font-size: 0.875rem;
-            border-top: 1px solid #3e4043;
+        }
+        
+        .leaderboard-table tr:not(:first-child) {
+            border-top: 1px solid #3a3c3e;
+        }
+        
+        .leaderboard-table td.rank {
+            font-weight: bold;
+            color: var(--main-color);
+            text-align: center;
+        }
+        
+        .leaderboard-table td.score {
+            font-weight: bold;
+        }
+        
+        .leaderboard-table tr.user-best {
+            background-color: rgba(226, 183, 20, 0.1);
+            border-left: 3px solid var(--main-color);
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .settings-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .settings-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .settings-content label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
         
         /* Responsive Design */
@@ -405,25 +640,37 @@
         ⚠️ ໂໝດແຂກ: ຂໍ້ມູນຂອງເຈົ້າຈະຫາຍໄປເມື່ອປິດແທັບເວັບໄຊທ໌ - ສະໝັກເຂົ້າ Gmail ເພື່ອບັນທຶກຂໍ້ມູນຖາວອນ
     </div>
 
-    <!-- Header Navigation -->
-    <header class="header-nav">
-        <div class="container mx-auto px-4">
-            <nav class="flex items-center justify-between">
-                <div class="flex items-center space-x-6">
-                    <div class="flex items-center space-x-2">
-                        <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="h-8 w-auto">
-                        <span class="text-main-color font-bold text-xl">LaoTypo</span>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="registration.html" class="nav-link active">🔐 ເຂົ້າສູ່ລະບົບ</a>
-                    <a href="testing.html" class="nav-link">🏠 ໜ້າຫຼັກ</a>
-                    <a href="#" class="nav-link" onclick="showNetworkStatus()">📡 ສະຖານະ</a>
-                </div>
-            </nav>
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
         </div>
-    </header>
+    </nav>
 
     <!-- Main Registration Container -->
     <main class="main-container">
@@ -432,13 +679,10 @@
                 <!-- Logo and Mascot Section -->
                 <div class="logo-section">
                     <div class="logo-container">
-                        <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" class="logo-img">
                         <img src="Gecko.png" alt="Gecko Mascot" class="gecko-mascot">
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-bold text-main-color leading-tight">
-                        ຍິນດີຕ້ອນຮັບສູ່<br>LaoTypo!
-                    </h1>
-                    <p class="text-lg text-sub-color">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ</p>
+                    <h2>ສະຖິຕິຂອງທ່ານຍັງບໍ່ໄດ້ຮັບ<br>ການບັນທຶກເຂົ້າໃນລະບົບ</h2>
+                    <p class="text-lg text-sub-color">ເລືອກວິທີການເຂົ້າສູ່ລະບົບ<br>ເພື່ອເກັບບັນທຶກສະຖິຕິການຫຼິ້ນຂອງທ່ານ</p>
                 </div>
 
                 <!-- Error/Success Messages -->
@@ -520,22 +764,188 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="space-y-1">
-            <p>LaoTypo - ເກມທົດສອບພາສາລາວ</p>
-            <p id="network-status">📡 ກຳລັງກວດສອບການເຊື່ອມຕໍ່...</p>
-            <p>Version: 2.1.0 - Phase 1 Registration System</p>
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-main-color">🔐 ເຂົ້າສູ່ລະບົບ</h2>
+                <button id="close-account-btn" class="text-xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name" id="account-display-name">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-rank">ສະຖານະ: <span id="account-status">ບໍ່ໄດ້ເຂົ້າສູ່ລະບົບ</span></div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">📧 Gmail:</span>
+                        <span class="stat-value" id="account-email">-</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label">👤 Guest Mode:</span>
+                        <span class="stat-value" id="account-guest-status">ບໍ່ໄດ້ໃຊ້</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="panel-gmail-login-btn" class="btn btn-primary text-sm">📧 ເຂົ້າສູ່ລະບົບດ້ວຍ Gmail</button>
+                <button id="panel-guest-mode-btn" class="btn btn-secondary text-sm">👤 ໂໝດແຂກ</button>
+            </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details">
+                    <p>📦 Version 2.1.0</p>
+                    <p>Registration System</p>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Leaderboard Panel (Separated from Settings) -->
+    <div id="leaderboard-panel" class="leaderboard-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ</h2>
+                <button id="close-leaderboard-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <!-- Tab Navigation (Removed Settings Tab) -->
+            <div class="flex border-b border-sub-color mb-6">
+                <button id="leaderboard-tab" class="tab-button active px-4 py-2 text-main-color border-b-2 border-main-color">
+                    🏆 ກະດານຈັດອັນດັບ
+                </button>
+                <button id="personal-records-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
+                    📈 ບັນທຶກສ່ວນຕົວ
+                </button>
+            </div>
+
+            <!-- Leaderboard Tab Content -->
+            <div id="leaderboard-content" class="tab-content">
+                <div id="leaderboard-container">
+                    <!-- Firebase leaderboard will be injected here -->
+                    <div class="text-center text-sub-color py-8">
+                        <p>🔄 Loading global leaderboard...</p>
+                        <p class="text-xs mt-2">Syncing with Firebase</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Records Tab Content -->
+            <div id="personal-records-content" class="tab-content hidden">
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-correct-color font-bold mb-2">ງ່າຍ (Easy)</div>
+                        <div id="easy-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="easy-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="easy-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-main-color font-bold mb-2">ປານກາງ (Medium)</div>
+                        <div id="medium-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="medium-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="medium-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-error-color font-bold mb-2">ຍາກ (Hard)</div>
+                        <div id="hard-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="hard-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="hard-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Independent Settings Panel (Floating) -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-main-color">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-2xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="text-left space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label>🔊 ສຽງເກມປະກອບ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>🎵 ສຽງປະກອບພື້ນຫຼັງເກມ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="music-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>☁️ Firebase Sync</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="firebase-sync-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Script to verify JavaScript is working -->
+    <script>
+        console.log('🧪 Basic script test - JavaScript is working!');
+        
+        // Simple test when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 DOMContentLoaded fired in basic script');
+            
+            // Test if we can find the guest button
+            const testGuestBtn = document.getElementById('guest-mode-btn');
+            console.log('🧪 Guest button found in basic script:', testGuestBtn);
+            
+            if (testGuestBtn) {
+                testGuestBtn.addEventListener('click', function() {
+                    console.log('🧪 Guest button clicked (basic script handler)!');
+                    alert('Guest button clicked! Redirecting to testing.html...');
+                    window.location.href = 'testing.html';
+                });
+            }
+        });
+    </script>
 
     <script type="module">
-        // Import Firebase modules
-        import { 
-            initializeFirebase, 
-            FirebaseAuthManager, 
-            FirebasePlayerManager 
-        } from './firebase-config.js';
+        console.log('🚀 Script starting to load...');
+        
+        // Wrap everything in an async function
+        (async function() {
+            // Import Firebase modules with error handling
+            let initializeFirebase, FirebaseAuthManager, FirebasePlayerManager;
+            
+            try {
+                const firebaseModule = await import('./firebase-config.js');
+                initializeFirebase = firebaseModule.initializeFirebase;
+                FirebaseAuthManager = firebaseModule.FirebaseAuthManager;
+                FirebasePlayerManager = firebaseModule.FirebasePlayerManager;
+                console.log('✅ Firebase modules imported successfully');
+            } catch (error) {
+                console.error('❌ Error importing Firebase modules:', error);
+                console.log('⚠️ Continuing without Firebase...');
+            }
 
         // --- GLOBAL STATE ---
         let authManager = null;
@@ -544,17 +954,17 @@
         let isGuest = false;
 
         // --- DOM ELEMENTS ---
-        const gmailLoginBtn = document.getElementById('gmail-login-btn');
-        const guestModeBtn = document.getElementById('guest-mode-btn');
-        const registrationOptions = document.getElementById('registration-options');
-        const profileSetup = document.getElementById('profile-setup');
-        const profileForm = document.getElementById('profile-form');
-        const completeBtn = document.getElementById('complete-registration-btn');
-        const backToOptionsBtn = document.getElementById('back-to-options-btn');
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
-        const guestWarningBanner = document.getElementById('guest-warning-banner');
-        const networkStatus = document.getElementById('network-status');
+        let gmailLoginBtn;
+        let guestModeBtn;
+        let registrationOptions;
+        let profileSetup;
+        let profileForm;
+        let completeBtn;
+        let backToOptionsBtn;
+        let errorMessage;
+        let successMessage;
+        let guestWarningBanner;
+        let networkStatus;
 
         // --- UTILITY FUNCTIONS ---
         function showError(message) {
@@ -623,9 +1033,34 @@
             alert(networkStatus.textContent);
         };
 
+        // --- DOM INITIALIZATION ---
+        function initializeDOMElements() {
+            gmailLoginBtn = document.getElementById('gmail-login-btn');
+            guestModeBtn = document.getElementById('guest-mode-btn');
+            registrationOptions = document.getElementById('registration-options');
+            profileSetup = document.getElementById('profile-setup');
+            profileForm = document.getElementById('profile-form');
+            completeBtn = document.getElementById('complete-registration-btn');
+            backToOptionsBtn = document.getElementById('back-to-options-btn');
+            errorMessage = document.getElementById('error-message');
+            successMessage = document.getElementById('success-message');
+            guestWarningBanner = document.getElementById('guest-warning-banner');
+            networkStatus = document.getElementById('network-status');
+        }
+
         // --- FIREBASE INITIALIZATION ---
         async function initializeApp() {
             try {
+                console.log('🔧 Initializing app...');
+                
+                // Initialize DOM elements first
+                initializeDOMElements();
+                console.log('✅ DOM elements initialized');
+                
+                // Setup event listeners after DOM elements are initialized
+                setupEventListeners();
+                console.log('✅ Event listeners set up');
+                
                 updateNetworkStatus();
                 
                 if (navigator.onLine) {
@@ -712,6 +1147,7 @@
         function handleGuestMode() {
             try {
                 console.log('👤 Starting guest mode...');
+                console.log('Guest button clicked!');
                 isGuest = true;
                 
                 // Option 1: Direct redirect to testing.html without profile setup
@@ -815,26 +1251,210 @@
             console.log('🏠 Redirecting to homepage...');
             window.location.href = 'testing.html';
         }
-
-        // --- EVENT LISTENERS ---
-        gmailLoginBtn.addEventListener('click', handleGmailLogin);
-        guestModeBtn.addEventListener('click', handleGuestMode);
-        backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
         
-        // Debug: Ensure guest button is found
-        console.log('Guest button found:', guestModeBtn);
-        if (!guestModeBtn) {
-            console.error('Guest mode button not found!');
+        // --- PANEL FUNCTIONS ---
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-main-color', 'border-main-color');
+                btn.classList.add('text-sub-color');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const activeTab = document.getElementById(`${tabName}-tab`);
+            const activeContent = document.getElementById(`${tabName}-content`);
+            
+            if (activeTab && activeContent) {
+                activeTab.classList.add('active', 'text-main-color', 'border-main-color');
+                activeTab.classList.remove('text-sub-color');
+                activeContent.classList.remove('hidden');
+                
+                // Load content based on tab
+                if (tabName === 'leaderboard') {
+                    renderLeaderboard();
+                } else if (tabName === 'personal-records') {
+                    // For registration page, just show placeholder
+                    console.log('Personal records tab selected');
+                }
+            }
         }
         
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            completeRegistration();
-        });
+        async function renderLeaderboard() {
+            const leaderboardContainer = document.getElementById('leaderboard-container');
+            leaderboardContainer.innerHTML = '<p class="text-center">ກຳລັງໂຫຼດ...</p>';
 
-        // Real-time validation
-        document.getElementById('profile-name').addEventListener('input', validateProfileForm);
-        document.getElementById('profile-age').addEventListener('input', validateProfileForm);
+            try {
+                // For registration page, show a simple message
+                leaderboardContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-sub-color mb-4">ກະດານຈັດອັນດັບຈະສະແດງຫຼັງຈາກເຂົ້າສູ່ລະບົບ</p>
+                        <p class="text-sm text-sub-color">ກະລຸນາເຂົ້າສູ່ລະບົບດ້ວຍ Gmail ຫຼື ໂໝດແຂກເພື່ອເບິ່ງກະດານຄະແນນ</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error("Error rendering leaderboard:", error);
+                leaderboardContainer.innerHTML = '<p class="text-center text-error-color">ບໍ່ສາມາດໂຫຼດກະດານຈັດອັນດັບໄດ້.</p>';
+            }
+        }
+
+        // --- EVENT LISTENERS SETUP ---
+        function setupEventListeners() {
+            // Main buttons
+            if (gmailLoginBtn) {
+                gmailLoginBtn.addEventListener('click', handleGmailLogin);
+            }
+            if (guestModeBtn) {
+                guestModeBtn.addEventListener('click', handleGuestMode);
+            }
+            if (backToOptionsBtn) {
+                backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+            }
+            
+            // Account panel event listeners
+            const accountNavBtn = document.getElementById('account-nav-btn');
+            if (accountNavBtn) {
+                accountNavBtn.addEventListener('click', () => {
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.toggle('hidden');
+                });
+            }
+            
+            const closeAccountBtn = document.getElementById('close-account-btn');
+            if (closeAccountBtn) {
+                closeAccountBtn.addEventListener('click', () => {
+                    document.getElementById('account-panel').classList.add('hidden');
+                });
+            }
+            
+            const panelGmailBtn = document.getElementById('panel-gmail-login-btn');
+            if (panelGmailBtn) {
+                panelGmailBtn.addEventListener('click', handleGmailLogin);
+            }
+            
+            const panelGuestBtn = document.getElementById('panel-guest-mode-btn');
+            if (panelGuestBtn) {
+                panelGuestBtn.addEventListener('click', handleGuestMode);
+            }
+            
+            // Home button navigation
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'registration.html';
+                });
+            }
+            
+            const homeNavBtn = document.getElementById('home-nav-btn');
+            if (homeNavBtn) {
+                homeNavBtn.addEventListener('click', () => {
+                    window.location.href = 'registration.html';
+                });
+            }
+            
+            // Panels
+            const leaderboardPanel = document.getElementById('leaderboard-panel');
+            const settingsPanel = document.getElementById('settings-panel');
+            const accountPanel = document.getElementById('account-panel');
+            
+            // Toggle functionality for all panels
+            const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+            if (leaderboardNavBtn) {
+                leaderboardNavBtn.addEventListener('click', () => {
+                    console.log('🏆 Toggling leaderboard panel');
+                    const isHidden = leaderboardPanel.classList.contains('hidden');
+                    
+                    // Close other panels
+                    settingsPanel.classList.add('hidden');
+                    accountPanel.classList.add('hidden');
+                    
+                    // Toggle leaderboard
+                    if (isHidden) {
+                        leaderboardPanel.classList.remove('hidden');
+                        switchTab('leaderboard');
+                    } else {
+                        leaderboardPanel.classList.add('hidden');
+                    }
+                });
+            }
+            
+            const openSettingsBtn = document.getElementById('open-settings-btn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', () => {
+                    console.log('⚙️ Toggling settings panel');
+                    const isHidden = settingsPanel.classList.contains('hidden');
+                    
+                    // Close other panels
+                    leaderboardPanel.classList.add('hidden');
+                    accountPanel.classList.add('hidden');
+                    
+                    // Toggle settings
+                    settingsPanel.classList.toggle('hidden');
+                });
+            }
+            
+            // Close buttons
+            const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+            if (closeLeaderboardBtn) {
+                closeLeaderboardBtn.addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
+            }
+            
+            const closeSettingsBtn = document.getElementById('close-settings-btn');
+            if (closeSettingsBtn) {
+                closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.add('hidden'));
+            }
+            
+            // Tab Navigation
+            const leaderboardTab = document.getElementById('leaderboard-tab');
+            if (leaderboardTab) {
+                leaderboardTab.addEventListener('click', () => switchTab('leaderboard'));
+            }
+            
+            const personalRecordsTab = document.getElementById('personal-records-tab');
+            if (personalRecordsTab) {
+                personalRecordsTab.addEventListener('click', () => switchTab('personal-records'));
+            }
+            
+            const saveSettingsBtn = document.getElementById('save-settings-btn');
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', () => {
+                    console.log('💾 Saving settings and closing panel');
+                    // For registration page, we'll just close the panel
+                    // Settings will be properly handled in the game pages
+                    settingsPanel.classList.add('hidden');
+                });
+            }
+            
+            // Debug: Ensure guest button is found
+            console.log('Guest button found:', guestModeBtn);
+            if (!guestModeBtn) {
+                console.error('Guest mode button not found!');
+            }
+            
+            // Profile form
+            if (profileForm) {
+                profileForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    completeRegistration();
+                });
+            }
+
+            // Real-time validation
+            const profileNameInput = document.getElementById('profile-name');
+            if (profileNameInput) {
+                profileNameInput.addEventListener('input', validateProfileForm);
+            }
+            
+            const profileAgeInput = document.getElementById('profile-age');
+            if (profileAgeInput) {
+                profileAgeInput.addEventListener('input', validateProfileForm);
+            }
+        }
 
         // Network status listeners
         window.addEventListener('online', updateNetworkStatus);
@@ -844,6 +1464,8 @@
         document.addEventListener('DOMContentLoaded', initializeApp);
 
         console.log('🚀 Registration page loaded - Phase 1 System');
+        
+        })(); // End of async wrapper
     </script>
 </body>
 </html>

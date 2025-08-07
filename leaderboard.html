@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ກະດານກຽດຕິຍົດ - LaoTypo</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#f8af3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LaoTypo">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #f8af3c;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Noto Sans Lao Looped', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1e2023 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        nav {
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
+        }
+        
+        .nav-link {
+            color: var(--sub-color);
+            transition: color 0.2s ease-in-out;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-color);
+        }
+        
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 9999px;
+            transition: all 0.2s ease-in-out;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+        }
+        
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        /* Main content styling */
+        .main-content {
+            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Info box styling */
+        .info-box {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 3px solid var(--main-color);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .info-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(248, 175, 60, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.1; }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Gecko styling */
+        .gecko-container {
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .gecko-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--main-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Speech bubble */
+        .speech-bubble {
+            position: absolute;
+            top: -20px;
+            right: -80px;
+            background: #fbbf24;
+            color: #1a1a1a;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #fbbf24;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        /* Title styling */
+        .title-gradient {
+            background: linear-gradient(135deg, var(--main-color) 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Panel styles (copied from testing.html) */
+        .account-panel, .settings-panel, .leaderboard-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .account-panel.hidden, .settings-panel.hidden, .leaderboard-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .panel-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .btn {
+            background-color: var(--sub-color);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--main-color) 0%, #b8940f 100%);
+            color: var(--bg-color);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #b8940f 0%, var(--main-color) 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (from testing.html) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content px-4">
+        <!-- Info Box -->
+        <div class="info-box relative z-10 max-w-lg mx-auto mb-12">
+            <h1 class="text-3xl font-bold mb-6 text-center title-gradient">
+                🏆 ກະດານກຽດຕິຍົດ
+            </h1>
+            <div class="w-24 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent mx-auto mb-6"></div>
+            <p class="text-center text-lg leading-relaxed">
+                ຊື່ ແລະ ຄະແນນຈາກການຫຼິ້ນ<br>
+                ເກມຂອງທ່ານໃນແຕ່ລະຄັ້ງ<br>
+                <span class="text-red-400 font-semibold inline-block mt-2">
+                    ຈະຖືກເອກອ້າງຢູ່ທີ່ກະດານກຽດຕິຍົດແຫ່ງນີ້
+                </span>
+            </p>
+        </div>
+
+        <!-- Gecko Mascot with Speech Bubble -->
+        <div class="gecko-container">
+            <img src="Gecko.png" alt="Gecko Mascot" class="gecko-img">
+            <div class="speech-bubble">
+                ພົບກັນໄວໆນີ້
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mt-12 text-center">
+            <a href="testing.html" class="btn btn-primary text-lg px-8 py-3">
+                🎮 ເລີ່ມເກມ
+            </a>
+        </div>
+    </div>
+
+    <!-- Account Panel -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" style="color: var(--main-color)">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl" style="color: var(--sub-color)">&times;</button>
+            </div>
+            <div class="text-center py-8">
+                <p style="color: var(--sub-color)">ກະລຸນາເຂົ້າສູ່ລະບົບເພື່ອເບິ່ງຂໍ້ມູນບັນຊີ</p>
+                <a href="registration.html" class="btn btn-primary mt-4">🔐 ເຂົ້າສູ່ລະບົບ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" style="color: var(--main-color)">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-xl" style="color: var(--sub-color)">&times;</button>
+            </div>
+            <div class="text-center py-8">
+                <p style="color: var(--sub-color)">ຕັ້ງຄ່າຈະມີໃຊ້ໃນເກມ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Panel -->
+    <div id="leaderboard-panel" class="leaderboard-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold" style="color: var(--main-color)">📊 ກະດານຄະແນນ</h2>
+                <button id="close-leaderboard-btn" class="text-xl" style="color: var(--sub-color)">&times;</button>
+            </div>
+            <div class="text-center py-8">
+                <p style="color: var(--sub-color)">ກະດານຄະແນນຈະສະແດງເມື່ອມີຜູ້ຫຼິ້ນ</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        document.getElementById('home-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'testing.html';
+        });
+
+        document.getElementById('home-nav-btn').addEventListener('click', () => {
+            window.location.href = 'testing.html';
+        });
+
+        // Panel controls
+        const accountPanel = document.getElementById('account-panel');
+        const settingsPanel = document.getElementById('settings-panel');
+        const leaderboardPanel = document.getElementById('leaderboard-panel');
+
+        // Toggle panels
+        document.getElementById('account-nav-btn').addEventListener('click', () => {
+            accountPanel.classList.toggle('hidden');
+            settingsPanel.classList.add('hidden');
+            leaderboardPanel.classList.add('hidden');
+        });
+
+        document.getElementById('open-settings-btn').addEventListener('click', () => {
+            settingsPanel.classList.toggle('hidden');
+            accountPanel.classList.add('hidden');
+            leaderboardPanel.classList.add('hidden');
+        });
+
+        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+            leaderboardPanel.classList.toggle('hidden');
+            accountPanel.classList.add('hidden');
+            settingsPanel.classList.add('hidden');
+        });
+
+        // Close buttons
+        document.getElementById('close-account-btn').addEventListener('click', () => {
+            accountPanel.classList.add('hidden');
+        });
+
+        document.getElementById('close-settings-btn').addEventListener('click', () => {
+            settingsPanel.classList.add('hidden');
+        });
+
+        document.getElementById('close-leaderboard-btn').addEventListener('click', () => {
+            leaderboardPanel.classList.add('hidden');
+        });
+
+        // Close panels on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                accountPanel.classList.add('hidden');
+                settingsPanel.classList.add('hidden');
+                leaderboardPanel.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
