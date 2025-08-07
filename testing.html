@@ -181,39 +181,99 @@
             min-height: 400px;
         }
         
-        /* Difficulty Card Styles */
-        .difficulty-card {
-            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
-            border: 2px solid transparent;
-            border-radius: 1rem;
-            padding: 1rem;
-            min-width: 80px;
-            text-align: center;
+        /* Difficulty Button Styles - Matching the design */
+        .difficulty-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        
+        .difficulty-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            border: 2px solid;
+            background: transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            color: var(--text-color);
         }
         
-        .difficulty-card:hover {
-            border-color: var(--main-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        .difficulty-btn.easy {
+            border-color: #4ade80;
         }
         
-        .difficulty-card.active {
-            border-color: var(--main-color);
-            background: linear-gradient(135deg, var(--main-color) 0%, #f8af3c 100%);
+        .difficulty-btn.easy.active {
+            background-color: #4ade80;
             color: var(--bg-color);
         }
         
-        .difficulty-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
+        .difficulty-btn.medium {
+            border-color: #fbbf24;
         }
         
-        .difficulty-label {
+        .difficulty-btn.medium.active {
+            background-color: #fbbf24;
+            color: var(--bg-color);
+        }
+        
+        .difficulty-btn.hard {
+            border-color: #ef4444;
+        }
+        
+        .difficulty-btn.hard.active {
+            background-color: #ef4444;
+            color: var(--bg-color);
+        }
+        
+        /* Custom input field with dotted border */
+        .custom-input {
+            width: 100%;
+            background-color: transparent;
+            border: 2px dashed var(--sub-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 1.125rem;
+            text-align: center;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            margin: 1.5rem 0;
+        }
+        
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--main-color);
+            border-style: solid;
+        }
+        
+        .custom-input::placeholder {
+            color: var(--sub-color);
+        }
+        
+        /* Start button matching design */
+        .start-button {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 1rem 3rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 2rem;
+        }
+        
+        .start-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.3);
+        }
+        
+        .start-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
 
@@ -251,7 +311,7 @@
             font-weight: 500;
         }
         
-        /* Toggle Switch Styles */
+        /* Toggle Switch Styles - Previous design */
         .switch {
             position: relative;
             display: inline-block;
@@ -295,6 +355,20 @@
         
         input:checked + .slider:before {
             transform: translateX(26px);
+        }
+        
+        /* Timer toggle container */
+        .timer-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        
+        .timer-label {
+            color: var(--text-color);
+            font-size: 0.875rem;
         }
         
         /* ADDED: Life Bar System Styles */
@@ -445,19 +519,28 @@
         .input-error {
             border-color: var(--error-color) !important;
         }
-        .loading-indicator {
+                .loading-indicator {
             color: var(--main-color);
             font-size: 1.2rem;
             margin: 1rem 0;
         }
         
-        /* Gecko Mascot - v1.8.0: Moved from top-left to bottom-left */
+        /* Gecko Mascot - Restored with click functionality */
         .gecko-mascot {
             position: fixed;
-            bottom: 1rem; /* Changed from top to bottom positioning */
+            bottom: 1rem;
             left: 1rem;
-            z-index: 40; /* Below navigation but above content */
-            pointer-events: none; /* Don't interfere with clicks */
+            z-index: 40;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .gecko-mascot:hover {
+            transform: scale(1.1);
+        }
+        
+        .gecko-mascot:active {
+            transform: scale(0.95);
         }
         
         .gecko-mascot img {
@@ -471,28 +554,23 @@
             opacity: 1;
         }
         
-        /* v1.8.0: Custom responsive typography for main title and subtitle */
-        .main-title-custom {
-            font-size: 1.8rem; /* Mobile: 1.8rem */
-            line-height: 1.2;
+        /* Custom typography for main title and subtitle */
+        .main-title {
+            font-size: 1.5rem;
+            line-height: 1.3;
             font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 1rem;
         }
         
-        .subtitle-custom {
-            font-size: 1rem; /* Mobile: 1rem */
+        .subtitle {
+            font-size: 0.875rem;
             line-height: 1.4;
+            color: var(--sub-color);
+            margin-bottom: 0.5rem;
         }
         
-        /* Desktop responsive sizes */
-        @media (min-width: 768px) {
-            .main-title-custom {
-                font-size: 2.4rem; /* Desktop: 2.4rem (calculated best fit) */
-            }
-            
-            .subtitle-custom {
-                font-size: 1.2rem; /* Desktop: 1.2rem (calculated best fit) */
-            }
-        }
+
         
         /* Enhanced Account Screen Styles */
         .profile-avatar {
@@ -705,6 +783,31 @@
             color: var(--main-color);
             font-weight: bold;
         }
+        
+        /* Version Info Styling */
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--sub-color), transparent);
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+        
+        .version-details {
+            text-align: center;
+            color: var(--sub-color);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .version-details p {
+            margin: 0.25rem 0;
+        }
     </style>
 </head>
 <body>
@@ -712,14 +815,28 @@
     <script type="module" src="firebase-config.js"></script>
     <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> 
     <script type="module" src="test-firebase-player-sync.js"></script>
+    
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
                 <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
             </a>
             <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
                 <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75a1.5 1.5 0 01-1.5 1.5H9a1.5 1.5 0 01-1.5-1.5V18a1.5 1.5 0 011.5-1.5h6a1.5 1.5 0 011.5 1.5v.75zM16.5 18.75V18a1.5 1.5 0 011.5-1.5h1.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75H18a1.5 1.5 0 01-1.5-1.5V6.75a3 3 0 00-3-3h-3a3 3 0 00-3 3v3.75A1.5 1.5 0 016 12H4.5a.75.75 0 00-.75.75v3a.75.75 0 00.75.75H6a1.5 1.5 0 011.5 1.5v.75M12 9.75v1.5m0 3V18" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
                 </button>
                 <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -732,67 +849,49 @@
     </nav>
 
     <!-- Gecko Mascot -->
-    <div class="gecko-mascot">
-        <img src="Gecko.png" alt="Gecko Mascot" class="w-15 h-15 object-contain">
+    <div class="gecko-mascot" id="gecko-mascot">
+        <img src="Gecko.png" alt="Gecko Mascot">
     </div>
 
     <div class="game-container">
         <!-- Start Screen -->
-        <div id="start-screen" class="screen active flex flex-col justify-center items-center h-full space-y-6">
-            <h1 class="main-title-custom text-main-color leading-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
-            <p class="subtitle-custom text-sub-color">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
-            <p class="text-sm text-sub-color">(Testing Version)</p>
+        <div id="start-screen" class="screen active">
+            <div class="flex flex-col items-center justify-center h-full">
+                <h1 class="main-title">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
+                <p class="subtitle">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
 
+                
+                <!-- Player name input with dotted border -->
+                <input type="text" id="player-name-input" 
+                       placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." 
+                       class="custom-input">
             
-            <!-- FIXED: Properly centered player name input -->
-            <div class="flex justify-center items-center w-full">
-                <div class="w-full max-w-sm">
-                    <label for="player-name-input" class="sr-only">ຊື່ຜູ້ຫຼິ້ນ</label>
-                    <input type="text" id="player-name-input" placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." class="w-full text-center bg-[#3e4043] border-2 border-transparent focus:border-main-color focus:outline-none rounded-md py-3 px-4 text-xl transition-colors">
-                </div>
-            </div>
-            
-            <!-- ADDED: Difficulty Setting (moved from settings panel) -->
-            <div class="flex flex-col items-center space-y-4">
-                <label class="text-lg text-sub-color">ລະດັບຄວາມຍາກ:</label>
-                <div class="flex gap-4">
-                    <div class="difficulty-card" data-difficulty="easy">
-                        <div class="difficulty-icon">🟢</div>
-                        <div class="difficulty-label">ງ່າຍ</div>
-                    </div>
-                    <div class="difficulty-card" data-difficulty="medium">
-                        <div class="difficulty-icon">🟡</div>
-                        <div class="difficulty-label">ປານກາງ</div>
-                    </div>
-                    <div class="difficulty-card" data-difficulty="hard">
-                        <div class="difficulty-icon">🔴</div>
-                        <div class="difficulty-label">ຍາກ</div>
+                <!-- Difficulty selection -->
+                <div class="text-center">
+                    <p class="text-sm text-sub-color mb-2">ເລືອກລະດັບຄວາມຍາກ:</p>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" data-difficulty="easy">ງ່າຍ</button>
+                        <button class="difficulty-btn medium" data-difficulty="medium">ປານກາງ</button>
+                        <button class="difficulty-btn hard" data-difficulty="hard">ຍາກ</button>
                     </div>
                 </div>
+            
+                <!-- Timer toggle -->
+                <div class="timer-toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="main-timer-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="timer-label">⏱️ ຈັບເວລາ (5 ວິນາທີ)</span>
+                </div>
+
+
+
+                <!-- Start button -->
+                <button id="start-game-btn" class="start-button" disabled>ເລີ່ມເກມ</button>
             </div>
             
-            <!-- ADDED: Timer Setting (moved from settings panel) -->
-            <div class="flex flex-col items-center space-y-2">
-                <label for="main-timer-toggle" class="text-lg text-sub-color">⏱️ ຈັບເວລາ (5 ວິນາທີ)</label>
-                <label class="switch">
-                    <input type="checkbox" id="main-timer-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
 
-
-
-            <div>
-                <button id="start-game-btn" class="btn btn-primary text-2xl px-12 py-4" disabled>ເລີ່ມເກມ</button>
-            </div>
-            
-            <!-- Footer moved below start game button -->
-            <div class="text-center text-xs text-sub-color mt-4">
-                <p id="user-type-display">👤 Guest Mode</p>
-                <p>ໄອດີຜູ້ໃຊ້: <span id="user-id-display"></span></p>
-                <p>Fixed Mode</p>
-                <p>Version: 2.1.0 - Phase 1: 4-Page System Implemented</p>
-            </div>
         </div>
 
         <!-- Game Screen -->
@@ -1010,6 +1109,15 @@
                 <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
                 <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details">
+                    <p>📦 Version 2.1.0</p>
+                    <p>Status: Testing</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1065,7 +1173,7 @@
         const leaderboardPanel = document.getElementById('leaderboard-panel');
         const leaderboardContainer = document.getElementById('leaderboard-container');
         const firebaseSyncToggle = document.getElementById('firebase-sync-toggle');
-        const difficultyCards = document.querySelectorAll('.difficulty-card');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
         const mainTimerToggle = document.getElementById('main-timer-toggle');
         const soundToggle = document.getElementById('sound-toggle');
         const musicToggle = document.getElementById('music-toggle');
@@ -1474,6 +1582,7 @@
             correct: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
             incorrect: new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 } }).toDestination(),
             start: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
+            uhoh: new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.2, release: 0.5 } }).toDestination(),
         };
 
         function playSound(sound) {
@@ -1483,6 +1592,11 @@
                 if (sound === 'correct') sounds.correct.triggerAttackRelease('C5', '8n');
                 else if (sound === 'incorrect') sounds.incorrect.triggerAttackRelease('C3', '8n');
                 else if (sound === 'start') sounds.start.triggerAttackRelease('C4', '8n');
+                else if (sound === 'uhoh') {
+                    // Play "uh-oh" sound with two descending notes
+                    sounds.uhoh.triggerAttackRelease('G3', '8n');
+                    setTimeout(() => sounds.uhoh.triggerAttackRelease('E3', '8n'), 150);
+                }
             } catch (e) {
                 console.error("Sound playback error", e);
             }
@@ -1559,19 +1673,19 @@
             const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
             document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
             
-            // Update difficulty cards
-            difficultyCards.forEach(card => {
-                card.classList.remove('active');
-                if (card.dataset.difficulty === settings.difficulty) {
-                    card.classList.add('active');
+            // Update difficulty buttons
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === settings.difficulty) {
+                    btn.classList.add('active');
                 }
             });
             
             // Set default difficulty if none selected
-            if (!document.querySelector('.difficulty-card.active')) {
-                const defaultCard = document.querySelector('.difficulty-card[data-difficulty="easy"]');
-                if (defaultCard) {
-                    defaultCard.classList.add('active');
+            if (!document.querySelector('.difficulty-btn.active')) {
+                const defaultBtn = document.querySelector('.difficulty-btn[data-difficulty="easy"]');
+                if (defaultBtn) {
+                    defaultBtn.classList.add('active');
                     settings.difficulty = 'easy';
                 }
             }
@@ -1579,28 +1693,8 @@
             soundToggle.checked = settings.sound;
             musicToggle.checked = settings.music;
             
-            // Display user ID in footer
-            console.log('🆔 Updating user ID display, userId =', userId);
-            console.log('🆔 userId length:', userId ? userId.length : 'undefined');
-            const userIdElement = document.getElementById('user-id-display');
-            if (userIdElement) {
-                const displayText = '...' + userId.slice(-6);
-                userIdElement.textContent = displayText;
-                console.log('✅ Set user ID display to:', displayText);
-                console.log('✅ Element content:', userIdElement.textContent);
-            } else {
-                console.error('❌ user-id-display element not found!');
-            }
-            
-            // Update user type display
-            const userTypeElement = document.getElementById('user-type-display');
-            if (userTypeElement) {
-                if (userType === 'gmail' && currentUser) {
-                    userTypeElement.textContent = `📧 ${currentUser.email}`;
-                } else {
-                    userTypeElement.textContent = '👤 Guest Mode';
-                }
-            }
+            // Update user display
+            updateUserDisplay();
         }
 
         async function startGame() {
@@ -1775,6 +1869,7 @@
         
         // --- EVENT LISTENERS ---
         document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
+        document.getElementById('home-nav-btn').addEventListener('click', () => switchScreen('start'));
         document.getElementById('start-game-btn').addEventListener('click', startGame);
         document.getElementById('restart-game-btn').addEventListener('click', startGame);
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
@@ -1857,12 +1952,12 @@
         });
         
         // Main page controls event listeners
-        // Difficulty card selection
-        difficultyCards.forEach(card => {
-            card.addEventListener('click', () => {
-                difficultyCards.forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                settings.difficulty = card.dataset.difficulty;
+        // Difficulty button selection
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                difficultyButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                settings.difficulty = btn.dataset.difficulty;
                 saveUserData();
             });
         });
@@ -1880,6 +1975,17 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Gecko mascot click event
+        document.getElementById('gecko-mascot').addEventListener('click', () => {
+            playSound('uhoh');
+            // Optional: Add a little animation
+            const gecko = document.getElementById('gecko-mascot');
+            gecko.style.transform = 'scale(0.9) rotate(-5deg)';
+            setTimeout(() => {
+                gecko.style.transform = 'scale(1) rotate(0deg)';
+            }, 200);
+        });
         
         // Account panel controls
         document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
@@ -1953,6 +2059,17 @@
 
         // --- AUTHENTICATION GUARD ---
         function checkUserAuthentication() {
+            // Check if we're in test mode (bypass authentication)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('testmode') === 'true') {
+                console.log('🧪 Test mode enabled - bypassing authentication');
+                userType = 'guest';
+                displayName = 'Test User';
+                userId = 'test_user_' + Math.random().toString(36).substr(2, 9);
+                updateUserDisplay();
+                return true;
+            }
+            
             // Check for guest user in sessionStorage
             const guestUser = sessionStorage.getItem('guestUser');
             const storedUserType = sessionStorage.getItem('userType');
@@ -1974,9 +2091,32 @@
                 // Will be fully loaded by Firebase auth listener
                 return true;
             } else {
-                console.log('🔐 No authenticated user found - redirecting to registration');
-                redirectToRegistration();
-                return false;
+                // For testing purposes, create a temporary guest session instead of redirecting
+                console.log('🔐 No authenticated user found - creating temporary test session');
+                
+                // Uncomment the next line to enable auto-redirect to registration
+                // redirectToRegistration();
+                // return false;
+                
+                // Create temporary guest session for testing
+                const tempUser = {
+                    id: 'temp_guest_' + Math.random().toString(36).substr(2, 9),
+                    name: 'Temporary Guest',
+                    age: 0,
+                    createdAt: new Date().toISOString(),
+                    userType: 'guest'
+                };
+                
+                sessionStorage.setItem('guestUser', JSON.stringify(tempUser));
+                sessionStorage.setItem('userType', 'guest');
+                
+                userType = 'guest';
+                displayName = tempUser.name;
+                userId = tempUser.id;
+                updateUserDisplay();
+                
+                console.log('✅ Temporary guest session created for testing');
+                return true;
             }
         }
         
@@ -1990,11 +2130,11 @@
             const userIdElement = document.getElementById('user-id-display');
             
             if (userType === 'guest') {
-                userTypeElement.textContent = '👤 Guest Mode';
-                userIdElement.textContent = userId || 'guest_user';
+                if (userTypeElement) userTypeElement.textContent = '👤 Guest Mode';
+                if (userIdElement) userIdElement.textContent = '...' + userId.slice(-6);
             } else if (userType === 'gmail' && currentUser) {
-                userTypeElement.textContent = `📧 ${currentUser.email}`;
-                userIdElement.textContent = currentUser.uid;
+                if (userTypeElement) userTypeElement.textContent = `📧 ${currentUser.email}`;
+                if (userIdElement) userIdElement.textContent = currentUser.uid;
             }
             
             // Update account nav link visibility
