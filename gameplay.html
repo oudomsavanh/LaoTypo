@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.0.0 - Major Game Logic Overhaul: Progressive Difficulty System -->
+    <!-- Cache Busting Headers v2.1.0 - Enhanced with authentication and scoring -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -45,8 +45,51 @@
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+        nav {
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
+        }
+        .nav-link {
+            color: var(--sub-color);
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        .nav-link:hover {
+            color: var(--text-color);
+            transform: scale(1.1) rotate(3deg);
+        }
+        /* Logo animation */
+        #home-btn img {
+            transition: transform 0.5s ease;
+        }
+        #home-btn:hover img {
+            transform: scale(1.05);
+        }
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 9999px; /* circle */
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+        }
+        .btn-icon:active {
+            transform: scale(0.95);
+        }
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: transform 0.3s ease;
         }
         .game-container {
             flex: 1;
@@ -89,7 +132,6 @@
             background-color: var(--sub-color);
             color: var(--text-color);
         }
-        /* v2.0.0: Removed back button - players must complete progressive levels */
         .word-card {
             background-color: #3e4043;
             border: 2px solid #4a4d50;
@@ -131,568 +173,464 @@
             transition: transform 0.1s linear;
         }
         
-        /* Life Bar System Styles - v1.3.0 Update: Redesigned with CSS pixel hearts (black style), more compact design */
-        .life-bar-header {
-            background: linear-gradient(135deg, #f8af3c 0%, #f8af3c 100%);
-            border: 2px solid #d1d0c5;
-            border-radius: 0.5rem;
-            padding: 0.5rem 1rem;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        /* Redesigned Life Bar with TailwindCSS */
+        .life-bar-container {
+            @apply bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg p-4 shadow-lg mb-6;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
-        .life-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 0.25rem;
+        .life-hearts-row {
+            @apply flex items-center justify-center gap-3 mb-2;
         }
         
-        .hearts {
-            display: flex;
-            gap: 0.5rem;
+        .life-label {
+            @apply text-gray-800 font-bold text-lg;
+        }
+        
+        .hearts-container {
+            @apply flex gap-2;
         }
         
         .heart {
-            width: 24px;
-            height: 24px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        /* CSS Pixel Heart - Simplified Design */
-        .heart::before {
-            content: '❤️';
-            position: absolute;
-            font-size: 20px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            filter: brightness(0) saturate(100%);
+            @apply text-3xl transition-all duration-300 ease-in-out;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
         
         .heart.active {
-            animation: heartPulse 3s infinite;
-        }
-        
-        .heart.active::before {
-            content: '❤️';
-            filter: brightness(0) saturate(100%);
-        }
-        
-        .heart.lost::before {
-            content: '❤️';
-            filter: brightness(0) saturate(100%) opacity(0.3);
+            @apply text-red-500;
+            animation: heartPulse 2s infinite;
         }
         
         .heart.lost {
-            opacity: 0.4;
-            transform: scale(0.8);
+            @apply text-gray-600 opacity-40 scale-75;
         }
         
         .heart.losing {
-            animation: heartBreak 0.6s ease-in-out forwards;
+            animation: heartBreak 0.6s ease-out forwards;
         }
         
         @keyframes heartPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.1); }
         }
         
         @keyframes heartBreak {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.2) rotate(5deg); }
-            50% { transform: scale(1.3) rotate(-5deg); }
-            75% { transform: scale(0.9) rotate(2deg); opacity: 0.7; }
-            100% { transform: scale(0.8); opacity: 0.4; }
-        }
-        
-        @keyframes lifeBarFlash {
-            0%, 100% { background: linear-gradient(135deg, #f8af3c 0%, #f8af3c 100%); }
-            50% { background: linear-gradient(135deg, #ca4754 0%, #8b2635 100%); }
+            0% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            25% { 
+                transform: scale(1.2) rotate(-10deg);
+                color: #ef4444;
+            }
+            50% { 
+                transform: scale(1.3) rotate(10deg);
+                color: #dc2626;
+            }
+            75% { 
+                transform: scale(0.9) rotate(-5deg);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: scale(0.75) rotate(0deg);
+                opacity: 0.4;
+                color: #4b5563;
+            }
         }
         
         .motivation-text {
-            font-size: 0.875rem;
-            color: #000000; /* v2.0.0: Changed to black for normal messages */
-            font-style: italic;
-            font-weight: 500;
+            @apply text-center text-gray-800 font-semibold italic;
+            font-size: 1rem;
+        }
+        
+        .motivation-text.warning {
+            @apply text-orange-700;
         }
         
         .motivation-text.critical {
-            color: var(--error-color); /* Red color for critical messages only */
+            @apply text-red-700 font-bold;
         }
         
-        .life-text {
-            font-weight: bold;
-            color: #ffffff;
-            font-size: 1.1rem;
-        }
-        
-        /* v2.0.0: Custom responsive typography */
+        /* Custom responsive typography */
         .context-display-custom {
-            font-size: 1.5rem; /* Mobile: 1.5rem */
+            font-size: 1.5rem;
             font-weight: bold;
         }
         
         .results-header-custom {
-            font-size: 1.8rem; /* Mobile: 1.8rem */
+            font-size: 1.8rem;
             font-weight: bold;
         }
         
         /* Desktop responsive sizes */
         @media (min-width: 768px) {
             .context-display-custom {
-                font-size: 2rem; /* Desktop: 2rem (calculated best fit) */
+                font-size: 2rem;
             }
             
             .results-header-custom {
-                font-size: 2.4rem; /* Desktop: 2.4rem (calculated best fit) */
+                font-size: 2.4rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation from testing.html -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
     <div class="game-container">
         <div class="w-full">
-            <!-- v2.0.0: Removed back button for progressive difficulty system -->
-
             <!-- Game Screen -->
-        <div id="game-screen" class="screen active">
-            <!-- Word Loading Status -->
-            <div id="word-loading-status" class="text-center mb-4 text-main-color">
-                ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
-            </div>
-            
-            <!-- v2.0.0: Progressive Level System WITH Life System -->
-            <div class="life-bar-header mb-6">
-                <div class="life-container">
-                    <span class="life-text">ຊິວິດ:</span>
-                    <div class="hearts">
-                        <span class="heart active"></span>
-                        <span class="heart active"></span>
-                        <span class="heart active"></span>
+            <div id="game-screen" class="screen active">
+                <!-- Word Loading Status -->
+                <div id="word-loading-status" class="text-center mb-4 text-main-color">
+                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+                </div>
+                
+                <!-- Redesigned Life Bar with TailwindCSS -->
+                <div class="life-bar-container">
+                    <div class="life-hearts-row">
+                        <span class="life-label">ຊີວິດ:</span>
+                        <div class="hearts-container" id="hearts-container">
+                            <span class="heart active">❤️</span>
+                            <span class="heart active">❤️</span>
+                            <span class="heart active">❤️</span>
+                        </div>
+                    </div>
+                    <div class="motivation-text" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
+                </div>
+                
+                <!-- Player Name Header -->
+                <div class="text-center mb-4">
+                    <h2 class="text-3xl font-bold text-main-color">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
+                    <div class="text-sm text-sub-color mt-1">
+                        <span id="game-settings-display">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
                     </div>
                 </div>
-                <div class="motivation-text">ລະດັບ ງ່າຍ: 0/30 ຄຳ </div>
-            </div>
-            
-            <!-- Player Name Header -->
-            <div class="text-center mb-4">
-                <h2 class="text-3xl font-bold text-main-color">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
-                <div class="text-sm text-sub-color mt-1">
-                    <span id="game-settings-display">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
+                
+                <div class="flex justify-between items-center mb-6 text-xl">
+                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
+                    <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+                </div>
+                <div id="timer-container" class="h-2 mb-6">
+                    <div id="timer-bar" class="timer-bar"></div>
+                </div>
+                
+                <!-- Context display area for showing word from Google Sheets Column A -->
+                <div class="mb-6 text-center">
+                    <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                    <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+                </div>
+                
+                <!-- v2.0.0: Difficulty level display with color coding -->
+                <div class="mb-4 text-center">
+                    <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
+                    <span id="difficulty-display" class="font-bold"></span>
+                </div>
+                
+                <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
+                    <div id="word-card-left" class="word-card"></div>
+                    <div id="word-card-right" class="word-card"></div>
                 </div>
             </div>
-            
-            <div class="flex justify-between items-center mb-6 text-xl">
-                <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
-                <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
-            </div>
-            <div id="timer-container" class="h-2 mb-6">
-                <div id="timer-bar" class="timer-bar"></div>
-            </div>
-            
-            <!-- Context display area for showing word from Google Sheets Column A -->
-            <div class="mb-6 text-center">
-                <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
-                <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
-            </div>
-            
-            <!-- Difficulty level display with color coding -->
-            <div class="mb-4 text-center">
-                <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
-                <span id="difficulty-display" class="font-bold"></span>
-            </div>
-            
-            <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
-                <div id="word-card-left" class="word-card"></div>
-                <div id="word-card-right" class="word-card"></div>
-            </div>
-            <p class="text-sub-color">ໃຊ້ <kbd class="border-b-2 border-sub-color">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 border-sub-color">D</kbd> ສຳລັບຂວາ.</p>
-        </div>
 
-                 <!-- Results Screen -->
-         <div id="results-screen" class="screen space-y-6">
-             <h2 class="results-header-custom text-main-color">ຜົນການປະເມີນ ບອກວ່າ...</h2>
-             
-             <!-- Game Stats -->
-             <div class="bg-[#3e4043] rounded-lg p-6 space-y-4">
-                <div id="evaluation-result" class="text-xl font-bold"></div>
-                 <div class="text-2xl space-y-2">
-                     <p>ຄະແນນສຸດທ້າຍ: <span id="final-streak" class="text-main-color font-bold">0</span></p>
-                     <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="text-main-color font-bold">0%</span></p>
-                 </div>
-                 
-                 <!-- NEW: Score Breakdown -->
-                 <div id="score-breakdown"></div>
-                 
-                 <!-- Personal Best Indicator -->
-                 <div id="personal-best-indicator" class="hidden bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-lg font-bold text-center">
-                     🏆 ສະຖິຕິໃໝ່ຂອງທ່ານເອງງງ! 🏆
-                 </div>
-             </div>
-
-             <!-- Personal Records -->
-             <div class="bg-[#3e4043] rounded-lg p-6">
-                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">📊 ສະຖິຕິຂອງທ່ານ</h3>
-                 <div class="grid grid-cols-3 gap-4 text-sm">
-                     <div class="text-center">
-                         <div class="text-correct-color font-bold">ງ່າຍ</div>
-                         <div id="easy-best-score" class="text-lg">0</div>
-                         <div id="easy-best-accuracy" class="text-sub-color">0%</div>
-                         <div id="easy-games-count" class="text-xs text-sub-color">0 games</div>
-                     </div>
-                     <div class="text-center">
-                         <div class="text-main-color font-bold">ປານກາງ</div>
-                         <div id="medium-best-score" class="text-lg">0</div>
-                         <div id="medium-best-accuracy" class="text-sub-color">0%</div>
-                         <div id="medium-games-count" class="text-xs text-sub-color">0 games</div>
-                     </div>
-                     <div class="text-center">
-                         <div class="text-error-color font-bold">ຍາກ</div>
-                         <div id="hard-best-score" class="text-lg">0</div>
-                         <div id="hard-best-accuracy" class="text-sub-color">0%</div>
-                         <div id="hard-games-count" class="text-xs text-sub-color">0 games</div>
-                     </div>
-                 </div>
-             </div>
-
-             <!-- Global Ranking Preview -->
-             <div class="bg-[#3e4043] rounded-lg p-6">
-                 <h3 class="text-xl font-bold text-main-color mb-4 text-center">🌍 ອັນດັບປະເທດ</h3>
-                 <div id="global-ranking-info" class="text-center text-sub-color">
-                     <p id="global-rank-text">ອັນດັບຂອງທ່ານ: ກຳລັງປະເມີນຜົນ...</p>
-                     <p class="text-xs mt-2">🔄  ກະດານກຽດຕິຍົດແບບເຕັມໆ ຈະມາຕາມຫຼັງເດີ້!</p>
-                 </div>
-             </div>
-
-             <!-- Action Buttons -->
-             <div class="space-y-4">
-                 <button onclick="playAgain()" class="btn text-xl px-8 py-3">ຫຼິ້ນອີກຄັ້ງ</button>
-                 <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປທີ່ເມນູ</button>
-                 <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
-             </div>
-         </div>
+            <!-- Results Screen -->
+            <div id="results-screen" class="screen">
+                <div class="space-y-6">
+                    <h2 class="results-header-custom text-main-color">ເກມຈົບ</h2>
+                    <div class="text-2xl space-y-2">
+                        <p>ຄະແນນຫຼ້າສຸດ: <span id="final-streak" class="font-bold text-white">0</span></p>
+                        <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="results-best-streak" class="font-bold text-white">0</span></p>
+                        <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-bold text-white">0%</span></p>
+                        <p>ຜົນການປະເມີນ: <span id="evaluation-result" class="font-bold"></span></p>
+                    </div>
+                    
+                    <!-- v2.0.0: Progressive Level Score Breakdown -->
+                    <div id="score-breakdown" class="bg-[#3e4043] rounded-lg p-4 text-left max-w-md mx-auto">
+                        <h3 class="text-lg font-bold text-main-color mb-3">ຜົນງານຕາມລະດັບ:</h3>
+                        <div id="level-scores" class="space-y-2 text-sm"></div>
+                    </div>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <button id="restart-game-btn" class="btn">ຫຼິ້ນອີກຄັ້ງ</button>
+                        <button id="back-to-menu-btn" class="btn btn-secondary">ເມນູຫຼັກ</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Footer -->
-    <footer class="w-full text-center py-4 text-xs text-sub-color bg-[#2c2e31] border-t border-[#4a4d50]">
-        <p>Game Mode</p>
-        <p>Version: 2.0.0</p>
-    </footer>
 
     <script>
-        // Google Sheets CSV URL (same as testing.html)
-        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
-
-        // DOM Elements
+        // Global variables
+        let currentStreak = 0;
+        let bestStreak = 0;
+        let currentWordIndex = 0;
+        let wordPairs = [];
+        let correctAnswers = 0;
+        let totalAnswers = 0;
+        let timerInterval;
+        let timerEnabled = false;
+        let timeLimit = 5000; // 5 seconds
+        let currentTimeout;
+        let playerName = '';
+        let selectedDifficulty = 'easy';
+        let isKeyboardEnabled = true;
+        let gameActive = false;
+        let synth = null;
+        let soundEnabled = true;
+        let selectedLeftCard = false;
+        let selectedRightCard = false;
+        
+        // v2.0.0: Progressive Difficulty System
+        let playerLives = 3;
+        let currentLevel = 0; // 0: easy, 1: medium, 2: hard
+        let levelProgress = 0;
+        const levelThresholds = [30, 40, 50]; // Words needed to complete each level
+        const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
+        const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
+        const levelScores = { easy: 0, medium: 0, hard: 0 };
+        
+        // Google Sheets configuration
+        const SHEET_ID = '1Hu3-LJnxAIKjHeO0SvZjF9NDR6mADlBJE1uu0MC0-zE';
+        const SHEET_NAME = 'LaoTypoWords';
+        const API_KEY = 'AIzaSyBsYiJQHPvW5uYipvRLr0VdFfESQdEWJnQ';
+        
+        // DOM elements
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
         const currentStreakEl = document.getElementById('current-streak');
         const bestStreakEl = document.getElementById('best-streak');
+        const finalStreakEl = document.getElementById('final-streak');
+        const resultsBestStreakEl = document.getElementById('results-best-streak');
+        const accuracyStatEl = document.getElementById('accuracy-stat');
+        const evaluationResultEl = document.getElementById('evaluation-result');
+        const contextDisplay = document.getElementById('context-display');
         const wordCardLeft = document.getElementById('word-card-left');
         const wordCardRight = document.getElementById('word-card-right');
         const timerBar = document.getElementById('timer-bar');
-        const contextDisplay = document.getElementById('context-display');
-        const difficultyDisplay = document.getElementById('difficulty-display');
-        const gamePlayerName = document.getElementById('game-player-name');
-        const wordLoadingStatus = document.getElementById('word-loading-status');
+        const restartGameBtn = document.getElementById('restart-game-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const gamePlayerNameEl = document.getElementById('game-player-name');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
-
-        // v2.0.0: Progressive Difficulty Game State
-        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
-        let currentStreak = 0;
-        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
-        let timerInterval;
-        let gameInProgress = false;
-        let displayName = '';
-        let wordList = [];
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const wordLoadingStatus = document.getElementById('word-loading-status');
+        const scoreBreakdownEl = document.getElementById('score-breakdown');
+        const levelScoresEl = document.getElementById('level-scores');
         
-        // v2.0.0: Progressive Level System WITH Life System
-        let currentLevel = 1; // 1=easy, 2=medium, 3=hard
-        let wordsAnsweredInLevel = 0;
-        let maxWordsPerLevel = 30;
-        let usedWords = new Set(); // Track used words to prevent repeats
-        
-        // NEW: Tracking for new scoring system
-        let levelScores = {
-            easy: { correct: 0, total: 0, completed: false },
-            medium: { correct: 0, total: 0, completed: false },
-            hard: { correct: 0, total: 0, completed: false }
-        };
-        
-        // Life System (restored)
-        let playerLives = 3;
-        let maxLives = 3;
-        let heartsContainer, motivationText;
-        
-        // Settings from URL parameters
-        let settings = {
-            difficulty: 'easy',
-            timer: false,
-            sound: true,
-            music: false,
-        };
+        // Life system elements
+        const heartsContainer = document.getElementById('hearts-container');
+        const motivationText = document.getElementById('motivation-text');
 
-                 let stats = {
-             bestStreak: 0,
-             totalGames: 0,
-             totalCorrect: 0,
-             totalMistakes: 0,
-         };
-
-         // MonkeyType-inspired Personal Records
-         let personalRecords = {
-             easy: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
-             medium: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
-             hard: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 }
-         };
-
-         // Global Leaderboard (simulated for demo - would be real cloud in production)
-         let globalLeaderboard = {
-             easy: [],
-             medium: [],
-             hard: []
-         };
-
-        // Background Music System
-        let backgroundMusic = null;
-        
-        function initializeBackgroundMusic() {
-            backgroundMusic = document.createElement('audio');
-            backgroundMusic.loop = true;
-            backgroundMusic.volume = 0.3;
-            backgroundMusic.preload = 'none';
-            // backgroundMusic.src = 'background-music.wav';
+        // Initialize game
+        async function initializeGame() {
+            loadGameSettings();
+            updateUI();
+            await loadWordsFromGoogleSheets();
+            setupEventListeners();
+            setupNavigationHandlers();
+            initializeSounds();
+            showNewWords();
         }
-        
-        function toggleBackgroundMusic() {
-            if (!backgroundMusic) return;
-            
-            if (settings.music && backgroundMusic.src) {
-                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
-            } else {
-                backgroundMusic.pause();
+
+        // Load game settings from localStorage
+        function loadGameSettings() {
+            const storedSettings = localStorage.getItem('gameSettings');
+            if (storedSettings) {
+                const settings = JSON.parse(storedSettings);
+                selectedDifficulty = settings.difficulty || 'easy';
+                timerEnabled = settings.timerEnabled || false;
+                soundEnabled = settings.soundEnabled !== false;
             }
+            
+            playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
+            
+            // Update UI with settings
+            gamePlayerNameEl.textContent = playerName;
+            const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
+            gameSettingsDisplay.textContent = `ລະດັບຄຳສັບ: ${levelNames[0]} | ຈຳກັດເວລາ: ${timerText}`;
+            updateDifficultyDisplay();
         }
 
-        // Enhanced word loading from Google Sheets (copied from testing.html, no fallback)
-        async function loadWordListsFromGoogleSheets() {
+        // Update difficulty display with color
+        function updateDifficultyDisplay() {
+            difficultyDisplay.textContent = levelNames[currentLevel];
+            difficultyDisplay.style.color = levelColors[currentLevel];
+        }
+
+        // Load words from Google Sheets
+        async function loadWordsFromGoogleSheets() {
+            const range = `${SHEET_NAME}!A:C`;
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+            
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
-                wordLoadingStatus.style.color = 'var(--main-color)';
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                const response = await fetch(GOOGLE_SHEETS_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (data.values && data.values.length > 1) {
+                    // Skip header row and process data
+                    wordPairs = data.values.slice(1).map(row => ({
+                        context: row[0] || '',
+                        correct: row[1] || '',
+                        incorrect: row[2] || ''
+                    })).filter(pair => pair.context && pair.correct && pair.incorrect);
+                    
+                    console.log(`Loaded ${wordPairs.length} word pairs from Google Sheets`);
+                    wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ ${wordPairs.length} ຄຳສັບ`;
+                    wordLoadingStatus.style.color = 'var(--correct-color)';
+                    
+                    // Shuffle words
+                    wordPairs = shuffleArray(wordPairs);
+                } else {
+                    throw new Error('No data found');
                 }
-                
-                const csvText = await response.text();
-                const lines = csvText.split('\n');
-                
-                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty
-                wordList = lines
-                    .slice(1) // Skip header row (A1:D1)
-                    .map(line => {
-                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
-                        if (columns.length >= 4 && columns[0] && columns[1] && columns[2] && columns[3]) {
-                            return {
-                                context: columns[0],    // Column A - context to display
-                                correct: columns[1],    // Column B - correct answer
-                                wrong: columns[2],      // Column C - wrong answer
-                                difficulty: parseInt(columns[3]) || 1  // Column D - difficulty (1=easy, 2=medium, 3=difficult)
-                            };
-                        }
-                        return null;
-                    })
-                    .filter(item => item !== null); // Remove invalid entries
-                
-                console.log("Word list loaded from Google Sheets:", wordList.length, "entries");
-                console.log("Sample entries:", wordList.slice(0, 3));
-                
-                if (wordList.length === 0) {
-                    throw new Error("No valid entries found in the spreadsheet");
-                }
-                
-                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordList.length} ຄຳສັບ`;
-                wordLoadingStatus.style.color = 'var(--correct-color)';
-                
-                // Hide loading status after successful load
-                setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
-                }, 2000);
-                
             } catch (error) {
-                console.error("Error loading word list from Google Sheets:", error);
-                console.log("Error details:", error.message);
-                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                console.error('Error loading from Google Sheets:', error);
+                wordLoadingStatus.textContent = 'ໂຫຼດຄຳສັບບໍ່ສຳເລັດ, ກະລຸນາລອງໃໝ່';
+                wordLoadingStatus.style.color = 'var(--error-color)';
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
-                wordLoadingStatus.style.color = 'var(--warning-color)';
-                
-                // Minimal fallback data for testing when Google Sheets fails
-                wordList = [
-                    { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
-                    { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
-                    { context: 'ລາວ', correct: 'ລາວ', wrong: 'ລາຍ', difficulty: 1 },
-                    { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', wrong: 'ພາສາລາຍ', difficulty: 2 },
-                    { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', wrong: 'ໂຮງຮິຽນ', difficulty: 2 },
-                    { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', wrong: 'ປະເທດລາຍ', difficulty: 2 },
-                    { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 },
-                    { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', wrong: 'ວິທະຍາສາຍ', difficulty: 3 },
-                    { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', wrong: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
-                ];
-                
-                console.log("Using fallback word list for testing:", wordList.length, "entries");
-                
-                // Hide loading status after fallback load
-                setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
-                }, 3000);
+                // Fallback to default words
+                wordPairs = getDefaultWords();
             }
         }
 
-        // NEW: Calculate weighted score based on new scoring system
-        function calculateWeightedScore() {
-            let rawScore = 0;
-            let maxPossibleScore = 0;
-            
-            // Calculate raw score with weights
-            if (levelScores.easy.total > 0) {
-                rawScore += levelScores.easy.correct * 1; // Easy = 1 point each
-                maxPossibleScore += 30 * 1; // Max 30 points for easy
-            }
-            
-            if (levelScores.medium.total > 0) {
-                rawScore += levelScores.medium.correct * 2; // Medium = 2 points each
-                maxPossibleScore += 30 * 2; // Max 60 points for medium
-            }
-            
-            if (levelScores.hard.total > 0) {
-                rawScore += levelScores.hard.correct * 3; // Hard = 3 points each
-                maxPossibleScore += 30 * 3; // Max 90 points for hard
-            }
-            
-            // Calculate percentage
-            const percentage = maxPossibleScore > 0 ? (rawScore / maxPossibleScore) * 100 : 0;
-            
-            return {
-                rawScore,
-                maxPossibleScore,
-                percentage,
-                evaluation: getEvaluationTier(percentage)
-            };
+        // Get default words as fallback
+        function getDefaultWords() {
+            return [
+                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌" },
+                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ" },
+                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ" }
+            ];
         }
-        
-        // NEW: Get evaluation tier based on percentage
-        function getEvaluationTier(percentage) {
-            if (percentage >= 90) {
-                return {
-                    text: "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ",
-                    color: 'var(--correct-color)'
-                };
-            } else if (percentage >= 70) {
-                return {
-                    text: "ເຈົ້າແມ່ນລູກຊອດລາວ 75%",
-                    color: 'var(--main-color)'
-                };
-            } else if (percentage >= 40) {
-                return {
-                    text: "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ",
-                    color: 'var(--main-color)'
-                };
-            } else if (percentage >= 20) {
-                return {
-                    text: "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ \"ຈຣິງໃຈ\"",
-                    color: 'var(--warning-color)'
-                };
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Show new words
+        function showNewWords() {
+            if (currentWordIndex >= wordPairs.length) {
+                currentWordIndex = 0;
+                wordPairs = shuffleArray(wordPairs);
+            }
+
+            const wordPair = wordPairs[currentWordIndex];
+            contextDisplay.textContent = wordPair.context;
+            
+            const options = [wordPair.correct, wordPair.incorrect];
+            const shuffled = Math.random() > 0.5 ? options : options.reverse();
+            
+            wordCardLeft.textContent = shuffled[0];
+            wordCardRight.textContent = shuffled[1];
+            
+            // Reset card states
+            wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            selectedLeftCard = false;
+            selectedRightCard = false;
+            
+            currentWordIndex++;
+            gameActive = true;
+            
+            if (timerEnabled) {
+                startTimer();
+            }
+        }
+
+        // Check answer
+        function checkAnswer(selectedWord) {
+            if (!gameActive) return;
+            
+            gameActive = false;
+            clearTimeout(currentTimeout);
+            
+            const wordPair = wordPairs[currentWordIndex - 1];
+            const isCorrect = selectedWord === wordPair.correct;
+            
+            totalAnswers++;
+            
+            // Visual feedback
+            const selectedCard = selectedWord === wordCardLeft.textContent ? wordCardLeft : wordCardRight;
+            const otherCard = selectedCard === wordCardLeft ? wordCardRight : wordCardLeft;
+            
+            if (isCorrect) {
+                correctAnswers++;
+                currentStreak++;
+                levelProgress++;
+                levelScores[levelNames[currentLevel].toLowerCase()]++;
+                selectedCard.classList.add('feedback-correct');
+                playSound('correct');
+                
+                // Check level progression
+                if (levelProgress >= levelThresholds[currentLevel]) {
+                    if (currentLevel < 2) {
+                        currentLevel++;
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        updateDifficultyDisplay();
+                    }
+                }
             } else {
-                return {
-                    text: "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ",
-                    color: 'var(--error-color)'
-                };
-            }
-        }
-        
-        // NEW: Display score breakdown in results
-        function displayScoreBreakdown(scoreResult) {
-            const breakdownEl = document.getElementById('score-breakdown');
-            if (!breakdownEl) return;
-            
-            let breakdownHTML = '<div class="bg-[#3e4043] rounded-lg p-4 mt-4">';
-            breakdownHTML += '<h3 class="text-lg font-bold mb-3">ຄະແນນລາຍລະອຽດ:</h3>';
-            
-            // Show each level's performance
-            if (levelScores.easy.total > 0) {
-                breakdownHTML += `
-                    <div class="mb-2">
-                        <span style="color: var(--correct-color)">ງ່າຍ:</span> 
-                        ${levelScores.easy.correct}/${levelScores.easy.total} ຖືກ 
-                        (${levelScores.easy.correct} × 1 = ${levelScores.easy.correct} ຄະແນນ)
-                    </div>`;
+                selectedCard.classList.add('feedback-incorrect');
+                otherCard.classList.add('feedback-correct');
+                playSound('incorrect');
+                loseLife();
             }
             
-            if (levelScores.medium.total > 0) {
-                breakdownHTML += `
-                    <div class="mb-2">
-                        <span style="color: var(--main-color)">ປານກາງ:</span> 
-                        ${levelScores.medium.correct}/${levelScores.medium.total} ຖືກ 
-                        (${levelScores.medium.correct} × 2 = ${levelScores.medium.correct * 2} ຄະແນນ)
-                    </div>`;
-            }
+            updateUI();
             
-            if (levelScores.hard.total > 0) {
-                breakdownHTML += `
-                    <div class="mb-2">
-                        <span style="color: var(--error-color)">ຍາກ:</span> 
-                        ${levelScores.hard.correct}/${levelScores.hard.total} ຖືກ 
-                        (${levelScores.hard.correct} × 3 = ${levelScores.hard.correct * 3} ຄະແນນ)
-                    </div>`;
-            }
-            
-            breakdownHTML += `
-                <div class="mt-3 pt-3 border-t border-gray-600">
-                    <div class="font-bold">ຄະແນນລວມ: ${scoreResult.rawScore}/${scoreResult.maxPossibleScore}</div>
-                    <div class="font-bold text-main-color">ເປີເຊັນ: ${scoreResult.percentage.toFixed(1)}%</div>
-                </div>
-            </div>`;
-            
-            breakdownEl.innerHTML = breakdownHTML;
-        }
-
-        function getDifficultyLabel(level) {
-            switch(level) {
-                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
-                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
-                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
-                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            if (playerLives > 0) {
+                setTimeout(() => {
+                    showNewWords();
+                }, 1500);
             }
         }
 
-        function filterWordsByDifficulty(difficulty) {
-            let targetLevel;
-            switch(difficulty) {
-                case 'easy': targetLevel = 1; break;
-                case 'medium': targetLevel = 2; break;
-                case 'hard': targetLevel = 3; break;
-                default: targetLevel = 1;
-            }
-            
-            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
-            return filtered.length > 0 ? filtered : wordList;
-        }
-
-        // v2.0.0: Progressive Level System Functions WITH Life System
+        // Update level display
         function updateLevelDisplay() {
-            const levelNames = { 1: 'ງ່າຍ', 2: 'ປານກາງ', 3: 'ຍາກ' };
-            const progress = `${wordsAnsweredInLevel}/${maxWordsPerLevel}`;
-            const livesInfo = `${playerLives}/3 ຊິວິດ`;
+            const progress = `${levelProgress}/${levelThresholds[currentLevel]}`;
+            const livesInfo = `${playerLives}/3 ຊີວິດ`;
             motivationText.textContent = `ລະດັບ ${levelNames[currentLevel]}: ${progress} ຄຳ | ${livesInfo}`;
-            updateMotivationTextColor(); // Update color based on lives
+            updateMotivationTextColor();
         }
 
-        // Restored Life System Functions
+        // Update life display with new motivational text
         function updateLifeDisplay() {
             const hearts = heartsContainer.querySelectorAll('.heart');
             
@@ -706,14 +644,34 @@
                 }
             });
             
-            updateLevelDisplay(); // Update the combined display
+            // Update motivational text based on lives
+            updateMotivationalText();
+        }
+
+        function updateMotivationalText() {
+            motivationText.classList.remove('warning', 'critical');
+            
+            switch(playerLives) {
+                case 3:
+                    motivationText.textContent = 'ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!';
+                    break;
+                case 2:
+                    motivationText.textContent = 'ເຫຼືອໂອກາດອີກ 2 ຄັ້ງ';
+                    motivationText.classList.add('warning');
+                    break;
+                case 1:
+                    motivationText.textContent = 'ໂອກາດສຸດທ້າຍແລ້ວ!!';
+                    motivationText.classList.add('critical');
+                    break;
+                case 0:
+                    motivationText.textContent = 'ເກມຈົບແລ້ວ!';
+                    motivationText.classList.add('critical');
+                    break;
+            }
         }
 
         function updateMotivationTextColor() {
-            motivationText.classList.remove('critical');
-            if (playerLives === 1) {
-                motivationText.classList.add('critical'); // Red for last life only
-            }
+            // This function is now handled by updateMotivationalText
         }
 
         function loseLife() {
@@ -729,607 +687,255 @@
                     updateLifeDisplay();
                     
                     if (playerLives === 0) {
-                        gameOver(); // Game ends if all lives lost
-                    } else {
-                        showLifeWarning();
-                        setTimeout(nextRound, 1500);
+                        endGame();
                     }
                 }, 600);
             }
         }
 
-        function showLifeWarning() {
-            const lifeBar = document.querySelector('.life-bar-header');
-            lifeBar.style.animation = 'lifeBarFlash 0.5s ease-in-out 2';
+        // Timer functions
+        function startTimer() {
+            if (!timerEnabled) return;
             
-            setTimeout(() => {
-                lifeBar.style.animation = '';
-            }, 1000);
-        }
-
-        function resetLives() {
-            playerLives = maxLives;
-            updateLifeDisplay();
-        }
-
-        function gameOver() {
-            gameInProgress = false;
-            clearInterval(timerInterval);
+            clearTimeout(currentTimeout);
+            timerBar.style.transform = 'scaleX(1)';
             
-            // Show results screen - game ended due to losing all lives
-            switchScreen('results');
-            endGame();
-        }
-
-        function handleCorrectAnswer() {
-            wordsAnsweredInLevel++;
-            currentStreak++;
+            const startTime = Date.now();
             
-            // NEW: Track score for current level
-            const levelName = ['easy', 'medium', 'hard'][currentLevel - 1];
-            levelScores[levelName].correct++;
-            levelScores[levelName].total++;
-            
-            if (currentStreak > stats.bestStreak) {
-                stats.bestStreak = currentStreak;
-            }
-            
-            updateLevelDisplay();
-            
-            // Check if level completed
-            if (wordsAnsweredInLevel >= maxWordsPerLevel) {
-                levelScores[levelName].completed = true;
-                completeLevelSuccess();
-            } else {
-                setTimeout(nextRound, 400);
-            }
-        }
-
-        function handleIncorrectAnswer() {
-            // v2.0.0: Wrong answer loses a life (not immediate game end)
-            stats.totalMistakes += 1;
-            
-            // NEW: Track incorrect answer for current level
-            const levelName = ['easy', 'medium', 'hard'][currentLevel - 1];
-            levelScores[levelName].total++;
-            
-            loseLife(); // Use life system - game ends only when all lives lost
-        }
-
-        function completeLevelSuccess() {
-            gameInProgress = false;
-            clearInterval(timerInterval);
-            
-            if (currentLevel === 1) {
-                // Easy level completed
-                showLevelCompletionMessage("ປາຕິໂທ໊! ຕອບບໍ່ຜິດຈັກຂໍ້ເລີຍ. ແຕ່ຂອງແທ້ຢູ່ 'ລະດັບກາງ' ພຸ້ນເດີ້, ກ້າບໍ່?", 2);
-            } else if (currentLevel === 2) {
-                // Medium level completed
-                showLevelCompletionMessage("ບໍ່ທຳມະດາ! ແຕ່ຢ່າຟ້າວດີໃຈ... 'ລະດັບຍາກ' ກຳລັງລໍຖ້າທົດສອບ ຄວາມສາມາດທີ່ແທ້ຈິງຂອງເຈົ້າຢູ່!", 3);
-            } else if (currentLevel === 3) {
-                // Hard level completed - game finished!
-                showFinalCompletionMessage();
-            }
-        }
-
-        function showLevelCompletionMessage(message, nextLevel) {
-            // Create completion screen
-            const completionScreen = document.createElement('div');
-            completionScreen.className = 'screen active space-y-6 text-center';
-            completionScreen.innerHTML = `
-                <h2 class="results-header-custom text-main-color">ຍິນດີ!</h2>
-                <div class="bg-[#3e4043] rounded-lg p-6">
-                    <p class="text-xl text-text-color mb-4">${message}</p>
-                    <div class="space-y-4">
-                        <button onclick="continueToNextLevel(${nextLevel})" class="btn text-xl px-8 py-3">ຕໍ່ໄປລະດັບຕໍ່ໄປ</button>
-                        <button onclick="endGameSuccess()" class="btn btn-secondary text-xl px-8 py-3">ຈົບເກມ</button>
-                    </div>
-                </div>
-            `;
-            
-            // Replace current screen
-            document.querySelector('.screen.active').classList.remove('active');
-            document.querySelector('.w-full').appendChild(completionScreen);
-        }
-
-        function showFinalCompletionMessage() {
-            const completionScreen = document.createElement('div');
-            completionScreen.className = 'screen active space-y-6 text-center';
-            completionScreen.innerHTML = `
-                <h2 class="results-header-custom text-main-color">ສຳເລັດແລ້ວ!</h2>
-                <div class="bg-[#3e4043] rounded-lg p-6">
-                    <p class="text-xl text-text-color mb-4">ເຈົ້າເກັ່ງໂພດແລ້ວ! ພາລະກິດໃໝ່ຂອງເຈົ້າ ແມ່ນການຊ່ວຍຊາດ ໂດຍໄປຕື່ມ 'ຄຳສັບ' ທີ່ຄິດວ່າຄົນລາວໃຊ້ຜິດເລື້ອຍໆ ຢູ່ທີ່ 'ປ່ອງຮັບຄຳຜິດ'.</p>
-                    <div class="space-y-4">
-                        <button onclick="addWords()" class="btn text-xl px-8 py-3">ຕື່ມຄຳສັບ</button>
-                        <button onclick="backToMenu()" class="btn btn-secondary text-xl px-8 py-3">ກັບໄປເມນູ</button>
-                    </div>
-                </div>
-            `;
-            
-            // Replace current screen
-            document.querySelector('.screen.active').classList.remove('active');
-            document.querySelector('.w-full').appendChild(completionScreen);
-        }
-
-        function continueToNextLevel(nextLevel) {
-            currentLevel = nextLevel;
-            wordsAnsweredInLevel = 0;
-            gameInProgress = true;
-            
-            // Reset lives for new level
-            resetLives();
-            
-            // Remove completion screen and show game screen
-            document.querySelector('.screen.active').remove();
-            document.getElementById('game-screen').classList.add('active');
-            
-            // Update settings difficulty for word filtering
-            const difficultyMap = { 1: 'easy', 2: 'medium', 3: 'hard' };
-            settings.difficulty = difficultyMap[currentLevel];
-            
-            nextRound();
-        }
-
-        function endGameSuccess() {
-            // Show results screen with success evaluation
-            switchScreen('results');
-            endGame();
-        }
-
-                 // Personal Records Functions
-         function updatePersonalRecords() {
-             const difficulty = settings.difficulty;
-             const currentScore = currentStreak;
-             const totalAnswers = currentStreak + stats.totalMistakes;
-             const currentAccuracy = totalAnswers > 0 ? (currentStreak / totalAnswers) * 100 : 0;
-             
-             const record = personalRecords[difficulty];
-             let isNewBest = false;
-             
-             // Update games played
-             record.gamesPlayed++;
-             record.totalScore += currentScore;
-             
-             // Check for new personal best score
-             if (currentScore > record.bestScore) {
-                 record.bestScore = currentScore;
-                 isNewBest = true;
-             }
-             
-             // Check for new personal best accuracy
-             if (currentAccuracy > record.bestAccuracy) {
-                 record.bestAccuracy = currentAccuracy;
-                 isNewBest = true;
-             }
-             
-             // Show personal best indicator
-             if (isNewBest) {
-                 document.getElementById('personal-best-indicator').classList.remove('hidden');
-             }
-             
-             // Update global ranking simulation
-             updateGlobalRanking(difficulty, currentScore, currentAccuracy);
-             
-             // Update UI display
-             updatePersonalRecordsDisplay();
-         }
-
-         function updatePersonalRecordsDisplay() {
-             // Update Easy records
-             document.getElementById('easy-best-score').textContent = personalRecords.easy.bestScore;
-             document.getElementById('easy-best-accuracy').textContent = `${personalRecords.easy.bestAccuracy.toFixed(1)}%`;
-             document.getElementById('easy-games-count').textContent = `${personalRecords.easy.gamesPlayed} games`;
-             
-             // Update Medium records
-             document.getElementById('medium-best-score').textContent = personalRecords.medium.bestScore;
-             document.getElementById('medium-best-accuracy').textContent = `${personalRecords.medium.bestAccuracy.toFixed(1)}%`;
-             document.getElementById('medium-games-count').textContent = `${personalRecords.medium.gamesPlayed} games`;
-             
-             // Update Hard records
-             document.getElementById('hard-best-score').textContent = personalRecords.hard.bestScore;
-             document.getElementById('hard-best-accuracy').textContent = `${personalRecords.hard.bestAccuracy.toFixed(1)}%`;
-             document.getElementById('hard-games-count').textContent = `${personalRecords.hard.gamesPlayed} games`;
-         }
-
-         function updateGlobalRanking(difficulty, score, accuracy) {
-             // Simulated global ranking - in production this would be cloud-based
-             const playerEntry = { name: displayName, score: score, accuracy: accuracy, timestamp: Date.now() };
-             
-             // Add to leaderboard
-             globalLeaderboard[difficulty].push(playerEntry);
-             
-             // Sort by score descending, then by accuracy
-             globalLeaderboard[difficulty].sort((a, b) => {
-                 if (b.score !== a.score) return b.score - a.score;
-                 return b.accuracy - a.accuracy;
-             });
-             
-             // Keep only top 100
-             globalLeaderboard[difficulty] = globalLeaderboard[difficulty].slice(0, 100);
-             
-             // Find player's rank
-             const playerRank = globalLeaderboard[difficulty].findIndex(entry => 
-                 entry.name === displayName && entry.timestamp === playerEntry.timestamp
-             ) + 1;
-             
-             // Update ranking display
-             const totalPlayers = Math.max(playerRank, Math.floor(Math.random() * 1000) + 500); // Simulated total
-             document.getElementById('global-rank-text').textContent = 
-                 `Your rank: #${playerRank} of ${totalPlayers} players`;
-         }
-
-         // Local Storage Functions
-         function loadUserData() {
-             try {
-                 const savedData = localStorage.getItem('laoTypoGame_userData');
-                 if (savedData) {
-                     const data = JSON.parse(savedData);
-                     stats = { ...stats, ...data.stats };
-                     personalRecords = { ...personalRecords, ...data.personalRecords };
-                     globalLeaderboard = { ...globalLeaderboard, ...data.globalLeaderboard };
-                     displayName = data.displayName || '';
-                 }
-             } catch (error) {
-                 console.error("Error loading user data:", error);
-             }
-         }
-
-         function saveUserData() {
-             try {
-                 const userData = {
-                     settings,
-                     stats,
-                     personalRecords,
-                     globalLeaderboard,
-                     displayName,
-                     lastPlayed: new Date().toISOString()
-                 };
-                 localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
-             } catch (error) {
-                 console.error("Error saving user data:", error);
-             }
-         }
-
-        // Game Functions
-        function switchScreen(screenName) {
-            const screens = {
-                game: document.getElementById('game-screen'),
-                results: document.getElementById('results-screen')
+            const updateTimer = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = 1 - (elapsed / timeLimit);
+                
+                if (progress <= 0) {
+                    timerBar.style.transform = 'scaleX(0)';
+                    if (gameActive) {
+                        gameActive = false;
+                        playSound('timeout');
+                        loseLife();
+                        
+                        if (playerLives > 0) {
+                            setTimeout(() => {
+                                showNewWords();
+                            }, 1500);
+                        }
+                    }
+                } else {
+                    timerBar.style.transform = `scaleX(${progress})`;
+                    currentTimeout = requestAnimationFrame(updateTimer);
+                }
             };
-            Object.values(screens).forEach(s => s.classList.remove('active'));
-            if (screens[screenName]) screens[screenName].classList.add('active');
+            
+            currentTimeout = requestAnimationFrame(updateTimer);
         }
 
-         // v2.0.0: Updated nextRound with word tracking and level progression
-         function nextRound() {
-             console.log('🎮 Starting new round - Level:', currentLevel, 'Progress:', `${wordsAnsweredInLevel}/${maxWordsPerLevel}`);
-             
-             currentStreakEl.textContent = currentStreak;
-             bestStreakEl.textContent = stats.bestStreak;
-             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
-             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
-             
-             // Get words filtered by current level difficulty
-             const availableWords = filterWordsByDifficulty(settings.difficulty);
-             
-             // Filter out already used words to prevent repeats
-             const unusedWords = availableWords.filter(word => !usedWords.has(word.context));
-             console.log(`📚 Available unused words for level ${currentLevel}:`, unusedWords.length);
-             
-             if (unusedWords.length === 0) {
-                 console.error('❌ No unused words available for level:', currentLevel);
-                 // If we run out of words, complete the level early
-                 completeLevelSuccess();
-                 return;
-             }
-             
-             currentEntry = unusedWords[Math.floor(Math.random() * unusedWords.length)];
-             usedWords.add(currentEntry.context); // Mark as used
-             console.log('🎯 Selected word:', currentEntry.context, '- Total used:', usedWords.size);
-             
-             contextDisplay.textContent = currentEntry.context;
-             
-             const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
-             difficultyDisplay.textContent = difficultyInfo.text;
-             difficultyDisplay.style.color = difficultyInfo.color;
-             
-             correctAnswer = currentEntry.correct;
-             wrongAnswer = currentEntry.wrong;
-
-             correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
-
-             if (correctWordPosition === 'left') {
-                 wordCardLeft.textContent = correctAnswer;
-                 wordCardRight.textContent = wrongAnswer;
-                 console.log('🎯 Correct answer on LEFT:', correctAnswer);
-             } else {
-                 wordCardLeft.textContent = wrongAnswer;
-                 wordCardRight.textContent = correctAnswer;
-                 console.log('🎯 Correct answer on RIGHT:', correctAnswer);
-             }
-             
-             // Update level display
-             updateLevelDisplay();
-             
-             startTimer();
-         }
-
-        // v2.0.0: Updated handleSelection for progressive difficulty system
-        function handleSelection(selectedPosition) {
-            if (!gameInProgress) return;
-            clearInterval(timerInterval);
-            const isCorrect = selectedPosition === correctWordPosition;
-            const selectedCard = selectedPosition === 'left' ? wordCardLeft : wordCardRight;
-
-            if (isCorrect) {
-                playSound('correct');
-                selectedCard.classList.add('feedback-correct');
-                handleCorrectAnswer(); // Use new progressive logic
-            } else {
-                playSound('incorrect');
-                selectedCard.classList.add('feedback-incorrect');
-                handleIncorrectAnswer(); // Use new failure logic (immediate game end)
+        // Update UI
+        function updateUI() {
+            currentStreakEl.textContent = currentStreak;
+            bestStreakEl.textContent = bestStreak;
+            
+            if (currentStreak > bestStreak) {
+                bestStreak = currentStreak;
+                localStorage.setItem('bestStreak', bestStreak);
             }
         }
 
-                 function endGame() {
-             gameInProgress = false;
-             stats.totalCorrect += currentStreak;
-             stats.totalGames++;
+        // End game
+        function endGame() {
+            gameActive = false;
+            clearTimeout(currentTimeout);
+            
+            // Update final stats
+            finalStreakEl.textContent = currentStreak;
+            resultsBestStreakEl.textContent = bestStreak;
+            
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : 0;
+            accuracyStatEl.textContent = `${accuracy}%`;
+            
+            // Evaluation
+            let evaluation = '';
+            let evaluationColor = '';
+            
+            if (currentStreak >= 50) {
+                evaluation = 'ເຈົ້າແມ່ນຄົນລາວແທ້! 🏆';
+                evaluationColor = '#FFD700';
+            } else if (currentStreak >= 30) {
+                evaluation = 'ດີຫຼາຍ! ເກືອບສົມບູນແບບແລ້ວ 🌟';
+                evaluationColor = 'var(--correct-color)';
+            } else if (currentStreak >= 15) {
+                evaluation = 'ດີ! ແຕ່ຍັງຕ້ອງຝຶກເພີ່ມ 📚';
+                evaluationColor = 'var(--main-color)';
+            } else {
+                evaluation = 'ພະຍາຍາມຕື່ມອີກເດີ! 💪';
+                evaluationColor = 'var(--error-color)';
+            }
+            
+            evaluationResultEl.textContent = evaluation;
+            evaluationResultEl.style.color = evaluationColor;
+            
+            // Show level breakdown
+            showLevelBreakdown();
+            
+            // Save game stats
+            saveGameStats();
+            
+            // Switch screens
+            gameScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+        }
 
-             // NEW: Calculate weighted score
-             const scoreResult = calculateWeightedScore();
-             
-             document.getElementById('final-streak').textContent = currentStreak;
-             
-             // Update accuracy display with weighted percentage
-             document.getElementById('accuracy-stat').textContent = `${scoreResult.percentage.toFixed(1)}%`;
-             
-             // NEW: Display score breakdown
-             displayScoreBreakdown(scoreResult);
-             
-             const evaluationEl = document.getElementById('evaluation-result');
-             evaluationEl.textContent = scoreResult.evaluation.text;
-             evaluationEl.style.color = scoreResult.evaluation.color;
+        // Show level breakdown
+        function showLevelBreakdown() {
+            levelScoresEl.innerHTML = '';
+            
+            Object.entries(levelScores).forEach(([level, score]) => {
+                if (score > 0) {
+                    const levelDiv = document.createElement('div');
+                    levelDiv.className = 'flex justify-between items-center';
+                    levelDiv.innerHTML = `
+                        <span class="text-sub-color">ລະດັບ ${level}:</span>
+                        <span class="text-white font-bold">${score} ຄຳ</span>
+                    `;
+                    levelScoresEl.appendChild(levelDiv);
+                }
+            });
+        }
 
-             // Update personal records
-             updatePersonalRecords();
-             saveUserData();
-         }
+        // Save game stats
+        function saveGameStats() {
+            const stats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            
+            if (!stats.totalGames) stats.totalGames = 0;
+            if (!stats.totalCorrect) stats.totalCorrect = 0;
+            if (!stats.totalMistakes) stats.totalMistakes = 0;
+            if (!stats.bestStreak) stats.bestStreak = 0;
+            
+            stats.totalGames++;
+            stats.totalCorrect += correctAnswers;
+            stats.totalMistakes += (totalAnswers - correctAnswers);
+            stats.bestStreak = Math.max(stats.bestStreak, currentStreak);
+            
+            localStorage.setItem('gameStats', JSON.stringify(stats));
+        }
 
-                 function startTimer() {
-             if (!settings.timer) {
-                 console.log('⏱️ Timer disabled, skipping countdown');
-                 timerBar.style.transform = 'scaleX(0)';
-                 return;
-             }
-             
-             console.log('⏱️ Starting 5-second timer...');
-             let timeLeft = 5000; // 5 seconds
-             const interval = 50; // Update every 50ms for smooth animation
-             
-             // Reset timer bar to full
-             timerBar.style.transform = 'scaleX(1)';
-             
-             timerInterval = setInterval(() => {
-                 timeLeft -= interval;
-                 const percentage = Math.max(0, timeLeft / 5000);
-                 timerBar.style.transform = `scaleX(${percentage})`;
-                 
-                 // Debug countdown
-                 if (timeLeft % 1000 < interval) {
-                     console.log(`⏱️ Timer: ${Math.ceil(timeLeft / 1000)} seconds left`);
-                 }
-                 
-                 if (timeLeft <= 0) {
-                     clearInterval(timerInterval);
-                     console.log('⏱️ Timer expired! Auto-selecting wrong answer');
-                     
-                     // v2.0.0: When timer expires, treat as wrong answer (lose life)
-                     playSound('incorrect');
-                     stats.totalMistakes += 1;
-                     loseLife();
-                 }
-             }, interval);
-         }
+        // Reset game
+        function resetGame() {
+            currentStreak = 0;
+            currentWordIndex = 0;
+            correctAnswers = 0;
+            totalAnswers = 0;
+            playerLives = 3;
+            currentLevel = 0;
+            levelProgress = 0;
+            levelScores.easy = 0;
+            levelScores.medium = 0;
+            levelScores.hard = 0;
+            gameActive = false;
+            
+            updateUI();
+            updateLifeDisplay();
+            updateLevelDisplay();
+            updateDifficultyDisplay();
+            
+            gameScreen.classList.add('active');
+            resultsScreen.classList.remove('active');
+            
+            showNewWords();
+        }
+
+        // Sound functions
+        function initializeSounds() {
+            if (typeof Tone !== 'undefined' && soundEnabled) {
+                synth = new Tone.Synth().toDestination();
+            }
+        }
 
         function playSound(type) {
-            if (!settings.sound) return;
+            if (!soundEnabled || !synth) return;
             
             try {
-                const synth = new Tone.Synth().toDestination();
-                switch(type) {
-                    case 'correct':
-                        synth.triggerAttackRelease('C5', '0.1');
-                        break;
-                    case 'incorrect':
-                        synth.triggerAttackRelease('C3', '0.3');
-                        break;
-                    case 'start':
-                        synth.triggerAttackRelease('G4', '0.2');
-                        break;
+                if (type === 'correct') {
+                    synth.triggerAttackRelease("C5", "8n");
+                } else if (type === 'incorrect') {
+                    synth.triggerAttackRelease("C3", "8n");
+                } else if (type === 'timeout') {
+                    synth.triggerAttackRelease("G3", "8n");
                 }
             } catch (error) {
-                console.log('Sound failed:', error);
+                console.error('Error playing sound:', error);
             }
         }
 
-                 // Navigation Functions
-         function playAgain() {
-             // Reset game state
-             currentStreak = 0;
-             stats.totalMistakes = 0; // Reset mistakes counter for new game
-             gameInProgress = true;
-             resetLives();
-             
-             // NEW: Reset level scores and start from level 1
-             levelScores = {
-                 easy: { correct: 0, total: 0, completed: false },
-                 medium: { correct: 0, total: 0, completed: false },
-                 hard: { correct: 0, total: 0, completed: false }
-             };
-             currentLevel = 1;
-             wordsAnsweredInLevel = 0;
-             usedWords.clear();
-             settings.difficulty = 'easy';
-             
-             // Hide personal best indicator
-             document.getElementById('personal-best-indicator').classList.add('hidden');
-             
-             switchScreen('game');
-             nextRound();
-         }
-
-        function backToMenu() {
-            window.location.href = 'testing.html';
+        // Event listeners
+        function setupEventListeners() {
+            // Card clicks
+            wordCardLeft.addEventListener('click', () => {
+                if (gameActive) {
+                    checkAnswer(wordCardLeft.textContent);
+                }
+            });
+            
+            wordCardRight.addEventListener('click', () => {
+                if (gameActive) {
+                    checkAnswer(wordCardRight.textContent);
+                }
+            });
+            
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive || !isKeyboardEnabled) return;
+                
+                if (e.key.toLowerCase() === 'a') {
+                    e.preventDefault();
+                    wordCardLeft.classList.add('focused');
+                    selectedLeftCard = true;
+                    selectedRightCard = false;
+                    wordCardRight.classList.remove('focused');
+                    checkAnswer(wordCardLeft.textContent);
+                } else if (e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+                    wordCardRight.classList.add('focused');
+                    selectedRightCard = true;
+                    selectedLeftCard = false;
+                    wordCardLeft.classList.remove('focused');
+                    checkAnswer(wordCardRight.textContent);
+                }
+            });
+            
+            // Button clicks
+            restartGameBtn.addEventListener('click', resetGame);
+            backToMenuBtn.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
         }
 
-        function addWords() {
-            window.open('https://docs.google.com/forms/d/e/1FAIpQLSefITi3AKGdPc843ID2PffFaYei-O7oouF0XAAciiK3seA55Q/viewform', '_blank');
+        // Navigation handlers
+        function setupNavigationHandlers() {
+            // Home button navigation
+            document.getElementById('home-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'registration.html';
+            });
+            
+            document.getElementById('home-nav-btn').addEventListener('click', () => {
+                window.location.href = 'testing.html';
+            });
+            
+            // Other navigation buttons can be added here
+            document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+                // Add leaderboard functionality
+            });
+            
+            document.getElementById('open-settings-btn').addEventListener('click', () => {
+                // Add settings functionality
+            });
+            
+            document.getElementById('account-nav-btn').addEventListener('click', () => {
+                // Add account functionality
+            });
         }
 
-        // Enhanced URL Parameter Functions with validation and debugging
-        function getURLParameters() {
-            console.log('🔗 Reading URL parameters...');
-            const urlParams = new URLSearchParams(window.location.search);
-            console.log('📋 Raw URL params:', window.location.search);
-            
-            // Read and validate player name
-            const playerParam = urlParams.get('player');
-            displayName = playerParam ? decodeURIComponent(playerParam) : 'Anonymous Player';
-            console.log('👤 Player name:', displayName, '(from param:', playerParam, ')');
-            
-            // Read and validate difficulty
-            const difficultyParam = urlParams.get('difficulty');
-            const validDifficulties = ['easy', 'medium', 'hard'];
-            settings.difficulty = validDifficulties.includes(difficultyParam) ? difficultyParam : 'easy';
-            console.log('⚡ Difficulty:', settings.difficulty, '(from param:', difficultyParam, ')');
-            
-            // Read boolean settings
-            settings.timer = urlParams.get('timer') === 'true';
-            settings.sound = urlParams.get('sound') === 'true';
-            settings.music = urlParams.get('music') === 'true';
-            
-            console.log('⏱️ Timer enabled:', settings.timer);
-            console.log('🔊 Sound enabled:', settings.sound);
-            console.log('🎵 Music enabled:', settings.music);
-            
-            // Validation check
-            if (!playerParam) {
-                console.warn('⚠️ No player name in URL, using default');
-            }
-            if (!difficultyParam || !validDifficulties.includes(difficultyParam)) {
-                console.warn('⚠️ Invalid/missing difficulty in URL, using easy');
-            }
-            
-            console.log('✅ Final settings loaded:', settings);
-            
-            // Update UI immediately
-            updateGameHeader();
-        }
-        
-        function updateGameHeader() {
-            // Update player name in header
-            gamePlayerName.textContent = displayName;
-            
-            // Update settings display
-            const difficultyText = {
-                'easy': 'ງ່າຍ',
-                'medium': 'ປານກາງ', 
-                'hard': 'ຍາກ'
-            }[settings.difficulty];
-            
-            const timerText = settings.timer ? 'ເປີດ (5 ວິ)' : 'ປິດ';
-            gameSettingsDisplay.textContent = `Difficulty: ${difficultyText} | Timer: ${timerText}`;
-            
-            console.log('🎯 Game header updated with player:', displayName, 'settings:', settings);
-        }
-
-        // v2.0.0: Event Listeners (removed back button for progressive system)
-
-        wordCardLeft.addEventListener('click', () => handleSelection('left'));
-        wordCardRight.addEventListener('click', () => handleSelection('right'));
-
-        document.addEventListener('keydown', (e) => {
-            if (!gameInProgress) return;
-            
-            if (e.key.toLowerCase() === 'a') {
-                wordCardLeft.classList.add('focused');
-                handleSelection('left');
-            } else if (e.key.toLowerCase() === 'd') {
-                wordCardRight.classList.add('focused');
-                handleSelection('right');
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (e.key.toLowerCase() === 'a') wordCardLeft.classList.remove('focused');
-            if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
-        });
-
-         // v2.0.0: Updated Initialization for Progressive Difficulty System
-         window.onload = async () => {
-             // Get parameters from URL
-             getURLParameters();
-             
-             // Initialize DOM references for combined system
-             heartsContainer = document.querySelector('.hearts');
-             motivationText = document.querySelector('.motivation-text');
-             
-             // Initialize background music
-             initializeBackgroundMusic();
-             
-             // Load user data
-             loadUserData();
-             
-             // Load word lists with error handling
-             try {
-                 await loadWordListsFromGoogleSheets();
-             } catch (error) {
-                 console.warn("Google Sheets loading failed, continuing with fallback data:", error);
-             }
-             
-             // Initialize personal records display
-             updatePersonalRecordsDisplay();
-             
-             // Set up progressive game system with life system
-             gamePlayerName.textContent = displayName;
-             bestStreakEl.textContent = stats.bestStreak;
-             currentStreak = 0;
-             currentLevel = 1; // Start at easy level
-             wordsAnsweredInLevel = 0;
-             usedWords.clear(); // Reset used words tracker
-             gameInProgress = true;
-             
-             // NEW: Reset level scores
-             levelScores = {
-                 easy: { correct: 0, total: 0, completed: false },
-                 medium: { correct: 0, total: 0, completed: false },
-                 hard: { correct: 0, total: 0, completed: false }
-             };
-             
-             // Initialize life system
-             resetLives();
-             
-             // Set initial difficulty to easy
-             settings.difficulty = 'easy';
-             
-             // Start background music if enabled
-             toggleBackgroundMusic();
-             
-             // Start first round
-             nextRound();
-         };
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeGame);
     </script>
-    
-    <!-- 
-    Version Update: v2.1.0 - New Weighted Scoring System (Updated: 2024-01-09)
-    Changes:
-    - Implemented weighted scoring: Easy=1pt, Medium=2pts, Hard=3pts per correct answer
-    - Score calculation based on percentage of maximum possible score from played levels only
-    - New evaluation tiers: 90%+, 70-89%, 40-69%, 20-39%, 0-19%
-    - Added detailed score breakdown showing performance per difficulty level
-    - Updated evaluation messages to match new requirements
-    -->
 </body>
 </html>
