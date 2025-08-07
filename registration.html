@@ -921,17 +921,17 @@
         let isGuest = false;
 
         // --- DOM ELEMENTS ---
-        const gmailLoginBtn = document.getElementById('gmail-login-btn');
-        const guestModeBtn = document.getElementById('guest-mode-btn');
-        const registrationOptions = document.getElementById('registration-options');
-        const profileSetup = document.getElementById('profile-setup');
-        const profileForm = document.getElementById('profile-form');
-        const completeBtn = document.getElementById('complete-registration-btn');
-        const backToOptionsBtn = document.getElementById('back-to-options-btn');
-        const errorMessage = document.getElementById('error-message');
-        const successMessage = document.getElementById('success-message');
-        const guestWarningBanner = document.getElementById('guest-warning-banner');
-        const networkStatus = document.getElementById('network-status');
+        let gmailLoginBtn;
+        let guestModeBtn;
+        let registrationOptions;
+        let profileSetup;
+        let profileForm;
+        let completeBtn;
+        let backToOptionsBtn;
+        let errorMessage;
+        let successMessage;
+        let guestWarningBanner;
+        let networkStatus;
 
         // --- UTILITY FUNCTIONS ---
         function showError(message) {
@@ -1000,9 +1000,34 @@
             alert(networkStatus.textContent);
         };
 
+        // --- DOM INITIALIZATION ---
+        function initializeDOMElements() {
+            gmailLoginBtn = document.getElementById('gmail-login-btn');
+            guestModeBtn = document.getElementById('guest-mode-btn');
+            registrationOptions = document.getElementById('registration-options');
+            profileSetup = document.getElementById('profile-setup');
+            profileForm = document.getElementById('profile-form');
+            completeBtn = document.getElementById('complete-registration-btn');
+            backToOptionsBtn = document.getElementById('back-to-options-btn');
+            errorMessage = document.getElementById('error-message');
+            successMessage = document.getElementById('success-message');
+            guestWarningBanner = document.getElementById('guest-warning-banner');
+            networkStatus = document.getElementById('network-status');
+        }
+
         // --- FIREBASE INITIALIZATION ---
         async function initializeApp() {
             try {
+                console.log('🔧 Initializing app...');
+                
+                // Initialize DOM elements first
+                initializeDOMElements();
+                console.log('✅ DOM elements initialized');
+                
+                // Setup event listeners after DOM elements are initialized
+                setupEventListeners();
+                console.log('✅ Event listeners set up');
+                
                 updateNetworkStatus();
                 
                 if (navigator.onLine) {
@@ -1089,6 +1114,7 @@
         function handleGuestMode() {
             try {
                 console.log('👤 Starting guest mode...');
+                console.log('Guest button clicked!');
                 isGuest = true;
                 
                 // Option 1: Direct redirect to testing.html without profile setup
@@ -1243,98 +1269,159 @@
             }
         }
 
-        // --- EVENT LISTENERS ---
-        gmailLoginBtn.addEventListener('click', handleGmailLogin);
-        guestModeBtn.addEventListener('click', handleGuestMode);
-        backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
-        
-        // Account panel event listeners
-        document.getElementById('account-nav-btn').addEventListener('click', () => {
-            const accountPanel = document.getElementById('account-panel');
-            accountPanel.classList.toggle('hidden');
-        });
-        
-        document.getElementById('close-account-btn').addEventListener('click', () => {
-            document.getElementById('account-panel').classList.add('hidden');
-        });
-        
-        document.getElementById('panel-gmail-login-btn').addEventListener('click', handleGmailLogin);
-        document.getElementById('panel-guest-mode-btn').addEventListener('click', handleGuestMode);
-        
-        // Home button navigation
-        document.getElementById('home-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'registration.html';
-        });
-        
-        document.getElementById('home-nav-btn').addEventListener('click', () => {
-            window.location.href = 'registration.html';
-        });
-        
-        // Panels and Tab Navigation
-        const leaderboardPanel = document.getElementById('leaderboard-panel');
-        const settingsPanel = document.getElementById('settings-panel');
-        const accountPanel = document.getElementById('account-panel');
-        
-        // Toggle functionality for all panels
-        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
-            console.log('🏆 Toggling leaderboard panel');
-            const isHidden = leaderboardPanel.classList.contains('hidden');
-            
-            // Close other panels
-            settingsPanel.classList.add('hidden');
-            accountPanel.classList.add('hidden');
-            
-            // Toggle leaderboard
-            if (isHidden) {
-                leaderboardPanel.classList.remove('hidden');
-                switchTab('leaderboard');
-            } else {
-                leaderboardPanel.classList.add('hidden');
+        // --- EVENT LISTENERS SETUP ---
+        function setupEventListeners() {
+            // Main buttons
+            if (gmailLoginBtn) {
+                gmailLoginBtn.addEventListener('click', handleGmailLogin);
             }
-        });
-        
-        document.getElementById('open-settings-btn').addEventListener('click', () => {
-            console.log('⚙️ Toggling settings panel');
-            const isHidden = settingsPanel.classList.contains('hidden');
+            if (guestModeBtn) {
+                guestModeBtn.addEventListener('click', handleGuestMode);
+            }
+            if (backToOptionsBtn) {
+                backToOptionsBtn.addEventListener('click', switchToRegistrationOptions);
+            }
             
-            // Close other panels
-            leaderboardPanel.classList.add('hidden');
-            accountPanel.classList.add('hidden');
+            // Account panel event listeners
+            const accountNavBtn = document.getElementById('account-nav-btn');
+            if (accountNavBtn) {
+                accountNavBtn.addEventListener('click', () => {
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.toggle('hidden');
+                });
+            }
             
-            // Toggle settings
-            settingsPanel.classList.toggle('hidden');
-        });
-        
-        // Close buttons
-        document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
-        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
-        
-        // Tab Navigation
-        document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
-        document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
-        
-        document.getElementById('save-settings-btn').addEventListener('click', () => {
-            console.log('💾 Saving settings and closing panel');
-            // For registration page, we'll just close the panel
-            // Settings will be properly handled in the game pages
-            settingsPanel.classList.add('hidden');
-        });
-        
-        // Debug: Ensure guest button is found
-        console.log('Guest button found:', guestModeBtn);
-        if (!guestModeBtn) {
-            console.error('Guest mode button not found!');
-        }
-        
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            completeRegistration();
-        });
+            const closeAccountBtn = document.getElementById('close-account-btn');
+            if (closeAccountBtn) {
+                closeAccountBtn.addEventListener('click', () => {
+                    document.getElementById('account-panel').classList.add('hidden');
+                });
+            }
+            
+            const panelGmailBtn = document.getElementById('panel-gmail-login-btn');
+            if (panelGmailBtn) {
+                panelGmailBtn.addEventListener('click', handleGmailLogin);
+            }
+            
+            const panelGuestBtn = document.getElementById('panel-guest-mode-btn');
+            if (panelGuestBtn) {
+                panelGuestBtn.addEventListener('click', handleGuestMode);
+            }
+            
+            // Home button navigation
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'registration.html';
+                });
+            }
+            
+            const homeNavBtn = document.getElementById('home-nav-btn');
+            if (homeNavBtn) {
+                homeNavBtn.addEventListener('click', () => {
+                    window.location.href = 'registration.html';
+                });
+            }
+            
+            // Panels
+            const leaderboardPanel = document.getElementById('leaderboard-panel');
+            const settingsPanel = document.getElementById('settings-panel');
+            const accountPanel = document.getElementById('account-panel');
+            
+            // Toggle functionality for all panels
+            const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+            if (leaderboardNavBtn) {
+                leaderboardNavBtn.addEventListener('click', () => {
+                    console.log('🏆 Toggling leaderboard panel');
+                    const isHidden = leaderboardPanel.classList.contains('hidden');
+                    
+                    // Close other panels
+                    settingsPanel.classList.add('hidden');
+                    accountPanel.classList.add('hidden');
+                    
+                    // Toggle leaderboard
+                    if (isHidden) {
+                        leaderboardPanel.classList.remove('hidden');
+                        switchTab('leaderboard');
+                    } else {
+                        leaderboardPanel.classList.add('hidden');
+                    }
+                });
+            }
+            
+            const openSettingsBtn = document.getElementById('open-settings-btn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', () => {
+                    console.log('⚙️ Toggling settings panel');
+                    const isHidden = settingsPanel.classList.contains('hidden');
+                    
+                    // Close other panels
+                    leaderboardPanel.classList.add('hidden');
+                    accountPanel.classList.add('hidden');
+                    
+                    // Toggle settings
+                    settingsPanel.classList.toggle('hidden');
+                });
+            }
+            
+            // Close buttons
+            const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+            if (closeLeaderboardBtn) {
+                closeLeaderboardBtn.addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
+            }
+            
+            const closeSettingsBtn = document.getElementById('close-settings-btn');
+            if (closeSettingsBtn) {
+                closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.add('hidden'));
+            }
+            
+            // Tab Navigation
+            const leaderboardTab = document.getElementById('leaderboard-tab');
+            if (leaderboardTab) {
+                leaderboardTab.addEventListener('click', () => switchTab('leaderboard'));
+            }
+            
+            const personalRecordsTab = document.getElementById('personal-records-tab');
+            if (personalRecordsTab) {
+                personalRecordsTab.addEventListener('click', () => switchTab('personal-records'));
+            }
+            
+            const saveSettingsBtn = document.getElementById('save-settings-btn');
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', () => {
+                    console.log('💾 Saving settings and closing panel');
+                    // For registration page, we'll just close the panel
+                    // Settings will be properly handled in the game pages
+                    settingsPanel.classList.add('hidden');
+                });
+            }
+            
+            // Debug: Ensure guest button is found
+            console.log('Guest button found:', guestModeBtn);
+            if (!guestModeBtn) {
+                console.error('Guest mode button not found!');
+            }
+            
+            // Profile form
+            if (profileForm) {
+                profileForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    completeRegistration();
+                });
+            }
 
-        // Real-time validation
-        document.getElementById('profile-name').addEventListener('input', validateProfileForm);
-        document.getElementById('profile-age').addEventListener('input', validateProfileForm);
+            // Real-time validation
+            const profileNameInput = document.getElementById('profile-name');
+            if (profileNameInput) {
+                profileNameInput.addEventListener('input', validateProfileForm);
+            }
+            
+            const profileAgeInput = document.getElementById('profile-age');
+            if (profileAgeInput) {
+                profileAgeInput.addEventListener('input', validateProfileForm);
+            }
+        }
 
         // Network status listeners
         window.addEventListener('online', updateNetworkStatus);
