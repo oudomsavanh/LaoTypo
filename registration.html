@@ -906,13 +906,46 @@
         </div>
     </div>
 
+    <!-- Test Script to verify JavaScript is working -->
+    <script>
+        console.log('🧪 Basic script test - JavaScript is working!');
+        
+        // Simple test when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 DOMContentLoaded fired in basic script');
+            
+            // Test if we can find the guest button
+            const testGuestBtn = document.getElementById('guest-mode-btn');
+            console.log('🧪 Guest button found in basic script:', testGuestBtn);
+            
+            if (testGuestBtn) {
+                testGuestBtn.addEventListener('click', function() {
+                    console.log('🧪 Guest button clicked (basic script handler)!');
+                    alert('Guest button clicked! Redirecting to testing.html...');
+                    window.location.href = 'testing.html';
+                });
+            }
+        });
+    </script>
+
     <script type="module">
-        // Import Firebase modules
-        import { 
-            initializeFirebase, 
-            FirebaseAuthManager, 
-            FirebasePlayerManager 
-        } from './firebase-config.js';
+        console.log('🚀 Script starting to load...');
+        
+        // Wrap everything in an async function
+        (async function() {
+            // Import Firebase modules with error handling
+            let initializeFirebase, FirebaseAuthManager, FirebasePlayerManager;
+            
+            try {
+                const firebaseModule = await import('./firebase-config.js');
+                initializeFirebase = firebaseModule.initializeFirebase;
+                FirebaseAuthManager = firebaseModule.FirebaseAuthManager;
+                FirebasePlayerManager = firebaseModule.FirebasePlayerManager;
+                console.log('✅ Firebase modules imported successfully');
+            } catch (error) {
+                console.error('❌ Error importing Firebase modules:', error);
+                console.log('⚠️ Continuing without Firebase...');
+            }
 
         // --- GLOBAL STATE ---
         let authManager = null;
@@ -1431,6 +1464,8 @@
         document.addEventListener('DOMContentLoaded', initializeApp);
 
         console.log('🚀 Registration page loaded - Phase 1 System');
+        
+        })(); // End of async wrapper
     </script>
 </body>
 </html>
