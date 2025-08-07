@@ -311,12 +311,12 @@
             font-weight: 500;
         }
         
-        /* Toggle Switch Styles - Matching design */
+        /* Toggle Switch Styles - Previous design */
         .switch {
             position: relative;
             display: inline-block;
-            width: 48px;
-            height: 24px;
+            width: 60px;
+            height: 34px;
         }
         
         .switch input {
@@ -334,16 +334,16 @@
             bottom: 0;
             background-color: var(--sub-color);
             transition: .4s;
-            border-radius: 24px;
+            border-radius: 34px;
         }
         
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -354,7 +354,7 @@
         }
         
         input:checked + .slider:before {
-            transform: translateX(24px);
+            transform: translateX(26px);
         }
         
         /* Timer toggle container */
@@ -519,13 +519,40 @@
         .input-error {
             border-color: var(--error-color) !important;
         }
-        .loading-indicator {
+                .loading-indicator {
             color: var(--main-color);
             font-size: 1.2rem;
             margin: 1rem 0;
         }
         
-
+        /* Gecko Mascot - Restored with click functionality */
+        .gecko-mascot {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 40;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .gecko-mascot:hover {
+            transform: scale(1.1);
+        }
+        
+        .gecko-mascot:active {
+            transform: scale(0.95);
+        }
+        
+        .gecko-mascot img {
+            width: 100px;
+            height: 100px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gecko-mascot:hover img {
+            opacity: 1;
+        }
         
         /* Custom typography for main title and subtitle */
         .main-title {
@@ -809,6 +836,11 @@
             </div>
         </div>
     </nav>
+
+    <!-- Gecko Mascot -->
+    <div class="gecko-mascot" id="gecko-mascot">
+        <img src="Gecko.png" alt="Gecko Mascot">
+    </div>
 
     <div class="game-container">
         <!-- Start Screen -->
@@ -1535,6 +1567,7 @@
             correct: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
             incorrect: new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 } }).toDestination(),
             start: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
+            uhoh: new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.2, release: 0.5 } }).toDestination(),
         };
 
         function playSound(sound) {
@@ -1544,6 +1577,11 @@
                 if (sound === 'correct') sounds.correct.triggerAttackRelease('C5', '8n');
                 else if (sound === 'incorrect') sounds.incorrect.triggerAttackRelease('C3', '8n');
                 else if (sound === 'start') sounds.start.triggerAttackRelease('C4', '8n');
+                else if (sound === 'uhoh') {
+                    // Play "uh-oh" sound with two descending notes
+                    sounds.uhoh.triggerAttackRelease('G3', '8n');
+                    setTimeout(() => sounds.uhoh.triggerAttackRelease('E3', '8n'), 150);
+                }
             } catch (e) {
                 console.error("Sound playback error", e);
             }
@@ -1922,6 +1960,17 @@
         });
 
         document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Gecko mascot click event
+        document.getElementById('gecko-mascot').addEventListener('click', () => {
+            playSound('uhoh');
+            // Optional: Add a little animation
+            const gecko = document.getElementById('gecko-mascot');
+            gecko.style.transform = 'scale(0.9) rotate(-5deg)';
+            setTimeout(() => {
+                gecko.style.transform = 'scale(1) rotate(0deg)';
+            }, 200);
+        });
         
         // Account panel controls
         document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
