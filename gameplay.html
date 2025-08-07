@@ -896,6 +896,11 @@
             }
         }
 
+        function gameOver() {
+            // When player runs out of lives, just call endGame
+            endGame();
+        }
+
         // Timer functions
         function startTimer() {
             if (!timerEnabled) return;
@@ -942,201 +947,108 @@
             }
         }
 
-        function gameOver() {
-            gameActive = false;
-            clearTimeout(currentTimeout);
-            
-            // Update final stats
-            document.getElementById('final-streak').textContent = currentStreak;
-            document.getElementById('results-best-streak').textContent = bestStreak;
-            
-            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : '0.0';
-            document.getElementById('accuracy-stat').textContent = `${accuracy}%`;
-            
-            // Update evaluation for game over due to no lives
-            const evaluationEl = document.getElementById('evaluation-result');
-            const memeContainer = document.getElementById('meme-container');
-            
-            // Clear previous classes
-            evaluationEl.className = 'text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4';
-            
-            if (currentStreak === 0) {
-                evaluationEl.textContent = "ຢ່າທໍ້ຖອຍ! ລອງໃໝ່ອີກຄັ້ງ! 💪";
-                evaluationEl.classList.add('animate-shake', 'text-red-500');
-                
-                // Add sad meme
-                memeContainer.innerHTML = `
-                    <div class="flex items-center justify-center h-full bg-gray-900 p-4">
-                        <div class="text-center">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😭</div>
-                            <p class="text-lg sm:text-2xl text-gray-300 font-bold">BRUH MOMENT</p>
-                            <p class="text-sm sm:text-lg text-gray-400">0 streak? Really?</p>
-                        </div>
-                    </div>
-                `;
-            } else if (currentStreak < 10) {
-                evaluationEl.textContent = "ເສຍດາຍ! ເກືອບໄດ້ແລ້ວ! 🌟";
-                evaluationEl.classList.add('animate-pulse', 'text-yellow-500');
-                
-                // Add "so close" meme
-                memeContainer.innerHTML = `
-                    <div class="flex items-center justify-center h-full bg-gray-900 p-4">
-                        <div class="text-center">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😩</div>
-                            <p class="text-lg sm:text-2xl text-gray-300 font-bold">SO CLOSE!</p>
-                            <p class="text-sm sm:text-lg text-gray-400">Just ${10 - currentStreak} more to greatness</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                evaluationEl.textContent = `ດີແລ້ວ! ໄດ້ ${currentStreak} ຄຳ! ລອງອີກຄັ້ງເພື່ອຜົນທີ່ດີກວ່າ! 🎯`;
-                evaluationEl.classList.add('animate-bounce', 'text-green-500');
-                
-                // Add success meme with confetti effect
-                memeContainer.innerHTML = `
-                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-purple-600 to-pink-600 relative overflow-hidden p-4">
-                        <div class="text-center z-10">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🐐</div>
-                            <p class="text-lg sm:text-2xl text-white font-bold">ABSOLUTE GOAT!</p>
-                            <p class="text-sm sm:text-lg text-gray-200">${currentStreak} streak legend!</p>
-                        </div>
-                        <div class="absolute inset-0 opacity-30">
-                            <div class="animate-pulse text-6xl sm:text-9xl absolute top-0 left-0">🎉</div>
-                            <div class="animate-bounce text-6xl sm:text-9xl absolute top-0 right-0">🎊</div>
-                            <div class="animate-pulse text-6xl sm:text-9xl absolute bottom-0 left-0">✨</div>
-                            <div class="animate-bounce text-6xl sm:text-9xl absolute bottom-0 right-0">🌟</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Save game stats
-            saveGameStats();
-            
-            // Switch screens
-            gameScreen.classList.remove('active');
-            resultsScreen.classList.add('active');
-        }
-
         // End game (general purpose)
         function endGame() {
             gameActive = false;
             clearTimeout(currentTimeout);
             
-            // Update final stats
-            finalStreakEl.textContent = currentStreak;
-            resultsBestStreakEl.textContent = bestStreak;
+            // Calculate final percentage score
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
+            const accuracyRounded = accuracy.toFixed(1);
             
-            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : 0;
-            accuracyStatEl.textContent = `${accuracy}%`;
+            // Update stats displays
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('results-best-streak').textContent = bestStreak;
+            document.getElementById('accuracy-stat').textContent = `${accuracyRounded}%`;
             
-            // Get meme container
+            // Get meme container and evaluation element
             const memeContainer = document.getElementById('meme-container');
+            const evaluationEl = document.getElementById('evaluation-result');
             
             // Clear previous classes
-            evaluationResultEl.className = 'text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4';
+            evaluationEl.className = 'text-xl sm:text-3xl font-bold text-center mt-2 sm:mt-4';
             
-            // Evaluation based on accuracy and streak
+            // Determine evaluation tier based on percentage only
             let evaluation = '';
-            let evaluationColor = '';
-            let animationClass = '';
             let memeContent = '';
             
-            if (parseFloat(accuracy) === 100 && currentStreak >= 30) {
-                // Perfect score special case
-                evaluation = 'ສົມບູນແບບ! ເຈົ້າຄືແຊມປ້ຽນ! 🌟🏆🌟';
-                evaluationColor = '';
-                animationClass = 'animate-rainbow text-4xl';
+            if (accuracy >= 90) {
+                // 90-100%: Born to be Lao
+                evaluation = 'ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ';
+                evaluationEl.classList.add('text-yellow-400', 'animate-bounce');
                 memeContent = `
-                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-purple-600 via-pink-500 to-yellow-500 relative overflow-hidden p-4">
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 relative overflow-hidden p-4">
                         <div class="text-center z-10">
-                            <div class="text-7xl sm:text-9xl mb-2 sm:mb-4 animate-bounce">🌟</div>
-                            <p class="text-xl sm:text-3xl text-white font-bold animate-pulse">PERFECT SCORE!</p>
-                            <p class="text-base sm:text-xl text-gray-100">100% ACCURACY - UNBELIEVABLE!</p>
+                            <div class="text-7xl sm:text-9xl mb-2 sm:mb-4 animate-pulse">🏆</div>
+                            <p class="text-xl sm:text-3xl text-white font-bold">BORN TO BE LAO!</p>
+                            <p class="text-base sm:text-xl text-gray-100">${accuracyRounded}% - Legendary!</p>
                         </div>
-                        <div class="absolute inset-0">
-                            <div class="animate-spin text-6xl sm:text-9xl absolute top-0 left-0 opacity-50">⭐</div>
-                            <div class="animate-spin text-6xl sm:text-9xl absolute top-0 right-0 opacity-50" style="animation-duration: 3s;">🌟</div>
-                            <div class="animate-spin text-6xl sm:text-9xl absolute bottom-0 left-0 opacity-50" style="animation-duration: 2s;">✨</div>
-                            <div class="animate-spin text-6xl sm:text-9xl absolute bottom-0 right-0 opacity-50" style="animation-duration: 4s;">💫</div>
+                        <div class="absolute inset-0 opacity-40">
+                            <div class="animate-spin text-6xl sm:text-8xl absolute top-4 left-4" style="animation-duration: 3s;">⭐</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute top-4 right-4" style="animation-duration: 4s;">🌟</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute bottom-4 left-4" style="animation-duration: 2s;">✨</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute bottom-4 right-4" style="animation-duration: 5s;">💫</div>
                         </div>
                     </div>
                 `;
-            } else if (parseFloat(accuracy) >= 90 && currentStreak >= 50) {
-                evaluation = 'ເຈົ້າແມ່ນຄົນລາວແທ້! 🏆';
-                evaluationColor = 'text-yellow-400';
-                animationClass = 'animate-bounce';
-                memeContent = `
-                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-yellow-400 to-orange-500 relative overflow-hidden p-4">
-                        <div class="text-center z-10">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">👑</div>
-                            <p class="text-lg sm:text-2xl text-white font-bold">LEGENDARY!</p>
-                            <p class="text-sm sm:text-lg text-gray-100">True Lao Champion!</p>
-                        </div>
-                        <div class="absolute inset-0 opacity-30">
-                            <div class="animate-pulse text-6xl sm:text-9xl absolute top-0 left-0">🏆</div>
-                            <div class="animate-bounce text-6xl sm:text-9xl absolute top-0 right-0">⭐</div>
-                            <div class="animate-pulse text-6xl sm:text-9xl absolute bottom-0 left-0">💯</div>
-                            <div class="animate-bounce text-6xl sm:text-9xl absolute bottom-0 right-0">🎯</div>
-                        </div>
-                    </div>
-                `;
-            } else if (parseFloat(accuracy) >= 80 && currentStreak >= 30) {
-                evaluation = 'ດີຫຼາຍ! ເກືອບສົມບູນແບບແລ້ວ 🌟';
-                evaluationColor = 'text-green-400';
-                animationClass = 'animate-bounce';
+            } else if (accuracy >= 70) {
+                // 70-89%: 75% True Lao Child
+                evaluation = 'ເຈົ້າແມ່ນລູກຊອດລາວ 75%';
+                evaluationEl.classList.add('text-green-400', 'animate-pulse');
                 memeContent = `
                     <div class="flex items-center justify-center h-full bg-gradient-to-br from-green-500 to-blue-600 p-4">
                         <div class="text-center">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🔥</div>
-                            <p class="text-lg sm:text-2xl text-white font-bold">ON FIRE!</p>
-                            <p class="text-sm sm:text-lg text-gray-200">Keep it up, champ!</p>
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🎉</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">TRUE LAO CHILD!</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Impressive!</p>
+                            <div class="mt-2 text-4xl sm:text-6xl">🎊🌟</div>
                         </div>
                     </div>
                 `;
-            } else if (parseFloat(accuracy) >= 70 && currentStreak >= 15) {
-                evaluation = 'ດີ! ແຕ່ຍັງຕ້ອງຝຶກເພີ່ມ 📚';
-                evaluationColor = 'text-blue-400';
-                animationClass = 'animate-pulse';
+            } else if (accuracy >= 40) {
+                // 40-69%: Born in Laos but grew up abroad
+                evaluation = 'ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ';
+                evaluationEl.classList.add('text-blue-400', 'animate-pulse');
                 memeContent = `
-                    <div class="flex items-center justify-center h-full bg-gray-900 p-4">
-                        <div class="text-center">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">💪</div>
-                            <p class="text-lg sm:text-2xl text-gray-300 font-bold">SOLID EFFORT!</p>
-                            <p class="text-sm sm:text-lg text-gray-400">Room for improvement</p>
-                        </div>
-                    </div>
-                `;
-            } else if (parseFloat(accuracy) >= 50) {
-                evaluation = 'ພະຍາຍາມຕື່ມອີກເດີ! 💪';
-                evaluationColor = 'text-yellow-500';
-                animationClass = 'animate-pulse';
-                memeContent = `
-                    <div class="flex items-center justify-center h-full bg-gray-900 p-4">
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-blue-600 to-purple-700 p-4">
                         <div class="text-center">
                             <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🤔</div>
-                            <p class="text-lg sm:text-2xl text-gray-300 font-bold">MID PERFORMANCE</p>
-                            <p class="text-sm sm:text-lg text-gray-400">You can do better!</p>
+                            <p class="text-lg sm:text-2xl text-white font-bold">LAO ABROAD</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Half way there!</p>
+                            <div class="mt-2 text-3xl sm:text-4xl">✈️🌏</div>
+                        </div>
+                    </div>
+                `;
+            } else if (accuracy >= 20) {
+                // 20-39%: At least not "Jing Jai"
+                evaluation = 'ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ "ຈຣິງໃຈ"';
+                evaluationEl.classList.add('text-yellow-500', 'animate-pulse');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-yellow-600 to-orange-700 p-4">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😏</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">NOT "JING JAI"</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Could be worse!</p>
                         </div>
                     </div>
                 `;
             } else {
-                evaluation = 'ຕ້ອງຝຶກຫຼາຍກວ່ານີ້! 📖';
-                evaluationColor = 'text-red-500';
-                animationClass = 'animate-shake';
+                // 0-19%: Foreigner whose plane crashed
+                evaluation = 'ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ';
+                evaluationEl.classList.add('text-red-500', 'animate-shake');
                 memeContent = `
-                    <div class="flex items-center justify-center h-full bg-gray-900 p-4">
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-gray-800 to-red-900 p-4">
                         <div class="text-center">
-                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">📚</div>
-                            <p class="text-lg sm:text-2xl text-gray-300 font-bold">STUDY TIME!</p>
-                            <p class="text-sm sm:text-lg text-gray-400">Hit the books!</p>
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😭</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">PLANE CRASH!</p>
+                            <p class="text-sm sm:text-lg text-gray-300">${accuracyRounded}% - Foreigner detected!</p>
+                            <div class="mt-2 text-4xl sm:text-5xl animate-bounce">✈️💥</div>
                         </div>
                     </div>
                 `;
             }
             
-            evaluationResultEl.textContent = evaluation;
-            evaluationResultEl.classList.add(evaluationColor, animationClass);
+            evaluationEl.textContent = evaluation;
             memeContainer.innerHTML = memeContent;
             
             // Save game stats
