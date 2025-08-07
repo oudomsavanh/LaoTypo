@@ -539,7 +539,17 @@
                 soundEnabled = settings.soundEnabled !== false;
             }
             
-            playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            // Get player name from URL parameters first, then fallback to localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlPlayerName = urlParams.get('player');
+            if (urlPlayerName) {
+                playerName = decodeURIComponent(urlPlayerName);
+                // Store in localStorage for consistency
+                localStorage.setItem('displayName', playerName);
+            } else {
+                playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            }
+            
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
             
             // Update UI with settings
@@ -609,7 +619,7 @@
                 console.log("Error details:", error.message);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
                 
                 // Fallback to default words
@@ -713,14 +723,15 @@
                         updateDifficultyDisplay();
                     }
                 }
+                
+                // Update UI immediately
+                updateUI();
             } else {
                 selectedCard.classList.add('feedback-incorrect');
                 otherCard.classList.add('feedback-correct');
                 playSound('incorrect');
                 loseLife();
             }
-            
-            updateUI();
             
             if (playerLives > 0) {
                 setTimeout(() => {
@@ -806,7 +817,7 @@
                     updateLifeDisplay();
                     
                     if (playerLives === 0) {
-                        endGame();
+                        gameOver();
                     }
                 }, 600);
             }
@@ -858,7 +869,41 @@
             }
         }
 
-        // End game
+        function gameOver() {
+            gameActive = false;
+            clearTimeout(currentTimeout);
+            
+            // Update final stats
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('results-best-streak').textContent = bestStreak;
+            
+            // Calculate accuracy
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : '0.0';
+            document.getElementById('accuracy-stat').textContent = `${accuracy}%`;
+            
+            // Update evaluation for game over due to no lives
+            const evaluationEl = document.getElementById('evaluation-result');
+            if (currentStreak === 0) {
+                evaluationEl.textContent = "ຢ່າທໍ້ຖອຍ! ລອງໃໝ່ອີກຄັ້ງ! 💪";
+            } else if (currentStreak < 10) {
+                evaluationEl.textContent = "ເສຍດາຍ! ເກືອບໄດ້ແລ້ວ! 🌟";
+            } else {
+                evaluationEl.textContent = `ດີແລ້ວ! ໄດ້ ${currentStreak} ຄຳ! ລອງອີກຄັ້ງເພື່ອຜົນທີ່ດີກວ່າ! 🎯`;
+            }
+            evaluationEl.style.color = 'var(--warning-color)';
+            
+            // Show level breakdown
+            showLevelBreakdown();
+            
+            // Save game stats
+            saveGameStats();
+            
+            // Switch screens
+            gameScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+        }
+
+        // End game (general purpose)
         function endGame() {
             gameActive = false;
             clearTimeout(currentTimeout);
@@ -870,21 +915,24 @@
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : 0;
             accuracyStatEl.textContent = `${accuracy}%`;
             
-            // Evaluation
+            // Evaluation based on accuracy and streak
             let evaluation = '';
             let evaluationColor = '';
             
-            if (currentStreak >= 50) {
+            if (parseFloat(accuracy) >= 90 && currentStreak >= 50) {
                 evaluation = 'ເຈົ້າແມ່ນຄົນລາວແທ້! 🏆';
                 evaluationColor = '#FFD700';
-            } else if (currentStreak >= 30) {
+            } else if (parseFloat(accuracy) >= 80 && currentStreak >= 30) {
                 evaluation = 'ດີຫຼາຍ! ເກືອບສົມບູນແບບແລ້ວ 🌟';
                 evaluationColor = 'var(--correct-color)';
-            } else if (currentStreak >= 15) {
+            } else if (parseFloat(accuracy) >= 70 && currentStreak >= 15) {
                 evaluation = 'ດີ! ແຕ່ຍັງຕ້ອງຝຶກເພີ່ມ 📚';
                 evaluationColor = 'var(--main-color)';
-            } else {
+            } else if (parseFloat(accuracy) >= 50) {
                 evaluation = 'ພະຍາຍາມຕື່ມອີກເດີ! 💪';
+                evaluationColor = 'var(--warning-color)';
+            } else {
+                evaluation = 'ຕ້ອງຝຶກຫຼາຍກວ່ານີ້! 📖';
                 evaluationColor = 'var(--error-color)';
             }
             
@@ -1039,6 +1087,11 @@
                 window.location.href = 'testing.html';
             });
             
+            // Return home button in footer
+            document.getElementById('return-home-btn').addEventListener('click', () => {
+                window.location.href = 'testing.html';
+            });
+            
             // Other navigation buttons can be added here
             document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
                 // Add leaderboard functionality
@@ -1056,5 +1109,14 @@
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', initializeGame);
     </script>
+    
+    <!-- Footer with Return Home button -->
+    <footer class="fixed bottom-0 left-0 right-0 p-4 bg-[#222426] border-t-2 border-[#f8af3c]">
+        <div class="max-w-7xl mx-auto text-center">
+            <button id="return-home-btn" class="btn btn-primary px-6 py-2">
+                🏠 ກັບໄປໜ້າຫຼັກ
+            </button>
+        </div>
+    </footer>
 </body>
 </html>
