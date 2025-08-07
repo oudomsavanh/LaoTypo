@@ -173,36 +173,86 @@
             transition: transform 0.1s linear;
         }
         
-        /* Redesigned Life Bar with TailwindCSS */
+        /* Redesigned Life Bar with Better Visual Design */
         .life-bar-container {
-            @apply bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-lg p-4 shadow-lg mb-6;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #1e1e20 0%, #2a2a2d 100%);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .life-bar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--main-color), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         
         .life-hearts-row {
-            @apply flex items-center justify-center gap-3 mb-2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
         }
         
         .life-label {
-            @apply text-gray-800 font-bold text-lg;
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .hearts-container {
-            @apply flex gap-2;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
         }
         
         .heart {
-            @apply text-3xl transition-all duration-300 ease-in-out;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            font-size: 2rem;
+            transition: all 0.3s ease-in-out;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+            position: relative;
         }
         
         .heart.active {
-            @apply text-red-500;
+            color: #ef4444;
             animation: heartPulse 2s infinite;
         }
         
+        .heart.active::after {
+            content: '✨';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.5rem;
+            animation: sparkle 2s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
         .heart.lost {
-            @apply text-gray-600 opacity-40 scale-75;
+            color: #4b5563;
+            opacity: 0.3;
+            transform: scale(0.8);
+            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
         
         .heart.losing {
@@ -239,16 +289,31 @@
         }
         
         .motivation-text {
-            @apply text-center text-gray-800 font-semibold italic;
-            font-size: 1rem;
+            text-align: center;
+            color: var(--text-color);
+            font-weight: 500;
+            font-style: italic;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
         }
         
         .motivation-text.warning {
-            @apply text-orange-700;
+            color: var(--warning-color);
+            opacity: 1;
+            font-weight: 600;
         }
         
         .motivation-text.critical {
-            @apply text-red-700 font-bold;
+            color: var(--error-color);
+            opacity: 1;
+            font-weight: 700;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         
         /* Custom responsive typography */
@@ -317,7 +382,7 @@
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
                 
-                <!-- Redesigned Life Bar with TailwindCSS -->
+                <!-- Redesigned Life Bar with Enhanced Visual Design -->
                 <div class="life-bar-container">
                     <div class="life-hearts-row">
                         <span class="life-label">ຊີວິດ:</span>
@@ -420,10 +485,8 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Google Sheets configuration
-        const SHEET_ID = '1Hu3-LJnxAIKjHeO0SvZjF9NDR6mADlBJE1uu0MC0-zE';
-        const SHEET_NAME = 'LaoTypoWords';
-        const API_KEY = 'AIzaSyBsYiJQHPvW5uYipvRLr0VdFfESQdEWJnQ';
+        // Google Sheets CSV URL (same as original gameplay.html)
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
         
         // DOM elements
         const gameScreen = document.getElementById('game-screen');
@@ -488,48 +551,88 @@
             difficultyDisplay.style.color = levelColors[currentLevel];
         }
 
-        // Load words from Google Sheets
+        // Load words from Google Sheets CSV
         async function loadWordsFromGoogleSheets() {
-            const range = `${SHEET_NAME}!A:C`;
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-            
             try {
-                const response = await fetch(url);
-                const data = await response.json();
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.style.color = 'var(--main-color)';
                 
-                if (data.values && data.values.length > 1) {
-                    // Skip header row and process data
-                    wordPairs = data.values.slice(1).map(row => ({
-                        context: row[0] || '',
-                        correct: row[1] || '',
-                        incorrect: row[2] || ''
-                    })).filter(pair => pair.context && pair.correct && pair.incorrect);
-                    
-                    console.log(`Loaded ${wordPairs.length} word pairs from Google Sheets`);
-                    wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ ${wordPairs.length} ຄຳສັບ`;
-                    wordLoadingStatus.style.color = 'var(--correct-color)';
-                    
-                    // Shuffle words
-                    wordPairs = shuffleArray(wordPairs);
-                } else {
-                    throw new Error('No data found');
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+                
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
+                wordPairs = lines
+                    .slice(1) // Skip header row
+                    .map(line => {
+                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
+                        if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
+                            return {
+                                context: columns[0],    // Column A - context to display
+                                correct: columns[1],    // Column B - correct answer
+                                incorrect: columns[2],  // Column C - incorrect answer
+                                difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null); // Remove invalid entries
+                
+                console.log("Word list loaded from Google Sheets:", wordPairs.length, "entries");
+                console.log("Sample entries:", wordPairs.slice(0, 3));
+                
+                if (wordPairs.length === 0) {
+                    throw new Error("No valid entries found in the spreadsheet");
+                }
+                
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
+                wordLoadingStatus.style.color = 'var(--correct-color)';
+                
+                // Hide loading status after successful load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 2000);
+                
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
+                
             } catch (error) {
-                console.error('Error loading from Google Sheets:', error);
-                wordLoadingStatus.textContent = 'ໂຫຼດຄຳສັບບໍ່ສຳເລັດ, ກະລຸນາລອງໃໝ່';
-                wordLoadingStatus.style.color = 'var(--error-color)';
+                console.error("Error loading word list from Google Sheets:", error);
+                console.log("Error details:", error.message);
+                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
+                wordLoadingStatus.style.color = 'var(--warning-color)';
                 
                 // Fallback to default words
                 wordPairs = getDefaultWords();
+                
+                // Hide loading status after fallback load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 3000);
             }
         }
 
         // Get default words as fallback
         function getDefaultWords() {
             return [
-                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌" },
-                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ" },
-                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ" }
+                { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', incorrect: 'ສະບາຍດີີ', difficulty: 1 },
+                { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບຈັຍ', difficulty: 1 },
+                { context: 'ລາວ', correct: 'ລາວ', incorrect: 'ລາຍ', difficulty: 1 },
+                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ", difficulty: 1 },
+                { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', incorrect: 'ພາສາລາຍ', difficulty: 2 },
+                { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', incorrect: 'ໂຮງຮິຽນ', difficulty: 2 },
+                { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', incorrect: 'ປະເທດລາຍ', difficulty: 2 },
+                { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', incorrect: 'ຄອມພິຍເຕີ', difficulty: 3 },
+                { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', incorrect: 'ວິທະຍາສາຍ', difficulty: 3 },
+                { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
             ];
         }
 
