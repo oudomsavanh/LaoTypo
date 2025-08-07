@@ -484,6 +484,133 @@
             margin: 0.25rem 0;
         }
         
+        /* Leaderboard Panel */
+        .leaderboard-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .panel-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-button.active {
+            color: var(--main-color) !important;
+            border-bottom-color: var(--main-color) !important;
+        }
+        
+        .tab-content {
+            min-height: 400px;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        
+        .leaderboard-table th {
+            color: var(--sub-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+        
+        .leaderboard-table tr:not(:first-child) {
+            border-top: 1px solid #3a3c3e;
+        }
+        
+        .leaderboard-table td.rank {
+            font-weight: bold;
+            color: var(--main-color);
+            text-align: center;
+        }
+        
+        .leaderboard-table td.score {
+            font-weight: bold;
+        }
+        
+        .leaderboard-table tr.user-best {
+            background-color: rgba(226, 183, 20, 0.1);
+            border-left: 3px solid var(--main-color);
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.4s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .settings-panel.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+            pointer-events: none;
+        }
+        
+        .settings-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .settings-content label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
         /* Responsive Design */
         @media (max-width: 640px) {
             .registration-card {
@@ -680,6 +807,100 @@
                 <div class="version-details">
                     <p>📦 Version 2.1.0</p>
                     <p>Registration System</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Panel (Separated from Settings) -->
+    <div id="leaderboard-panel" class="leaderboard-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ</h2>
+                <button id="close-leaderboard-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <!-- Tab Navigation (Removed Settings Tab) -->
+            <div class="flex border-b border-sub-color mb-6">
+                <button id="leaderboard-tab" class="tab-button active px-4 py-2 text-main-color border-b-2 border-main-color">
+                    🏆 ກະດານຈັດອັນດັບ
+                </button>
+                <button id="personal-records-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
+                    📈 ບັນທຶກສ່ວນຕົວ
+                </button>
+            </div>
+
+            <!-- Leaderboard Tab Content -->
+            <div id="leaderboard-content" class="tab-content">
+                <div id="leaderboard-container">
+                    <!-- Firebase leaderboard will be injected here -->
+                    <div class="text-center text-sub-color py-8">
+                        <p>🔄 Loading global leaderboard...</p>
+                        <p class="text-xs mt-2">Syncing with Firebase</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Records Tab Content -->
+            <div id="personal-records-content" class="tab-content hidden">
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-correct-color font-bold mb-2">ງ່າຍ (Easy)</div>
+                        <div id="easy-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="easy-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="easy-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-main-color font-bold mb-2">ປານກາງ (Medium)</div>
+                        <div id="medium-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="medium-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="medium-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
+                        <div class="text-error-color font-bold mb-2">ຍາກ (Hard)</div>
+                        <div id="hard-best-score-main" class="text-2xl font-bold">0</div>
+                        <div id="hard-best-accuracy-main" class="text-sub-color">0%</div>
+                        <div id="hard-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Independent Settings Panel (Floating) -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-main-color">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-2xl text-sub-color hover:text-text-color">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="text-left space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label>🔊 ສຽງເກມປະກອບ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>🎵 ສຽງປະກອບພື້ນຫຼັງເກມ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="music-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label>☁️ Firebase Sync</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="firebase-sync-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
                 </div>
             </div>
         </div>
@@ -971,6 +1192,56 @@
             console.log('🏠 Redirecting to homepage...');
             window.location.href = 'testing.html';
         }
+        
+        // --- PANEL FUNCTIONS ---
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-main-color', 'border-main-color');
+                btn.classList.add('text-sub-color');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const activeTab = document.getElementById(`${tabName}-tab`);
+            const activeContent = document.getElementById(`${tabName}-content`);
+            
+            if (activeTab && activeContent) {
+                activeTab.classList.add('active', 'text-main-color', 'border-main-color');
+                activeTab.classList.remove('text-sub-color');
+                activeContent.classList.remove('hidden');
+                
+                // Load content based on tab
+                if (tabName === 'leaderboard') {
+                    renderLeaderboard();
+                } else if (tabName === 'personal-records') {
+                    // For registration page, just show placeholder
+                    console.log('Personal records tab selected');
+                }
+            }
+        }
+        
+        async function renderLeaderboard() {
+            const leaderboardContainer = document.getElementById('leaderboard-container');
+            leaderboardContainer.innerHTML = '<p class="text-center">ກຳລັງໂຫຼດ...</p>';
+
+            try {
+                // For registration page, show a simple message
+                leaderboardContainer.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-sub-color mb-4">ກະດານຈັດອັນດັບຈະສະແດງຫຼັງຈາກເຂົ້າສູ່ລະບົບ</p>
+                        <p class="text-sm text-sub-color">ກະລຸນາເຂົ້າສູ່ລະບົບດ້ວຍ Gmail ຫຼື ໂໝດແຂກເພື່ອເບິ່ງກະດານຄະແນນ</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error("Error rendering leaderboard:", error);
+                leaderboardContainer.innerHTML = '<p class="text-center text-error-color">ບໍ່ສາມາດໂຫຼດກະດານຈັດອັນດັບໄດ້.</p>';
+            }
+        }
 
         // --- EVENT LISTENERS ---
         gmailLoginBtn.addEventListener('click', handleGmailLogin);
@@ -989,6 +1260,66 @@
         
         document.getElementById('panel-gmail-login-btn').addEventListener('click', handleGmailLogin);
         document.getElementById('panel-guest-mode-btn').addEventListener('click', handleGuestMode);
+        
+        // Home button navigation
+        document.getElementById('home-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'registration.html';
+        });
+        
+        document.getElementById('home-nav-btn').addEventListener('click', () => {
+            window.location.href = 'registration.html';
+        });
+        
+        // Panels and Tab Navigation
+        const leaderboardPanel = document.getElementById('leaderboard-panel');
+        const settingsPanel = document.getElementById('settings-panel');
+        const accountPanel = document.getElementById('account-panel');
+        
+        // Toggle functionality for all panels
+        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+            console.log('🏆 Toggling leaderboard panel');
+            const isHidden = leaderboardPanel.classList.contains('hidden');
+            
+            // Close other panels
+            settingsPanel.classList.add('hidden');
+            accountPanel.classList.add('hidden');
+            
+            // Toggle leaderboard
+            if (isHidden) {
+                leaderboardPanel.classList.remove('hidden');
+                switchTab('leaderboard');
+            } else {
+                leaderboardPanel.classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('open-settings-btn').addEventListener('click', () => {
+            console.log('⚙️ Toggling settings panel');
+            const isHidden = settingsPanel.classList.contains('hidden');
+            
+            // Close other panels
+            leaderboardPanel.classList.add('hidden');
+            accountPanel.classList.add('hidden');
+            
+            // Toggle settings
+            settingsPanel.classList.toggle('hidden');
+        });
+        
+        // Close buttons
+        document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
+        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
+        
+        // Tab Navigation
+        document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
+        document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
+        
+        document.getElementById('save-settings-btn').addEventListener('click', () => {
+            console.log('💾 Saving settings and closing panel');
+            // For registration page, we'll just close the panel
+            // Settings will be properly handled in the game pages
+            settingsPanel.classList.add('hidden');
+        });
         
         // Debug: Ensure guest button is found
         console.log('Guest button found:', guestModeBtn);
