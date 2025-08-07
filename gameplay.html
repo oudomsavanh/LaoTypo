@@ -516,18 +516,11 @@
                         <p id="evaluation-result" class="text-2xl font-bold text-center mt-4"></p>
                     </div>
                     
-                    <!-- v2.0.0: Progressive Level Score Breakdown -->
-                    <div id="score-breakdown" class="bg-[#3e4043] rounded-lg p-4 text-left max-w-md mx-auto">
-                        <h3 class="text-lg font-bold text-main-color mb-3">ຜົນງານຕາມລະດັບ:</h3>
-                        <div id="level-scores" class="space-y-2 text-sm"></div>
-                    </div>
-                    
                     <!-- Action Buttons with Meme Style -->
                     <div class="flex flex-col items-center space-y-3">
                         <button id="restart-game-btn" class="bg-[#f8af3c] text-[#2c2e31] text-xl px-6 py-3 rounded-lg hover:scale-105 transition duration-300 font-bold shadow-lg">
                             🔁 ຫຼິ້ນອີກຄັ້ງ 🔁
                         </button>
-                        <button id="back-to-menu-btn" class="btn btn-secondary">ເມນູຫຼັກ</button>
                     </div>
                 </div>
             </div>
@@ -581,13 +574,10 @@
         const wordCardRight = document.getElementById('word-card-right');
         const timerBar = document.getElementById('timer-bar');
         const restartGameBtn = document.getElementById('restart-game-btn');
-        const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const gamePlayerNameEl = document.getElementById('game-player-name');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
         const wordLoadingStatus = document.getElementById('word-loading-status');
-        const scoreBreakdownEl = document.getElementById('score-breakdown');
-        const levelScoresEl = document.getElementById('level-scores');
         
         // Life system elements
         const heartsContainer = document.getElementById('hearts-container');
@@ -1012,9 +1002,6 @@
                 `;
             }
             
-            // Show level breakdown
-            showLevelBreakdown();
-            
             // Save game stats
             saveGameStats();
             
@@ -1144,32 +1131,12 @@
             evaluationResultEl.classList.add(evaluationColor, animationClass);
             memeContainer.innerHTML = memeContent;
             
-            // Show level breakdown
-            showLevelBreakdown();
-            
             // Save game stats
             saveGameStats();
             
             // Switch screens
             gameScreen.classList.remove('active');
             resultsScreen.classList.add('active');
-        }
-
-        // Show level breakdown
-        function showLevelBreakdown() {
-            levelScoresEl.innerHTML = '';
-            
-            Object.entries(levelScores).forEach(([level, score]) => {
-                if (score > 0) {
-                    const levelDiv = document.createElement('div');
-                    levelDiv.className = 'flex justify-between items-center';
-                    levelDiv.innerHTML = `
-                        <span class="text-sub-color">ລະດັບ ${level}:</span>
-                        <span class="text-white font-bold">${score} ຄຳ</span>
-                    `;
-                    levelScoresEl.appendChild(levelDiv);
-                }
-            });
         }
 
         // Save game stats
@@ -1275,9 +1242,6 @@
             
             // Button clicks
             restartGameBtn.addEventListener('click', resetGame);
-            backToMenuBtn.addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
         }
 
         // Navigation handlers
