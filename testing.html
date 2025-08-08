@@ -615,6 +615,45 @@
         .gecko-mascot:hover img {
             opacity: 1;
         }
+
+        /* Speech Bubble for Gecko */
+        .speech-bubble {
+            position: absolute;
+            bottom: 110px; /* Position above the gecko */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+            text-align: center;
+            min-width: 180px;
+            max-width: 220px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 41;
+            pointer-events: none; /* So it doesn't interfere with clicking the gecko again */
+        }
+
+        .speech-bubble.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        /* The little triangle pointing down */
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0 10px;
+            border-style: solid;
+            border-color: var(--main-color) transparent transparent transparent;
+        }
         
         /* Custom typography for main title and subtitle */
         .main-title {
@@ -1113,19 +1152,20 @@
     <!-- Gecko Mascot -->
     <div class="gecko-mascot" id="gecko-mascot">
         <img src="Gecko.png" alt="Gecko Mascot">
+        <div id="gecko-speech-bubble" class="speech-bubble"></div>
     </div>
 
     <div class="game-container">
         <!-- Start Screen -->
         <div id="start-screen" class="screen active">
             <div class="flex flex-col items-center justify-center h-full">
-                <h1 class="main-title">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
+                <h1 class="main-title">The Ultimate Lao Typo Challenge</h1>
                 <p class="subtitle">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
 
                 
                 <!-- Player name input with dotted border -->
                 <input type="text" id="player-name-input" 
-                       placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." 
+                       placeholder="Enter your LEGENDARY name..."
                        class="custom-input">
             
                 <!-- Difficulty selection -->
@@ -1150,7 +1190,7 @@
 
 
                 <!-- Start button -->
-                <button id="start-game-btn" class="start-button" disabled>ເລີ່ມເກມ</button>
+                <button id="start-game-btn" class="start-button hover:animate-bounce" disabled>LET'S GOOOO! 🚀</button>
             </div>
             
 
@@ -1455,6 +1495,17 @@
         let timerInterval;
         let gameInProgress = false;
         let displayName = '';
+        const memeQuotes = [
+            "Wow. Much knowledge. Very smart.",
+            "Do you even type, bro?",
+            "I'm in your code, judging your typos.",
+            "404: Correct answer not found.",
+            "Are you a wizard?",
+            "Keep calm and type on.",
+            "This is the way.",
+            "Stonks!",
+            "You miss 100% of the shots you don't take."
+        ];
         
         // NEW: Tracking for new scoring system
         let levelScores = {
@@ -2241,8 +2292,20 @@
         // Gecko mascot click event
         document.getElementById('gecko-mascot').addEventListener('click', () => {
             playSound('uhoh');
-            // Optional: Add a little animation
             const gecko = document.getElementById('gecko-mascot');
+            const speechBubble = document.getElementById('gecko-speech-bubble');
+
+            // Show a random quote
+            const randomQuote = memeQuotes[Math.floor(Math.random() * memeQuotes.length)];
+            speechBubble.textContent = randomQuote;
+            speechBubble.classList.add('show');
+
+            // Hide the bubble after a few seconds
+            setTimeout(() => {
+                speechBubble.classList.remove('show');
+            }, 3000);
+
+            // Optional: Add a little animation
             gecko.style.transform = 'scale(0.9) rotate(-5deg)';
             setTimeout(() => {
                 gecko.style.transform = 'scale(1) rotate(0deg)';
@@ -2316,7 +2379,7 @@
             
             // Word loading now handled in gameplay.html
             startGameBtn.disabled = false;
-            startGameBtn.textContent = 'ເລີ່ມເກມ';
+            startGameBtn.textContent = 'LET\\'S GOOOO! 🚀';
         };
 
         // --- AUTHENTICATION GUARD ---
