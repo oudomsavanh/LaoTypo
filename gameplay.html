@@ -46,6 +46,7 @@
             margin: 0;
             padding: 0;
             padding-top: 80px; /* Space for fixed nav */
+            padding-bottom: 80px; /* Space for fixed footer */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -127,6 +128,15 @@
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+        .btn-primary {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+        }
+        .btn-primary:hover {
+            background-color: #f8af3c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
         }
         .btn-secondary {
             background-color: var(--sub-color);
@@ -323,6 +333,53 @@
             50% { opacity: 0.7; }
         }
         
+        /* Custom shake animation for 0 streak */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        /* Meme container styling */
+        #meme-container {
+            min-height: 200px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 640px) {
+            #meme-container {
+                min-height: 150px;
+                aspect-ratio: 4 / 3;
+            }
+        }
+        
+        /* Enhanced button hover effects */
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Rainbow text animation for perfect scores */
+        @keyframes rainbow {
+            0% { color: #ff0000; }
+            17% { color: #ff8800; }
+            33% { color: #ffff00; }
+            50% { color: #00ff00; }
+            67% { color: #0088ff; }
+            83% { color: #8800ff; }
+            100% { color: #ff0000; }
+        }
+        
+        .animate-rainbow {
+            animation: rainbow 3s linear infinite;
+        }
+        
         /* Custom responsive typography */
         .context-display-custom {
             font-size: 1.5rem;
@@ -434,25 +491,44 @@
             </div>
 
             <!-- Results Screen -->
-            <div id="results-screen" class="screen">
-                <div class="space-y-6">
-                    <h2 class="results-header-custom text-main-color">ເກມຈົບ</h2>
-                    <div class="text-2xl space-y-2">
-                        <p>ຄະແນນຫຼ້າສຸດ: <span id="final-streak" class="font-bold text-white">0</span></p>
-                        <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="results-best-streak" class="font-bold text-white">0</span></p>
-                        <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-bold text-white">0%</span></p>
-                        <p>ຜົນການປະເມີນ: <span id="evaluation-result" class="font-bold"></span></p>
+            <div id="results-screen" class="screen pb-20">
+                <div class="space-y-4 sm:space-y-6 max-w-2xl mx-auto px-4">
+                    <h2 class="results-header-custom text-main-color animate-pulse">ເກມຈົບ</h2>
+                    
+                    <!-- Meme Image Container -->
+                    <div id="meme-container" class="w-full max-w-xs sm:max-w-md mx-auto rounded-lg shadow-lg overflow-hidden bg-gray-800">
+                        <!-- Meme image will be inserted here dynamically -->
                     </div>
                     
-                    <!-- v2.0.0: Progressive Level Score Breakdown -->
-                    <div id="score-breakdown" class="bg-[#3e4043] rounded-lg p-4 text-left max-w-md mx-auto">
-                        <h3 class="text-lg font-bold text-main-color mb-3">ຜົນງານຕາມລະດັບ:</h3>
-                        <div id="level-scores" class="space-y-2 text-sm"></div>
+                    <!-- Stats Container with Card Design -->
+                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700">
+                        <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
+                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
+                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນຫຼ້າສຸດ</p>
+                                <p class="text-xl sm:text-3xl font-bold text-white" id="final-streak">0</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
+                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນທີ່ດີທີ່ສຸດ</p>
+                                <p class="text-xl sm:text-3xl font-bold text-yellow-400" id="results-best-streak">0</p>
+                            </div>
+                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
+                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄວາມຖືກຕ້ອງ</p>
+                                <p class="text-xl sm:text-3xl font-bold text-green-400" id="accuracy-stat">0%</p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="flex justify-center space-x-4">
-                        <button id="restart-game-btn" class="btn">ຫຼິ້ນອີກຄັ້ງ</button>
-                        <button id="back-to-menu-btn" class="btn btn-secondary">ເມນູຫຼັກ</button>
+                    <!-- Evaluation Result with Enhanced Styling -->
+                    <div class="text-center px-4">
+                        <p class="text-gray-400 text-base sm:text-lg mb-2">ຜົນການປະເມີນ:</p>
+                        <p id="evaluation-result" class="text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4"></p>
+                    </div>
+                    
+                    <!-- Action Buttons with Meme Style -->
+                    <div class="flex flex-col items-center space-y-3 px-4">
+                        <button id="restart-game-btn" class="w-full sm:w-auto bg-[#f8af3c] text-[#2c2e31] text-lg sm:text-xl px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:scale-105 transition duration-300 font-bold shadow-lg">
+                            🔁 ຫຼິ້ນອີກຄັ້ງ 🔁
+                        </button>
                     </div>
                 </div>
             </div>
@@ -506,13 +582,10 @@
         const wordCardRight = document.getElementById('word-card-right');
         const timerBar = document.getElementById('timer-bar');
         const restartGameBtn = document.getElementById('restart-game-btn');
-        const backToMenuBtn = document.getElementById('back-to-menu-btn');
         const gamePlayerNameEl = document.getElementById('game-player-name');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
         const wordLoadingStatus = document.getElementById('word-loading-status');
-        const scoreBreakdownEl = document.getElementById('score-breakdown');
-        const levelScoresEl = document.getElementById('level-scores');
         
         // Life system elements
         const heartsContainer = document.getElementById('hearts-container');
@@ -539,7 +612,17 @@
                 soundEnabled = settings.soundEnabled !== false;
             }
             
-            playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            // Get player name from URL parameters first, then fallback to localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlPlayerName = urlParams.get('player');
+            if (urlPlayerName) {
+                playerName = decodeURIComponent(urlPlayerName);
+                // Store in localStorage for consistency
+                localStorage.setItem('displayName', playerName);
+            } else {
+                playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            }
+            
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
             
             // Update UI with settings
@@ -609,7 +692,7 @@
                 console.log("Error details:", error.message);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
                 
                 // Fallback to default words
@@ -713,14 +796,15 @@
                         updateDifficultyDisplay();
                     }
                 }
+                
+                // Update UI immediately
+                updateUI();
             } else {
                 selectedCard.classList.add('feedback-incorrect');
                 otherCard.classList.add('feedback-correct');
                 playSound('incorrect');
                 loseLife();
             }
-            
-            updateUI();
             
             if (playerLives > 0) {
                 setTimeout(() => {
@@ -806,10 +890,15 @@
                     updateLifeDisplay();
                     
                     if (playerLives === 0) {
-                        endGame();
+                        gameOver();
                     }
                 }, 600);
             }
+        }
+
+        function gameOver() {
+            // When player runs out of lives, just call endGame
+            endGame();
         }
 
         // Timer functions
@@ -858,41 +947,109 @@
             }
         }
 
-        // End game
+        // End game (general purpose)
         function endGame() {
             gameActive = false;
             clearTimeout(currentTimeout);
             
-            // Update final stats
-            finalStreakEl.textContent = currentStreak;
-            resultsBestStreakEl.textContent = bestStreak;
+            // Calculate final percentage score
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
+            const accuracyRounded = accuracy.toFixed(1);
             
-            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : 0;
-            accuracyStatEl.textContent = `${accuracy}%`;
+            // Update stats displays
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('results-best-streak').textContent = bestStreak;
+            document.getElementById('accuracy-stat').textContent = `${accuracyRounded}%`;
             
-            // Evaluation
+            // Get meme container and evaluation element
+            const memeContainer = document.getElementById('meme-container');
+            const evaluationEl = document.getElementById('evaluation-result');
+            
+            // Clear previous classes
+            evaluationEl.className = 'text-xl sm:text-3xl font-bold text-center mt-2 sm:mt-4';
+            
+            // Determine evaluation tier based on percentage only
             let evaluation = '';
-            let evaluationColor = '';
+            let memeContent = '';
             
-            if (currentStreak >= 50) {
-                evaluation = 'ເຈົ້າແມ່ນຄົນລາວແທ້! 🏆';
-                evaluationColor = '#FFD700';
-            } else if (currentStreak >= 30) {
-                evaluation = 'ດີຫຼາຍ! ເກືອບສົມບູນແບບແລ້ວ 🌟';
-                evaluationColor = 'var(--correct-color)';
-            } else if (currentStreak >= 15) {
-                evaluation = 'ດີ! ແຕ່ຍັງຕ້ອງຝຶກເພີ່ມ 📚';
-                evaluationColor = 'var(--main-color)';
+            if (accuracy >= 90) {
+                // 90-100%: Born to be Lao
+                evaluation = 'ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ';
+                evaluationEl.classList.add('text-yellow-400', 'animate-bounce');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 relative overflow-hidden p-4">
+                        <div class="text-center z-10">
+                            <div class="text-7xl sm:text-9xl mb-2 sm:mb-4 animate-pulse">🏆</div>
+                            <p class="text-xl sm:text-3xl text-white font-bold">BORN TO BE LAO!</p>
+                            <p class="text-base sm:text-xl text-gray-100">${accuracyRounded}% - Legendary!</p>
+                        </div>
+                        <div class="absolute inset-0 opacity-40">
+                            <div class="animate-spin text-6xl sm:text-8xl absolute top-4 left-4" style="animation-duration: 3s;">⭐</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute top-4 right-4" style="animation-duration: 4s;">🌟</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute bottom-4 left-4" style="animation-duration: 2s;">✨</div>
+                            <div class="animate-spin text-6xl sm:text-8xl absolute bottom-4 right-4" style="animation-duration: 5s;">💫</div>
+                        </div>
+                    </div>
+                `;
+            } else if (accuracy >= 70) {
+                // 70-89%: 75% True Lao Child
+                evaluation = 'ເຈົ້າແມ່ນລູກຊອດລາວ 75%';
+                evaluationEl.classList.add('text-green-400', 'animate-pulse');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-green-500 to-blue-600 p-4">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🎉</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">TRUE LAO CHILD!</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Impressive!</p>
+                            <div class="mt-2 text-4xl sm:text-6xl">🎊🌟</div>
+                        </div>
+                    </div>
+                `;
+            } else if (accuracy >= 40) {
+                // 40-69%: Born in Laos but grew up abroad
+                evaluation = 'ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ';
+                evaluationEl.classList.add('text-blue-400', 'animate-pulse');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-blue-600 to-purple-700 p-4">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🤔</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">LAO ABROAD</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Half way there!</p>
+                            <div class="mt-2 text-3xl sm:text-4xl">✈️🌏</div>
+                        </div>
+                    </div>
+                `;
+            } else if (accuracy >= 20) {
+                // 20-39%: At least not "Jing Jai"
+                evaluation = 'ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ "ຈຣິງໃຈ"';
+                evaluationEl.classList.add('text-yellow-500', 'animate-pulse');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-yellow-600 to-orange-700 p-4">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😏</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">NOT "JING JAI"</p>
+                            <p class="text-sm sm:text-lg text-gray-200">${accuracyRounded}% - Could be worse!</p>
+                        </div>
+                    </div>
+                `;
             } else {
-                evaluation = 'ພະຍາຍາມຕື່ມອີກເດີ! 💪';
-                evaluationColor = 'var(--error-color)';
+                // 0-19%: Foreigner whose plane crashed
+                evaluation = 'ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ';
+                evaluationEl.classList.add('text-red-500', 'animate-shake');
+                memeContent = `
+                    <div class="flex items-center justify-center h-full bg-gradient-to-br from-gray-800 to-red-900 p-4">
+                        <div class="text-center">
+                            <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">😭</div>
+                            <p class="text-lg sm:text-2xl text-white font-bold">PLANE CRASH!</p>
+                            <p class="text-sm sm:text-lg text-gray-300">${accuracyRounded}% - Foreigner detected!</p>
+                            <div class="mt-2 text-4xl sm:text-5xl animate-bounce">✈️💥</div>
+                        </div>
+                    </div>
+                `;
             }
             
-            evaluationResultEl.textContent = evaluation;
-            evaluationResultEl.style.color = evaluationColor;
-            
-            // Show level breakdown
-            showLevelBreakdown();
+            evaluationEl.textContent = evaluation;
+            memeContainer.innerHTML = memeContent;
             
             // Save game stats
             saveGameStats();
@@ -900,23 +1057,6 @@
             // Switch screens
             gameScreen.classList.remove('active');
             resultsScreen.classList.add('active');
-        }
-
-        // Show level breakdown
-        function showLevelBreakdown() {
-            levelScoresEl.innerHTML = '';
-            
-            Object.entries(levelScores).forEach(([level, score]) => {
-                if (score > 0) {
-                    const levelDiv = document.createElement('div');
-                    levelDiv.className = 'flex justify-between items-center';
-                    levelDiv.innerHTML = `
-                        <span class="text-sub-color">ລະດັບ ${level}:</span>
-                        <span class="text-white font-bold">${score} ຄຳ</span>
-                    `;
-                    levelScoresEl.appendChild(levelDiv);
-                }
-            });
         }
 
         // Save game stats
@@ -1022,9 +1162,6 @@
             
             // Button clicks
             restartGameBtn.addEventListener('click', resetGame);
-            backToMenuBtn.addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
         }
 
         // Navigation handlers
@@ -1036,6 +1173,11 @@
             });
             
             document.getElementById('home-nav-btn').addEventListener('click', () => {
+                window.location.href = 'testing.html';
+            });
+            
+            // Return home button in footer
+            document.getElementById('return-home-btn').addEventListener('click', () => {
                 window.location.href = 'testing.html';
             });
             
@@ -1056,5 +1198,14 @@
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', initializeGame);
     </script>
+    
+    <!-- Footer with Return Home button -->
+    <footer class="fixed bottom-0 left-0 right-0 p-4 bg-[#222426] border-t-2 border-[#f8af3c]">
+        <div class="max-w-7xl mx-auto text-center">
+            <button id="return-home-btn" class="btn btn-primary px-6 py-2">
+                🏠 ກັບໄປໜ້າຫຼັກ
+            </button>
+        </div>
+    </footer>
 </body>
 </html>
