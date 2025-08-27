@@ -20,7 +20,7 @@
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
@@ -36,8 +36,19 @@
             --correct-color: #72b483;
             --warning-color: #f59e0b;
         }
+        
+        /* Global font rules - Montserrat for English, Noto Sans Lao Looped for Lao */
+        * {
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
+        }
+        
+        /* Specific rule for elements containing Lao text */
+        :lang(lo), 
+        [lang="lo"] {
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+        }
         body {
-            font-family: 'Noto Sans Lao Looped', sans-serif;
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
@@ -119,6 +130,7 @@
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             font-size: 1rem;
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
         }
         .btn:hover {
             transform: translateY(-1px);
@@ -155,6 +167,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
         }
         .word-card:hover {
             border-color: var(--main-color);
@@ -219,86 +232,83 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
+            gap: 8px;
         }
         
         .life-label {
-            color: var(--bg-color);
-            font-weight: bold;
-            font-size: 1.1rem;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+            color: #58636d;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
         }
         
         .hearts-container {
             display: flex;
-            gap: 0.75rem;
+            gap: 6px;
             align-items: center;
         }
         
+        /* Minimal flat heart icon */
         .heart {
-            font-size: 2rem;
-            transition: all 0.3s ease-in-out;
-            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .heart.active {
-            color: #ef4444;
-            animation: heartPulse 2s infinite;
+        .heart svg {
+            width: 100%;
+            height: 100%;
         }
         
-        .heart.active::after {
-            content: '✨';
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 0.5rem;
-            animation: sparkle 2s infinite;
+        .heart.active svg path {
+            fill: #ff4b4b;
         }
         
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
+        .heart.lost svg path {
+            fill: #e5e5e5;
         }
         
-        .heart.lost {
-            color: #4b5563;
-            opacity: 0.3;
-            transform: scale(0.8);
-            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-        }
-        
+        /* Subtle Duolingo-style animation when losing a life */
         .heart.losing {
-            animation: heartBreak 0.6s ease-out forwards;
+            animation: heartPop 0.4s ease-out;
         }
         
-        @keyframes heartPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        @keyframes heartBreak {
+        @keyframes heartPop {
             0% { 
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
+                transform: scale(1);
             }
-            25% { 
-                transform: scale(1.2) rotate(-10deg);
-                color: #ef4444;
+            30% { 
+                transform: scale(1.3);
             }
-            50% { 
-                transform: scale(1.3) rotate(10deg);
-                color: #dc2626;
-            }
-            75% { 
-                transform: scale(0.9) rotate(-5deg);
-                opacity: 0.7;
+            60% {
+                transform: scale(0.8);
             }
             100% { 
-                transform: scale(0.75) rotate(0deg);
-                opacity: 0.4;
-                color: #4b5563;
+                transform: scale(1);
+            }
+        }
+        
+        /* Animation when life value changes */
+        .heart.life-change {
+            animation: lifeChange 0.5s ease-out;
+        }
+        
+        @keyframes lifeChange {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            25% {
+                transform: scale(1.15) translateY(-4px);
+            }
+            50% {
+                transform: scale(0.95) translateY(0);
+            }
+            100% {
+                transform: scale(1) translateY(0);
             }
         }
         
@@ -311,6 +321,7 @@
             opacity: 0.9;
             transition: all 0.3s ease;
             text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
         }
         
         .motivation-text.warning {
@@ -445,17 +456,36 @@
                 <div id="word-loading-status" class="text-center mb-4 text-main-color">
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
-                    <div class="text-center mb-2">
-                        <h2 class="text-xl font-bold" style="color: var(--sub-color); text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></h2>
+                    <!-- Clean Duolingo-style Player Name Display -->
+                    <div class="text-center mb-4">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full" style="background-color: #f0f0f0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="8" r="3" fill="#58636d"/>
+                                <path d="M16 14c0-2.21-1.79-4-4-4s-4 1.79-4 4v4h8v-4z" fill="#58636d"/>
+                            </svg>
+                            <span style="color: #3c4444; font-weight: 600; font-size: 16px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
+                        </div>
                     </div>
                 <!-- Redesigned Life Bar with Enhanced Visual Design -->
                 <div class="life-bar-container">
                     <div class="motivation-text" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
                     <div class="life-hearts-row">
                         <div class="hearts-container" id="hearts-container">
-                            <span class="heart active">❤️</span>
-                            <span class="heart active">❤️</span>
-                            <span class="heart active">❤️</span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -466,7 +496,7 @@
                 </div>
                 
                 <div class="text-center mb-4">
-                    <span id="game-settings-display" class="text-sm text-main-color">ລະດັບຄຳສັບ: ງ່າຍ | ຈຳກັດເວລາ: ປິດ</span>
+                    <span id="game-settings-display" class="text-sm text-main-color">ລະດັບຄຳສັບ: <span id="difficulty-display" class="font-bold"></span> | ຈຳກັດເວລາ: <span id="timer-status">ປິດ</span></span>
                 </div>
                 <div id="timer-container" class="h-2 mb-6">
                     <div id="timer-bar" class="timer-bar"></div>
@@ -474,14 +504,8 @@
                 
                 <!-- Context display area for showing word from Google Sheets Column A -->
                 <div class="mb-6 text-center">
-                    <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                    <h3 class="text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນຫວ່າງ:</h3>
                     <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
-                </div>
-                
-                <!-- v2.0.0: Difficulty level display with color coding -->
-                <div class="mb-4 text-center">
-                    <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
-                    <span id="difficulty-display" class="font-bold"></span>
                 </div>
                 
                 <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
@@ -628,7 +652,10 @@
             // Update UI with settings
             gamePlayerNameEl.textContent = playerName;
             const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
-            gameSettingsDisplay.textContent = `ລະດັບ ${levelNames[0]} | ຈຳກັດເວລາ: ${timerText}`;
+            const timerStatusEl = document.getElementById('timer-status');
+            if (timerStatusEl) {
+                timerStatusEl.textContent = timerText;
+            }
             updateDifficultyDisplay();
         }
 
@@ -821,13 +848,8 @@
                 progressEl.textContent = levelThresholds[currentLevel];
             }
             
-            // Update difficulty display
-            const difficultyText = `ລະດັບ ${levelNames[currentLevel]}`;
-            const settingsDisplay = document.getElementById('game-settings-display');
-            if (settingsDisplay) {
-                const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
-                settingsDisplay.textContent = `${difficultyText} | ຈຳກັດເວລາ: ${timerText}`;
-            }
+            // Update difficulty display span
+            updateDifficultyDisplay();
             
             // Motivation text no longer shows score/lives
             updateMotivationalText();
@@ -838,9 +860,15 @@
             const hearts = heartsContainer.querySelectorAll('.heart');
             
             hearts.forEach((heart, index) => {
+                // Add life-change animation to active hearts
                 if (index < playerLives) {
                     heart.classList.remove('lost');
                     heart.classList.add('active');
+                    // Add subtle animation when life changes
+                    heart.classList.add('life-change');
+                    setTimeout(() => {
+                        heart.classList.remove('life-change');
+                    }, 500);
                 } else {
                     heart.classList.add('lost');
                     heart.classList.remove('active');
@@ -883,16 +911,22 @@
                 
                 const hearts = heartsContainer.querySelectorAll('.heart');
                 const heartToBreak = hearts[playerLives];
+                
+                // Add losing animation
                 heartToBreak.classList.add('losing');
                 
                 setTimeout(() => {
                     heartToBreak.classList.remove('losing');
-                    updateLifeDisplay();
+                    heartToBreak.classList.remove('active');
+                    heartToBreak.classList.add('lost');
+                    
+                    // Update motivational text
+                    updateMotivationalText();
                     
                     if (playerLives === 0) {
                         gameOver();
                     }
-                }, 600);
+                }, 400);
             }
         }
 
@@ -1203,7 +1237,7 @@
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-[#222426] border-t-2 border-[#f8af3c]">
         <div class="max-w-7xl mx-auto text-center">
             <button id="return-home-btn" class="btn btn-primary px-6 py-2">
-                🏠 ກັບໄປໜ້າຫຼັກ
+                ກັບໄປໜ້າຫຼັກ
             </button>
         </div>
     </footer>
