@@ -183,18 +183,36 @@
             transition: transform 0.1s linear;
         }
         
-        /* Minimal Duolingo-style Life Bar */
+        /* Redesigned Life Bar with Better Visual Design */
         .life-bar-container {
-            background: #f7f7f7;
-            border-radius: 16px;
-            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--main-color) 0%, rgba(248, 175, 60, 0.7) 50%, var(--main-color) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
-            display: inline-block;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .life-bar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
         }
         
         .life-bar-container h2 {
             margin: 0;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         
         .life-hearts-row {
@@ -283,22 +301,28 @@
         
         .motivation-text {
             text-align: center;
-            color: #58636d;
-            font-weight: 500;
-            font-size: 14px;
+            color: var(--bg-color);
+            font-weight: 600;
+            font-style: italic;
+            font-size: 0.9rem;
+            opacity: 0.9;
             transition: all 0.3s ease;
-            margin-bottom: 8px;
-            font-family: 'DIN Round', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
         }
         
         .motivation-text.warning {
-            color: #ffa500;
-            font-weight: 600;
+            color: #1f2937;
+            opacity: 1;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
         }
         
         .motivation-text.critical {
-            color: #ff4b4b;
-            font-weight: 600;
+            color: #7f1d1d;
+            opacity: 1;
+            font-weight: 800;
+            animation: pulse 1s infinite;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
         }
         
         @keyframes pulse {
