@@ -1,0 +1,205 @@
+<!-- Loading Screen Component for Lao Typo Game -->
+<!-- Include this HTML in your main game pages -->
+
+<div id="loadingScreen" class="loading-screen">
+    <!-- Phase 1: Instant Splash -->
+    <div class="splash-container">
+        <img src="/LaoTypo-logo-04.png" alt="LaoTypo" class="loading-logo" />
+        <h1 class="loading-title">ເກມພິມລາວ</h1>
+        <p class="loading-subtitle">ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?</p>
+    </div>
+
+    <!-- Phase 2: Progress Container -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div class="progress-text">
+            <span>ກຳລັງໂຫຼດ...</span>
+            <span id="progressPercentage" class="progress-percentage">0%</span>
+        </div>
+        <div id="progressMessage" class="progress-message">
+            <div class="loading-dots">
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+                <span class="loading-dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gecko Mascot -->
+    <img src="/Gecko.png" alt="Gecko" id="loadingMascot" class="loading-mascot" />
+
+    <!-- Skip Button (appears after 3s) -->
+    <button id="skipLoading" class="loading-skip" style="display: none;">
+        ຂ້າມ →
+    </button>
+
+    <!-- Error State (hidden by default) -->
+    <div id="loadingError" class="loading-error" style="display: none;">
+        <p>⚠️ ມີຂໍ້ຜິດພາດໃນການໂຫຼດ</p>
+        <button onclick="location.reload()" class="btn btn-secondary">ລອງໃໝ່</button>
+    </div>
+</div>
+
+<!-- Skeleton Loading (optional, for underneath) -->
+<div id="skeletonLoader" class="skeleton-container" style="display: none;">
+    <div class="skeleton skeleton-nav"></div>
+    <div class="skeleton skeleton-content"></div>
+    <div class="skeleton skeleton-button"></div>
+</div>
+
+<script>
+/**
+ * Loading Screen Controller
+ * Manages the loading screen lifecycle
+ */
+class LoadingScreenController {
+    constructor() {
+        this.screen = document.getElementById('loadingScreen');
+        this.progressFill = document.getElementById('progressFill');
+        this.progressPercentage = document.getElementById('progressPercentage');
+        this.progressMessage = document.getElementById('progressMessage');
+        this.mascot = document.getElementById('loadingMascot');
+        this.skipButton = document.getElementById('skipLoading');
+        this.errorDiv = document.getElementById('loadingError');
+        
+        this.isVisible = true;
+        this.canSkip = false;
+        
+        this.init();
+    }
+
+    init() {
+        // Enable skip button after 3 seconds
+        setTimeout(() => {
+            this.canSkip = true;
+            if (this.skipButton) {
+                this.skipButton.style.display = 'block';
+                this.skipButton.addEventListener('click', () => this.hide());
+            }
+        }, 3000);
+
+        // Add walking animation to mascot after initial bounce
+        setTimeout(() => {
+            if (this.mascot) {
+                this.mascot.classList.add('walking');
+            }
+        }, 2000);
+    }
+
+    updateProgress(data) {
+        if (!this.isVisible) return;
+
+        const { percentage, message } = data;
+        
+        // Update progress bar
+        if (this.progressFill) {
+            this.progressFill.style.width = `${percentage}%`;
+        }
+        
+        // Update percentage text
+        if (this.progressPercentage) {
+            this.progressPercentage.textContent = `${percentage}%`;
+        }
+        
+        // Update message
+        if (this.progressMessage && message) {
+            this.progressMessage.innerHTML = message;
+        }
+
+        // Auto-hide at 100%
+        if (percentage >= 100) {
+            setTimeout(() => this.hide(), 500);
+        }
+    }
+
+    showError(message) {
+        if (this.errorDiv) {
+            this.errorDiv.style.display = 'block';
+            if (message) {
+                this.errorDiv.querySelector('p').textContent = message;
+            }
+        }
+        
+        // Hide other elements
+        if (this.progressContainer) {
+            this.progressContainer.style.display = 'none';
+        }
+    }
+
+    hide() {
+        if (!this.isVisible) return;
+        
+        this.isVisible = false;
+        
+        // Fade out animation
+        if (this.screen) {
+            this.screen.classList.add('hidden');
+            
+            // Remove from DOM after animation
+            setTimeout(() => {
+                if (this.screen && this.screen.parentNode) {
+                    this.screen.parentNode.removeChild(this.screen);
+                }
+            }, 500);
+        }
+    }
+
+    // Quick hide without animation (for testing)
+    forceHide() {
+        if (this.screen && this.screen.parentNode) {
+            this.screen.parentNode.removeChild(this.screen);
+        }
+    }
+}
+
+// Initialize loading screen controller
+let loadingScreen = null;
+if (document.getElementById('loadingScreen')) {
+    loadingScreen = new LoadingScreenController();
+}
+
+// Example integration with preloader
+function initializeWithLoadingScreen() {
+    // Create preloader instance
+    const preloader = new GamePreloader();
+    
+    // Set up progress callback
+    preloader.onProgress = (data) => {
+        if (loadingScreen) {
+            loadingScreen.updateProgress(data);
+        }
+    };
+    
+    // Set up complete callback
+    preloader.onComplete = async (data) => {
+        console.log('✅ Loading complete:', data);
+        
+        // Ensure minimum display time for UX
+        await preloader.ensureMinimumLoadTime(1500);
+        
+        // Hide loading screen
+        if (loadingScreen) {
+            loadingScreen.hide();
+        }
+        
+        // Initialize game
+        if (typeof initializeGame === 'function') {
+            initializeGame();
+        }
+    };
+    
+    // Set up error callback
+    preloader.onError = (error) => {
+        console.error('Loading error:', error);
+        if (loadingScreen) {
+            loadingScreen.showError('ມີຂໍ້ຜິດພາດໃນການໂຫຼດເກມ. ກະລຸນາລອງໃໝ່.');
+        }
+    };
+    
+    // Register assets and start loading
+    preloader.registerAssets();
+    preloader.load();
+}
+</script>
