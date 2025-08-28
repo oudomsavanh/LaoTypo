@@ -51,12 +51,26 @@
             font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
             margin: 0;
             padding: 0;
+            padding-top: 60px; /* Space for fixed nav - responsive */
+            padding-bottom: 60px; /* Space for fixed footer - responsive */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        /* Nav styles are handled by Tailwind classes in HTML */
+        @media (min-width: 640px) {
+            body {
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+        }
+        nav {
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
+        }
         .nav-link {
             color: var(--sub-color);
             transition: all 0.3s ease-in-out;
@@ -95,14 +109,26 @@
             height: 1.5rem;
             transition: transform 0.3s ease;
         }
-        /* Game container styles handled by Tailwind flex utilities */
+        .game-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem;
+            text-align: center;
+        }
+        @media (min-width: 640px) {
+            .game-container {
+                padding: 2rem;
+            }
+        }
         .screen {
             display: none;
         }
         .screen.active {
-            display: flex;
-        }
-        #results-screen.screen.active {
             display: block;
         }
         .btn {
@@ -150,6 +176,13 @@
             align-items: center;
             justify-content: center;
             font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+            padding: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .word-card {
+                padding: 1.5rem;
+            }
         }
         .word-card:hover {
             border-color: var(--main-color);
@@ -178,19 +211,81 @@
             transition: transform 0.1s linear;
         }
         
-        /* Compact Life Bar Styles - Removed old bulky styles */
+        /* Redesigned Life Bar with Better Visual Design */
+        .life-bar-container {
+            background: linear-gradient(135deg, var(--main-color) 0%, rgba(248, 175, 60, 0.7) 50%, var(--main-color) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 640px) {
+            .life-bar-container {
+                padding: 1rem 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        .life-bar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .life-bar-container h2 {
+            margin: 0;
+        }
+        
         @keyframes shimmer {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
         
-        /* Responsive heart icon */
+        .life-hearts-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .life-label {
+            color: #58636d;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .hearts-container {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        /* Minimal flat heart icon */
         .heart {
+            width: 24px;
+            height: 24px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             position: relative;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @media (min-width: 640px) {
+            .heart {
+                width: 28px;
+                height: 28px;
+            }
         }
         
         .heart svg {
@@ -251,11 +346,17 @@
             color: var(--bg-color);
             font-weight: 600;
             font-style: italic;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             opacity: 0.9;
             transition: all 0.3s ease;
             text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
             font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+        }
+        
+        @media (min-width: 640px) {
+            .motivation-text {
+                font-size: 0.9rem;
+            }
         }
         
         .motivation-text.warning {
@@ -356,14 +457,14 @@
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    <!-- Sticky Compact Navigation -->
-    <nav class="sticky top-0 z-50 bg-[#222426] border-b border-[#f8af3c] p-2 md:p-3">
+<body>
+    <!-- Navigation from testing.html -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
                 <img src="LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
             </a>
-            <div class="flex items-center space-x-1 md:space-x-3">
+            <div class="flex items-center space-x-2 md:space-x-4">
                 <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -390,80 +491,69 @@
         </div>
     </nav>
 
-    <!-- Main Game Container -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <div class="w-full h-full">
+    <div class="game-container">
+        <div class="w-full">
             <!-- Game Screen -->
-            <div id="game-screen" class="screen active flex flex-col h-full p-2 md:p-4">
-                <!-- Compact Top Section -->
-                <div class="flex-shrink-0">
-                    <!-- Word Loading Status -->
-                    <div id="word-loading-status" class="text-center mb-2 text-main-color text-sm md:text-base">
-                        ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
-                    </div>
-                    
-                    <!-- Compact Player Name Display -->
-                    <div class="text-center mb-2">
-                        <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-200">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div id="game-screen" class="screen active">
+                <!-- Word Loading Status -->
+                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
+                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+                </div>
+                    <!-- Clean Duolingo-style Player Name Display -->
+                    <div class="text-center mb-3 sm:mb-4">
+                        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full" style="background-color: #f0f0f0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="12" cy="8" r="3" fill="#58636d"/>
                                 <path d="M16 14c0-2.21-1.79-4-4-4s-4 1.79-4 4v4h8v-4z" fill="#58636d"/>
                             </svg>
-                            <span class="text-gray-700 font-semibold text-sm md:text-base">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name"></span></span>
+                            <span style="color: #3c4444; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
                         </div>
                     </div>
-                    <!-- Compact Life Bar -->
-                    <div class="mb-2">
-                        <div class="text-center text-sm md:text-base text-gray-400 mb-1" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
-                        <div class="flex justify-center gap-1">
-                            <div class="flex gap-1" id="hearts-container">
-                                <span class="heart active w-6 h-6 md:w-8 md:h-8">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    </svg>
-                                </span>
-                                <span class="heart active w-6 h-6 md:w-8 md:h-8">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    </svg>
-                                </span>
-                                <span class="heart active w-6 h-6 md:w-8 md:h-8">
-                                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                    </svg>
-                                </span>
-                            </div>
+                <!-- Redesigned Life Bar with Enhanced Visual Design -->
+                <div class="life-bar-container mb-4">
+                    <div class="motivation-text text-sm sm:text-base" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
+                    <div class="life-hearts-row">
+                        <div class="hearts-container" id="hearts-container">
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
                         </div>
-                    </div>
-                    
-                    <!-- Compact Score Display -->
-                    <div class="flex justify-between items-center mb-2 text-sm md:text-lg px-2">
-                        <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span>/<span id="level-progress" class="text-main-color">30</span></div>
-                        <div class="text-sub-color">ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
-                    </div>
-                    
-                    <!-- Compact Settings Display -->
-                    <div class="text-center mb-2">
-                        <span id="game-settings-display" class="text-xs md:text-sm text-main-color">ລະດັບ: <span id="difficulty-display" class="font-bold"></span> | ເວລາ: <span id="timer-status">ປິດ</span></span>
-                    </div>
-                    <div id="timer-container" class="h-1 md:h-2 mb-2">
-                        <div id="timer-bar" class="timer-bar"></div>
                     </div>
                 </div>
                 
-                <!-- Main Game Content - Flexible Height -->
-                <div class="flex-1 flex flex-col justify-center">
-                    <!-- Question Section -->
-                    <div class="mb-4 text-center">
-                        <h3 class="text-base md:text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນຫວ່າງ:</h3>
-                        <div id="context-display" class="text-lg md:text-2xl lg:text-3xl text-text-color bg-[#3e4043] rounded-lg py-3 md:py-4 px-4 md:px-6 min-h-[60px] md:min-h-[100px] flex items-center justify-center"></div>
-                    </div>
-                    
-                    <!-- Answer Cards -->
-                    <div id="word-area" class="grid grid-cols-2 gap-2 md:gap-4 lg:gap-8 px-2">
-                        <div id="word-card-left" class="word-card text-base md:text-xl lg:text-2xl py-4 md:py-6"></div>
-                        <div id="word-card-right" class="word-card text-base md:text-xl lg:text-2xl py-4 md:py-6"></div>
-                    </div>
+                <div class="flex justify-between items-center mb-4 sm:mb-6 text-base sm:text-xl">
+                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span> / <span id="level-progress" class="text-main-color">30</span></div>
+                    <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+                </div>
+                
+                <div class="text-center mb-3 sm:mb-4">
+                    <span id="game-settings-display" class="text-xs sm:text-sm text-main-color">ລະດັບຄຳສັບ: <span id="difficulty-display" class="font-bold"></span> | ຈຳກັດເວລາ: <span id="timer-status">ປິດ</span></span>
+                </div>
+                <div id="timer-container" class="h-2 mb-4 sm:mb-6">
+                    <div id="timer-bar" class="timer-bar"></div>
+                </div>
+                
+                <!-- Context display area for showing word from Google Sheets Column A -->
+                <div class="mb-4 sm:mb-6 text-center">
+                    <h3 class="text-lg sm:text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນຫວ່າງ:</h3>
+                    <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-3 sm:py-4 px-4 sm:px-6 min-h-[80px] sm:min-h-[100px] flex items-center justify-center text-base sm:text-2xl"></div>
+                </div>
+                
+                <div id="word-area" class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-8 mb-6 sm:mb-8">
+                    <div id="word-card-left" class="word-card p-4 sm:p-6 text-base sm:text-xl md:text-2xl min-h-[80px] sm:min-h-[100px]"></div>
+                    <div id="word-card-right" class="word-card p-4 sm:p-6 text-base sm:text-xl md:text-2xl min-h-[80px] sm:min-h-[100px]"></div>
                 </div>
             </div>
 
@@ -1593,10 +1683,10 @@
         document.addEventListener('DOMContentLoaded', initializeGame);
     </script>
     
-    <!-- Compact Footer -->
-    <footer class="sticky bottom-0 p-2 md:p-3 bg-[#222426] border-t border-[#f8af3c]">
+    <!-- Footer with Return Home button -->
+    <footer class="fixed bottom-0 left-0 right-0 p-3 sm:p-4 bg-[#222426] border-t-2 border-[#f8af3c]">
         <div class="max-w-7xl mx-auto text-center">
-            <button id="return-home-btn" class="btn btn-primary px-4 py-1.5 text-sm md:text-base">
+            <button id="return-home-btn" class="btn btn-primary px-4 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base">
                 ກັບໄປໜ້າຫຼັກ
             </button>
         </div>
