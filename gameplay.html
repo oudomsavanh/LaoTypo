@@ -376,6 +376,17 @@
             transform: scale(1.05);
         }
         
+        /* Format button styles */
+        .format-btn {
+            opacity: 0.7;
+            border: 2px solid transparent;
+        }
+        .format-btn.active {
+            opacity: 1;
+            border-color: #f8af3c;
+            background-color: #3e4043 !important;
+        }
+        
         /* Rainbow text animation for perfect scores */
         @keyframes rainbow {
             0% { color: #ff0000; }
@@ -546,6 +557,58 @@
                     <div class="text-center px-4">
                         <p class="text-gray-400 text-base sm:text-lg mb-2">ຜົນການປະເມີນ:</p>
                         <p id="evaluation-result" class="text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4"></p>
+                    </div>
+                    
+                    <!-- Share Image Section -->
+                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700 mb-4">
+                        <h3 class="text-lg sm:text-xl font-bold text-main-color mb-4">ແບ່ງປັນຜົນຂອງເຈົ້າ!</h3>
+                        
+                        <!-- Canvas for shareable image -->
+                        <canvas id="share-canvas" class="hidden"></canvas>
+                        
+                        <!-- Preview of shareable image -->
+                        <div id="share-preview-container" class="mb-4 hidden">
+                            <img id="share-preview" class="w-full max-w-md mx-auto rounded-lg shadow-lg" alt="Share preview">
+                        </div>
+                        
+                        <!-- Format selector -->
+                        <div class="flex justify-center gap-2 mb-3">
+                            <button id="format-square" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300 active">
+                                ສີ່ຫຼ່ຽມ (1:1)
+                            </button>
+                            <button id="format-landscape" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300">
+                                ແນວນອນ (16:9)
+                            </button>
+                        </div>
+                        
+                        <!-- Share buttons -->
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <button id="generate-share-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                ສ້າງຮູບແບ່ງປັນ
+                            </button>
+                            
+                            <button id="download-share-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                ດາວໂຫລດຮູບ
+                            </button>
+                            
+                            <button id="copy-share-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                ຄັດລອກຮູບ
+                            </button>
+                        </div>
+                        
+                        <!-- Copy status message -->
+                        <div id="copy-status" class="mt-3 text-sm text-green-400 hidden">
+                            ✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!
+                        </div>
                     </div>
                     
                     <!-- Action Buttons with Meme Style -->
@@ -1196,6 +1259,296 @@
             
             // Button clicks
             restartGameBtn.addEventListener('click', resetGame);
+            
+            // Share image buttons
+            setupShareButtons();
+        }
+        
+        // Share Image Generator Functions
+        function setupShareButtons() {
+            const generateBtn = document.getElementById('generate-share-btn');
+            const downloadBtn = document.getElementById('download-share-btn');
+            const copyBtn = document.getElementById('copy-share-btn');
+            const previewContainer = document.getElementById('share-preview-container');
+            const previewImg = document.getElementById('share-preview');
+            const copyStatus = document.getElementById('copy-status');
+            const formatSquareBtn = document.getElementById('format-square');
+            const formatLandscapeBtn = document.getElementById('format-landscape');
+            
+            let selectedFormat = 'square';
+            
+            // Format switching
+            formatSquareBtn.addEventListener('click', () => {
+                selectedFormat = 'square';
+                formatSquareBtn.classList.add('active');
+                formatLandscapeBtn.classList.remove('active');
+            });
+            
+            formatLandscapeBtn.addEventListener('click', () => {
+                selectedFormat = 'landscape';
+                formatLandscapeBtn.classList.add('active');
+                formatSquareBtn.classList.remove('active');
+            });
+            
+            generateBtn.addEventListener('click', async () => {
+                const imageDataUrl = await generateShareImage(selectedFormat);
+                previewImg.src = imageDataUrl;
+                previewContainer.classList.remove('hidden');
+                downloadBtn.classList.remove('hidden');
+                
+                // Show copy button only if clipboard API is available
+                if (navigator.clipboard && window.ClipboardItem) {
+                    copyBtn.classList.remove('hidden');
+                }
+            });
+            
+            downloadBtn.addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = `lao-typo-score-${Date.now()}.png`;
+                link.href = previewImg.src;
+                link.click();
+            });
+            
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    const response = await fetch(previewImg.src);
+                    const blob = await response.blob();
+                    
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        const item = new ClipboardItem({ 'image/png': blob });
+                        await navigator.clipboard.write([item]);
+                        
+                        copyStatus.classList.remove('hidden');
+                        setTimeout(() => {
+                            copyStatus.classList.add('hidden');
+                        }, 3000);
+                    }
+                } catch (err) {
+                    console.error('Failed to copy image:', err);
+                    alert('ບໍ່ສາມາດຄັດລອກຮູບໄດ້. ກະລຸນາດາວໂຫລດແທນ.');
+                }
+            });
+        }
+        
+        async function generateShareImage(format = 'square') {
+            const canvas = document.getElementById('share-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size based on format
+            if (format === 'landscape') {
+                canvas.width = 1200;
+                canvas.height = 630;
+            } else {
+                canvas.width = 1080;
+                canvas.height = 1080;
+            }
+            
+            // Get game stats
+            const finalScore = document.getElementById('final-streak').textContent;
+            const bestScore = document.getElementById('results-best-streak').textContent;
+            const accuracy = document.getElementById('accuracy-stat').textContent;
+            const evaluation = document.getElementById('evaluation-result').textContent;
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#2c2e31');
+            gradient.addColorStop(0.5, '#3e4043');
+            gradient.addColorStop(1, '#2c2e31');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add decorative pattern
+            ctx.strokeStyle = 'rgba(248, 175, 60, 0.1)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 20; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * 60);
+                ctx.lineTo(canvas.width, i * 60);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(i * 60, 0);
+                ctx.lineTo(i * 60, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Layout adjustments based on format
+            if (format === 'landscape') {
+                // Landscape layout (1200x630)
+                
+                // Try to load and draw the Gecko mascot on the left
+                try {
+                    const geckoImg = new Image();
+                    geckoImg.src = 'Gecko.png';
+                    await new Promise((resolve, reject) => {
+                        geckoImg.onload = resolve;
+                        geckoImg.onerror = reject;
+                        setTimeout(reject, 3000);
+                    });
+                    
+                    const imgSize = 150;
+                    ctx.drawImage(geckoImg, 50, (canvas.height - imgSize) / 2, imgSize, imgSize);
+                } catch (error) {
+                    ctx.font = 'bold 150px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#f8af3c';
+                    ctx.fillText('🦎', 125, canvas.height / 2 + 50);
+                }
+                
+                // Right side content
+                const contentX = 280;
+                
+                // App title
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 42px Montserrat, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('LaoTypo', contentX, 80);
+                
+                // Subtitle
+                ctx.fillStyle = '#d1d0c5';
+                ctx.font = '24px Noto Sans Lao, sans-serif';
+                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', contentX, 120);
+                
+                // "I just finished!" message
+                ctx.fillStyle = '#72b483';
+                ctx.font = 'bold 32px Noto Sans Lao, sans-serif';
+                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', contentX, 180);
+                
+                // Stats
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 28px Montserrat, sans-serif';
+                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', contentX, 240);
+                
+                ctx.fillStyle = '#d1d0c5';
+                ctx.font = '24px Montserrat, sans-serif';
+                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX, 290);
+                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX, 330);
+                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, contentX, 370);
+                
+                // Evaluation
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 22px Noto Sans Lao, sans-serif';
+                const evalWords = evaluation.split(' ');
+                let evalLine = '';
+                let evalY = 440;
+                const evalMaxWidth = 850;
+                
+                for (let n = 0; n < evalWords.length; n++) {
+                    const testLine = evalLine + evalWords[n] + ' ';
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > evalMaxWidth && n > 0) {
+                        ctx.fillText(evalLine, contentX, evalY);
+                        evalLine = evalWords[n] + ' ';
+                        evalY += 35;
+                    } else {
+                        evalLine = testLine;
+                    }
+                }
+                ctx.fillText(evalLine, contentX, evalY);
+                
+                // Website at bottom
+                ctx.fillStyle = '#646669';
+                ctx.font = '20px Montserrat, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('laotypo.com', canvas.width / 2, canvas.height - 30);
+                
+            } else {
+                // Square layout (1080x1080)
+                
+                // Try to load and draw the Gecko mascot
+                try {
+                    const geckoImg = new Image();
+                    geckoImg.src = 'Gecko.png';
+                    await new Promise((resolve, reject) => {
+                        geckoImg.onload = resolve;
+                        geckoImg.onerror = reject;
+                        setTimeout(reject, 3000);
+                    });
+                    
+                    const imgSize = 180;
+                    ctx.drawImage(geckoImg, (canvas.width - imgSize) / 2, 80, imgSize, imgSize);
+                } catch (error) {
+                    ctx.font = 'bold 200px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#f8af3c';
+                    ctx.fillText('🦎', canvas.width / 2, 250);
+                }
+                
+                // Draw app title
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 48px Montserrat, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('LaoTypo', canvas.width / 2, 350);
+                
+                // Draw subtitle
+                ctx.fillStyle = '#d1d0c5';
+                ctx.font = '32px Noto Sans Lao, sans-serif';
+                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', canvas.width / 2, 400);
+                
+                // Draw "I just finished!" message
+                ctx.fillStyle = '#72b483';
+                ctx.font = 'bold 36px Noto Sans Lao, sans-serif';
+                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', canvas.width / 2, 480);
+                
+                // Draw stats container background
+                ctx.fillStyle = 'rgba(100, 102, 105, 0.3)';
+                ctx.fillRect(140, 520, 800, 300);
+                
+                // Draw stats
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 36px Montserrat, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', 180, 580);
+                
+                // Score details
+                ctx.fillStyle = '#d1d0c5';
+                ctx.font = '32px Montserrat, sans-serif';
+                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, 180, 640);
+                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, 180, 690);
+                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, 180, 740);
+                
+                // Draw evaluation in a box
+                ctx.fillStyle = 'rgba(248, 175, 60, 0.2)';
+                ctx.fillRect(140, 840, 800, 120);
+                
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 28px Noto Sans Lao, sans-serif';
+                ctx.textAlign = 'center';
+                
+                // Word wrap for long evaluation text
+                const maxWidth = 750;
+                const lineHeight = 40;
+                const words = evaluation.split(' ');
+                let line = '';
+                let y = 900;
+                
+                for (let n = 0; n < words.length; n++) {
+                    const testLine = line + words[n] + ' ';
+                    const metrics = ctx.measureText(testLine);
+                    const testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        ctx.fillText(line, canvas.width / 2, y);
+                        line = words[n] + ' ';
+                        y += lineHeight;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                ctx.fillText(line, canvas.width / 2, y);
+                
+                // Add website/app name at bottom
+                ctx.fillStyle = '#646669';
+                ctx.font = '24px Montserrat, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('laotypo.com', canvas.width / 2, 1040);
+            }
+            
+            // Add decorative elements
+            ctx.strokeStyle = '#f8af3c';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            
+            // Convert to data URL
+            return canvas.toDataURL('image/png');
         }
 
         // Navigation handlers
