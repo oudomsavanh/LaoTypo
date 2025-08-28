@@ -534,7 +534,7 @@
                 </div>
                 
                 <div class="flex justify-between items-center mb-4 sm:mb-6 text-base sm:text-xl">
-                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span> / <span id="level-progress" class="text-main-color">30</span></div>
+                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span> / <span id="level-progress" class="text-main-color">15</span></div>
                     <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
                 </div>
                 
@@ -658,6 +658,48 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Level Transition Interstitial Modal -->
+            <div id="level-transition-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black bg-opacity-75">
+                <div class="bg-gray-800 rounded-xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-2 border-[#f8af3c]">
+                    <div class="text-center">
+                        <!-- Success Icon -->
+                        <div class="text-6xl sm:text-8xl mb-4" id="level-icon">🎉</div>
+                        
+                        <!-- Level Completion Message -->
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#f8af3c] mb-4" id="level-message">
+                            ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!
+                        </h2>
+                        
+                        <!-- Progress Stats -->
+                        <div class="bg-gray-900/50 rounded-lg p-4 mb-6">
+                            <p class="text-gray-400 text-sm mb-2">ຄະແນນລະດັບນີ້</p>
+                            <p class="text-2xl font-bold text-white"><span id="level-score">15</span>/15</p>
+                        </div>
+                        
+                        <!-- Question -->
+                        <p class="text-lg sm:text-xl text-gray-300 mb-6" id="level-question">
+                            ສືບຕໍ່ໄປລະດັບປານກາງບໍ?
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ແມ່ນແລ້ວ, ສືບຕໍ່!
+                            </button>
+                            <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                ຫຼິ້ນລະດັບນີ້ຕໍ່
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -686,7 +728,7 @@
         let playerLives = 3;
         let currentLevel = 0; // 0: easy, 1: medium, 2: hard
         let levelProgress = 0;
-        const levelThresholds = [30, 40, 50]; // Words needed to complete each level
+        const levelThresholds = [15, 15, 15]; // Words needed to complete each level
         const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
@@ -918,12 +960,8 @@
                 
                 // Check level progression
                 if (levelProgress >= levelThresholds[currentLevel]) {
-                    if (currentLevel < 2) {
-                        currentLevel++;
-                        levelProgress = 0;
-                        updateLevelDisplay();
-                        updateDifficultyDisplay();
-                    }
+                    // Show level transition modal
+                    showLevelTransitionModal();
                 }
                 
                 // Update UI immediately
@@ -1679,8 +1717,134 @@
             });
         }
 
+        // Level Transition Modal Functions
+        function showLevelTransitionModal() {
+            const modal = document.getElementById('level-transition-modal');
+            const levelMessage = document.getElementById('level-message');
+            const levelQuestion = document.getElementById('level-question');
+            const levelScore = document.getElementById('level-score');
+            const levelIcon = document.getElementById('level-icon');
+            const continueBtn = document.getElementById('continue-next-level');
+            const replayBtn = document.getElementById('replay-current-level');
+            
+            // Pause the game
+            gameActive = false;
+            
+            // Update modal content based on current level
+            levelScore.textContent = levelProgress;
+            
+            if (currentLevel === 0) {
+                // Completed Easy Level
+                levelIcon.textContent = '🟢';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບປານກາງບໍ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
+                `;
+            } else if (currentLevel === 1) {
+                // Completed Medium Level
+                levelIcon.textContent = '🔵';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບປານກາງແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບຍາກບໍ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
+                `;
+            } else if (currentLevel === 2) {
+                // Completed Hard Level
+                levelIcon.textContent = '🔴';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບຍາກແລ້ວ! 🏆';
+                levelQuestion.textContent = 'ທ່ານຕ້ອງການຫຼິ້ນຕໍ່ ຫຼື ຈົບເກມ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ຫຼິ້ນຕໍ່ (ລະດັບຍາກ)
+                `;
+                replayBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    ກັບໄປໜ້າຫຼັກ
+                `;
+            }
+            
+            // Show the modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Play success sound
+            playSound('correct');
+        }
+        
+        function setupLevelTransitionHandlers() {
+            const modal = document.getElementById('level-transition-modal');
+            const continueBtn = document.getElementById('continue-next-level');
+            const replayBtn = document.getElementById('replay-current-level');
+            
+            continueBtn.addEventListener('click', () => {
+                if (currentLevel < 2) {
+                    // Advance to next level
+                    currentLevel++;
+                    levelProgress = 0;
+                    updateLevelDisplay();
+                    updateDifficultyDisplay();
+                    
+                    // Hide modal and continue game
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    
+                    // Resume game with new level
+                    setTimeout(() => {
+                        showNewWords();
+                    }, 500);
+                } else {
+                    // At hard level, continue playing hard
+                    levelProgress = 0;
+                    updateLevelDisplay();
+                    
+                    // Hide modal and continue game
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    
+                    // Resume game
+                    setTimeout(() => {
+                        showNewWords();
+                    }, 500);
+                }
+            });
+            
+            replayBtn.addEventListener('click', () => {
+                if (currentLevel === 2) {
+                    // At hard level, "replay" means go to home
+                    window.location.href = 'testing.html';
+                } else {
+                    // Replay current level
+                    levelProgress = 0;
+                    updateLevelDisplay();
+                    
+                    // Hide modal and continue game
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    
+                    // Resume game at same level
+                    setTimeout(() => {
+                        showNewWords();
+                    }, 500);
+                }
+            });
+        }
+
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', initializeGame);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            setupLevelTransitionHandlers();
+        });
     </script>
     
     <!-- Footer with Return Home button -->
