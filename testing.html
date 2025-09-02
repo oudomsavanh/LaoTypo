@@ -606,10 +606,26 @@
         }
         
         .gecko-mascot img {
-            width: 100px;
-            height: 100px;
+            width: 70px;
+            height: auto;
             opacity: 0.8;
             transition: opacity 0.3s ease;
+            /* Maintains the 412:327 aspect ratio */
+        }
+        
+        /* Responsive gecko size - width only, height auto */
+        @media (min-width: 640px) {
+            .gecko-mascot img {
+                width: 90px;
+                height: auto;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .gecko-mascot img {
+                width: 120px;
+                height: auto;
+            }
         }
         
         .gecko-mascot:hover img {
