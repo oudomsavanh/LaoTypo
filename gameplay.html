@@ -211,14 +211,14 @@
             transition: transform 0.1s linear;
         }
         
-        /* Redesigned Life Bar with Better Visual Design */
+        /* Life Bar Container with solid color */
         .life-bar-container {
-            background: linear-gradient(135deg, var(--main-color) 0%, rgba(248, 175, 60, 0.7) 50%, var(--main-color) 100%);
+            background: #fbb03b;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 1rem;
             padding: 0.75rem 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -230,25 +230,17 @@
             }
         }
         
+        /* Removed shimmer effect */
         .life-bar-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-            animation: shimmer 3s infinite;
+            display: none;
         }
         
         .life-bar-container h2 {
             margin: 0;
         }
         
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
+        /* Shimmer animation removed */
+        /* @keyframes shimmer - removed */
         
         .life-hearts-row {
             display: flex;
@@ -258,7 +250,7 @@
         }
         
         .life-label {
-            color: #58636d;
+            color: #000000; /* Black to match background */
             font-weight: 600;
             font-size: 14px;
             margin-right: 8px;
@@ -298,7 +290,7 @@
         }
         
         .heart.lost svg path {
-            fill: #e5e5e5;
+            fill: #000000; /* Black heart for lost lives */
         }
         
         /* Subtle Duolingo-style animation when losing a life */
@@ -343,13 +335,13 @@
         
         .motivation-text {
             text-align: center;
-            color: var(--bg-color);
+            color: #000000; /* Black text */
             font-weight: 600;
             font-style: italic;
             font-size: 0.875rem;
             opacity: 0.9;
             transition: all 0.3s ease;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+            text-shadow: none;
             font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
         }
         
@@ -360,18 +352,18 @@
         }
         
         .motivation-text.warning {
-            color: #1f2937;
+            color: #000000; /* Keep black for warning */
             opacity: 1;
             font-weight: 700;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
+            text-shadow: none;
         }
         
         .motivation-text.critical {
-            color: #7f1d1d;
+            color: #7f1d1d; /* Dark red for critical */
             opacity: 1;
             font-weight: 800;
             animation: pulse 1s infinite;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
+            text-shadow: none;
         }
         
         @keyframes pulse {
@@ -388,6 +380,18 @@
         
         .animate-shake {
             animation: shake 0.5s ease-in-out;
+        }
+        
+        /* Player name styles - no background or box */
+        .player-name {
+            background: none !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         /* Meme container styling */
@@ -499,14 +503,13 @@
                 <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
-                    <!-- Clean Duolingo-style Player Name Display -->
+                    <!-- Player Name Display without background -->
                     <div class="text-center mb-3 sm:mb-4">
-                        <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full" style="background-color: #f0f0f0;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="8" r="3" fill="#58636d"/>
-                                <path d="M16 14c0-2.21-1.79-4-4-4s-4 1.79-4 4v4h8v-4z" fill="#58636d"/>
+                        <div class="inline-flex items-center gap-2 player-name">
+                            <svg width="20" height="20" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M128 28C70.562 28 24 74.562 24 132C24 189.438 70.562 236 128 236C185.438 236 232 189.438 232 132C232 74.562 185.438 28 128 28ZM128 44C176.604 44 216 83.396 216 132C216 156.48 206.792 178.712 191.636 195.364C186.768 182.968 178.572 172.504 168.02 165.012C175.652 157.036 180 146.248 180 134.5C180 110.804 159.196 90 135.5 90H120.5C96.804 90 76 110.804 76 134.5C76 146.248 80.348 157.036 87.98 165.012C77.428 172.504 69.232 182.968 64.364 195.364C49.208 178.712 40 156.48 40 132C40 83.396 79.396 44 128 44ZM120.5 106H135.5C150.412 106 164 119.588 164 134.5C164 149.412 150.412 163 135.5 163H120.5C105.588 163 92 149.412 92 134.5C92 119.588 105.588 106 120.5 106ZM78.692 203.872C82.66 187.616 96.94 175 114 175H142C159.06 175 173.34 187.616 177.308 203.872C161.816 215.156 145.704 220 128 220C110.296 220 94.184 215.156 78.692 203.872Z" fill="#fbb03b"/>
                             </svg>
-                            <span style="color: #3c4444; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
+                            <span style="color: #d1d0c5; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
                         </div>
                     </div>
                 <!-- Redesigned Life Bar with Enhanced Visual Design -->
