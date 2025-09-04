@@ -2602,10 +2602,6 @@
             // Update account panel with current data
             document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
             
-            // Update rank
-            const rank = calculateUserRank();
-            document.getElementById('account-rank').textContent = `#${rank}`;
-            
             // Update quick stats
             document.getElementById('account-best-streak').textContent = stats.bestStreak;
             
