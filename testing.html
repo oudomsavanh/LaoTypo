@@ -28,49 +28,49 @@
     <script src="firebase-config.js"></script>
     <style>
         :root {
-            /* Material 3 Color Tokens - Dark Theme */
-            --md-sys-color-primary: #ffb84d;
-            --md-sys-color-on-primary: #2d1600;
-            --md-sys-color-primary-container: #3d2500;
-            --md-sys-color-on-primary-container: #ffdbb0;
+            /* Your Original Color Scheme */
+            --bg-color: #2c2e31;
+            --main-color: #f8af3c;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
             
-            --md-sys-color-secondary: #d6c2a0;
-            --md-sys-color-on-secondary: #3a2f15;
-            --md-sys-color-secondary-container: #52452a;
-            --md-sys-color-on-secondary-container: #f3debb;
+            /* Material 3 Color Tokens - Optimized for your colors */
+            --md-sys-color-primary: #f8af3c;
+            --md-sys-color-on-primary: #2c2e31;
+            --md-sys-color-primary-container: #3d2f00;
+            --md-sys-color-on-primary-container: #f8af3c;
             
-            --md-sys-color-tertiary: #b0c9a7;
-            --md-sys-color-on-tertiary: #1f3318;
-            --md-sys-color-tertiary-container: #354a2c;
-            --md-sys-color-on-tertiary-container: #cce5c1;
+            --md-sys-color-secondary: #646669;
+            --md-sys-color-on-secondary: #2c2e31;
+            --md-sys-color-secondary-container: #4a4c4f;
+            --md-sys-color-on-secondary-container: #d1d0c5;
             
-            --md-sys-color-error: #ffb4ab;
-            --md-sys-color-on-error: #690005;
-            --md-sys-color-error-container: #93000a;
-            --md-sys-color-on-error-container: #ffdad6;
+            --md-sys-color-tertiary: #72b483;
+            --md-sys-color-on-tertiary: #2c2e31;
+            --md-sys-color-tertiary-container: #4a5c4f;
+            --md-sys-color-on-tertiary-container: #d1d0c5;
             
-            --md-sys-color-surface: #14120e;
-            --md-sys-color-on-surface: #e6e1d9;
-            --md-sys-color-surface-variant: #4e4539;
-            --md-sys-color-on-surface-variant: #d1c5b4;
+            --md-sys-color-error: #ca4754;
+            --md-sys-color-on-error: #2c2e31;
+            --md-sys-color-error-container: #5a2a2f;
+            --md-sys-color-on-error-container: #d1d0c5;
             
-            --md-sys-color-outline: #9b8f80;
-            --md-sys-color-outline-variant: #4e4539;
+            --md-sys-color-surface: #2c2e31;
+            --md-sys-color-on-surface: #d1d0c5;
+            --md-sys-color-surface-variant: #3e4043;
+            --md-sys-color-on-surface-variant: #646669;
             
-            --md-sys-color-surface-container-lowest: #0f0d0a;
-            --md-sys-color-surface-container-low: #1d1b16;
-            --md-sys-color-surface-container: #211f1a;
-            --md-sys-color-surface-container-high: #2b2924;
-            --md-sys-color-surface-container-highest: #36342e;
+            --md-sys-color-outline: #646669;
+            --md-sys-color-outline-variant: #3e4043;
             
-            /* Legacy color mappings for compatibility */
-            --bg-color: var(--md-sys-color-surface);
-            --main-color: var(--md-sys-color-primary);
-            --sub-color: var(--md-sys-color-on-surface-variant);
-            --text-color: var(--md-sys-color-on-surface);
-            --error-color: var(--md-sys-color-error);
-            --correct-color: var(--md-sys-color-tertiary);
-            --warning-color: #ffb84d;
+            --md-sys-color-surface-container-lowest: #1d1f22;
+            --md-sys-color-surface-container-low: #2c2e31;
+            --md-sys-color-surface-container: #3e4043;
+            --md-sys-color-surface-container-high: #4a4c4f;
+            --md-sys-color-surface-container-highest: #56585b;
         }
         body {
             font-family: 'Noto Sans Lao Looped', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -103,13 +103,13 @@
             display: block;
         }
         .word-card {
-            background-color: var(--md-sys-color-surface-container-high);
+            background-color: #3e4043;
             border-radius: 1rem;
             padding: 2rem 1.5rem;
             font-size: 2.25rem;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            border: 1px solid var(--md-sys-color-outline-variant);
+            border: 2px solid transparent;
             user-select: none;
             display: flex;
             align-items: center;
@@ -119,8 +119,8 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .word-card:hover, .word-card.focused {
-            background-color: var(--md-sys-color-surface-container-highest);
-            border-color: var(--md-sys-color-primary);
+            background-color: #4a4c4f;
+            border-color: var(--main-color);
             transform: translateY(-2px);
             box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
         }
@@ -135,35 +135,35 @@
             animation: slide-in-right 0.5s ease-out;
         }
         .btn {
-            background-color: var(--md-sys-color-surface-container-high);
-            color: var(--md-sys-color-on-surface);
+            background-color: var(--sub-color);
+            color: var(--text-color);
             padding: 0.75rem 1.5rem;
             border-radius: 1.25rem;
             font-size: 0.875rem;
             font-weight: 500;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            border: 1px solid var(--md-sys-color-outline);
+            border: 1px solid var(--sub-color);
             cursor: pointer;
             text-transform: none;
             letter-spacing: 0.1px;
             min-height: 40px;
         }
         .btn:hover {
-            background-color: var(--md-sys-color-surface-container-highest);
+            background-color: #7a7c7e;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-primary {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
+            background-color: var(--main-color);
+            color: var(--bg-color);
             border: none;
         }
         .btn-primary:hover {
-            background-color: var(--md-sys-color-primary);
+            background-color: var(--main-color);
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon {
             background-color: transparent;
-            color: var(--md-sys-color-on-surface-variant);
+            color: var(--sub-color);
             padding: 0.5rem;
             border-radius: 1.25rem;
             transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
@@ -175,8 +175,8 @@
             justify-content: center;
         }
         .btn-icon:hover {
-            color: var(--md-sys-color-on-surface);
-            background-color: var(--md-sys-color-surface-container-high);
+            color: var(--text-color);
+            background-color: #3e4043;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon:active {
@@ -196,15 +196,15 @@
         @keyframes glow-correct {
             0% { 
                 box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-                border-color: var(--md-sys-color-outline-variant);
+                border-color: transparent;
             }
             50% { 
-                box-shadow: 0 0 0 1px var(--md-sys-color-tertiary), 0 0 20px 5px rgba(176, 201, 167, 0.3);
-                border-color: var(--md-sys-color-tertiary);
+                box-shadow: 0 0 0 2px var(--correct-color), 0 0 20px 5px rgba(114, 180, 131, 0.3);
+                border-color: var(--correct-color);
             }
             100% { 
                 box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
-                border-color: var(--md-sys-color-outline-variant);
+                border-color: transparent;
             }
         }
         @keyframes shake-horizontal {
@@ -214,7 +214,7 @@
         }
         .timer-bar {
             height: 4px;
-            background-color: var(--md-sys-color-primary);
+            background-color: var(--main-color);
             width: 100%;
             transform-origin: left;
             transition: transform 0.1s linear;
@@ -225,12 +225,12 @@
             top: 15%;
             right: 1rem;
             background: var(--bg-color);
-            border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: 1.75rem;
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
             padding: 0;
             min-width: 320px;
             max-width: 380px;
-            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
             transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
@@ -256,9 +256,9 @@
             font-size: 0.875rem;
         }
         .tab-button.active {
-            color: var(--md-sys-color-primary) !important;
-            border-bottom-color: var(--md-sys-color-primary) !important;
-            background-color: var(--md-sys-color-surface-container-high);
+            color: var(--main-color) !important;
+            border-bottom-color: var(--main-color) !important;
+            background-color: #3e4043;
         }
         .tab-content {
             min-height: 400px;
@@ -274,21 +274,20 @@
         
         .difficulty-btn {
             padding: 0.5rem 1.25rem;
-            border-radius: 1.25rem;
-            border: 1px solid var(--md-sys-color-outline);
-            background: var(--md-sys-color-surface-container-high);
+            border-radius: 20px;
+            border: 2px solid;
+            background: transparent;
             font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            color: var(--md-sys-color-on-surface);
+            transition: all 0.3s ease;
+            color: var(--text-color);
             transform-origin: center;
-            min-height: 40px;
         }
         
         .difficulty-btn:hover {
-            background-color: var(--md-sys-color-surface-container-highest);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .difficulty-btn:active {
@@ -325,64 +324,60 @@
             border-color: #ef4444;
         }
         
-        /* Custom input field with Material 3 styling */
+        /* Custom input field with dotted border */
         .custom-input {
             width: 100%;
-            background-color: var(--md-sys-color-surface-container-high);
-            border: 1px solid var(--md-sys-color-outline);
-            border-radius: 0.75rem;
+            background-color: transparent;
+            border: 2px dashed var(--sub-color);
+            border-radius: 0.5rem;
             padding: 1rem;
-            font-size: 1rem;
+            font-size: 1.125rem;
             text-align: center;
-            color: var(--md-sys-color-on-surface);
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            color: var(--text-color);
+            transition: all 0.3s ease;
             margin: 1.5rem 0;
-            min-height: 56px;
         }
         
         .custom-input:focus {
             outline: none;
-            border-color: var(--md-sys-color-primary);
-            border-width: 2px;
-            box-shadow: 0 0 0 1px var(--md-sys-color-primary);
+            border-color: var(--main-color);
+            border-style: solid;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(248, 175, 60, 0.3);
         }
         
         .custom-input::placeholder {
-            color: var(--md-sys-color-on-surface-variant);
+            color: var(--sub-color);
         }
         
-        /* Start button matching Material 3 design */
+        /* Start button matching design */
         .start-button {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
+            background-color: var(--main-color);
+            color: var(--bg-color);
             border: none;
-            border-radius: 1.25rem;
+            border-radius: 0.5rem;
             padding: 1rem 3rem;
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.25rem;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            transition: all 0.3s ease;
             margin-top: 2rem;
             transform-origin: center;
-            min-height: 48px;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         
         .start-button:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(248, 175, 60, 0.4);
         }
         
         .start-button:active:not(:disabled) {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+            transform: scale(0.98);
         }
         
         .start-button:disabled {
-            opacity: 0.38;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            transform: scale(1);
         }
         
 
@@ -392,12 +387,12 @@
             top: 15%;
             right: 1rem;
             background: var(--bg-color);
-            border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: 1.75rem;
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
             padding: 0;
             min-width: 320px;
             max-width: 380px;
-            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
             transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
@@ -425,12 +420,12 @@
             font-weight: 500;
         }
         
-        /* Toggle Switch Styles - Material 3 design */
+        /* Toggle Switch Styles - Previous design */
         .switch {
             position: relative;
             display: inline-block;
-            width: 52px;
-            height: 32px;
+            width: 60px;
+            height: 34px;
         }
         
         .switch input {
@@ -446,32 +441,29 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--md-sys-color-surface-variant);
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            border-radius: 16px;
-            border: 2px solid var(--md-sys-color-outline);
+            background-color: var(--sub-color);
+            transition: .4s;
+            border-radius: 34px;
         }
         
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
+            height: 26px;
+            width: 26px;
             left: 4px;
             bottom: 4px;
-            background-color: var(--md-sys-color-outline);
-            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            background-color: white;
+            transition: .4s;
             border-radius: 50%;
         }
         
         input:checked + .slider {
-            background-color: var(--md-sys-color-primary);
-            border-color: var(--md-sys-color-primary);
+            background-color: var(--main-color);
         }
         
         input:checked + .slider:before {
-            transform: translateX(20px);
-            background-color: var(--md-sys-color-on-primary);
+            transform: translateX(26px);
         }
         
         /* Timer toggle container */
@@ -490,12 +482,12 @@
         
         /* ADDED: Life Bar System Styles */
         .life-bar-header {
-            background: var(--md-sys-color-surface-container-high);
-            border: 1px solid var(--md-sys-color-outline-variant);
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 2px solid var(--main-color);
             border-radius: 1rem;
             padding: 1rem;
             text-align: center;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
         
         .life-container {
@@ -633,26 +625,25 @@
             text-align: left;
         }
         .leaderboard-table th {
-            color: var(--md-sys-color-on-surface-variant);
-            font-weight: 500;
-            text-transform: none;
+            color: var(--sub-color);
+            font-weight: bold;
+            text-transform: uppercase;
             font-size: 0.875rem;
-            letter-spacing: 0.1px;
         }
         .leaderboard-table tr:not(:first-child) {
-            border-top: 1px solid var(--md-sys-color-outline-variant);
+            border-top: 1px solid #3a3c3e;
         }
         .leaderboard-table td.rank {
-            font-weight: 500;
-            color: var(--md-sys-color-primary);
+            font-weight: bold;
+            color: var(--main-color);
             text-align: center;
         }
         .leaderboard-table td.score {
-            font-weight: 500;
+            font-weight: bold;
         }
         .leaderboard-table tr.user-best {
-            background-color: var(--md-sys-color-primary-container);
-            border-left: 3px solid var(--md-sys-color-primary);
+            background-color: rgba(248, 175, 60, 0.1);
+            border-left: 3px solid var(--main-color);
         }
         .input-error {
             border-color: var(--error-color) !important;
@@ -872,12 +863,12 @@
             top: 15%;
             right: 1rem;
             background: var(--bg-color);
-            border: 1px solid var(--md-sys-color-outline-variant);
-            border-radius: 1.75rem;
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
             padding: 0;
             min-width: 300px;
             max-width: 350px;
-            box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
             transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
