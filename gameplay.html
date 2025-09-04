@@ -510,6 +510,13 @@
                 <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
+                
+                <!-- Retry Button (hidden by default) -->
+                <div id="retry-loading-container" class="text-center mb-4 hidden">
+                    <button id="retry-loading-btn" class="bg-amber-500 hover:bg-amber-400 text-neutral-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+                        🔄 ລອງໂຫຼດອີກຄັ້ງ
+                    </button>
+                </div>
                     <!-- Player Name Display without background -->
                     <div class="text-center mb-3 sm:mb-4">
                         <div class="inline-flex items-center gap-2 player-name">
@@ -750,10 +757,37 @@
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
         const wordLoadingStatus = document.getElementById('word-loading-status');
+        const retryLoadingContainer = document.getElementById('retry-loading-container');
+        const retryLoadingBtn = document.getElementById('retry-loading-btn');
         
         // Life system elements
         const heartsContainer = document.getElementById('hearts-container');
         const motivationText = document.getElementById('motivation-text');
+
+        // Test Google Sheets connection (for debugging)
+        async function testGoogleSheetsConnection() {
+            console.log("Testing Google Sheets connection...");
+            console.log("URL:", GOOGLE_SHEETS_URL);
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                console.log("Response status:", response.status);
+                console.log("Response headers:", [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log("Response text length:", text.length);
+                    console.log("Response preview:", text.substring(0, 500));
+                    return true;
+                } else {
+                    console.error("Response not OK:", response.status, response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                return false;
+            }
+        }
 
         // Initialize game
         async function initializeGame() {
@@ -811,26 +845,84 @@
                 wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
                 
-                const response = await fetch(GOOGLE_SHEETS_URL);
+                console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
+                
+                // Try multiple approaches to fetch the data
+                let response;
+                let fetchMethod = '';
+                
+                // Method 1: Try CORS proxy (allorigins.win)
+                try {
+                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_SHEETS_URL)}`;
+                    console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
+                    response = await fetch(corsProxyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv',
+                        },
+                    });
+                    fetchMethod = 'CORS proxy (allorigins)';
+                } catch (corsError1) {
+                    console.log("CORS proxy (allorigins) failed:", corsError1);
+                    
+                    // Method 2: Try another CORS proxy (cors-anywhere)
+                    try {
+                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GOOGLE_SHEETS_URL}`;
+                        console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
+                        response = await fetch(corsProxyUrl2, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'text/csv',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                        });
+                        fetchMethod = 'CORS proxy (cors-anywhere)';
+                    } catch (corsError2) {
+                        console.log("CORS proxy (cors-anywhere) failed:", corsError2);
+                        
+                        // Method 3: Try direct fetch
+                        console.log("Trying direct fetch:", GOOGLE_SHEETS_URL);
+                        response = await fetch(GOOGLE_SHEETS_URL, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'text/csv',
+                            },
+                        });
+                        fetchMethod = 'Direct fetch';
+                    }
+                }
+                
+                console.log(`Successfully fetched using: ${fetchMethod}`);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
                 
                 const csvText = await response.text();
-                const lines = csvText.split('\n');
+                console.log("CSV response length:", csvText.length);
+                console.log("CSV preview:", csvText.substring(0, 200));
+                
+                const lines = csvText.split('\n').filter(line => line.trim());
+                console.log("Total lines:", lines.length);
                 
                 // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
                 wordPairs = lines
                     .slice(1) // Skip header row
-                    .map(line => {
-                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
-                        if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
-                            return {
-                                context: columns[0],    // Column A - context to display
-                                correct: columns[1],    // Column B - correct answer
-                                incorrect: columns[2],  // Column C - incorrect answer
-                                difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
-                            };
+                    .map((line, index) => {
+                        try {
+                            // Handle CSV parsing more robustly
+                            const columns = line.split(',').map(col => col.replace(/^"|"$/g, '').trim());
+                            if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
+                                return {
+                                    context: columns[0],    // Column A - context to display
+                                    correct: columns[1],    // Column B - correct answer
+                                    incorrect: columns[2],  // Column C - incorrect answer
+                                    difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
+                                };
+                            }
+                        } catch (parseError) {
+                            console.warn(`Error parsing line ${index + 2}:`, line, parseError);
                         }
                         return null;
                     })
@@ -846,9 +938,10 @@
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
                 
-                // Hide loading status after successful load
+                // Hide loading status and retry button after successful load
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
+                    retryLoadingContainer.classList.add('hidden');
                 }, 2000);
                 
                 // Shuffle words
@@ -857,18 +950,26 @@
             } catch (error) {
                 console.error("Error loading word list from Google Sheets:", error);
                 console.log("Error details:", error.message);
+                console.log("Error stack:", error.stack);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
                 
+                // Show retry button
+                retryLoadingContainer.classList.remove('hidden');
+                
                 // Fallback to default words
                 wordPairs = getDefaultWords();
+                console.log("Using fallback words:", wordPairs.length, "entries");
                 
                 // Hide loading status after fallback load
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
                 }, 3000);
+                
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
             }
         }
 
@@ -1306,6 +1407,13 @@
 
         // Event listeners
         function setupEventListeners() {
+            // Retry loading button
+            retryLoadingBtn.addEventListener('click', async () => {
+                retryLoadingContainer.classList.add('hidden');
+                wordLoadingStatus.style.display = 'block';
+                await loadWordsFromGoogleSheets();
+            });
+            
             // Card clicks
             wordCardLeft.addEventListener('click', () => {
                 if (gameActive) {
