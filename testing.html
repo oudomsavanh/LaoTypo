@@ -74,8 +74,8 @@
         }
         body {
             font-family: 'Noto Sans Lao Looped', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--md-sys-color-surface);
-            color: var(--md-sys-color-on-surface);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,10 +86,8 @@
             line-height: 1.5;
         }
         nav {
-            background-color: var(--md-sys-color-surface-container);
-            border-bottom: 1px solid var(--md-sys-color-outline-variant);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
         }
 
         .game-container {
@@ -298,33 +296,33 @@
         }
         
         .difficulty-btn.easy {
-            border-color: var(--md-sys-color-tertiary);
+            border-color: #4ade80;
         }
         
         .difficulty-btn.easy.active {
-            background-color: var(--md-sys-color-tertiary);
-            color: var(--md-sys-color-on-tertiary);
-            border-color: var(--md-sys-color-tertiary);
+            background-color: #4ade80;
+            color: var(--bg-color);
+            border-color: #4ade80;
         }
         
         .difficulty-btn.medium {
-            border-color: var(--md-sys-color-primary);
+            border-color: #fbbf24;
         }
         
         .difficulty-btn.medium.active {
-            background-color: var(--md-sys-color-primary);
-            color: var(--md-sys-color-on-primary);
-            border-color: var(--md-sys-color-primary);
+            background-color: #fbbf24;
+            color: var(--bg-color);
+            border-color: #fbbf24;
         }
         
         .difficulty-btn.hard {
-            border-color: var(--md-sys-color-error);
+            border-color: #ef4444;
         }
         
         .difficulty-btn.hard.active {
-            background-color: var(--md-sys-color-error);
-            color: var(--md-sys-color-on-error);
-            border-color: var(--md-sys-color-error);
+            background-color: #ef4444;
+            color: var(--bg-color);
+            border-color: #ef4444;
         }
         
         /* Custom input field with Material 3 styling */
