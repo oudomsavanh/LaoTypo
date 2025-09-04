@@ -1333,7 +1333,7 @@
                 <button id="leaderboard-tab" class="tab-button active px-4 py-2 border-b-2" style="color: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary);">
                     🏆 ກະດານຈັດອັນດັບ
                 </button>
-                <button id="personal-records-tab" class="tab-button px-4 py-2 hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">
+                <button id="personal-records-tab" class="tab-button px-4 py-2 hover:opacity-70 transition-opacity hidden" style="color: var(--md-sys-color-on-surface-variant);" aria-hidden="true" tabindex="-1">
                     📈 ບັນທຶກສ່ວນຕົວ
                 </button>
             </div>
@@ -1401,13 +1401,6 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <label class="font-medium" style="color: var(--md-sys-color-on-surface);">☁️ Firebase Sync</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="firebase-sync-toggle" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
                 </div>
                 <div class="text-center">
                     <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
@@ -1430,18 +1423,17 @@
                     <div class="small-avatar" id="account-avatar">👤</div>
                     <div>
                         <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
-                        <div class="account-rank text-sm font-medium" style="color: var(--md-sys-color-on-surface-variant);">ອັນດັບ: <span id="account-rank">#-</span></div>
                     </div>
                 </div>
                 
                 <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນດີສຸດ:</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
                         <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມແມ່ນຍຳ:</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
                         <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
                     </div>
                     <div class="quick-stat">
@@ -1453,7 +1445,7 @@
             
             <!-- Action Buttons -->
             <div class="flex flex-col gap-2 mt-4">
-                <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm hidden" aria-hidden="true" tabindex="-1">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
                 <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
             
@@ -1886,7 +1878,7 @@
                 }
                 
                 if (leaderboard.length === 0) {
-                    leaderboardContainer.innerHTML = '<p class="text-center">ຍັງບໍ່ມີໃຜຕິດອັນດັບເທື່ອ!</p>';
+                    leaderboardContainer.innerHTML = '<p class="text-center">ຈະເປີດໃຫ້ແຂ່ງກັນໄວໆນີ້!</p>';
                     return;
                 }
 
