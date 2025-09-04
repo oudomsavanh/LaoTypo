@@ -1408,24 +1408,30 @@
         // Event listeners
         function setupEventListeners() {
             // Retry loading button
-            retryLoadingBtn.addEventListener('click', async () => {
-                retryLoadingContainer.classList.add('hidden');
-                wordLoadingStatus.style.display = 'block';
-                await loadWordsFromGoogleSheets();
-            });
+            if (retryLoadingBtn) {
+                retryLoadingBtn.addEventListener('click', async () => {
+                    retryLoadingContainer.classList.add('hidden');
+                    wordLoadingStatus.style.display = 'block';
+                    await loadWordsFromGoogleSheets();
+                });
+            }
             
             // Card clicks
-            wordCardLeft.addEventListener('click', () => {
-                if (gameActive) {
-                    checkAnswer(wordCardLeft.textContent);
-                }
-            });
+            if (wordCardLeft) {
+                wordCardLeft.addEventListener('click', () => {
+                    if (gameActive) {
+                        checkAnswer(wordCardLeft.textContent);
+                    }
+                });
+            }
             
-            wordCardRight.addEventListener('click', () => {
-                if (gameActive) {
-                    checkAnswer(wordCardRight.textContent);
-                }
-            });
+            if (wordCardRight) {
+                wordCardRight.addEventListener('click', () => {
+                    if (gameActive) {
+                        checkAnswer(wordCardRight.textContent);
+                    }
+                });
+            }
             
             // Keyboard controls
             document.addEventListener('keydown', (e) => {
@@ -1433,25 +1439,31 @@
                 
                 if (e.key.toLowerCase() === 'a') {
                     e.preventDefault();
-                    wordCardLeft.classList.add('focused');
-                    selectedLeftCard = true;
-                    selectedRightCard = false;
-                    wordCardRight.classList.remove('focused');
-                    checkAnswer(wordCardLeft.textContent);
+                    if (wordCardLeft) {
+                        wordCardLeft.classList.add('focused');
+                        selectedLeftCard = true;
+                        selectedRightCard = false;
+                        if (wordCardRight) wordCardRight.classList.remove('focused');
+                        checkAnswer(wordCardLeft.textContent);
+                    }
                 } else if (e.key.toLowerCase() === 'd') {
                     e.preventDefault();
-                    wordCardRight.classList.add('focused');
-                    selectedRightCard = true;
-                    selectedLeftCard = false;
-                    wordCardLeft.classList.remove('focused');
-                    checkAnswer(wordCardRight.textContent);
+                    if (wordCardRight) {
+                        wordCardRight.classList.add('focused');
+                        selectedRightCard = true;
+                        selectedLeftCard = false;
+                        if (wordCardLeft) wordCardLeft.classList.remove('focused');
+                        checkAnswer(wordCardRight.textContent);
+                    }
                 }
             });
             
             // Button clicks
-            restartGameBtn.addEventListener('click', resetGame);
+            if (restartGameBtn) {
+                restartGameBtn.addEventListener('click', resetGame);
+            }
             
-            // Share image buttons
+            // Share image buttons (only if they exist)
             setupShareButtons();
         }
         
@@ -1467,104 +1479,120 @@
             const formatSquareBtn = document.getElementById('format-square');
             const formatLandscapeBtn = document.getElementById('format-landscape');
             
+            // Return early if share elements don't exist (they were removed in the redesign)
+            if (!generateBtn || !nativeShareBtn || !downloadBtn || !copyBtn) {
+                console.log('Share buttons not found - skipping setup');
+                return;
+            }
+            
             let selectedFormat = 'square';
             let currentImageBlob = null;
             
             // Format switching
-            formatSquareBtn.addEventListener('click', () => {
-                selectedFormat = 'square';
-                formatSquareBtn.classList.add('active');
-                formatLandscapeBtn.classList.remove('active');
-            });
-            
-            formatLandscapeBtn.addEventListener('click', () => {
-                selectedFormat = 'landscape';
-                formatLandscapeBtn.classList.add('active');
-                formatSquareBtn.classList.remove('active');
-            });
-            
-            generateBtn.addEventListener('click', async () => {
-                // Ensure fonts are loaded before generating image
-                await document.fonts.ready;
+            if (formatSquareBtn && formatLandscapeBtn) {
+                formatSquareBtn.addEventListener('click', () => {
+                    selectedFormat = 'square';
+                    formatSquareBtn.classList.add('active');
+                    formatLandscapeBtn.classList.remove('active');
+                });
                 
-                const { dataUrl, blob } = await generateShareImage(selectedFormat);
-                currentImageBlob = blob;
-                previewImg.src = dataUrl;
-                previewContainer.classList.remove('hidden');
-                downloadBtn.classList.remove('hidden');
-                
-                // Show native share button if Web Share API is available
-                if (navigator.share && navigator.canShare) {
-                    // Check if sharing files is supported
-                    const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
-                    if (navigator.canShare({ files: [testFile] })) {
-                        nativeShareBtn.classList.remove('hidden');
+                formatLandscapeBtn.addEventListener('click', () => {
+                    selectedFormat = 'landscape';
+                    formatLandscapeBtn.classList.add('active');
+                    formatSquareBtn.classList.remove('active');
+                });
+            }
+            
+            if (generateBtn) {
+                generateBtn.addEventListener('click', async () => {
+                    // Ensure fonts are loaded before generating image
+                    await document.fonts.ready;
+                    
+                    const { dataUrl, blob } = await generateShareImage(selectedFormat);
+                    currentImageBlob = blob;
+                    if (previewImg) previewImg.src = dataUrl;
+                    if (previewContainer) previewContainer.classList.remove('hidden');
+                    if (downloadBtn) downloadBtn.classList.remove('hidden');
+                    
+                    // Show native share button if Web Share API is available
+                    if (navigator.share && navigator.canShare) {
+                        // Check if sharing files is supported
+                        const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+                        if (navigator.canShare({ files: [testFile] })) {
+                            if (nativeShareBtn) nativeShareBtn.classList.remove('hidden');
+                        }
                     }
-                }
-                
-                // Show copy button only if clipboard API is available
-                if (navigator.clipboard && window.ClipboardItem) {
-                    copyBtn.classList.remove('hidden');
-                }
-            });
+                    
+                    // Show copy button only if clipboard API is available
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        if (copyBtn) copyBtn.classList.remove('hidden');
+                    }
+                });
+            }
             
             // Native share button
-            nativeShareBtn.addEventListener('click', async () => {
-                if (!currentImageBlob) return;
-                
-                try {
-                    const file = new File([currentImageBlob], `lao-typo-score-${Date.now()}.png`, {
-                        type: 'image/png'
-                    });
+            if (nativeShareBtn) {
+                nativeShareBtn.addEventListener('click', async () => {
+                    if (!currentImageBlob) return;
                     
-                    const shareData = {
-                        title: 'LaoTypo - ຜົນຄະແນນຂອງຂ້ອຍ',
-                        text: `ຂ້ອຍຫາກໍ່ຫຼິ້ນເກມ LaoTypo ຈົບ! ${document.getElementById('evaluation-result').textContent}`,
-                        files: [file]
-                    };
-                    
-                    if (navigator.canShare(shareData)) {
-                        await navigator.share(shareData);
-                    } else {
-                        // Fallback to sharing without file if file sharing is not supported
-                        await navigator.share({
-                            title: shareData.title,
-                            text: shareData.text,
-                            url: window.location.href
+                    try {
+                        const file = new File([currentImageBlob], `lao-typo-score-${Date.now()}.png`, {
+                            type: 'image/png'
                         });
-                    }
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        console.error('Error sharing:', err);
-                        // Fallback to download if share fails
-                        downloadBtn.click();
-                    }
-                }
-            });
-            
-            downloadBtn.addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = `lao-typo-score-${Date.now()}.png`;
-                link.href = previewImg.src;
-                link.click();
-            });
-            
-            copyBtn.addEventListener('click', async () => {
-                try {
-                    if (currentImageBlob && navigator.clipboard && window.ClipboardItem) {
-                        const item = new ClipboardItem({ 'image/png': currentImageBlob });
-                        await navigator.clipboard.write([item]);
                         
-                        copyStatus.classList.remove('hidden');
-                        setTimeout(() => {
-                            copyStatus.classList.add('hidden');
-                        }, 3000);
+                        const shareData = {
+                            title: 'LaoTypo - ຜົນຄະແນນຂອງຂ້ອຍ',
+                            text: `ຂ້ອຍຫາກໍ່ຫຼິ້ນເກມ LaoTypo ຈົບ! ${document.getElementById('evaluation-result').textContent}`,
+                            files: [file]
+                        };
+                        
+                        if (navigator.canShare(shareData)) {
+                            await navigator.share(shareData);
+                        } else {
+                            // Fallback to sharing without file if file sharing is not supported
+                            await navigator.share({
+                                title: shareData.title,
+                                text: shareData.text,
+                                url: window.location.href
+                            });
+                        }
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('Error sharing:', err);
+                            // Fallback to download if share fails
+                            if (downloadBtn) downloadBtn.click();
+                        }
                     }
-                } catch (err) {
-                    console.error('Failed to copy image:', err);
-                    alert('ບໍ່ສາມາດຄັດລອກຮູບໄດ້. ກະລຸນາດາວໂຫລດແທນ.');
-                }
-            });
+                });
+            }
+            
+            if (downloadBtn && previewImg) {
+                downloadBtn.addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.download = `lao-typo-score-${Date.now()}.png`;
+                    link.href = previewImg.src;
+                    link.click();
+                });
+            }
+            
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        if (currentImageBlob && navigator.clipboard && window.ClipboardItem) {
+                            const item = new ClipboardItem({ 'image/png': currentImageBlob });
+                            await navigator.clipboard.write([item]);
+                            
+                            if (copyStatus) copyStatus.classList.remove('hidden');
+                            setTimeout(() => {
+                                if (copyStatus) copyStatus.classList.add('hidden');
+                            }, 3000);
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy image:', err);
+                        alert('ບໍ່ສາມາດຄັດລອກຮູບໄດ້. ກະລຸນາດາວໂຫລດແທນ.');
+                    }
+                });
+            }
         }
         
         async function generateShareImage(format = 'square') {
@@ -1803,32 +1831,50 @@
         // Navigation handlers
         function setupNavigationHandlers() {
             // Home button navigation
-            document.getElementById('home-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = 'registration.html';
-            });
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'registration.html';
+                });
+            }
             
-            document.getElementById('home-nav-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
+            const homeNavBtn = document.getElementById('home-nav-btn');
+            if (homeNavBtn) {
+                homeNavBtn.addEventListener('click', () => {
+                    window.location.href = 'testing.html';
+                });
+            }
             
             // Return home button in footer
-            document.getElementById('return-home-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
+            const returnHomeBtn = document.getElementById('return-home-btn');
+            if (returnHomeBtn) {
+                returnHomeBtn.addEventListener('click', () => {
+                    window.location.href = 'testing.html';
+                });
+            }
             
             // Other navigation buttons can be added here
-            document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
-                // Add leaderboard functionality
-            });
+            const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+            if (leaderboardNavBtn) {
+                leaderboardNavBtn.addEventListener('click', () => {
+                    // Add leaderboard functionality
+                });
+            }
             
-            document.getElementById('open-settings-btn').addEventListener('click', () => {
-                // Add settings functionality
-            });
+            const openSettingsBtn = document.getElementById('open-settings-btn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', () => {
+                    // Add settings functionality
+                });
+            }
             
-            document.getElementById('account-nav-btn').addEventListener('click', () => {
-                // Add account functionality
-            });
+            const accountNavBtn = document.getElementById('account-nav-btn');
+            if (accountNavBtn) {
+                accountNavBtn.addEventListener('click', () => {
+                    // Add account functionality
+                });
+            }
         }
 
         // Level Transition Modal Functions
@@ -1901,63 +1947,86 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            continueBtn.addEventListener('click', () => {
-                if (currentLevel < 2) {
-                    // Advance to next level
-                    currentLevel++;
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    updateDifficultyDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game with new level
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                } else {
-                    // At hard level, continue playing hard
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                }
-            });
+            if (continueBtn) {
+                continueBtn.addEventListener('click', () => {
+                    if (currentLevel < 2) {
+                        // Advance to next level
+                        currentLevel++;
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        updateDifficultyDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game with new level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    } else {
+                        // At hard level, continue playing hard
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    }
+                });
+            }
             
-            replayBtn.addEventListener('click', () => {
-                if (currentLevel === 2) {
-                    // At hard level, "replay" means go to home
-                    window.location.href = 'testing.html';
-                } else {
-                    // Replay current level
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game at same level
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                }
-            });
+            if (replayBtn) {
+                replayBtn.addEventListener('click', () => {
+                    if (currentLevel === 2) {
+                        // At hard level, "replay" means go to home
+                        window.location.href = 'testing.html';
+                    } else {
+                        // Replay current level
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game at same level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    }
+                });
+            }
         }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            initializeGame();
-            setupLevelTransitionHandlers();
+            try {
+                initializeGame();
+                setupLevelTransitionHandlers();
+            } catch (error) {
+                console.error('Error initializing game:', error);
+                // Show user-friendly error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 left-4 right-4 bg-red-500 text-white p-4 rounded-lg z-50';
+                errorDiv.innerHTML = `
+                    <h3 class="font-bold">ເກີດຂໍ້ຜິດພາດ!</h3>
+                    <p>ກະລຸນາລອງໂຫຼດໜ້ານີ້ອີກຄັ້ງ</p>
+                    <button onclick="location.reload()" class="mt-2 bg-white text-red-500 px-4 py-2 rounded">ໂຫຼດໃໝ່</button>
+                `;
+                document.body.appendChild(errorDiv);
+            }
         });
     </script>
     
