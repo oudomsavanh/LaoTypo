@@ -397,16 +397,23 @@
         /* Meme container styling */
         #meme-container {
             min-height: 200px;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+        
+        #meme-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         @media (max-width: 640px) {
             #meme-container {
                 min-height: 150px;
-                aspect-ratio: 4 / 3;
+                aspect-ratio: 1 / 1;
             }
         }
         
@@ -561,103 +568,89 @@
             </div>
 
             <!-- Results Screen -->
-            <div id="results-screen" class="screen pb-20">
-                <div class="space-y-4 sm:space-y-6 max-w-2xl mx-auto px-4">
-                    <h2 class="results-header-custom text-main-color animate-pulse">ເກມຈົບ</h2>
-                    
-                    <!-- Meme Image Container -->
-                    <div id="meme-container" class="w-full max-w-xs sm:max-w-md mx-auto rounded-lg shadow-lg overflow-hidden bg-gray-800">
-                        <!-- Meme image will be inserted here dynamically -->
-                    </div>
-                    
-                    <!-- Stats Container with Card Design -->
-                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700">
-                        <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນຫຼ້າສຸດ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-white" id="final-streak">0</p>
+            <div id="results-screen" class="screen pb-20 opacity-0 scale-95 transition-all duration-250">
+                <div class="flex flex-col items-center justify-center min-h-screen px-4">
+                    <div class="w-full max-w-sm mx-auto space-y-3">
+                        
+                        <!-- Result Card (Image + Amber Frame + Caption Bar) -->
+                        <div class="rounded-xl border-2 border-amber-400 bg-neutral-800 shadow-lg overflow-hidden max-w-sm w-full mx-auto">
+                            <!-- Meme Image Container -->
+                            <div id="meme-container" class="aspect-square bg-neutral-800">
+                                <!-- Meme image will be inserted here dynamically -->
                             </div>
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນທີ່ດີທີ່ສຸດ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-yellow-400" id="results-best-streak">0</p>
-                            </div>
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄວາມຖືກຕ້ອງ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-green-400" id="accuracy-stat">0%</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Evaluation Result with Enhanced Styling -->
-                    <div class="text-center px-4">
-                        <p class="text-gray-400 text-base sm:text-lg mb-2">ຜົນການປະເມີນ:</p>
-                        <p id="evaluation-result" class="text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4"></p>
-                    </div>
-                    
-                    <!-- Share Image Section -->
-                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700 mb-4">
-                        <h3 class="text-lg sm:text-xl font-bold text-main-color mb-4">ແບ່ງປັນຜົນຂອງເຈົ້າ!</h3>
-                        
-                        <!-- Canvas for shareable image -->
-                        <canvas id="share-canvas" class="hidden"></canvas>
-                        
-                        <!-- Preview of shareable image -->
-                        <div id="share-preview-container" class="mb-4 hidden">
-                            <img id="share-preview" class="w-full max-w-md mx-auto rounded-lg shadow-lg" alt="Share preview">
-                        </div>
-                        
-                        <!-- Format selector -->
-                        <div class="flex justify-center gap-2 mb-3">
-                            <button id="format-square" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300 active">
-                                ສີ່ຫຼ່ຽມ (1:1)
-                            </button>
-                            <button id="format-landscape" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300">
-                                ແນວນອນ (16:9)
-                            </button>
-                        </div>
-                        
-                        <!-- Share buttons -->
-                        <div class="flex flex-wrap justify-center gap-3">
-                            <button id="generate-share-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                ສ້າງຮູບແບ່ງປັນ
-                            </button>
                             
-                            <button id="native-share-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <!-- Caption Bar -->
+                            <div id="evaluation-result" class="block w-full text-center bg-amber-500 text-neutral-900 font-semibold px-3 py-2">
+                                <!-- Evaluation text will be inserted here dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Stats Block (Two Compact Rows with Right Badges) -->
+                        <div class="w-full max-w-sm mx-auto bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 grid gap-1 mt-3">
+                            <!-- Row A: Best Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນສູງສຸດ</span>
+                                <span id="results-best-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                            
+                            <!-- Row B: Final Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນລ່າສຸດ</span>
+                                <span id="final-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                            
+                            <!-- Accuracy (Small Muted Line) -->
+                            <div class="text-sm text-neutral-400 mt-2">
+                                ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat">0%</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Icon Grid -->
+                        <div class="max-w-sm mx-auto grid grid-cols-4 gap-4 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-4 text-center">
+                            <div class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                ແບ່ງປັນ
-                            </button>
+                                <span class="text-xs">ແບ່ງປັນ</span>
+                            </div>
                             
-                            <button id="download-share-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <div class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
-                                ດາວໂຫລດຮູບ
-                            </button>
+                                <span class="text-xs">ດາວໂຫລດ</span>
+                            </div>
                             
-                            <button id="copy-share-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <div class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
-                                ຄັດລອກຮູບ
+                                <span class="text-xs">ຄັດລອກ</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <span class="text-xs">ລາຍງານ</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Small Buttons Row -->
+                        <div class="max-w-sm mx-auto w-full grid grid-cols-2 gap-3 mt-3">
+                            <button class="rounded-xl border border-amber-500/60 text-amber-400 px-4 py-2.5 font-semibold hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                                ສະຖິຕິ
+                            </button>
+                            <button class="rounded-xl bg-neutral-800 border border-neutral-700 px-4 py-2.5 font-semibold text-neutral-200 hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                                ເມນູຫຼັກ
                             </button>
                         </div>
                         
-                        <!-- Copy status message -->
-                        <div id="copy-status" class="mt-3 text-sm text-green-400 hidden">
-                            ✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons with Meme Style -->
-                    <div class="flex flex-col items-center space-y-3 px-4">
-                        <button id="restart-game-btn" class="w-full sm:w-auto bg-[#f8af3c] text-[#2c2e31] text-lg sm:text-xl px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:scale-105 transition duration-300 font-bold shadow-lg">
-                            🔁 ຫຼິ້ນອີກຄັ້ງ 🔁
+                        <!-- Primary Bottom Button -->
+                        <button id="restart-game-btn" class="mt-3 w-full max-w-sm rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-3.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            ຫຼິ້ນອີກຄັ້ງ
                         </button>
+                        
                     </div>
                 </div>
             </div>
@@ -1234,6 +1227,12 @@
             // Switch screens
             gameScreen.classList.remove('active');
             resultsScreen.classList.add('active');
+            
+            // Animate results screen entrance
+            setTimeout(() => {
+                resultsScreen.classList.remove('opacity-0', 'scale-95');
+                resultsScreen.classList.add('opacity-100', 'scale-100');
+            }, 50);
         }
 
         // Save game stats
@@ -1274,6 +1273,10 @@
             
             gameScreen.classList.add('active');
             resultsScreen.classList.remove('active');
+            
+            // Reset results screen animation state
+            resultsScreen.classList.remove('opacity-100', 'scale-100');
+            resultsScreen.classList.add('opacity-0', 'scale-95');
             
             showNewWords();
         }
