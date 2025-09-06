@@ -1521,6 +1521,77 @@
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
 
+        // --- SOUND SYSTEM INITIALIZATION ---
+        // Initialize soundEnabled from localStorage
+        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
+        
+        // Initialize sound toggle state
+        if (soundToggle) {
+            soundToggle.checked = soundEnabled;
+        }
+        
+        // Background music system
+        let backgroundMusic = null;
+        
+        function initializeBackgroundMusic() {
+            backgroundMusic = document.createElement('audio');
+            backgroundMusic.src = 'bg_sound.mp3';
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.3;
+            backgroundMusic.preload = 'auto';
+        }
+        
+        function toggleBackgroundMusic() {
+            if (!backgroundMusic) return;
+            
+            if (musicToggle && musicToggle.checked) {
+                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
+            } else {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+        }
+        
+        // Sound toggle event listener
+        if (soundToggle) {
+            soundToggle.addEventListener('change', () => {
+                soundEnabled = soundToggle.checked;
+                localStorage.setItem('soundEnabled', soundEnabled.toString());
+                
+                // Dispatch custom event for same-page listeners
+                window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                    detail: { soundEnabled }
+                }));
+            });
+        }
+        
+        // Music toggle event listener
+        if (musicToggle) {
+            musicToggle.addEventListener('change', () => {
+                toggleBackgroundMusic();
+            });
+        }
+        
+        // Listen for storage events (cross-tab sync)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'soundEnabled') {
+                soundEnabled = JSON.parse(e.newValue ?? 'true');
+                if (soundToggle) {
+                    soundToggle.checked = soundEnabled;
+                }
+                
+                // Dispatch custom event for same-page listeners
+                window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                    detail: { soundEnabled }
+                }));
+            }
+        });
+        
+        // Listen for custom sound setting changes
+        window.addEventListener('soundSettingChanged', (e) => {
+            soundEnabled = e.detail.soundEnabled;
+        });
+
         // --- AUTHENTICATION STATE ---
         let currentUser = null;
         let userType = null; // 'gmail' or 'guest'
@@ -1925,7 +1996,7 @@
         };
 
         function playSound(sound) {
-            if (!settings.sound) return;
+            if (!soundEnabled) return;
             try {
                 Tone.start(); // Required for browsers that autoplay
                 if (sound === 'correct') sounds.correct.triggerAttackRelease('C5', '8n');

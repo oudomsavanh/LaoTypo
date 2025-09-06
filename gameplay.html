@@ -736,7 +736,7 @@
         let isKeyboardEnabled = true;
         let gameActive = false;
         let synth = null;
-        let soundEnabled = true;
+        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         let selectedLeftCard = false;
         let selectedRightCard = false;
         
@@ -810,6 +810,7 @@
             setupEventListeners();
             setupNavigationHandlers();
             initializeSounds();
+            initializeBackgroundMusic();
             showNewWords();
         }
 
@@ -820,7 +821,6 @@
                 const settings = JSON.parse(storedSettings);
                 selectedDifficulty = settings.difficulty || 'easy';
                 timerEnabled = settings.timerEnabled || false;
-                soundEnabled = settings.soundEnabled !== false;
             }
             
             // Get player name from URL parameters first, then fallback to localStorage
@@ -1397,13 +1397,14 @@
 
         // Sound functions
         function initializeSounds() {
-            if (typeof Tone !== 'undefined' && soundEnabled) {
+            if (typeof Tone !== 'undefined') {
                 synth = new Tone.Synth().toDestination();
+                Tone.Destination.mute = !soundEnabled;
             }
         }
 
         function playSound(type) {
-            if (!soundEnabled || !synth) return;
+            if (!soundEnabled) return;
             
             try {
                 if (type === 'correct') {
@@ -1415,6 +1416,29 @@
                 }
             } catch (error) {
                 console.error('Error playing sound:', error);
+            }
+        }
+
+        // Background music system
+        let backgroundMusic = null;
+        
+        function initializeBackgroundMusic() {
+            backgroundMusic = document.createElement('audio');
+            backgroundMusic.src = 'bg_sound.mp3';
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.3;
+            backgroundMusic.preload = 'auto';
+        }
+        
+        function toggleBackgroundMusic() {
+            if (!backgroundMusic) return;
+            
+            const musicToggle = document.getElementById('music-toggle');
+            if (musicToggle && musicToggle.checked) {
+                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
+            } else {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
             }
         }
 
@@ -1478,6 +1502,31 @@
             
             // Share image buttons (only if they exist)
             setupShareButtons();
+            
+            // Sound setting change listeners
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'soundEnabled') {
+                    soundEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
+                    }
+                }
+            });
+            
+            window.addEventListener('soundSettingChanged', (e) => {
+                soundEnabled = e.detail.soundEnabled;
+                if (typeof Tone !== 'undefined') {
+                    Tone.Destination.mute = !soundEnabled;
+                }
+            });
+            
+            // Music toggle event listener
+            const musicToggle = document.getElementById('music-toggle');
+            if (musicToggle) {
+                musicToggle.addEventListener('change', () => {
+                    toggleBackgroundMusic();
+                });
+            }
         }
         
         // Share Image Generator Functions
