@@ -1461,6 +1461,8 @@
     </div>
 
     <script type="module">
+        // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
+        
         // --- PWA SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
@@ -1521,49 +1523,50 @@
         const difficultyDisplay = document.getElementById('difficulty-display');
         const gamePlayerName = document.getElementById('game-player-name');
 
-        // --- SOUND SYSTEM INITIALIZATION ---
-        // Initialize soundEnabled from localStorage
+        // --- AUDIO SYSTEM v2.2.0 ---
+        // Initialize sound settings from localStorage
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
-        
-        // Initialize musicEnabled from localStorage (default to true for auto-on)
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
-        
-        // Track if user has interacted with the page (for autoplay)
         let userHasInteracted = false;
         
-        // Background music system
-        let backgroundMusic = null;
+        // Audio objects
+        const backgroundMusic = new Audio("bg_sound.mp3");
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 1.0;
         
-        function initializeBackgroundMusic() {
-            backgroundMusic = document.createElement('audio');
-            backgroundMusic.src = 'bg_sound.mp3';
-            backgroundMusic.loop = true;
-            backgroundMusic.volume = 0.3;
-            backgroundMusic.preload = 'auto';
-            
-            // Add error handling for missing file
-            backgroundMusic.addEventListener('error', (e) => {
-                console.warn('Background music file not found: bg_sound.mp3');
-                console.log('Please add bg_sound.mp3 to your workspace root directory');
-            });
-            
-            backgroundMusic.addEventListener('canplaythrough', () => {
-                console.log('Background music loaded successfully');
-            });
+        const resultSound = new Audio("result_sound.mp3");
+        resultSound.loop = true;
+        resultSound.volume = 0.0;
+        
+        // Audio fade utility
+        function fadeAudio(audioEl, targetVolume, durationMs, onComplete) {
+            const steps = 20;
+            const stepTime = durationMs / steps;
+            const volumeStep = (targetVolume - audioEl.volume) / steps;
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                audioEl.volume = Math.max(0, Math.min(1, audioEl.volume + volumeStep));
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    audioEl.volume = targetVolume;
+                    if (targetVolume === 0) audioEl.pause();
+                    if (onComplete) onComplete();
+                }
+            }, stepTime);
+            if (targetVolume > 0 && audioEl.paused) {
+                audioEl.play().catch(() => {});
+            }
         }
         
         function toggleBackgroundMusic() {
-            if (!backgroundMusic) return;
-            
             if (musicEnabled) {
                 // Try to play music, but handle autoplay restrictions
                 const playPromise = backgroundMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(e => {
-                        console.log('Music play failed:', e);
                         if (e.name === 'NotAllowedError') {
                             console.log('Autoplay blocked by browser. User needs to interact with page first.');
-                            // Don't show error for autoplay restrictions
                         } else {
                             console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
                         }
@@ -1583,6 +1586,27 @@
             }
         }
         
+        function startResultSound() {
+            if (soundEnabled) {
+                // Fade out background music
+                fadeAudio(backgroundMusic, 0, 1500);
+                // Fade in result sound
+                fadeAudio(resultSound, 1.0, 1500);
+            }
+        }
+        
+        function stopResultSound() {
+            // Fade out result sound
+            fadeAudio(resultSound, 0, 1500, () => {
+                resultSound.pause();
+                resultSound.currentTime = 0;
+                // Resume background music if enabled
+                if (musicEnabled) {
+                    fadeAudio(backgroundMusic, 1.0, 1500);
+                }
+            });
+        }
+        
         function initializeSoundSystem() {
             // Initialize sound toggle state
             if (soundToggle) {
@@ -1599,6 +1623,11 @@
                 soundToggle.addEventListener('change', () => {
                     soundEnabled = soundToggle.checked;
                     localStorage.setItem('soundEnabled', soundEnabled.toString());
+                    
+                    // Update Tone.js mute state
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
+                    }
                     
                     // Dispatch custom event for same-page listeners
                     window.dispatchEvent(new CustomEvent('soundSettingChanged', {
@@ -1619,7 +1648,14 @@
                     }));
                     
                     // Toggle music immediately
-                    toggleBackgroundMusic();
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
                 });
             }
             
@@ -1629,6 +1665,11 @@
                     soundEnabled = JSON.parse(e.newValue ?? 'true');
                     if (soundToggle) {
                         soundToggle.checked = soundEnabled;
+                    }
+                    
+                    // Update Tone.js mute state
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
                     }
                     
                     // Dispatch custom event for same-page listeners
@@ -1647,7 +1688,14 @@
                     }));
                     
                     // Toggle music immediately
-                    toggleBackgroundMusic();
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
                 }
             });
             
@@ -2302,6 +2350,9 @@
             }
             saveUserData();
             updateUI();
+            
+            // Start result sound with fade
+            startResultSound();
         }
 
         function startTimer() {
@@ -2334,8 +2385,12 @@
         document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
         document.getElementById('home-nav-btn').addEventListener('click', () => switchScreen('start'));
         document.getElementById('start-game-btn').addEventListener('click', startGame);
-        document.getElementById('restart-game-btn').addEventListener('click', startGame);
+        document.getElementById('restart-game-btn').addEventListener('click', () => {
+            stopResultSound();
+            startGame();
+        });
         document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+            stopResultSound();
             switchScreen('start');
             updateUI(); // Ensure name is displayed correctly when going back to menu
         });
@@ -2497,9 +2552,6 @@
         window.onload = async () => {
             // Initialize sound system first (always needed)
             initializeSoundSystem();
-            
-            // Initialize background music system
-            initializeBackgroundMusic();
             
             // Try to auto-start music if enabled (may be blocked by browser)
             if (musicEnabled) {

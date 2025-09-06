@@ -720,6 +720,8 @@
     </div>
 
     <script>
+        // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
+        
         // Global variables
         let currentStreak = 0;
         let bestStreak = 0;
@@ -739,6 +741,15 @@
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
         let userHasInteracted = false;
+        
+        // Audio objects
+        const backgroundMusic = new Audio("bg_sound.mp3");
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 1.0;
+        
+        const resultSound = new Audio("result_sound.mp3");
+        resultSound.loop = true;
+        resultSound.volume = 0.0;
         let selectedLeftCard = false;
         let selectedRightCard = false;
         
@@ -812,7 +823,6 @@
             setupEventListeners();
             setupNavigationHandlers();
             initializeSounds();
-            initializeBackgroundMusic();
             
             // Try to auto-start music if enabled (may be blocked by browser)
             if (musicEnabled) {
@@ -1357,6 +1367,9 @@
                 resultsScreen.classList.remove('opacity-0', 'scale-95');
                 resultsScreen.classList.add('opacity-100', 'scale-100');
             }, 50);
+            
+            // Start result sound with fade
+            startResultSound();
         }
 
         // Save game stats
@@ -1378,6 +1391,9 @@
 
         // Reset game
         function resetGame() {
+            // Stop result sound and resume background music
+            stopResultSound();
+            
             currentStreak = 0;
             currentWordIndex = 0;
             correctAnswers = 0;
@@ -1405,6 +1421,27 @@
             showNewWords();
         }
 
+        // Audio fade utility
+        function fadeAudio(audioEl, targetVolume, durationMs, onComplete) {
+            const steps = 20;
+            const stepTime = durationMs / steps;
+            const volumeStep = (targetVolume - audioEl.volume) / steps;
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                audioEl.volume = Math.max(0, Math.min(1, audioEl.volume + volumeStep));
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    audioEl.volume = targetVolume;
+                    if (targetVolume === 0) audioEl.pause();
+                    if (onComplete) onComplete();
+                }
+            }, stepTime);
+            if (targetVolume > 0 && audioEl.paused) {
+                audioEl.play().catch(() => {});
+            }
+        }
+        
         // Sound functions
         function initializeSounds() {
             if (typeof Tone !== 'undefined') {
@@ -1428,40 +1465,15 @@
                 console.error('Error playing sound:', error);
             }
         }
-
-        // Background music system
-        let backgroundMusic = null;
-        
-        function initializeBackgroundMusic() {
-            backgroundMusic = document.createElement('audio');
-            backgroundMusic.src = 'bg_sound.mp3';
-            backgroundMusic.loop = true;
-            backgroundMusic.volume = 0.3;
-            backgroundMusic.preload = 'auto';
-            
-            // Add error handling for missing file
-            backgroundMusic.addEventListener('error', (e) => {
-                console.warn('Background music file not found: bg_sound.mp3');
-                console.log('Please add bg_sound.mp3 to your workspace root directory');
-            });
-            
-            backgroundMusic.addEventListener('canplaythrough', () => {
-                console.log('Background music loaded successfully');
-            });
-        }
         
         function toggleBackgroundMusic() {
-            if (!backgroundMusic) return;
-            
             if (musicEnabled) {
                 // Try to play music, but handle autoplay restrictions
                 const playPromise = backgroundMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(e => {
-                        console.log('Music play failed:', e);
                         if (e.name === 'NotAllowedError') {
                             console.log('Autoplay blocked by browser. User needs to interact with page first.');
-                            // Don't show error for autoplay restrictions
                         } else {
                             console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
                         }
@@ -1479,6 +1491,27 @@
                 console.log('User interaction detected. Enabling background music...');
                 toggleBackgroundMusic();
             }
+        }
+        
+        function startResultSound() {
+            if (soundEnabled) {
+                // Fade out background music
+                fadeAudio(backgroundMusic, 0, 1500);
+                // Fade in result sound
+                fadeAudio(resultSound, 1.0, 1500);
+            }
+        }
+        
+        function stopResultSound() {
+            // Fade out result sound
+            fadeAudio(resultSound, 0, 1500, () => {
+                resultSound.pause();
+                resultSound.currentTime = 0;
+                // Resume background music if enabled
+                if (musicEnabled) {
+                    fadeAudio(backgroundMusic, 1.0, 1500);
+                }
+            });
         }
 
         // Event listeners
@@ -1551,7 +1584,14 @@
                     }
                 } else if (e.key === 'musicEnabled') {
                     musicEnabled = JSON.parse(e.newValue ?? 'true');
-                    toggleBackgroundMusic();
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
                 }
             });
             
@@ -1564,7 +1604,14 @@
             
             window.addEventListener('musicSettingChanged', (e) => {
                 musicEnabled = e.detail.musicEnabled;
-                toggleBackgroundMusic();
+                if (musicEnabled) {
+                    toggleBackgroundMusic();
+                } else {
+                    fadeAudio(backgroundMusic, 0, 1000, () => {
+                        backgroundMusic.pause();
+                        backgroundMusic.currentTime = 0;
+                    });
+                }
             });
             
             // Music toggle event listener (if music toggle exists in gameplay.html)
@@ -1579,7 +1626,14 @@
                         detail: { musicEnabled }
                     }));
                     
-                    toggleBackgroundMusic();
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
                 });
             }
             
@@ -1956,6 +2010,7 @@
             const returnHomeBtn = document.getElementById('return-home-btn');
             if (returnHomeBtn) {
                 returnHomeBtn.addEventListener('click', () => {
+                    stopResultSound();
                     window.location.href = 'testing.html';
                 });
             }
