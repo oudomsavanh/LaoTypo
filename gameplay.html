@@ -738,6 +738,7 @@
         let synth = null;
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let userHasInteracted = false;
         let selectedLeftCard = false;
         let selectedRightCard = false;
         
@@ -813,7 +814,7 @@
             initializeSounds();
             initializeBackgroundMusic();
             
-            // Auto-start music if enabled
+            // Try to auto-start music if enabled (may be blocked by browser)
             if (musicEnabled) {
                 setTimeout(() => {
                     toggleBackgroundMusic();
@@ -1453,13 +1454,30 @@
             if (!backgroundMusic) return;
             
             if (musicEnabled) {
-                backgroundMusic.play().catch(e => {
-                    console.log('Music play failed:', e);
-                    console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
-                });
+                // Try to play music, but handle autoplay restrictions
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.log('Music play failed:', e);
+                        if (e.name === 'NotAllowedError') {
+                            console.log('Autoplay blocked by browser. User needs to interact with page first.');
+                            // Don't show error for autoplay restrictions
+                        } else {
+                            console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
+                        }
+                    });
+                }
             } else {
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
+            }
+        }
+        
+        function enableMusicAfterInteraction() {
+            if (!userHasInteracted && musicEnabled) {
+                userHasInteracted = true;
+                console.log('User interaction detected. Enabling background music...');
+                toggleBackgroundMusic();
             }
         }
 
@@ -1564,6 +1582,11 @@
                     toggleBackgroundMusic();
                 });
             }
+            
+            // Add user interaction listeners to enable music after first interaction
+            document.addEventListener('click', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('keydown', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('touchstart', enableMusicAfterInteraction, { once: true });
         }
         
         // Share Image Generator Functions
