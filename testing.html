@@ -1525,11 +1525,6 @@
         // Initialize soundEnabled from localStorage
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         
-        // Initialize sound toggle state
-        if (soundToggle) {
-            soundToggle.checked = soundEnabled;
-        }
-        
         // Background music system
         let backgroundMusic = null;
         
@@ -1552,45 +1547,52 @@
             }
         }
         
-        // Sound toggle event listener
-        if (soundToggle) {
-            soundToggle.addEventListener('change', () => {
-                soundEnabled = soundToggle.checked;
-                localStorage.setItem('soundEnabled', soundEnabled.toString());
-                
-                // Dispatch custom event for same-page listeners
-                window.dispatchEvent(new CustomEvent('soundSettingChanged', {
-                    detail: { soundEnabled }
-                }));
-            });
-        }
-        
-        // Music toggle event listener
-        if (musicToggle) {
-            musicToggle.addEventListener('change', () => {
-                toggleBackgroundMusic();
-            });
-        }
-        
-        // Listen for storage events (cross-tab sync)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'soundEnabled') {
-                soundEnabled = JSON.parse(e.newValue ?? 'true');
-                if (soundToggle) {
-                    soundToggle.checked = soundEnabled;
-                }
-                
-                // Dispatch custom event for same-page listeners
-                window.dispatchEvent(new CustomEvent('soundSettingChanged', {
-                    detail: { soundEnabled }
-                }));
+        function initializeSoundSystem() {
+            // Initialize sound toggle state
+            if (soundToggle) {
+                soundToggle.checked = soundEnabled;
             }
-        });
-        
-        // Listen for custom sound setting changes
-        window.addEventListener('soundSettingChanged', (e) => {
-            soundEnabled = e.detail.soundEnabled;
-        });
+            
+            // Sound toggle event listener
+            if (soundToggle) {
+                soundToggle.addEventListener('change', () => {
+                    soundEnabled = soundToggle.checked;
+                    localStorage.setItem('soundEnabled', soundEnabled.toString());
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                        detail: { soundEnabled }
+                    }));
+                });
+            }
+            
+            // Music toggle event listener
+            if (musicToggle) {
+                musicToggle.addEventListener('change', () => {
+                    toggleBackgroundMusic();
+                });
+            }
+            
+            // Listen for storage events (cross-tab sync)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'soundEnabled') {
+                    soundEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (soundToggle) {
+                        soundToggle.checked = soundEnabled;
+                    }
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                        detail: { soundEnabled }
+                    }));
+                }
+            });
+            
+            // Listen for custom sound setting changes
+            window.addEventListener('soundSettingChanged', (e) => {
+                soundEnabled = e.detail.soundEnabled;
+            });
+        }
 
         // --- AUTHENTICATION STATE ---
         let currentUser = null;
@@ -1623,28 +1625,6 @@
             hard: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 }
         };
         
-        // --- BACKGROUND MUSIC SYSTEM ---
-        let backgroundMusic = null;
-        
-        function initializeBackgroundMusic() {
-            // Create audio element for background music
-            backgroundMusic = document.createElement('audio');
-            backgroundMusic.loop = true;
-            backgroundMusic.volume = 0.3; // 30% volume
-            backgroundMusic.preload = 'none';
-            // Note: Music file will be added later - prepared for .wav format
-            // backgroundMusic.src = 'background-music.wav';
-        }
-        
-        function toggleBackgroundMusic() {
-            if (!backgroundMusic) return;
-            
-            if (settings.music && backgroundMusic.src) {
-                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
-            } else {
-                backgroundMusic.pause();
-            }
-        }
 
         let settings = {
             difficulty: 'easy',
@@ -2100,7 +2080,7 @@
                 }
             }
             mainTimerToggle.checked = settings.timer;
-            soundToggle.checked = settings.sound;
+            // soundToggle.checked is already set by the sound system initialization
             musicToggle.checked = settings.music;
             
             // Update user display
@@ -2140,7 +2120,7 @@
                 player: encodeURIComponent(displayName),
                 difficulty: settings.difficulty,
                 timer: settings.timer.toString(),
-                sound: settings.sound.toString(),
+                sound: soundEnabled.toString(),
                 music: settings.music.toString()
             });
             
@@ -2352,7 +2332,7 @@
         
         document.getElementById('save-settings-btn').addEventListener('click', () => {
             console.log('💾 Saving settings and closing panel');
-            settings.sound = soundToggle.checked;
+            // soundEnabled is already handled by the sound toggle event listener
             settings.music = musicToggle.checked;
             if (firebaseSync) {
                 firebaseSync.setEnabled(firebaseSyncToggle.checked);
@@ -2443,7 +2423,13 @@
 
         // --- INITIALIZATION ---
         window.onload = async () => {
-            // Check authentication first
+            // Initialize sound system first (always needed)
+            initializeSoundSystem();
+            
+            // Initialize background music system
+            initializeBackgroundMusic();
+            
+            // Check authentication
             if (!checkUserAuthentication()) {
                 return; // Will redirect to registration
             }
@@ -2452,9 +2438,6 @@
             heartsContainer = document.querySelector('.hearts');
             lifeCountEl = document.querySelector('.life-count');
             motivationText = document.querySelector('.motivation-text');
-            
-            // Initialize background music system
-            initializeBackgroundMusic();
             
             // Initialize Firebase sync
             await initializeFirebaseSync();
