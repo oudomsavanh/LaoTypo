@@ -983,6 +983,9 @@
                 default: currentLevel = 0;
             }
             
+            // Update difficulty display with correct currentLevel
+            updateDifficultyDisplay();
+            
             updateUI();
             await loadWordsFromGoogleSheets();
             setupEventListeners();
@@ -1042,7 +1045,6 @@
             if (timerStatusEl) {
                 timerStatusEl.textContent = timerText;
             }
-            updateDifficultyDisplay();
             
             // Set initial timer container visibility
             const timerContainer = document.getElementById('timer-container');
