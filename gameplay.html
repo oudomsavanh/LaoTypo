@@ -843,8 +843,10 @@
                 timerEnabled = settings.timerEnabled || false;
             }
             
-            // Get player name from URL parameters first, then fallback to localStorage
+            // Get settings from URL parameters first, then fallback to localStorage
             const urlParams = new URLSearchParams(window.location.search);
+            
+            // Get player name from URL parameters
             const urlPlayerName = urlParams.get('player');
             if (urlPlayerName) {
                 playerName = decodeURIComponent(urlPlayerName);
@@ -852,6 +854,18 @@
                 localStorage.setItem('displayName', playerName);
             } else {
                 playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            }
+            
+            // Get difficulty from URL parameters
+            const urlDifficulty = urlParams.get('difficulty');
+            if (urlDifficulty) {
+                selectedDifficulty = urlDifficulty;
+            }
+            
+            // Get timer setting from URL parameters
+            const urlTimer = urlParams.get('timer');
+            if (urlTimer !== null) {
+                timerEnabled = urlTimer === 'true';
             }
             
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
@@ -864,6 +878,12 @@
                 timerStatusEl.textContent = timerText;
             }
             updateDifficultyDisplay();
+            
+            // Set initial timer container visibility
+            const timerContainer = document.getElementById('timer-container');
+            if (timerContainer) {
+                timerContainer.style.display = timerEnabled ? 'block' : 'none';
+            }
         }
 
         // Update difficulty display with color
@@ -1207,7 +1227,18 @@
 
         // Timer functions
         function startTimer() {
-            if (!timerEnabled) return;
+            const timerContainer = document.getElementById('timer-container');
+            
+            if (!timerEnabled) {
+                if (timerContainer) {
+                    timerContainer.style.display = 'none';
+                }
+                return;
+            }
+            
+            if (timerContainer) {
+                timerContainer.style.display = 'block';
+            }
             
             clearTimeout(currentTimeout);
             timerBar.style.transform = 'scaleX(1)';
