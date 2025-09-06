@@ -1525,6 +1525,9 @@
         // Initialize soundEnabled from localStorage
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         
+        // Initialize musicEnabled from localStorage (default to true for auto-on)
+        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        
         // Background music system
         let backgroundMusic = null;
         
@@ -1549,7 +1552,7 @@
         function toggleBackgroundMusic() {
             if (!backgroundMusic) return;
             
-            if (musicToggle && musicToggle.checked) {
+            if (musicEnabled) {
                 backgroundMusic.play().catch(e => {
                     console.log('Music play failed:', e);
                     console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
@@ -1564,6 +1567,11 @@
             // Initialize sound toggle state
             if (soundToggle) {
                 soundToggle.checked = soundEnabled;
+            }
+            
+            // Initialize music toggle state
+            if (musicToggle) {
+                musicToggle.checked = musicEnabled;
             }
             
             // Sound toggle event listener
@@ -1582,6 +1590,15 @@
             // Music toggle event listener
             if (musicToggle) {
                 musicToggle.addEventListener('change', () => {
+                    musicEnabled = musicToggle.checked;
+                    localStorage.setItem('musicEnabled', musicEnabled.toString());
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
+                    // Toggle music immediately
                     toggleBackgroundMusic();
                 });
             }
@@ -1598,12 +1615,30 @@
                     window.dispatchEvent(new CustomEvent('soundSettingChanged', {
                         detail: { soundEnabled }
                     }));
+                } else if (e.key === 'musicEnabled') {
+                    musicEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (musicToggle) {
+                        musicToggle.checked = musicEnabled;
+                    }
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
+                    // Toggle music immediately
+                    toggleBackgroundMusic();
                 }
             });
             
             // Listen for custom sound setting changes
             window.addEventListener('soundSettingChanged', (e) => {
                 soundEnabled = e.detail.soundEnabled;
+            });
+            
+            // Listen for custom music setting changes
+            window.addEventListener('musicSettingChanged', (e) => {
+                musicEnabled = e.detail.musicEnabled;
             });
         }
 
@@ -2134,7 +2169,7 @@
                 difficulty: settings.difficulty,
                 timer: settings.timer.toString(),
                 sound: soundEnabled.toString(),
-                music: settings.music.toString()
+                music: musicEnabled.toString()
             });
             
             const gameURL = `gameplay.html?${params.toString()}`;
@@ -2345,8 +2380,7 @@
         
         document.getElementById('save-settings-btn').addEventListener('click', () => {
             console.log('💾 Saving settings and closing panel');
-            // soundEnabled is already handled by the sound toggle event listener
-            settings.music = musicToggle.checked;
+            // soundEnabled and musicEnabled are already handled by their respective event listeners
             if (firebaseSync) {
                 firebaseSync.setEnabled(firebaseSyncToggle.checked);
             }
@@ -2441,6 +2475,13 @@
             
             // Initialize background music system
             initializeBackgroundMusic();
+            
+            // Auto-start music if enabled
+            if (musicEnabled) {
+                setTimeout(() => {
+                    toggleBackgroundMusic();
+                }, 1000); // Small delay to ensure audio is ready
+            }
             
             // Check authentication
             if (!checkUserAuthentication()) {

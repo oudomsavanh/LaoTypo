@@ -737,6 +737,7 @@
         let gameActive = false;
         let synth = null;
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
+        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
         let selectedLeftCard = false;
         let selectedRightCard = false;
         
@@ -811,6 +812,14 @@
             setupNavigationHandlers();
             initializeSounds();
             initializeBackgroundMusic();
+            
+            // Auto-start music if enabled
+            if (musicEnabled) {
+                setTimeout(() => {
+                    toggleBackgroundMusic();
+                }, 1000); // Small delay to ensure audio is ready
+            }
+            
             showNewWords();
         }
 
@@ -1443,8 +1452,7 @@
         function toggleBackgroundMusic() {
             if (!backgroundMusic) return;
             
-            const musicToggle = document.getElementById('music-toggle');
-            if (musicToggle && musicToggle.checked) {
+            if (musicEnabled) {
                 backgroundMusic.play().catch(e => {
                     console.log('Music play failed:', e);
                     console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
@@ -1523,6 +1531,9 @@
                     if (typeof Tone !== 'undefined') {
                         Tone.Destination.mute = !soundEnabled;
                     }
+                } else if (e.key === 'musicEnabled') {
+                    musicEnabled = JSON.parse(e.newValue ?? 'true');
+                    toggleBackgroundMusic();
                 }
             });
             
@@ -1533,10 +1544,23 @@
                 }
             });
             
-            // Music toggle event listener
+            window.addEventListener('musicSettingChanged', (e) => {
+                musicEnabled = e.detail.musicEnabled;
+                toggleBackgroundMusic();
+            });
+            
+            // Music toggle event listener (if music toggle exists in gameplay.html)
             const musicToggle = document.getElementById('music-toggle');
             if (musicToggle) {
                 musicToggle.addEventListener('change', () => {
+                    musicEnabled = musicToggle.checked;
+                    localStorage.setItem('musicEnabled', musicEnabled.toString());
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
                     toggleBackgroundMusic();
                 });
             }
