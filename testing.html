@@ -28,6 +28,7 @@
     <script src="firebase-config.js"></script>
     <style>
         :root {
+            /* Your Original Color Scheme */
             --bg-color: #2c2e31;
             --main-color: #f8af3c;
             --sub-color: #646669;
@@ -35,9 +36,44 @@
             --error-color: #ca4754;
             --correct-color: #72b483;
             --warning-color: #f59e0b;
+            
+            /* Material 3 Color Tokens - Optimized for your colors */
+            --md-sys-color-primary: #f8af3c;
+            --md-sys-color-on-primary: #2c2e31;
+            --md-sys-color-primary-container: #3d2f00;
+            --md-sys-color-on-primary-container: #f8af3c;
+            
+            --md-sys-color-secondary: #646669;
+            --md-sys-color-on-secondary: #2c2e31;
+            --md-sys-color-secondary-container: #4a4c4f;
+            --md-sys-color-on-secondary-container: #d1d0c5;
+            
+            --md-sys-color-tertiary: #72b483;
+            --md-sys-color-on-tertiary: #2c2e31;
+            --md-sys-color-tertiary-container: #4a5c4f;
+            --md-sys-color-on-tertiary-container: #d1d0c5;
+            
+            --md-sys-color-error: #ca4754;
+            --md-sys-color-on-error: #2c2e31;
+            --md-sys-color-error-container: #5a2a2f;
+            --md-sys-color-on-error-container: #d1d0c5;
+            
+            --md-sys-color-surface: #2c2e31;
+            --md-sys-color-on-surface: #d1d0c5;
+            --md-sys-color-surface-variant: #3e4043;
+            --md-sys-color-on-surface-variant: #646669;
+            
+            --md-sys-color-outline: #646669;
+            --md-sys-color-outline-variant: #3e4043;
+            
+            --md-sys-color-surface-container-lowest: #1d1f22;
+            --md-sys-color-surface-container-low: #2c2e31;
+            --md-sys-color-surface-container: #3e4043;
+            --md-sys-color-surface-container-high: #4a4c4f;
+            --md-sys-color-surface-container-highest: #56585b;
         }
         body {
-            font-family: 'Noto Sans Lao Looped', sans-serif;
+            font-family: 'Noto Sans Lao Looped', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
@@ -47,6 +83,7 @@
             padding-top: 80px; /* Space for fixed nav */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
         }
         nav {
             background-color: #222426;
@@ -67,11 +104,11 @@
         }
         .word-card {
             background-color: #3e4043;
-            border-radius: 0.75rem;
+            border-radius: 1rem;
             padding: 2rem 1.5rem;
             font-size: 2.25rem;
             cursor: pointer;
-            transition: all 0.3s ease-in-out;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
             border: 2px solid transparent;
             user-select: none;
             display: flex;
@@ -79,15 +116,17 @@
             justify-content: center;
             min-height: 150px;
             transform-origin: center;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .word-card:hover, .word-card.focused {
             background-color: #4a4c4f;
             border-color: var(--main-color);
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(248, 175, 60, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
         }
         .word-card:active {
-            transform: scale(0.98);
+            transform: translateY(0);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .word-card.animate-slide-in-left {
             animation: slide-in-left 0.5s ease-out;
@@ -99,36 +138,46 @@
             background-color: var(--sub-color);
             color: var(--text-color);
             padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            border-radius: 1.25rem;
+            font-size: 0.875rem;
             font-weight: 500;
-            transition: background-color 0.2s;
-            border: none;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: 1px solid var(--sub-color);
             cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0.1px;
+            min-height: 40px;
         }
         .btn:hover {
             background-color: #7a7c7e;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-primary {
             background-color: var(--main-color);
             color: var(--bg-color);
+            border: none;
         }
         .btn-primary:hover {
-            background-color: #f8af3c;
+            background-color: var(--main-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon {
             background-color: transparent;
             color: var(--sub-color);
             padding: 0.5rem;
-            border-radius: 9999px; /* circle */
-            transition: all 0.3s ease-in-out;
+            border-radius: 1.25rem;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
             transform-origin: center;
+            min-width: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-icon:hover {
             color: var(--text-color);
             background-color: #3e4043;
-            transform: scale(1.1) rotate(3deg);
-            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon:active {
             transform: scale(0.95);
@@ -139,27 +188,37 @@
             transition: transform 0.3s ease;
         }
         .feedback-correct {
-            animation: glow-correct 0.5s ease;
+            animation: glow-correct 0.3s cubic-bezier(0.2, 0, 0, 1);
         }
         .feedback-incorrect {
-            animation: shake-horizontal 0.5s ease;
+            animation: shake-horizontal 0.3s cubic-bezier(0.2, 0, 0, 1);
         }
         @keyframes glow-correct {
-            0% { box-shadow: 0 0 0 0 rgba(114, 180, 131, 0); }
-            50% { box-shadow: 0 0 20px 5px rgba(114, 180, 131, 0.7); }
-            100% { box-shadow: 0 0 0 0 rgba(114, 180, 131, 0); }
+            0% { 
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+                border-color: transparent;
+            }
+            50% { 
+                box-shadow: 0 0 0 2px var(--correct-color), 0 0 20px 5px rgba(114, 180, 131, 0.3);
+                border-color: var(--correct-color);
+            }
+            100% { 
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+                border-color: transparent;
+            }
         }
         @keyframes shake-horizontal {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
         .timer-bar {
-            height: 5px;
+            height: 4px;
             background-color: var(--main-color);
             width: 100%;
             transform-origin: left;
             transition: transform 0.1s linear;
+            border-radius: 2px;
         }
         .leaderboard-panel {
             position: fixed;
@@ -173,7 +232,7 @@
             max-width: 380px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
             overflow-y: auto;
             transform-origin: right center;
@@ -189,12 +248,17 @@
             animation: slide-in-right 0.5s ease-out;
         }
         .tab-button {
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
             border-bottom: 2px solid transparent;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 500;
+            font-size: 0.875rem;
         }
         .tab-button.active {
             color: var(--main-color) !important;
             border-bottom-color: var(--main-color) !important;
+            background-color: #3e4043;
         }
         .tab-content {
             min-height: 400px;
@@ -227,7 +291,7 @@
         }
         
         .difficulty-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
         
         .difficulty-btn.easy {
@@ -237,6 +301,7 @@
         .difficulty-btn.easy.active {
             background-color: #4ade80;
             color: var(--bg-color);
+            border-color: #4ade80;
         }
         
         .difficulty-btn.medium {
@@ -246,6 +311,7 @@
         .difficulty-btn.medium.active {
             background-color: #fbbf24;
             color: var(--bg-color);
+            border-color: #fbbf24;
         }
         
         .difficulty-btn.hard {
@@ -255,6 +321,7 @@
         .difficulty-btn.hard.active {
             background-color: #ef4444;
             color: var(--bg-color);
+            border-color: #ef4444;
         }
         
         /* Custom input field with dotted border */
@@ -327,7 +394,7 @@
             max-width: 380px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
             overflow-y: auto;
             transform-origin: right center;
@@ -632,22 +699,24 @@
             opacity: 1;
         }
         
-        /* Custom typography for main title and subtitle */
+        /* Custom typography for main title and subtitle - Material 3 */
         .main-title {
-            font-size: 1.5rem;
-            line-height: 1.3;
-            font-weight: bold;
-            color: var(--text-color);
+            font-size: 1.75rem;
+            line-height: 1.2;
+            font-weight: 400;
+            color: var(--md-sys-color-on-surface);
             margin-bottom: 1rem;
             animation: fade-in-down 1s ease-out;
+            letter-spacing: -0.01em;
         }
         
         .subtitle {
-            font-size: 0.875rem;
-            line-height: 1.4;
-            color: var(--sub-color);
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--md-sys-color-on-surface-variant);
             margin-bottom: 0.5rem;
             animation: fade-in-up 1s ease-out 0.3s both;
+            font-weight: 400;
         }
         
 
@@ -801,7 +870,7 @@
             max-width: 350px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.7);
             z-index: 9999;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             max-height: 80vh;
             overflow-y: auto;
             transform-origin: right center;
@@ -1135,8 +1204,8 @@
         <!-- Start Screen -->
         <div id="start-screen" class="screen active">
             <div class="flex flex-col items-center justify-center h-full">
-                <h1 class="main-title">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
-                <p class="subtitle">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
+                <h1 class="main-title text-3xl font-normal leading-tight tracking-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
+                <p class="subtitle text-base font-normal leading-relaxed">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
 
                 
                 <!-- Player name input with dotted border -->
@@ -1146,7 +1215,7 @@
             
                 <!-- Difficulty selection -->
                 <div class="text-center">
-                    <p class="text-sm text-sub-color mb-2">ເລືອກລະດັບຄວາມຍາກ:</p>
+                    <p class="text-sm font-medium mb-2" style="color: var(--md-sys-color-on-surface-variant);">ເລືອກລະດັບຄວາມຍາກ:</p>
                     <div class="difficulty-buttons">
                         <button class="difficulty-btn easy" data-difficulty="easy">ງ່າຍ</button>
                         <button class="difficulty-btn medium" data-difficulty="medium">ປານກາງ</button>
@@ -1160,7 +1229,7 @@
                         <input type="checkbox" id="main-timer-toggle">
                         <span class="slider"></span>
                     </label>
-                    <span class="timer-label">⏱️ ຈັບເວລາ (5 ວິນາທີ)</span>
+                    <span class="timer-label text-sm font-medium">⏱️ ຈັບເວລາ (5 ວິນາທີ)</span>
                 </div>
 
 
@@ -1188,10 +1257,10 @@
                 <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
             </div>
             
-            <div class="flex justify-between items-center mb-6 text-2xl">
-                <div class="text-sub-color">ຄະແນນ: <span id="current-streak" class="text-text-color font-bold">0</span></div>
-                <div class="text-sub-color text-center">Player: <span id="game-player-name" class="text-text-color font-bold"></span></div>
-                <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+            <div class="flex justify-between items-center mb-6 text-xl">
+                <div class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນ: <span id="current-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></div>
+                <div class="font-medium text-center" style="color: var(--md-sys-color-on-surface-variant);">Player: <span id="game-player-name" class="font-semibold" style="color: var(--md-sys-color-on-surface);"></span></div>
+                <div class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></div>
             </div>
             <div id="timer-container" class="h-2 mb-6">
                 <div id="timer-bar" class="timer-bar"></div>
@@ -1199,31 +1268,31 @@
             
             <!-- Context display area for showing word -->
             <div class="mb-6 text-center">
-                <h3 class="text-xl text-sub-color mb-2">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
-                <div id="context-display" class="text-4xl font-bold text-text-color bg-[#3e4043] rounded-lg py-4 px-6 min-h-[100px] flex items-center justify-center"></div>
+                <h3 class="text-xl font-medium mb-2" style="color: var(--md-sys-color-on-surface-variant);">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                <div id="context-display" class="text-4xl font-semibold rounded-xl py-4 px-6 min-h-[100px] flex items-center justify-center" style="color: var(--md-sys-color-on-surface); background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);"></div>
             </div>
             
             <!-- ADDED: Difficulty level display with color coding -->
             <div class="mb-4 text-center">
-                <span class="text-sub-color">ລະດັບຄວາມຍາກ: </span>
-                <span id="difficulty-display" class="font-bold"></span>
+                <span class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ລະດັບຄວາມຍາກ: </span>
+                <span id="difficulty-display" class="font-semibold"></span>
             </div>
             
             <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
                 <div id="word-card-left" class="word-card"></div>
                 <div id="word-card-right" class="word-card"></div>
             </div>
-            <p class="text-sub-color">ໃຊ້ <kbd class="border-b-2 border-sub-color">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 border-sub-color">D</kbd> ສຳລັບຂວາ.</p>
+            <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ໃຊ້ <kbd class="border-b-2 font-mono text-sm px-1 rounded" style="border-color: var(--md-sys-color-outline);">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 font-mono text-sm px-1 rounded" style="border-color: var(--md-sys-color-outline);">D</kbd> ສຳລັບຂວາ.</p>
         </div>
 
         <!-- Results Screen -->
         <div id="results-screen" class="screen space-y-6">
-            <h2 class="text-4xl font-bold text-main-color">ເກມຈົບ</h2>
-            <div class="text-2xl space-y-2">
-                <p>ຄະແນນຫຼ້າສຸດ: <span id="final-streak" class="font-bold text-white">0</span></p>
-                <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="results-best-streak" class="font-bold text-white">0</span></p>
-                <p>ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-bold text-white">0%</span></p>
-                <p>ຜົນການປະເມີນ: <span id="evaluation-result" class="font-bold"></span></p>
+            <h2 class="text-4xl font-normal" style="color: var(--md-sys-color-primary);">ເກມຈົບ</h2>
+            <div class="text-xl space-y-2">
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນຫຼ້າສຸດ: <span id="final-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="results-best-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0%</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຜົນການປະເມີນ: <span id="evaluation-result" class="font-semibold"></span></p>
             </div>
             
             <!-- NEW: Score Breakdown -->
@@ -1236,14 +1305,14 @@
 
         <!-- Stats Screen -->
         <div id="stats-screen" class="screen space-y-6">
-            <h2 class="text-4xl font-bold text-main-color">ສະຖິຕິສ່ວນຕົວ</h2>
-            <div class="text-xl space-y-3 text-left max-w-md mx-auto bg-[#3e4043] p-6 rounded-lg">
-                <p>ຊື່: <span id="stats-display-name" class="font-bold text-white float-right"></span></p>
-                <p>ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-bold text-white float-right">0</span></p>
-                <p>ຈຳນວນຄຳຕອບທີ່ຜິດ: <span id="stats-total-mistakes" class="font-bold text-white float-right">0</span></p>
-                <p>ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-bold text-white float-right">0%</span></p>
+            <h2 class="text-4xl font-normal" style="color: var(--md-sys-color-primary);">ສະຖິຕິສ່ວນຕົວ</h2>
+            <div class="text-lg space-y-3 text-left max-w-md mx-auto p-6 rounded-xl" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຊື່: <span id="stats-display-name" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);"></span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນຄຳຕອບທີ່ຜິດ: <span id="stats-total-mistakes" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0%</span></p>
             </div>
             <div>
                 <button id="stats-back-btn" class="btn">ກັບຄືນ</button>
@@ -1255,16 +1324,16 @@
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
         <div class="panel-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-main-color">📊 ສະຖິຕິ</h2>
-                <button id="close-leaderboard-btn" class="text-3xl text-sub-color hover:text-text-color">&times;</button>
+                <h2 class="text-3xl font-normal" style="color: var(--md-sys-color-primary);">📊 ສະຖິຕິ</h2>
+                <button id="close-leaderboard-btn" class="text-3xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
             </div>
             
             <!-- Tab Navigation (Removed Settings Tab) -->
-            <div class="flex border-b border-sub-color mb-6">
-                <button id="leaderboard-tab" class="tab-button active px-4 py-2 text-main-color border-b-2 border-main-color">
+            <div class="flex border-b mb-6" style="border-color: var(--md-sys-color-outline-variant);">
+                <button id="leaderboard-tab" class="tab-button active px-4 py-2 border-b-2" style="color: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary);">
                     🏆 ກະດານຈັດອັນດັບ
                 </button>
-                <button id="personal-records-tab" class="tab-button px-4 py-2 text-sub-color hover:text-text-color">
+                <button id="personal-records-tab" class="tab-button px-4 py-2 hover:opacity-70 transition-opacity hidden" style="color: var(--md-sys-color-on-surface-variant);" aria-hidden="true" tabindex="-1">
                     📈 ບັນທຶກສ່ວນຕົວ
                 </button>
             </div>
@@ -1285,23 +1354,23 @@
             <!-- Personal Records Tab Content -->
             <div id="personal-records-content" class="tab-content hidden">
                 <div class="grid grid-cols-3 gap-4 text-sm">
-                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
-                        <div class="text-correct-color font-bold mb-2">ງ່າຍ (Easy)</div>
-                        <div id="easy-best-score-main" class="text-2xl font-bold">0</div>
-                        <div id="easy-best-accuracy-main" class="text-sub-color">0%</div>
-                        <div id="easy-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-tertiary);">ງ່າຍ (Easy)</div>
+                        <div id="easy-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="easy-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="easy-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
                     </div>
-                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
-                        <div class="text-main-color font-bold mb-2">ປານກາງ (Medium)</div>
-                        <div id="medium-best-score-main" class="text-2xl font-bold">0</div>
-                        <div id="medium-best-accuracy-main" class="text-sub-color">0%</div>
-                        <div id="medium-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-primary);">ປານກາງ (Medium)</div>
+                        <div id="medium-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="medium-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="medium-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
                     </div>
-                    <div class="text-center bg-[#3e4043] rounded-lg p-4">
-                        <div class="text-error-color font-bold mb-2">ຍາກ (Hard)</div>
-                        <div id="hard-best-score-main" class="text-2xl font-bold">0</div>
-                        <div id="hard-best-accuracy-main" class="text-sub-color">0%</div>
-                        <div id="hard-games-count-main" class="text-xs text-sub-color mt-2">0 games</div>
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-error);">ຍາກ (Hard)</div>
+                        <div id="hard-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="hard-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="hard-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
                     </div>
                 </div>
             </div>
@@ -1312,30 +1381,23 @@
     <div id="settings-panel" class="settings-panel hidden">
         <div class="settings-content">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-main-color">⚙️ ຕັ້ງຄ່າ</h2>
-                <button id="close-settings-btn" class="text-2xl text-sub-color hover:text-text-color">&times;</button>
+                <h2 class="text-2xl font-normal" style="color: var(--md-sys-color-primary);">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-2xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
             </div>
             
             <div class="space-y-6">
                 <div class="text-left space-y-4">
                     <div class="flex justify-between items-center">
-                        <label>🔊 ສຽງເກມປະກອບ</label>
+                        <label class="font-medium" style="color: var(--md-sys-color-on-surface);">🔊 ສຽງເກມປະກອບ</label>
                         <label class="toggle-switch">
                             <input type="checkbox" id="sound-toggle" checked>
                             <span class="slider"></span>
                         </label>
                     </div>
                     <div class="flex justify-between items-center">
-                        <label>🎵 ສຽງປະກອບພື້ນຫຼັງເກມ</label>
+                        <label class="font-medium" style="color: var(--md-sys-color-on-surface);">🎵 ສຽງປະກອບພື້ນຫຼັງເກມ</label>
                         <label class="toggle-switch">
                             <input type="checkbox" id="music-toggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <label>☁️ Firebase Sync</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="firebase-sync-toggle" checked>
                             <span class="slider"></span>
                         </label>
                     </div>
@@ -1351,8 +1413,8 @@
     <div id="account-panel" class="account-panel hidden">
         <div class="account-content">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-main-color">👤 ບັນຊີ</h2>
-                <button id="close-account-btn" class="text-xl text-sub-color hover:text-text-color">&times;</button>
+                <h2 class="text-xl font-normal" style="color: var(--md-sys-color-primary);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
             </div>
             
             <!-- Quick Profile Info -->
@@ -1360,38 +1422,37 @@
                 <div class="flex items-center gap-3 mb-3">
                     <div class="small-avatar" id="account-avatar">👤</div>
                     <div>
-                        <div class="account-name" id="account-display-name">ຜູ້ຫຼິ້ນ</div>
-                        <div class="account-rank">ອັນດັບ: <span id="account-rank">#-</span></div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
                     </div>
                 </div>
                 
                 <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-label">🏆 ຄະແນນດີສຸດ:</span>
-                        <span class="stat-value" id="account-best-streak">0</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label">🎯 ຄວາມແມ່ນຍຳ:</span>
-                        <span class="stat-value" id="account-accuracy">0%</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label">🏅 ລາງວັນ:</span>
-                        <span class="stat-value" id="account-achievements">0/8</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--md-sys-color-on-surface);">0/8</span>
                     </div>
                 </div>
             </div>
             
             <!-- Action Buttons -->
             <div class="flex flex-col gap-2 mt-4">
-                <button id="view-full-profile-btn" class="btn btn-primary text-sm">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
-                <button id="quick-edit-name-btn" class="btn btn-secondary text-sm">✏️ ແກ້ໄຂຊື່</button>
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm hidden" aria-hidden="true" tabindex="-1">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
             
             <!-- Version Info -->
             <div class="version-info-section">
                 <div class="version-divider"></div>
-                <div class="version-details">
+                <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
                     <p>📦 Version 2.1.0</p>
                     <p>Status: Testing</p>
                 </div>
@@ -1817,7 +1878,7 @@
                 }
                 
                 if (leaderboard.length === 0) {
-                    leaderboardContainer.innerHTML = '<p class="text-center">ຍັງບໍ່ມີໃຜຕິດອັນດັບເທື່ອ!</p>';
+                    leaderboardContainer.innerHTML = '<p class="text-center">ຈະເປີດໃຫ້ແຂ່ງກັນໄວໆນີ້!</p>';
                     return;
                 }
 
@@ -2540,10 +2601,6 @@
         function updateAccountPanel() {
             // Update account panel with current data
             document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
-            
-            // Update rank
-            const rank = calculateUserRank();
-            document.getElementById('account-rank').textContent = `#${rank}`;
             
             // Update quick stats
             document.getElementById('account-best-streak').textContent = stats.bestStreak;

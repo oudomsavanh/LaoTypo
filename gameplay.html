@@ -397,16 +397,23 @@
         /* Meme container styling */
         #meme-container {
             min-height: 200px;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+        }
+        
+        #meme-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         @media (max-width: 640px) {
             #meme-container {
                 min-height: 150px;
-                aspect-ratio: 4 / 3;
+                aspect-ratio: 1 / 1;
             }
         }
         
@@ -503,13 +510,20 @@
                 <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
+                
+                <!-- Retry Button (hidden by default) -->
+                <div id="retry-loading-container" class="text-center mb-4 hidden">
+                    <button id="retry-loading-btn" class="bg-amber-500 hover:bg-amber-400 text-neutral-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+                        🔄 ລອງໂຫຼດອີກຄັ້ງ
+                    </button>
+                </div>
                     <!-- Player Name Display without background -->
                     <div class="text-center mb-3 sm:mb-4">
                         <div class="inline-flex items-center gap-2 player-name">
                             <svg width="20" height="20" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M128 28C70.562 28 24 74.562 24 132C24 189.438 70.562 236 128 236C185.438 236 232 189.438 232 132C232 74.562 185.438 28 128 28ZM128 44C176.604 44 216 83.396 216 132C216 156.48 206.792 178.712 191.636 195.364C186.768 182.968 178.572 172.504 168.02 165.012C175.652 157.036 180 146.248 180 134.5C180 110.804 159.196 90 135.5 90H120.5C96.804 90 76 110.804 76 134.5C76 146.248 80.348 157.036 87.98 165.012C77.428 172.504 69.232 182.968 64.364 195.364C49.208 178.712 40 156.48 40 132C40 83.396 79.396 44 128 44ZM120.5 106H135.5C150.412 106 164 119.588 164 134.5C164 149.412 150.412 163 135.5 163H120.5C105.588 163 92 149.412 92 134.5C92 119.588 105.588 106 120.5 106ZM78.692 203.872C82.66 187.616 96.94 175 114 175H142C159.06 175 173.34 187.616 177.308 203.872C161.816 215.156 145.704 220 128 220C110.296 220 94.184 215.156 78.692 203.872Z" fill="#fbb03b"/>
                             </svg>
-                            <span style="color: #d1d0c5; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base">ທ່ານຜູ້ຫຼິ້ນ: <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
+                            <span style="color: #d1d0c5; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base"> <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
                         </div>
                     </div>
                 <!-- Redesigned Life Bar with Enhanced Visual Design -->
@@ -561,103 +575,102 @@
             </div>
 
             <!-- Results Screen -->
-            <div id="results-screen" class="screen pb-20">
-                <div class="space-y-4 sm:space-y-6 max-w-2xl mx-auto px-4">
-                    <h2 class="results-header-custom text-main-color animate-pulse">ເກມຈົບ</h2>
-                    
-                    <!-- Meme Image Container -->
-                    <div id="meme-container" class="w-full max-w-xs sm:max-w-md mx-auto rounded-lg shadow-lg overflow-hidden bg-gray-800">
-                        <!-- Meme image will be inserted here dynamically -->
-                    </div>
-                    
-                    <!-- Stats Container with Card Design -->
-                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700">
-                        <div class="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນຫຼ້າສຸດ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-white" id="final-streak">0</p>
+            <div id="results-screen" class="screen pb-20 opacity-0 scale-95 transition-all duration-250">
+                <div class="flex flex-col items-center pt-6 px-4">
+                    <div class="w-full max-w-sm mx-auto space-y-3">
+                        
+                        <!-- Result Card (Image + Amber Frame + Caption Bar) -->
+                        <div class="rounded-xl border-2 border-amber-400 bg-neutral-800 shadow-lg overflow-hidden max-w-sm w-full mx-auto">
+                            <!-- Meme Image Container -->
+                            <div id="meme-container" class="aspect-square bg-neutral-800">
+                                <!-- Meme image will be inserted here dynamically -->
                             </div>
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄະແນນທີ່ດີທີ່ສຸດ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-yellow-400" id="results-best-streak">0</p>
-                            </div>
-                            <div class="bg-gray-900/50 rounded-lg p-2 sm:p-4">
-                                <p class="text-gray-400 text-xs sm:text-sm mb-1">ຄວາມຖືກຕ້ອງ</p>
-                                <p class="text-xl sm:text-3xl font-bold text-green-400" id="accuracy-stat">0%</p>
+                            
+                            <!-- Caption Bar -->
+                            <div id="evaluation-result" class="block w-full rounded-b-xl bg-[#fbb03b] py-3 px-4 text-black font-semibold text-base text-center">
+                                <!-- Evaluation text will be inserted here dynamically -->
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Evaluation Result with Enhanced Styling -->
-                    <div class="text-center px-4">
-                        <p class="text-gray-400 text-base sm:text-lg mb-2">ຜົນການປະເມີນ:</p>
-                        <p id="evaluation-result" class="text-lg sm:text-2xl font-bold text-center mt-2 sm:mt-4"></p>
-                    </div>
-                    
-                    <!-- Share Image Section -->
-                    <div class="bg-gray-800/50 backdrop-blur rounded-xl p-3 sm:p-6 shadow-2xl border border-gray-700 mb-4">
-                        <h3 class="text-lg sm:text-xl font-bold text-main-color mb-4">ແບ່ງປັນຜົນຂອງເຈົ້າ!</h3>
                         
-                        <!-- Canvas for shareable image -->
-                        <canvas id="share-canvas" class="hidden"></canvas>
-                        
-                        <!-- Preview of shareable image -->
-                        <div id="share-preview-container" class="mb-4 hidden">
-                            <img id="share-preview" class="w-full max-w-md mx-auto rounded-lg shadow-lg" alt="Share preview">
+                        <!-- Stats Block (Two Compact Rows with Right Badges) -->
+                        <div class="w-full max-w-sm mx-auto bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 grid gap-1 mt-3">
+                            <!-- Row A: Best Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນສູງສຸດ</span>
+                                <span id="results-best-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                            
+                            <!-- Row B: Final Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນລ່າສຸດ</span>
+                                <span id="final-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                            
+                            <!-- Accuracy (Small Muted Line) -->
+                            <div class="text-sm text-neutral-400 mt-2">
+                                ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat">0%</span>
+                            </div>
                         </div>
                         
-                        <!-- Format selector -->
-                        <div class="flex justify-center gap-2 mb-3">
-                            <button id="format-square" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300 active">
-                                ສີ່ຫຼ່ຽມ (1:1)
-                            </button>
-                            <button id="format-landscape" class="format-btn bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded-lg text-sm transition duration-300">
-                                ແນວນອນ (16:9)
-                            </button>
-                        </div>
-                        
-                        <!-- Share buttons -->
-                        <div class="flex flex-wrap justify-center gap-3">
-                            <button id="generate-share-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2">
+                        <!-- Action Icon Grid -->
+                        <div class="max-w-sm mx-auto grid grid-cols-4 gap-4 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-4 text-center">
+                            <button id="generate-share-btn" class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                ສ້າງຮູບແບ່ງປັນ
+                                <span class="text-xs">ສ້າງຮູບ</span>
                             </button>
                             
-                            <button id="native-share-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <button id="native-share-btn" class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded hidden">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                ແບ່ງປັນ
+                                <span class="text-xs">ແບ່ງປັນ</span>
                             </button>
                             
-                            <button id="download-share-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <button id="download-share-btn" class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded hidden">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
-                                ດາວໂຫລດຮູບ
+                                <span class="text-xs">ດາວໂຫລດ</span>
                             </button>
                             
-                            <button id="copy-share-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold transition duration-300 flex items-center gap-2 hidden">
+                            <button id="copy-share-btn" class="flex flex-col items-center gap-1 text-sm text-neutral-300 hover:text-amber-400 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded hidden">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
-                                ຄັດລອກຮູບ
+                                <span class="text-xs">ຄັດລອກ</span>
                             </button>
                         </div>
                         
-                        <!-- Copy status message -->
-                        <div id="copy-status" class="mt-3 text-sm text-green-400 hidden">
+                        <!-- Share Preview Container (hidden by default) -->
+                        <div id="share-preview-container" class="max-w-sm mx-auto hidden">
+                            <img id="share-preview" class="w-full rounded-lg shadow-lg" alt="Share preview">
+                        </div>
+                        
+                        <!-- Copy Status Message -->
+                        <div id="copy-status" class="text-center text-sm text-green-400 hidden">
                             ✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!
                         </div>
-                    </div>
-                    
-                    <!-- Action Buttons with Meme Style -->
-                    <div class="flex flex-col items-center space-y-3 px-4">
-                        <button id="restart-game-btn" class="w-full sm:w-auto bg-[#f8af3c] text-[#2c2e31] text-lg sm:text-xl px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:scale-105 transition duration-300 font-bold shadow-lg">
-                            🔁 ຫຼິ້ນອີກຄັ້ງ 🔁
+                        
+                        <!-- Canvas for shareable image (hidden) -->
+                        <canvas id="share-canvas" class="hidden"></canvas>
+                        
+                        <!-- Small Buttons Row -->
+                        <div class="max-w-sm mx-auto w-full grid grid-cols-2 gap-3 mt-3">
+                            <button class="rounded-xl border border-amber-500/60 text-amber-400 px-4 py-2.5 font-semibold hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                                ສະຖິຕິ
+                            </button>
+                            <button class="rounded-xl bg-neutral-800 border border-neutral-700 px-4 py-2.5 font-semibold text-neutral-200 hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                                ເມນູຫຼັກ
+                            </button>
+                        </div>
+                        
+                        <!-- Primary Bottom Button -->
+                        <button id="restart-game-btn" class="mt-3 w-full max-w-sm rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-3.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            ຫຼິ້ນອີກຄັ້ງ
                         </button>
+                        
                     </div>
                 </div>
             </div>
@@ -757,10 +770,37 @@
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
         const wordLoadingStatus = document.getElementById('word-loading-status');
+        const retryLoadingContainer = document.getElementById('retry-loading-container');
+        const retryLoadingBtn = document.getElementById('retry-loading-btn');
         
         // Life system elements
         const heartsContainer = document.getElementById('hearts-container');
         const motivationText = document.getElementById('motivation-text');
+
+        // Test Google Sheets connection (for debugging)
+        async function testGoogleSheetsConnection() {
+            console.log("Testing Google Sheets connection...");
+            console.log("URL:", GOOGLE_SHEETS_URL);
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                console.log("Response status:", response.status);
+                console.log("Response headers:", [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log("Response text length:", text.length);
+                    console.log("Response preview:", text.substring(0, 500));
+                    return true;
+                } else {
+                    console.error("Response not OK:", response.status, response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                return false;
+            }
+        }
 
         // Initialize game
         async function initializeGame() {
@@ -818,26 +858,84 @@
                 wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
                 
-                const response = await fetch(GOOGLE_SHEETS_URL);
+                console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
+                
+                // Try multiple approaches to fetch the data
+                let response;
+                let fetchMethod = '';
+                
+                // Method 1: Try CORS proxy (allorigins.win)
+                try {
+                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_SHEETS_URL)}`;
+                    console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
+                    response = await fetch(corsProxyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv',
+                        },
+                    });
+                    fetchMethod = 'CORS proxy (allorigins)';
+                } catch (corsError1) {
+                    console.log("CORS proxy (allorigins) failed:", corsError1);
+                    
+                    // Method 2: Try another CORS proxy (cors-anywhere)
+                    try {
+                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GOOGLE_SHEETS_URL}`;
+                        console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
+                        response = await fetch(corsProxyUrl2, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'text/csv',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                        });
+                        fetchMethod = 'CORS proxy (cors-anywhere)';
+                    } catch (corsError2) {
+                        console.log("CORS proxy (cors-anywhere) failed:", corsError2);
+                        
+                        // Method 3: Try direct fetch
+                        console.log("Trying direct fetch:", GOOGLE_SHEETS_URL);
+                        response = await fetch(GOOGLE_SHEETS_URL, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'text/csv',
+                            },
+                        });
+                        fetchMethod = 'Direct fetch';
+                    }
+                }
+                
+                console.log(`Successfully fetched using: ${fetchMethod}`);
+                
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
                 
                 const csvText = await response.text();
-                const lines = csvText.split('\n');
+                console.log("CSV response length:", csvText.length);
+                console.log("CSV preview:", csvText.substring(0, 200));
+                
+                const lines = csvText.split('\n').filter(line => line.trim());
+                console.log("Total lines:", lines.length);
                 
                 // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
                 wordPairs = lines
                     .slice(1) // Skip header row
-                    .map(line => {
-                        const columns = line.split(',').map(col => col.replace(/"/g, '').trim());
-                        if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
-                            return {
-                                context: columns[0],    // Column A - context to display
-                                correct: columns[1],    // Column B - correct answer
-                                incorrect: columns[2],  // Column C - incorrect answer
-                                difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
-                            };
+                    .map((line, index) => {
+                        try {
+                            // Handle CSV parsing more robustly
+                            const columns = line.split(',').map(col => col.replace(/^"|"$/g, '').trim());
+                            if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
+                                return {
+                                    context: columns[0],    // Column A - context to display
+                                    correct: columns[1],    // Column B - correct answer
+                                    incorrect: columns[2],  // Column C - incorrect answer
+                                    difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
+                                };
+                            }
+                        } catch (parseError) {
+                            console.warn(`Error parsing line ${index + 2}:`, line, parseError);
                         }
                         return null;
                     })
@@ -853,9 +951,10 @@
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
                 
-                // Hide loading status after successful load
+                // Hide loading status and retry button after successful load
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
+                    retryLoadingContainer.classList.add('hidden');
                 }, 2000);
                 
                 // Shuffle words
@@ -864,18 +963,26 @@
             } catch (error) {
                 console.error("Error loading word list from Google Sheets:", error);
                 console.log("Error details:", error.message);
+                console.log("Error stack:", error.stack);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
                 
+                // Show retry button
+                retryLoadingContainer.classList.remove('hidden');
+                
                 // Fallback to default words
                 wordPairs = getDefaultWords();
+                console.log("Using fallback words:", wordPairs.length, "entries");
                 
                 // Hide loading status after fallback load
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
                 }, 3000);
+                
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
             }
         }
 
@@ -1234,6 +1341,12 @@
             // Switch screens
             gameScreen.classList.remove('active');
             resultsScreen.classList.add('active');
+            
+            // Animate results screen entrance
+            setTimeout(() => {
+                resultsScreen.classList.remove('opacity-0', 'scale-95');
+                resultsScreen.classList.add('opacity-100', 'scale-100');
+            }, 50);
         }
 
         // Save game stats
@@ -1275,6 +1388,10 @@
             gameScreen.classList.add('active');
             resultsScreen.classList.remove('active');
             
+            // Reset results screen animation state
+            resultsScreen.classList.remove('opacity-100', 'scale-100');
+            resultsScreen.classList.add('opacity-0', 'scale-95');
+            
             showNewWords();
         }
 
@@ -1303,18 +1420,31 @@
 
         // Event listeners
         function setupEventListeners() {
-            // Card clicks
-            wordCardLeft.addEventListener('click', () => {
-                if (gameActive) {
-                    checkAnswer(wordCardLeft.textContent);
-                }
-            });
+            // Retry loading button
+            if (retryLoadingBtn) {
+                retryLoadingBtn.addEventListener('click', async () => {
+                    retryLoadingContainer.classList.add('hidden');
+                    wordLoadingStatus.style.display = 'block';
+                    await loadWordsFromGoogleSheets();
+                });
+            }
             
-            wordCardRight.addEventListener('click', () => {
-                if (gameActive) {
-                    checkAnswer(wordCardRight.textContent);
-                }
-            });
+            // Card clicks
+            if (wordCardLeft) {
+                wordCardLeft.addEventListener('click', () => {
+                    if (gameActive) {
+                        checkAnswer(wordCardLeft.textContent);
+                    }
+                });
+            }
+            
+            if (wordCardRight) {
+                wordCardRight.addEventListener('click', () => {
+                    if (gameActive) {
+                        checkAnswer(wordCardRight.textContent);
+                    }
+                });
+            }
             
             // Keyboard controls
             document.addEventListener('keydown', (e) => {
@@ -1322,25 +1452,31 @@
                 
                 if (e.key.toLowerCase() === 'a') {
                     e.preventDefault();
-                    wordCardLeft.classList.add('focused');
-                    selectedLeftCard = true;
-                    selectedRightCard = false;
-                    wordCardRight.classList.remove('focused');
-                    checkAnswer(wordCardLeft.textContent);
+                    if (wordCardLeft) {
+                        wordCardLeft.classList.add('focused');
+                        selectedLeftCard = true;
+                        selectedRightCard = false;
+                        if (wordCardRight) wordCardRight.classList.remove('focused');
+                        checkAnswer(wordCardLeft.textContent);
+                    }
                 } else if (e.key.toLowerCase() === 'd') {
                     e.preventDefault();
-                    wordCardRight.classList.add('focused');
-                    selectedRightCard = true;
-                    selectedLeftCard = false;
-                    wordCardLeft.classList.remove('focused');
-                    checkAnswer(wordCardRight.textContent);
+                    if (wordCardRight) {
+                        wordCardRight.classList.add('focused');
+                        selectedRightCard = true;
+                        selectedLeftCard = false;
+                        if (wordCardLeft) wordCardLeft.classList.remove('focused');
+                        checkAnswer(wordCardRight.textContent);
+                    }
                 }
             });
             
             // Button clicks
-            restartGameBtn.addEventListener('click', resetGame);
+            if (restartGameBtn) {
+                restartGameBtn.addEventListener('click', resetGame);
+            }
             
-            // Share image buttons
+            // Share image buttons (only if they exist)
             setupShareButtons();
         }
         
@@ -1353,107 +1489,107 @@
             const previewContainer = document.getElementById('share-preview-container');
             const previewImg = document.getElementById('share-preview');
             const copyStatus = document.getElementById('copy-status');
-            const formatSquareBtn = document.getElementById('format-square');
-            const formatLandscapeBtn = document.getElementById('format-landscape');
             
+            // Return early if share elements don't exist
+            if (!generateBtn || !nativeShareBtn || !downloadBtn || !copyBtn) {
+                console.log('Share buttons not found - skipping setup');
+                return;
+            }
+            
+            // Use square format only
             let selectedFormat = 'square';
             let currentImageBlob = null;
             
-            // Format switching
-            formatSquareBtn.addEventListener('click', () => {
-                selectedFormat = 'square';
-                formatSquareBtn.classList.add('active');
-                formatLandscapeBtn.classList.remove('active');
-            });
-            
-            formatLandscapeBtn.addEventListener('click', () => {
-                selectedFormat = 'landscape';
-                formatLandscapeBtn.classList.add('active');
-                formatSquareBtn.classList.remove('active');
-            });
-            
-            generateBtn.addEventListener('click', async () => {
-                // Ensure fonts are loaded before generating image
-                await document.fonts.ready;
-                
-                const { dataUrl, blob } = await generateShareImage(selectedFormat);
-                currentImageBlob = blob;
-                previewImg.src = dataUrl;
-                previewContainer.classList.remove('hidden');
-                downloadBtn.classList.remove('hidden');
-                
-                // Show native share button if Web Share API is available
-                if (navigator.share && navigator.canShare) {
-                    // Check if sharing files is supported
-                    const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
-                    if (navigator.canShare({ files: [testFile] })) {
-                        nativeShareBtn.classList.remove('hidden');
+            if (generateBtn) {
+                generateBtn.addEventListener('click', async () => {
+                    // Ensure fonts are loaded before generating image
+                    await document.fonts.ready;
+                    
+                    const { dataUrl, blob } = await generateShareImage(selectedFormat);
+                    currentImageBlob = blob;
+                    if (previewImg) previewImg.src = dataUrl;
+                    if (previewContainer) previewContainer.classList.remove('hidden');
+                    if (downloadBtn) downloadBtn.classList.remove('hidden');
+                    
+                    // Show native share button if Web Share API is available
+                    if (navigator.share && navigator.canShare) {
+                        // Check if sharing files is supported
+                        const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+                        if (navigator.canShare({ files: [testFile] })) {
+                            if (nativeShareBtn) nativeShareBtn.classList.remove('hidden');
+                        }
                     }
-                }
-                
-                // Show copy button only if clipboard API is available
-                if (navigator.clipboard && window.ClipboardItem) {
-                    copyBtn.classList.remove('hidden');
-                }
-            });
+                    
+                    // Show copy button only if clipboard API is available
+                    if (navigator.clipboard && window.ClipboardItem) {
+                        if (copyBtn) copyBtn.classList.remove('hidden');
+                    }
+                });
+            }
             
             // Native share button
-            nativeShareBtn.addEventListener('click', async () => {
-                if (!currentImageBlob) return;
-                
-                try {
-                    const file = new File([currentImageBlob], `lao-typo-score-${Date.now()}.png`, {
-                        type: 'image/png'
-                    });
+            if (nativeShareBtn) {
+                nativeShareBtn.addEventListener('click', async () => {
+                    if (!currentImageBlob) return;
                     
-                    const shareData = {
-                        title: 'LaoTypo - ຜົນຄະແນນຂອງຂ້ອຍ',
-                        text: `ຂ້ອຍຫາກໍ່ຫຼິ້ນເກມ LaoTypo ຈົບ! ${document.getElementById('evaluation-result').textContent}`,
-                        files: [file]
-                    };
-                    
-                    if (navigator.canShare(shareData)) {
-                        await navigator.share(shareData);
-                    } else {
-                        // Fallback to sharing without file if file sharing is not supported
-                        await navigator.share({
-                            title: shareData.title,
-                            text: shareData.text,
-                            url: window.location.href
+                    try {
+                        const file = new File([currentImageBlob], `lao-typo-score-${Date.now()}.png`, {
+                            type: 'image/png'
                         });
-                    }
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        console.error('Error sharing:', err);
-                        // Fallback to download if share fails
-                        downloadBtn.click();
-                    }
-                }
-            });
-            
-            downloadBtn.addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = `lao-typo-score-${Date.now()}.png`;
-                link.href = previewImg.src;
-                link.click();
-            });
-            
-            copyBtn.addEventListener('click', async () => {
-                try {
-                    if (currentImageBlob && navigator.clipboard && window.ClipboardItem) {
-                        const item = new ClipboardItem({ 'image/png': currentImageBlob });
-                        await navigator.clipboard.write([item]);
                         
-                        copyStatus.classList.remove('hidden');
-                        setTimeout(() => {
-                            copyStatus.classList.add('hidden');
-                        }, 3000);
+                        const shareData = {
+                            title: 'LaoTypo - ຜົນຄະແນນຂອງຂ້ອຍ',
+                            text: `ຂ້ອຍຫາກໍ່ຫຼິ້ນເກມ LaoTypo ຈົບ! ${document.getElementById('evaluation-result').textContent}`,
+                            files: [file]
+                        };
+                        
+                        if (navigator.canShare(shareData)) {
+                            await navigator.share(shareData);
+                        } else {
+                            // Fallback to sharing without file if file sharing is not supported
+                            await navigator.share({
+                                title: shareData.title,
+                                text: shareData.text,
+                                url: window.location.href
+                            });
+                        }
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('Error sharing:', err);
+                            // Fallback to download if share fails
+                            if (downloadBtn) downloadBtn.click();
+                        }
                     }
-                } catch (err) {
-                    console.error('Failed to copy image:', err);
-                    alert('ບໍ່ສາມາດຄັດລອກຮູບໄດ້. ກະລຸນາດາວໂຫລດແທນ.');
-                }
-            });
+                });
+            }
+            
+            if (downloadBtn && previewImg) {
+                downloadBtn.addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.download = `lao-typo-score-${Date.now()}.png`;
+                    link.href = previewImg.src;
+                    link.click();
+                });
+            }
+            
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    try {
+                        if (currentImageBlob && navigator.clipboard && window.ClipboardItem) {
+                            const item = new ClipboardItem({ 'image/png': currentImageBlob });
+                            await navigator.clipboard.write([item]);
+                            
+                            if (copyStatus) copyStatus.classList.remove('hidden');
+                            setTimeout(() => {
+                                if (copyStatus) copyStatus.classList.add('hidden');
+                            }, 3000);
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy image:', err);
+                        alert('ບໍ່ສາມາດຄັດລອກຮູບໄດ້. ກະລຸນາດາວໂຫລດແທນ.');
+                    }
+                });
+            }
         }
         
         async function generateShareImage(format = 'square') {
@@ -1692,32 +1828,50 @@
         // Navigation handlers
         function setupNavigationHandlers() {
             // Home button navigation
-            document.getElementById('home-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                window.location.href = 'registration.html';
-            });
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'registration.html';
+                });
+            }
             
-            document.getElementById('home-nav-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
+            const homeNavBtn = document.getElementById('home-nav-btn');
+            if (homeNavBtn) {
+                homeNavBtn.addEventListener('click', () => {
+                    window.location.href = 'testing.html';
+                });
+            }
             
             // Return home button in footer
-            document.getElementById('return-home-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
-            });
+            const returnHomeBtn = document.getElementById('return-home-btn');
+            if (returnHomeBtn) {
+                returnHomeBtn.addEventListener('click', () => {
+                    window.location.href = 'testing.html';
+                });
+            }
             
             // Other navigation buttons can be added here
-            document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
-                // Add leaderboard functionality
-            });
+            const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+            if (leaderboardNavBtn) {
+                leaderboardNavBtn.addEventListener('click', () => {
+                    // Add leaderboard functionality
+                });
+            }
             
-            document.getElementById('open-settings-btn').addEventListener('click', () => {
-                // Add settings functionality
-            });
+            const openSettingsBtn = document.getElementById('open-settings-btn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', () => {
+                    // Add settings functionality
+                });
+            }
             
-            document.getElementById('account-nav-btn').addEventListener('click', () => {
-                // Add account functionality
-            });
+            const accountNavBtn = document.getElementById('account-nav-btn');
+            if (accountNavBtn) {
+                accountNavBtn.addEventListener('click', () => {
+                    // Add account functionality
+                });
+            }
         }
 
         // Level Transition Modal Functions
@@ -1790,63 +1944,86 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            continueBtn.addEventListener('click', () => {
-                if (currentLevel < 2) {
-                    // Advance to next level
-                    currentLevel++;
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    updateDifficultyDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game with new level
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                } else {
-                    // At hard level, continue playing hard
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                }
-            });
+            if (continueBtn) {
+                continueBtn.addEventListener('click', () => {
+                    if (currentLevel < 2) {
+                        // Advance to next level
+                        currentLevel++;
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        updateDifficultyDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game with new level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    } else {
+                        // At hard level, continue playing hard
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    }
+                });
+            }
             
-            replayBtn.addEventListener('click', () => {
-                if (currentLevel === 2) {
-                    // At hard level, "replay" means go to home
-                    window.location.href = 'testing.html';
-                } else {
-                    // Replay current level
-                    levelProgress = 0;
-                    updateLevelDisplay();
-                    
-                    // Hide modal and continue game
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    
-                    // Resume game at same level
-                    setTimeout(() => {
-                        showNewWords();
-                    }, 500);
-                }
-            });
+            if (replayBtn) {
+                replayBtn.addEventListener('click', () => {
+                    if (currentLevel === 2) {
+                        // At hard level, "replay" means go to home
+                        window.location.href = 'testing.html';
+                    } else {
+                        // Replay current level
+                        levelProgress = 0;
+                        updateLevelDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game at same level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    }
+                });
+            }
         }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            initializeGame();
-            setupLevelTransitionHandlers();
+            try {
+                initializeGame();
+                setupLevelTransitionHandlers();
+            } catch (error) {
+                console.error('Error initializing game:', error);
+                // Show user-friendly error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 left-4 right-4 bg-red-500 text-white p-4 rounded-lg z-50';
+                errorDiv.innerHTML = `
+                    <h3 class="font-bold">ເກີດຂໍ້ຜິດພາດ!</h3>
+                    <p>ກະລຸນາລອງໂຫຼດໜ້ານີ້ອີກຄັ້ງ</p>
+                    <button onclick="location.reload()" class="mt-2 bg-white text-red-500 px-4 py-2 rounded">ໂຫຼດໃໝ່</button>
+                `;
+                document.body.appendChild(errorDiv);
+            }
         });
     </script>
     
