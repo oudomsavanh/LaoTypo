@@ -818,6 +818,15 @@
         // Initialize game
         async function initializeGame() {
             loadGameSettings();
+            
+            // Set initial currentLevel based on selectedDifficulty
+            switch(selectedDifficulty) {
+                case 'easy': currentLevel = 0; break;
+                case 'medium': currentLevel = 1; break;
+                case 'hard': currentLevel = 2; break;
+                default: currentLevel = 0;
+            }
+            
             updateUI();
             await loadWordsFromGoogleSheets();
             setupEventListeners();
