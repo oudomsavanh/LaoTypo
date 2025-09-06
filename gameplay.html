@@ -466,6 +466,110 @@
                 font-size: 2.4rem;
             }
         }
+        
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            width: 280px;
+            background: var(--md-sys-color-surface-container);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: right center;
+        }
+        
+        .account-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(120%) scale(0.95);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .account-profile-summary {
+            padding: 0.75rem;
+            background: var(--md-sys-color-surface-container-low);
+            border-radius: 12px;
+            border: 1px solid var(--md-sys-color-outline-variant);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--md-sys-color-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            border: 2px solid var(--md-sys-color-primary);
+        }
+        
+        .quick-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+        }
+        
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            height: 1px;
+            background: var(--md-sys-color-outline-variant);
+            margin-bottom: 0.75rem;
+        }
+        
+        .version-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(120%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .account-panel {
+                width: calc(100vw - 2rem);
+                right: 1rem;
+                left: 1rem;
+                top: 10%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -714,6 +818,58 @@
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-normal" style="color: var(--md-sys-color-primary);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--md-sys-color-on-surface);">0/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm hidden" aria-hidden="true" tabindex="-1">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
+            </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
+                    <p>📦 Version 2.2.0</p>
+                    <p>🎵 Sound System</p>
+                    <p>Status: Testing</p>
                 </div>
             </div>
         </div>
@@ -1284,6 +1440,12 @@
         function updateUI() {
             currentStreakEl.textContent = currentStreak;
             bestStreakEl.textContent = bestStreak;
+            
+            // Update account panel if it exists and is visible
+            const accountPanel = document.getElementById('account-panel');
+            if (accountPanel && !accountPanel.classList.contains('hidden')) {
+                updateAccountPanel();
+            }
             
             if (currentStreak > bestStreak) {
                 bestStreak = currentStreak;
@@ -2073,9 +2235,79 @@
             const accountNavBtn = document.getElementById('account-nav-btn');
             if (accountNavBtn) {
                 accountNavBtn.addEventListener('click', () => {
-                    // Add account functionality
+                    console.log('👤 Toggling account panel');
+                    const accountPanel = document.getElementById('account-panel');
+                    const isHidden = accountPanel.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        updateAccountPanel(); // Update account panel with latest data
+                        accountPanel.classList.remove('hidden');
+                    } else {
+                        accountPanel.classList.add('hidden');
+                    }
                 });
             }
+            
+            // Account panel close button
+            const closeAccountBtn = document.getElementById('close-account-btn');
+            if (closeAccountBtn) {
+                closeAccountBtn.addEventListener('click', () => {
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.add('hidden');
+                });
+            }
+            
+            // Quick edit name button
+            const quickEditNameBtn = document.getElementById('quick-edit-name-btn');
+            if (quickEditNameBtn) {
+                quickEditNameBtn.addEventListener('click', () => {
+                    const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
+                    if (newName && newName.trim() !== '') {
+                        playerName = newName.trim();
+                        localStorage.setItem('displayName', playerName);
+                        updateAccountPanel();
+                        updateUI();
+                    }
+                });
+            }
+            
+            // View full profile button
+            const viewFullProfileBtn = document.getElementById('view-full-profile-btn');
+            if (viewFullProfileBtn) {
+                viewFullProfileBtn.addEventListener('click', () => {
+                    // Close account panel and navigate to full profile page
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.add('hidden');
+                    window.location.href = 'player_account_info.html';
+                });
+            }
+        }
+
+        // Enhanced Account Functions
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = playerName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = bestStreak;
+            
+            // Calculate accuracy
+            const totalAnswers = correctAnswers + (currentStreak - correctAnswers);
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : '0.0';
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
+            
+            // Calculate achievements (simplified - based on best streak)
+            let achievements = 0;
+            if (bestStreak >= 5) achievements++;
+            if (bestStreak >= 10) achievements++;
+            if (bestStreak >= 15) achievements++;
+            if (bestStreak >= 20) achievements++;
+            if (bestStreak >= 25) achievements++;
+            if (bestStreak >= 30) achievements++;
+            if (bestStreak >= 40) achievements++;
+            if (bestStreak >= 50) achievements++;
+            
+            document.getElementById('account-achievements').textContent = `${achievements}/8`;
         }
 
         // Level Transition Modal Functions
