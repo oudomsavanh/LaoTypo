@@ -1254,7 +1254,7 @@
             if (!gameActive) return;
             
             gameActive = false;
-            clearTimeout(currentTimeout);
+            cancelAnimationFrame(currentTimeout);
             
             const wordPair = wordPairs[currentWordIndex - 1];
             const isCorrect = selectedWord === wordPair.correct;
@@ -1405,7 +1405,7 @@
                 timerContainer.style.display = 'block';
             }
             
-            clearTimeout(currentTimeout);
+            cancelAnimationFrame(currentTimeout);
             timerBar.style.transform = 'scaleX(1)';
             
             const startTime = Date.now();
@@ -1456,7 +1456,7 @@
         // End game (general purpose)
         function endGame() {
             gameActive = false;
-            clearTimeout(currentTimeout);
+            cancelAnimationFrame(currentTimeout);
             
             // Calculate final percentage score
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
