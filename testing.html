@@ -1534,13 +1534,26 @@
             backgroundMusic.loop = true;
             backgroundMusic.volume = 0.3;
             backgroundMusic.preload = 'auto';
+            
+            // Add error handling for missing file
+            backgroundMusic.addEventListener('error', (e) => {
+                console.warn('Background music file not found: bg_sound.mp3');
+                console.log('Please add bg_sound.mp3 to your workspace root directory');
+            });
+            
+            backgroundMusic.addEventListener('canplaythrough', () => {
+                console.log('Background music loaded successfully');
+            });
         }
         
         function toggleBackgroundMusic() {
             if (!backgroundMusic) return;
             
             if (musicToggle && musicToggle.checked) {
-                backgroundMusic.play().catch(e => console.log('Music play failed:', e));
+                backgroundMusic.play().catch(e => {
+                    console.log('Music play failed:', e);
+                    console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
+                });
             } else {
                 backgroundMusic.pause();
                 backgroundMusic.currentTime = 0;
