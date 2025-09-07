@@ -760,15 +760,20 @@
                         
                         <!-- Bottom Button Section -->
                         <div class="max-w-sm mx-auto text-center space-y-3 mt-3">
-                          <!-- Top row (2 buttons) -->
-                          <div class="grid grid-cols-2 gap-3">
+                          <!-- Top row (3 buttons) -->
+                          <div class="grid grid-cols-3 gap-2">
                             <!-- Restart Game Button -->
-                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
                               ຫຼິ້ນອີກຄັ້ງ
                             </button>
 
+                            <!-- Leaderboard Button -->
+                            <button id="leaderboard-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
+                              ກະດານຄະແນນ
+                            </button>
+
                             <!-- Back to Home -->
-                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
                               ກັບໜ້າທຳອິດ
                             </button>
                           </div>
@@ -1558,6 +1563,14 @@
             
             // Start result sound with fade
             startResultSound();
+            
+            // Optional: Auto-navigate to leaderboard after 10 seconds (can be enabled/disabled)
+            // Uncomment the following lines if you want automatic navigation to leaderboard
+            // setTimeout(() => {
+            //     if (confirm('ຕ້ອງການໄປກະດານຄະແນນບໍ່?')) {
+            //         window.location.href = 'leaderboard.html';
+            //     }
+            // }, 10000);
         }
 
         // Save game stats
@@ -1760,6 +1773,14 @@
                 restartGameBtn.addEventListener('click', resetGame);
             }
             
+            // Leaderboard button
+            const leaderboardBtn = document.getElementById('leaderboard-btn');
+            if (leaderboardBtn) {
+                leaderboardBtn.addEventListener('click', () => {
+                    window.location.href = 'leaderboard.html';
+                });
+            }
+
             // Back to Home button
             const backHomeBtn = document.getElementById('back-home-btn');
             if (backHomeBtn) {
@@ -2217,7 +2238,7 @@
             const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
             if (leaderboardNavBtn) {
                 leaderboardNavBtn.addEventListener('click', () => {
-                    // Add leaderboard functionality
+                    window.location.href = 'leaderboard.html';
                 });
             }
             
