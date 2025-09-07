@@ -2014,8 +2014,8 @@
             ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
             
             // 2. Result Card (Image + Amber Frame + Caption Bar) - exact same as endgame page
-            const cardWidth = 600;
-            const cardHeight = 700;
+            const cardWidth = 700;
+            const cardHeight = 800;
             const cardX = (canvas.width - cardWidth) / 2;
             const cardY = 150;
             const cardRadius = 20;
@@ -2086,7 +2086,7 @@
             
             // Draw caption bar (amber box with evaluation text)
             const captionY = cardY + cardWidth - 6; // Below the image
-            const captionHeight = 80;
+            const captionHeight = 100;
             const captionX = cardX + 6;
             const captionWidth = cardWidth - 12;
             
@@ -2098,15 +2098,15 @@
             
             // Draw evaluation text
             ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 24px "Noto Sans Lao Looped", sans-serif';
+            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
             // Word wrap for evaluation text
             const maxWidth = captionWidth - 20;
-            const lineHeight = 30;
+            const lineHeight = 35;
             const words = evaluation.split(' ');
             let line = '';
-            let y = captionY + 35;
+            let y = captionY + 40;
             
             for (let n = 0; n < words.length; n++) {
                 const testLine = line + words[n] + ' ';
@@ -2132,8 +2132,8 @@
                     setTimeout(reject, 3000);
                 });
                 
-                // Draw logo at bottom center
-                const logoWidth = 200;
+                // Draw logo at bottom center (15% bigger)
+                const logoWidth = 230;
                 const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
                 const logoX = (canvas.width - logoWidth) / 2;
                 const logoY = canvas.height - logoHeight - 40;
@@ -2674,16 +2674,13 @@
                     }
                 }
                 
-                // Fallback: open image in new tab
-                const newWindow = window.open();
-                newWindow.document.write(`
-                    <html>
-                        <head><title>ຜົນການປະເມີນບອກວ່າ...</title></head>
-                        <body style="margin:0; padding:20px; background:#2c2e31; display:flex; justify-content:center; align-items:center; min-height:100vh;">
-                            <img src="${dataUrl}" style="max-width:100%; max-height:100%; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-                        </body>
-                    </html>
-                `);
+                // Fallback: copy image to clipboard
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
                 
             } catch (error) {
                 console.error('Share failed:', error);
