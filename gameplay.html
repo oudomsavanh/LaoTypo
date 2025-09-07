@@ -941,7 +941,6 @@
         const bestStreakEl = document.getElementById('best-streak');
         const finalStreakEl = document.getElementById('final-streak');
         const resultsBestStreakEl = document.getElementById('results-best-streak');
-        const accuracyStatEl = document.getElementById('accuracy-stat');
         const evaluationResultEl = document.getElementById('evaluation-result');
         const contextDisplay = document.getElementById('context-display');
         const wordCardLeft = document.getElementById('word-card-left');
@@ -1887,7 +1886,7 @@
             
             // Return early if action buttons don't exist
             if (!downloadBtn || !shareBtn || !shareWithLinkBtn) {
-                console.log('Action buttons not found - skipping setup');
+                console.log('Action grid buttons not found - skipping setup');
                 return;
             }
             
@@ -2004,7 +2003,6 @@
             // Get game stats
             const finalScore = document.getElementById('final-streak').textContent;
             const bestScore = document.getElementById('results-best-streak').textContent;
-            const accuracy = document.getElementById('accuracy-stat').textContent;
             const evaluation = document.getElementById('evaluation-result').textContent;
             
             // Create gradient background
@@ -2080,7 +2078,6 @@
                 ctx.font = '24px "Noto Sans Lao Looped", sans-serif';
                 ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX, 290);
                 ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX, 330);
-                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, contentX, 370);
                 
                 // Evaluation
                 ctx.fillStyle = '#f8af3c';
@@ -2162,7 +2159,6 @@
                 ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
                 ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, 180, 640);
                 ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, 180, 690);
-                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, 180, 740);
                 
                 // Draw evaluation in a box
                 ctx.fillStyle = 'rgba(248, 175, 60, 0.2)';
