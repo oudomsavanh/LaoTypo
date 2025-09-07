@@ -2011,9 +2011,29 @@
             ctx.fillStyle = '#f8af3c';
             ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 120);
+            ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
             
-            // 2. Get the meme image from #meme-container
+            // 2. Result Card (Image + Amber Frame + Caption Bar) - exact same as endgame page
+            const cardWidth = 600;
+            const cardHeight = 700;
+            const cardX = (canvas.width - cardWidth) / 2;
+            const cardY = 150;
+            const cardRadius = 20;
+            
+            // Draw result card background
+            ctx.fillStyle = '#3e4043';
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardWidth, cardHeight, cardRadius);
+            ctx.fill();
+            
+            // Draw amber border
+            ctx.strokeStyle = '#f8af3c';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardWidth, cardHeight, cardRadius);
+            ctx.stroke();
+            
+            // Get the meme image from #meme-container
             const memeContainer = document.getElementById('meme-container');
             const memeImg = memeContainer.querySelector('img');
             
@@ -2030,20 +2050,13 @@
                         setTimeout(reject, 3000);
                     });
                     
-                    // Draw meme image in rounded rectangle with amber border
-                    const imgSize = 400;
-                    const imgX = (canvas.width - imgSize) / 2;
-                    const imgY = 180;
-                    const imgRadius = 20;
+                    // Draw meme image (aspect-square, same as endgame page)
+                    const imgSize = cardWidth - 12; // Account for border
+                    const imgX = cardX + 6;
+                    const imgY = cardY + 6;
+                    const imgRadius = cardRadius - 3;
                     
-                    // Draw amber border
-                    ctx.strokeStyle = '#f8af3c';
-                    ctx.lineWidth = 6;
-                    ctx.beginPath();
-                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
-                    ctx.stroke();
-                    
-                    // Draw image
+                    // Draw image with rounded corners
                     ctx.save();
                     ctx.beginPath();
                     ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
@@ -2054,81 +2067,87 @@
                 } catch (error) {
                     console.log('Could not load meme image, using fallback');
                     // Fallback: draw a placeholder
-                    const imgSize = 400;
-                    const imgX = (canvas.width - imgSize) / 2;
-                    const imgY = 180;
-                    const imgRadius = 20;
+                    const imgSize = cardWidth - 12;
+                    const imgX = cardX + 6;
+                    const imgY = cardY + 6;
+                    const imgRadius = cardRadius - 3;
                     
-                    ctx.fillStyle = '#3e4043';
+                    ctx.fillStyle = '#2c2e31';
                     ctx.beginPath();
                     ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
                     ctx.fill();
                     
-                    ctx.strokeStyle = '#f8af3c';
-                    ctx.lineWidth = 6;
-                    ctx.beginPath();
-                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
-                    ctx.stroke();
-                    
                     ctx.fillStyle = '#f8af3c';
-                    ctx.font = 'bold 60px Arial';
+                    ctx.font = 'bold 80px Arial';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🦎', canvas.width / 2, imgY + imgSize / 2 + 20);
+                    ctx.fillText('🦎', cardX + cardWidth / 2, cardY + cardWidth / 2 + 30);
                 }
             }
             
-            // 3. Evaluation text in amber rounded box below the image
-            const evalY = 620;
-            const evalWidth = 800;
-            const evalHeight = 120;
-            const evalX = (canvas.width - evalWidth) / 2;
-            const evalRadius = 15;
+            // Draw caption bar (amber box with evaluation text)
+            const captionY = cardY + cardWidth - 6; // Below the image
+            const captionHeight = 80;
+            const captionX = cardX + 6;
+            const captionWidth = cardWidth - 12;
             
-            // Draw amber box
+            // Draw amber caption bar
             ctx.fillStyle = '#f8af3c';
             ctx.beginPath();
-            ctx.roundRect(evalX, evalY, evalWidth, evalHeight, evalRadius);
+            ctx.roundRect(captionX, captionY, captionWidth, captionHeight, cardRadius - 3);
             ctx.fill();
             
             // Draw evaluation text
             ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+            ctx.font = 'bold 24px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
             // Word wrap for evaluation text
-            const maxWidth = evalWidth - 40;
-            const lineHeight = 35;
+            const maxWidth = captionWidth - 20;
+            const lineHeight = 30;
             const words = evaluation.split(' ');
             let line = '';
-            let y = evalY + 50;
+            let y = captionY + 35;
             
             for (let n = 0; n < words.length; n++) {
                 const testLine = line + words[n] + ' ';
                 const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) {
-                    ctx.fillText(line, canvas.width / 2, y);
+                    ctx.fillText(line, cardX + cardWidth / 2, y);
                     line = words[n] + ' ';
                     y += lineHeight;
                 } else {
                     line = testLine;
                 }
             }
-            ctx.fillText(line, canvas.width / 2, y);
+            ctx.fillText(line, cardX + cardWidth / 2, y);
             
-            // 4. Footer brand "Laotypo" with small amber circle
-            const footerY = canvas.height - 80;
-            
-            // Draw small amber circle
-            ctx.fillStyle = '#f8af3c';
-            ctx.beginPath();
-            ctx.arc(200, footerY, 8, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Draw "Laotypo" text
-            ctx.fillStyle = '#f8af3c';
-            ctx.font = 'bold 32px "Montserrat", sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Laotypo', 220, footerY + 10);
+            // 3. Footer: LaoTypo logo
+            try {
+                const logoImg = new Image();
+                logoImg.src = 'images/LaoTypo-logo-04.png';
+                
+                await new Promise((resolve, reject) => {
+                    logoImg.onload = resolve;
+                    logoImg.onerror = reject;
+                    setTimeout(reject, 3000);
+                });
+                
+                // Draw logo at bottom center
+                const logoWidth = 200;
+                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = canvas.height - logoHeight - 40;
+                
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+                
+            } catch (error) {
+                console.log('Could not load logo, using text fallback');
+                // Fallback: draw text
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 32px "Montserrat", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Laotypo', canvas.width / 2, canvas.height - 40);
+            }
             
             
             // Convert canvas to blob and data URL
