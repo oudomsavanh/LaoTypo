@@ -2009,7 +2009,7 @@
             
             // 1. Header text at the top: "ຜົນການປະເມີນບອກວ່າ..."
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 43px "Noto Sans Lao Looped", sans-serif';
+            ctx.font = '40px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
             
@@ -2050,18 +2050,38 @@
                         setTimeout(reject, 3000);
                     });
                     
-                    // Draw meme image (aspect-square, same as endgame page)
+                    // Draw meme image (responsive, maintaining aspect ratio)
                     const imgSize = cardWidth - 12; // Account for border
                     const imgX = cardX + 6;
                     const imgY = cardY + 6;
                     const imgRadius = cardRadius - 3;
                     
-                    // Draw image with rounded corners
+                    // Calculate responsive scaling to maintain aspect ratio
+                    const imgAspectRatio = img.width / img.height;
+                    const containerAspectRatio = 1; // Square container
+                    
+                    let drawWidth, drawHeight, drawX, drawY;
+                    
+                    if (imgAspectRatio > containerAspectRatio) {
+                        // Image is wider than container
+                        drawWidth = imgSize;
+                        drawHeight = imgSize / imgAspectRatio;
+                        drawX = imgX;
+                        drawY = imgY + (imgSize - drawHeight) / 2;
+                    } else {
+                        // Image is taller than container
+                        drawHeight = imgSize;
+                        drawWidth = imgSize * imgAspectRatio;
+                        drawX = imgX + (imgSize - drawWidth) / 2;
+                        drawY = imgY;
+                    }
+                    
+                    // Draw image with rounded corners and proper scaling
                     ctx.save();
                     ctx.beginPath();
                     ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
                     ctx.clip();
-                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
                     ctx.restore();
                     
                 } catch (error) {
@@ -2084,8 +2104,8 @@
                 }
             }
             
-            // Draw caption bar (amber box with evaluation text) - with 10% spacing
-            const spacing = 70; // 10% of card width (700px)
+            // Draw caption bar (amber box with evaluation text) - with better spacing
+            const spacing = 45; // Better visual spacing
             const captionY = cardY + cardWidth - 6 + spacing; // Below the image with spacing
             const captionHeight = 100;
             const captionX = cardX + 6;
@@ -2102,12 +2122,12 @@
             ctx.font = 'bold 35px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
-            // Word wrap for evaluation text
+            // Word wrap for evaluation text with perfect centering
             const maxWidth = captionWidth - 20;
             const lineHeight = 35;
             const words = evaluation.split(' ');
             let line = '';
-            let y = captionY + 40;
+            let y = captionY + 50; // Better vertical centering
             
             for (let n = 0; n < words.length; n++) {
                 const testLine = line + words[n] + ' ';
@@ -2133,8 +2153,8 @@
                     setTimeout(reject, 3000);
                 });
                 
-                // Draw logo at bottom center (280px width)
-                const logoWidth = 280;
+                // Draw logo at bottom center (250px width)
+                const logoWidth = 250;
                 const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
                 const logoX = (canvas.width - logoWidth) / 2;
                 const logoY = canvas.height - logoHeight - 40;
