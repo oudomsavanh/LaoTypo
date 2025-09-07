@@ -1,7 +1,7 @@
 # LaoTypo
 
 <div align="center">
-  <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" width="200">
+  <img src="images/LaoTypo-logo-04.png" alt="LaoTypo Logo" width="200">
   
   **Learn Lao Through Interactive Gaming**
 </div>

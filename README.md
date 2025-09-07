@@ -1,7 +1,7 @@
 # LaoTypo - Real-time Multiplayer Word-Selection Race Game
 
 <div align="center">
-  <img src="LaoTypo-logo-04.png" alt="LaoTypo Logo" width="200">
+  <img src="images/LaoTypo-logo-04.png" alt="LaoTypo Logo" width="200">
   
   A web-based, real-time multiplayer word-selection race game adapted for the Lao language
   

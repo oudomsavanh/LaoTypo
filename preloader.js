@@ -22,8 +22,8 @@ class GamePreloader {
         this.addAsset('firebase-config', () => this.loadScript('/firebase-config.js'), 'critical', 'ກຳລັງເຊື່ອມຕໍ່ Firebase...');
         
         // Images
-        this.addAsset('logo', () => this.loadImage('/LaoTypo-logo-04.png'), 'high', 'ກຳລັງໂຫຼດຮູບພາບ...');
-        this.addAsset('mascot', () => this.loadImage('/Gecko.png'), 'medium', 'ກຳລັງໂຫຼດຕົວການ໌ຕູນ...');
+        this.addAsset('logo', () => this.loadImage('/images/LaoTypo-logo-04.png'), 'high', 'ກຳລັງໂຫຼດຮູບພາບ...');
+        this.addAsset('mascot', () => this.loadImage('/images/Gecko.png'), 'medium', 'ກຳລັງໂຫຼດຕົວການ໌ຕູນ...');
         
         // External dependencies
         this.addAsset('tailwind', () => this.loadScript('https://cdn.tailwindcss.com'), 'high', 'ກຳລັງໂຫຼດ CSS...');
