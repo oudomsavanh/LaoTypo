@@ -764,10 +764,26 @@
                         <canvas id="share-canvas" class="hidden"></canvas>
                         
                         
-                        <!-- Primary Bottom Button -->
-                        <button id="restart-game-btn" class="mt-3 w-full max-w-sm rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-3.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
-                            ຫຼິ້ນອີກຄັ້ງ
-                        </button>
+                        <!-- Bottom Button Section -->
+                        <div class="max-w-sm mx-auto text-center space-y-3 mt-3">
+                          <!-- Top row (2 buttons) -->
+                          <div class="grid grid-cols-2 gap-3">
+                            <!-- Restart Game Button -->
+                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                              ຫຼິ້ນອີກຄັ້ງ
+                            </button>
+
+                            <!-- Back to Home -->
+                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                              ກັບໜ້າທຳອິດ
+                            </button>
+                          </div>
+
+                          <!-- Add Word (Facebook Redirect) -->
+                          <button id="add-word-btn" class="w-1/3 mx-auto block rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-2.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            ຕື່ມຄຳສັບ
+                          </button>
+                        </div>
                         
                     </div>
                 </div>
@@ -1773,6 +1789,22 @@
                 restartGameBtn.addEventListener('click', resetGame);
             }
             
+            // Back to Home button
+            const backHomeBtn = document.getElementById('back-home-btn');
+            if (backHomeBtn) {
+                backHomeBtn.addEventListener('click', () => {
+                    window.location.href = '/testing.html';
+                });
+            }
+            
+            // Add Word button (Facebook redirect)
+            const addWordBtn = document.getElementById('add-word-btn');
+            if (addWordBtn) {
+                addWordBtn.addEventListener('click', () => {
+                    window.location.href = 'https://www.facebook.com/profile.php?id=61578349258643';
+                });
+            }
+            
             // Action grid buttons (only if they exist)
             setupActionGrid();
             
@@ -2457,7 +2489,7 @@
     </script>
     
     <!-- Footer with Return Home button -->
-    <footer class="fixed bottom-0 left-0 right-0 p-3 sm:p-4 bg-[#222426] border-t-2 border-[#f8af3c]">
+    <footer class="fixed bottom-0 left-0 right-0 p-3 sm:p-4 bg-[#222426] border-t-2 border-[#f8af3c] hidden">
         <div class="max-w-7xl mx-auto text-center">
             <button id="return-home-btn" class="btn btn-primary px-4 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base">
                 ກັບໄປໜ້າຫຼັກ
