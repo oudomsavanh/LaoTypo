@@ -2000,33 +2000,33 @@
             const bestScore = document.getElementById('results-best-streak').textContent;
             const evaluation = document.getElementById('evaluation-result').textContent;
             
-            // Create gradient background
+            // Create clean gradient background (matching game design)
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#2c2e31');
-            gradient.addColorStop(0.5, '#3e4043');
-            gradient.addColorStop(1, '#2c2e31');
+            gradient.addColorStop(1, '#1e2023');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Add decorative pattern
-            ctx.strokeStyle = 'rgba(248, 175, 60, 0.1)';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 20; i++) {
-                ctx.beginPath();
-                ctx.moveTo(0, i * 60);
-                ctx.lineTo(canvas.width, i * 60);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(i * 60, 0);
-                ctx.lineTo(i * 60, canvas.height);
-                ctx.stroke();
-            }
             
             // Layout adjustments based on format
             if (format === 'landscape') {
                 // Landscape layout (1200x630)
                 
-                // Try to load and draw the Gecko mascot on the left
+                // Create main content container with border (matching game design)
+                const containerX = 60;
+                const containerY = 60;
+                const containerWidth = canvas.width - 120;
+                const containerHeight = canvas.height - 120;
+                
+                // Draw container background
+                ctx.fillStyle = '#3e4043';
+                ctx.fillRect(containerX, containerY, containerWidth, containerHeight);
+                
+                // Draw amber border
+                ctx.strokeStyle = '#f8af3c';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(containerX, containerY, containerWidth, containerHeight);
+                
+                // Try to load and draw the Gecko mascot
                 try {
                     const geckoImg = new Image();
                     geckoImg.src = 'images/Gecko.png';
@@ -2036,68 +2036,62 @@
                         setTimeout(reject, 3000);
                     });
                     
-                    const imgSize = 150;
-                    ctx.drawImage(geckoImg, 50, (canvas.height - imgSize) / 2, imgSize, imgSize);
+                    const imgSize = 120;
+                    const imgX = containerX + 40;
+                    const imgY = containerY + (containerHeight - imgSize) / 2;
+                    ctx.drawImage(geckoImg, imgX, imgY, imgSize, imgSize);
                 } catch (error) {
-                    ctx.font = 'bold 150px Arial';
+                    ctx.font = 'bold 120px Arial';
                     ctx.textAlign = 'center';
                     ctx.fillStyle = '#f8af3c';
-                    ctx.fillText('🦎', 125, canvas.height / 2 + 50);
+                    ctx.fillText('🦎', containerX + 100, containerY + containerHeight / 2 + 40);
                 }
                 
-                // Right side content
-                const contentX = 280;
+                // Content area
+                const contentX = containerX + 200;
+                const contentY = containerY + 50;
                 
                 // App title
                 ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 42px "Montserrat", sans-serif';
+                ctx.font = 'bold 36px "Montserrat", sans-serif';
                 ctx.textAlign = 'left';
-                ctx.fillText('LaoTypo', contentX, 80);
-                
-                // Subtitle
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '24px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', contentX, 120);
+                ctx.fillText('LaoTypo', contentX, contentY + 40);
                 
                 // "I just finished!" message
                 ctx.fillStyle = '#72b483';
-                ctx.font = 'bold 32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', contentX, 180);
-                
-                // Stats
-                ctx.fillStyle = '#f8af3c';
                 ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', contentX, 240);
+                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', contentX, contentY + 80);
+                
+                // Stats container
+                const statsY = contentY + 120;
+                ctx.fillStyle = '#2c2e31';
+                ctx.fillRect(contentX, statsY, 400, 120);
+                ctx.strokeStyle = '#f8af3c';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(contentX, statsY, 400, 120);
+                
+                // Stats text
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 20px "Noto Sans Lao Looped", sans-serif';
+                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', contentX + 20, statsY + 30);
                 
                 ctx.fillStyle = '#d1d0c5';
-                ctx.font = '24px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX, 290);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX, 330);
+                ctx.font = '18px "Noto Sans Lao Looped", sans-serif';
+                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX + 20, statsY + 55);
+                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX + 20, statsY + 80);
                 
-                // Evaluation
+                // Evaluation in amber box (matching game design)
+                const evalY = statsY + 140;
                 ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 22px "Noto Sans Lao Looped", sans-serif';
-                const evalWords = evaluation.split(' ');
-                let evalLine = '';
-                let evalY = 440;
-                const evalMaxWidth = 850;
+                ctx.fillRect(contentX, evalY, 400, 60);
+                ctx.fillStyle = '#1a1a1a';
+                ctx.font = 'bold 16px "Noto Sans Lao Looped", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(evaluation, contentX + 200, evalY + 35);
                 
-                for (let n = 0; n < evalWords.length; n++) {
-                    const testLine = evalLine + evalWords[n] + ' ';
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > evalMaxWidth && n > 0) {
-                        ctx.fillText(evalLine, contentX, evalY);
-                        evalLine = evalWords[n] + ' ';
-                        evalY += 35;
-                    } else {
-                        evalLine = testLine;
-                    }
-                }
-                ctx.fillText(evalLine, contentX, evalY);
-                
-                // Website at bottom
+                // Website URL
                 ctx.fillStyle = '#646669';
-                ctx.font = '20px "Montserrat", sans-serif';
+                ctx.font = '16px "Montserrat", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('laotypo.com', canvas.width / 2, canvas.height - 30);
                 
@@ -2139,36 +2133,38 @@
                 ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
                 ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', canvas.width / 2, 480);
                 
-                // Draw stats container background
-                ctx.fillStyle = 'rgba(100, 102, 105, 0.3)';
-                ctx.fillRect(140, 520, 800, 300);
+                // Draw stats container background (matching game design)
+                ctx.fillStyle = '#2c2e31';
+                ctx.fillRect(140, 520, 800, 200);
+                ctx.strokeStyle = '#f8af3c';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(140, 520, 800, 200);
                 
                 // Draw stats
                 ctx.fillStyle = '#f8af3c';
                 ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', 180, 580);
+                ctx.textAlign = 'center';
+                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', canvas.width / 2, 570);
                 
                 // Score details
                 ctx.fillStyle = '#d1d0c5';
                 ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, 180, 640);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, 180, 690);
+                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, canvas.width / 2, 620);
+                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, canvas.width / 2, 670);
                 
-                // Draw evaluation in a box
-                ctx.fillStyle = 'rgba(248, 175, 60, 0.2)';
-                ctx.fillRect(140, 840, 800, 120);
-                
+                // Draw evaluation in amber box (matching game design)
                 ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+                ctx.fillRect(140, 740, 800, 100);
+                ctx.fillStyle = '#1a1a1a';
+                ctx.font = 'bold 24px "Noto Sans Lao Looped", sans-serif';
                 ctx.textAlign = 'center';
                 
                 // Word wrap for long evaluation text
                 const maxWidth = 750;
-                const lineHeight = 40;
+                const lineHeight = 35;
                 const words = evaluation.split(' ');
                 let line = '';
-                let y = 900;
+                let y = 800;
                 
                 for (let n = 0; n < words.length; n++) {
                     const testLine = line + words[n] + ' ';
