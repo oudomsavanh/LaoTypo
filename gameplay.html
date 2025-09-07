@@ -2474,5 +2474,274 @@
             </button>
         </div>
     </footer>
+
+    <!-- Result Screen Share Functionality -->
+    <script>
+    // Result Screen Share Functionality
+    class ResultShareGenerator {
+        constructor() {
+            this.canvas = document.getElementById('share-canvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.memeContainer = document.getElementById('meme-container');
+            this.evaluationResult = document.getElementById('evaluation-result');
+            this.sharePreview = document.getElementById('share-preview');
+            this.sharePreviewContainer = document.getElementById('share-preview-container');
+            this.copyStatus = document.getElementById('copy-status');
+            
+            this.setupEventListeners();
+        }
+        
+        setupEventListeners() {
+            document.getElementById('share-with-link-btn')?.addEventListener('click', () => this.handleShareWithLink());
+            document.getElementById('share-btn')?.addEventListener('click', () => this.handleShare());
+            document.getElementById('download-btn')?.addEventListener('click', () => this.handleDownload());
+        }
+        
+        async generateResultImage() {
+            const size = 600; // Square image size
+            this.canvas.width = size;
+            this.canvas.height = size;
+            
+            // Clear canvas
+            this.ctx.clearRect(0, 0, size, size);
+            
+            // Draw outer dark rounded background
+            this.drawRoundedRect(0, 0, size, size, 20, '#2c2e31');
+            
+            const padding = 30;
+            const contentWidth = size - (padding * 2);
+            let currentY = padding;
+            
+            // Header text
+            const headerText = "ຜົນການປະເມີນບອກວ່າ...";
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = 'bold 24px Arial, sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(headerText, size / 2, currentY + 30);
+            currentY += 60;
+            
+            // Get meme image
+            const memeImg = this.memeContainer.querySelector('img');
+            if (memeImg) {
+                const imageSize = 300;
+                const imageX = (size - imageSize) / 2;
+                const imageY = currentY;
+                
+                // Draw amber border
+                this.drawRoundedRect(imageX - 4, imageY - 4, imageSize + 8, imageSize + 8, 12, '#f8af3c');
+                
+                // Draw image with rounded corners
+                await this.drawImageWithRoundedCorners(memeImg, imageX, imageY, imageSize, imageSize, 8);
+                currentY += imageSize + 20;
+            }
+            
+            // Evaluation text
+            const evaluationText = this.evaluationResult.textContent || '';
+            if (evaluationText) {
+                const textBoxHeight = 60;
+                const textBoxY = currentY;
+                
+                // Draw amber background for text
+                this.drawRoundedRect(padding, textBoxY, contentWidth, textBoxHeight, 8, '#f8af3c');
+                
+                // Draw wrapped text
+                this.ctx.fillStyle = '#000000';
+                this.ctx.font = 'bold 18px Arial, sans-serif';
+                this.ctx.textAlign = 'center';
+                this.wrapText(evaluationText, size / 2, textBoxY + 35, contentWidth - 20, 20);
+                currentY += textBoxHeight + 20;
+            }
+            
+            // Footer logo
+            try {
+                const logoImg = await this.loadImage('images/LaoTypo-logo-04.png');
+                const logoSize = 40;
+                const logoX = (size - logoSize) / 2;
+                const logoY = size - padding - logoSize;
+                
+                this.ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+            } catch (error) {
+                console.warn('Could not load logo:', error);
+                // Fallback text
+                this.ctx.fillStyle = '#f8af3c';
+                this.ctx.font = 'bold 20px Arial, sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('Laotypo', size / 2, size - padding - 10);
+            }
+            
+            return this.canvas.toDataURL('image/png');
+        }
+        
+        drawRoundedRect(x, y, width, height, radius, color) {
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, width, height, radius);
+            this.ctx.fill();
+        }
+        
+        async drawImageWithRoundedCorners(img, x, y, width, height, radius) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, width, height, radius);
+            this.ctx.clip();
+            
+            // Calculate image cover dimensions
+            const imgAspect = img.naturalWidth / img.naturalHeight;
+            const targetAspect = width / height;
+            
+            let drawWidth, drawHeight, drawX, drawY;
+            
+            if (imgAspect > targetAspect) {
+                // Image is wider than target
+                drawHeight = height;
+                drawWidth = height * imgAspect;
+                drawX = x - (drawWidth - width) / 2;
+                drawY = y;
+            } else {
+                // Image is taller than target
+                drawWidth = width;
+                drawHeight = width / imgAspect;
+                drawX = x;
+                drawY = y - (drawHeight - height) / 2;
+            }
+            
+            this.ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+            this.ctx.restore();
+        }
+        
+        wrapText(text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = this.ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && i > 0) {
+                    this.ctx.fillText(line, x, currentY);
+                    line = words[i] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            this.ctx.fillText(line, x, currentY);
+        }
+        
+        async loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+        
+        showCopyStatus(message) {
+            this.copyStatus.textContent = message;
+            this.copyStatus.style.display = 'block';
+            setTimeout(() => {
+                this.copyStatus.style.display = 'none';
+            }, 3000);
+        }
+        
+        async handleShareWithLink() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Convert to blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Copy to clipboard
+                if (navigator.clipboard && window.ClipboardItem) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
+                } else {
+                    throw new Error('Clipboard API not supported');
+                }
+                
+                // Show preview
+                this.sharePreview.src = dataUrl;
+                this.sharePreviewContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Share with link failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດຄັດລອກໄດ້');
+            }
+        }
+        
+        async handleShare() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Convert to blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Try Web Share API
+                if (navigator.share && navigator.canShare) {
+                    const file = new File([blob], 'laotypo-result.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'ຜົນການປະເມີນບອກວ່າ...',
+                            text: 'ເບິ່ງຜົນການປະເມີນຂອງຂ້ອຍ!',
+                            files: [file]
+                        });
+                        return;
+                    }
+                }
+                
+                // Fallback: open image in new tab
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <html>
+                        <head><title>ຜົນການປະເມີນບອກວ່າ...</title></head>
+                        <body style="margin:0; padding:20px; background:#2c2e31; display:flex; justify-content:center; align-items:center; min-height:100vh;">
+                            <img src="${dataUrl}" style="max-width:100%; max-height:100%; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+                        </body>
+                    </html>
+                `);
+                
+            } catch (error) {
+                console.error('Share failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດແບ່ງປັນໄດ້');
+            }
+        }
+        
+        async handleDownload() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'laotypo-result.png';
+                link.href = dataUrl;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                
+            } catch (error) {
+                console.error('Download failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດດາວໂຫຼດໄດ້');
+            }
+        }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        new ResultShareGenerator();
+    });
+    </script>
 </body>
 </html>
