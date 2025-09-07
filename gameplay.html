@@ -1891,7 +1891,7 @@
             downloadBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     const url = URL.createObjectURL(blob);
@@ -1911,7 +1911,7 @@
             shareBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     if (navigator.share && navigator.canShare) {
@@ -1948,7 +1948,7 @@
             shareWithLinkBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     if (navigator.share && navigator.canShare) {
@@ -1986,211 +1986,150 @@
             const canvas = document.getElementById('share-canvas');
             const ctx = canvas.getContext('2d');
             
-            // Set canvas size based on format
-            if (format === 'landscape') {
-                canvas.width = 1200;
-                canvas.height = 630;
-            } else {
-                canvas.width = 1080;
-                canvas.height = 1080;
-            }
+            // Always use square format (1080x1080)
+            canvas.width = 1080;
+            canvas.height = 1080;
             
             // Get game stats
             const finalScore = document.getElementById('final-streak').textContent;
             const bestScore = document.getElementById('results-best-streak').textContent;
             const evaluation = document.getElementById('evaluation-result').textContent;
             
-            // Create clean gradient background (matching game design)
+            // Create dark rounded background
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#2c2e31');
             gradient.addColorStop(1, '#1e2023');
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Layout adjustments based on format
-            if (format === 'landscape') {
-                // Landscape layout (1200x630)
-                
-                // Create main content container with border (matching game design)
-                const containerX = 60;
-                const containerY = 60;
-                const containerWidth = canvas.width - 120;
-                const containerHeight = canvas.height - 120;
-                
-                // Draw container background
-                ctx.fillStyle = '#3e4043';
-                ctx.fillRect(containerX, containerY, containerWidth, containerHeight);
-                
-                // Draw amber border
-                ctx.strokeStyle = '#f8af3c';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(containerX, containerY, containerWidth, containerHeight);
-                
-                // Try to load and draw the Gecko mascot
+            // Draw rounded rectangle background
+            const cornerRadius = 40;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, cornerRadius);
+            ctx.fill();
+            
+            // 1. Header text at the top: "ຜົນການປະເມີນບອກວ່າ..."
+            ctx.fillStyle = '#f8af3c';
+            ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 120);
+            
+            // 2. Get the meme image from #meme-container
+            const memeContainer = document.getElementById('meme-container');
+            const memeImg = memeContainer.querySelector('img');
+            
+            if (memeImg && memeImg.src) {
                 try {
-                    const geckoImg = new Image();
-                    geckoImg.src = 'images/Gecko.png';
+                    // Load the meme image
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = memeImg.src;
+                    
                     await new Promise((resolve, reject) => {
-                        geckoImg.onload = resolve;
-                        geckoImg.onerror = reject;
+                        img.onload = resolve;
+                        img.onerror = reject;
                         setTimeout(reject, 3000);
                     });
                     
-                    const imgSize = 120;
-                    const imgX = containerX + 40;
-                    const imgY = containerY + (containerHeight - imgSize) / 2;
-                    ctx.drawImage(geckoImg, imgX, imgY, imgSize, imgSize);
-                } catch (error) {
-                    ctx.font = 'bold 120px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillStyle = '#f8af3c';
-                    ctx.fillText('🦎', containerX + 100, containerY + containerHeight / 2 + 40);
-                }
-                
-                // Content area
-                const contentX = containerX + 200;
-                const contentY = containerY + 50;
-                
-                // App title
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 36px "Montserrat", sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('LaoTypo', contentX, contentY + 40);
-                
-                // "I just finished!" message
-                ctx.fillStyle = '#72b483';
-                ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', contentX, contentY + 80);
-                
-                // Stats container
-                const statsY = contentY + 120;
-                ctx.fillStyle = '#2c2e31';
-                ctx.fillRect(contentX, statsY, 400, 120);
-                ctx.strokeStyle = '#f8af3c';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(contentX, statsY, 400, 120);
-                
-                // Stats text
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 20px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', contentX + 20, statsY + 30);
-                
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '18px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX + 20, statsY + 55);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX + 20, statsY + 80);
-                
-                // Evaluation in amber box (matching game design)
-                const evalY = statsY + 140;
-                ctx.fillStyle = '#f8af3c';
-                ctx.fillRect(contentX, evalY, 400, 60);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.font = 'bold 16px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(evaluation, contentX + 200, evalY + 35);
-                
-                // Website URL
-                ctx.fillStyle = '#646669';
-                ctx.font = '16px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('laotypo.com', canvas.width / 2, canvas.height - 30);
-                
-            } else {
-                // Square layout (1080x1080)
-                
-                // Try to load and draw the Gecko mascot
-                try {
-                    const geckoImg = new Image();
-                    geckoImg.src = 'images/Gecko.png';
-                    await new Promise((resolve, reject) => {
-                        geckoImg.onload = resolve;
-                        geckoImg.onerror = reject;
-                        setTimeout(reject, 3000);
-                    });
+                    // Draw meme image in rounded rectangle with amber border
+                    const imgSize = 400;
+                    const imgX = (canvas.width - imgSize) / 2;
+                    const imgY = 180;
+                    const imgRadius = 20;
                     
-                    const imgSize = 180;
-                    ctx.drawImage(geckoImg, (canvas.width - imgSize) / 2, 80, imgSize, imgSize);
+                    // Draw amber border
+                    ctx.strokeStyle = '#f8af3c';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.stroke();
+                    
+                    // Draw image
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.clip();
+                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                    ctx.restore();
+                    
                 } catch (error) {
-                    ctx.font = 'bold 200px Arial';
-                    ctx.textAlign = 'center';
+                    console.log('Could not load meme image, using fallback');
+                    // Fallback: draw a placeholder
+                    const imgSize = 400;
+                    const imgX = (canvas.width - imgSize) / 2;
+                    const imgY = 180;
+                    const imgRadius = 20;
+                    
+                    ctx.fillStyle = '#3e4043';
+                    ctx.beginPath();
+                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#f8af3c';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.stroke();
+                    
                     ctx.fillStyle = '#f8af3c';
-                    ctx.fillText('🦎', canvas.width / 2, 250);
+                    ctx.font = 'bold 60px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🦎', canvas.width / 2, imgY + imgSize / 2 + 20);
                 }
-                
-                // Draw app title
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 48px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('LaoTypo', canvas.width / 2, 350);
-                
-                // Draw subtitle
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', canvas.width / 2, 400);
-                
-                // Draw "I just finished!" message
-                ctx.fillStyle = '#72b483';
-                ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', canvas.width / 2, 480);
-                
-                // Draw stats container background (matching game design)
-                ctx.fillStyle = '#2c2e31';
-                ctx.fillRect(140, 520, 800, 200);
-                ctx.strokeStyle = '#f8af3c';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(140, 520, 800, 200);
-                
-                // Draw stats
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', canvas.width / 2, 570);
-                
-                // Score details
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, canvas.width / 2, 620);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, canvas.width / 2, 670);
-                
-                // Draw evaluation in amber box (matching game design)
-                ctx.fillStyle = '#f8af3c';
-                ctx.fillRect(140, 740, 800, 100);
-                ctx.fillStyle = '#1a1a1a';
-                ctx.font = 'bold 24px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'center';
-                
-                // Word wrap for long evaluation text
-                const maxWidth = 750;
-                const lineHeight = 35;
-                const words = evaluation.split(' ');
-                let line = '';
-                let y = 800;
-                
-                for (let n = 0; n < words.length; n++) {
-                    const testLine = line + words[n] + ' ';
-                    const metrics = ctx.measureText(testLine);
-                    const testWidth = metrics.width;
-                    if (testWidth > maxWidth && n > 0) {
-                        ctx.fillText(line, canvas.width / 2, y);
-                        line = words[n] + ' ';
-                        y += lineHeight;
-                    } else {
-                        line = testLine;
-                    }
-                }
-                ctx.fillText(line, canvas.width / 2, y);
-                
-                // Add website/app name at bottom
-                ctx.fillStyle = '#646669';
-                ctx.font = '24px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('laotypo.com', canvas.width / 2, 1040);
             }
             
-            // Add decorative elements
-            ctx.strokeStyle = '#f8af3c';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            // 3. Evaluation text in amber rounded box below the image
+            const evalY = 620;
+            const evalWidth = 800;
+            const evalHeight = 120;
+            const evalX = (canvas.width - evalWidth) / 2;
+            const evalRadius = 15;
+            
+            // Draw amber box
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.roundRect(evalX, evalY, evalWidth, evalHeight, evalRadius);
+            ctx.fill();
+            
+            // Draw evaluation text
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            
+            // Word wrap for evaluation text
+            const maxWidth = evalWidth - 40;
+            const lineHeight = 35;
+            const words = evaluation.split(' ');
+            let line = '';
+            let y = evalY + 50;
+            
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    ctx.fillText(line, canvas.width / 2, y);
+                    line = words[n] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, canvas.width / 2, y);
+            
+            // 4. Footer brand "Laotypo" with small amber circle
+            const footerY = canvas.height - 80;
+            
+            // Draw small amber circle
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.arc(200, footerY, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw "Laotypo" text
+            ctx.fillStyle = '#f8af3c';
+            ctx.font = 'bold 32px "Montserrat", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Laotypo', 220, footerY + 10);
+            
             
             // Convert canvas to blob and data URL
             const dataUrl = canvas.toDataURL('image/png');
