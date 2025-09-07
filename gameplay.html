@@ -912,11 +912,11 @@
         let userHasInteracted = false;
         
         // Audio objects
-        const backgroundMusic = new Audio("bg_sound.mp3");
+        const backgroundMusic = new Audio("sounds/bg_sound.mp3");
         backgroundMusic.loop = true;
         backgroundMusic.volume = 1.0;
         
-        const resultSound = new Audio("result_sound.mp3");
+        const resultSound = new Audio("sounds/result_sound.mp3");
         resultSound.loop = true;
         resultSound.volume = 0.0;
         let selectedLeftCard = false;
@@ -1692,7 +1692,7 @@
                         if (e.name === 'NotAllowedError') {
                             console.log('Autoplay blocked by browser. User needs to interact with page first.');
                         } else {
-                            console.log('Make sure bg_sound.mp3 exists in your workspace root directory');
+                            console.log('Make sure bg_sound.mp3 exists in your sounds directory');
                         }
                     });
                 }
