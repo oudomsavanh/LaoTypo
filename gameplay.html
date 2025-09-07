@@ -2009,7 +2009,7 @@
             
             // 1. Header text at the top: "ຜົນການປະເມີນບອກວ່າ..."
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
+            ctx.font = 'bold 43px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
             
@@ -2084,8 +2084,9 @@
                 }
             }
             
-            // Draw caption bar (amber box with evaluation text)
-            const captionY = cardY + cardWidth - 6; // Below the image
+            // Draw caption bar (amber box with evaluation text) - with 10% spacing
+            const spacing = 70; // 10% of card width (700px)
+            const captionY = cardY + cardWidth - 6 + spacing; // Below the image with spacing
             const captionHeight = 100;
             const captionX = cardX + 6;
             const captionWidth = cardWidth - 12;
@@ -2098,7 +2099,7 @@
             
             // Draw evaluation text
             ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+            ctx.font = 'bold 35px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
             // Word wrap for evaluation text
@@ -2132,8 +2133,8 @@
                     setTimeout(reject, 3000);
                 });
                 
-                // Draw logo at bottom center (15% bigger)
-                const logoWidth = 230;
+                // Draw logo at bottom center (280px width)
+                const logoWidth = 280;
                 const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
                 const logoX = (canvas.width - logoWidth) / 2;
                 const logoY = canvas.height - logoHeight - 40;
