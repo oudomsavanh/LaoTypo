@@ -2026,9 +2026,9 @@
             ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
-            const captionPadding = 20;
+            const captionPadding = 24; // Increased by 20% (20 * 1.2 = 24)
             const maxWidth = blockWidth - (captionPadding * 2);
-            const lineHeight = 32;
+            const lineHeight = 38; // Increased by 20% (32 * 1.2 = 38.4, rounded to 38)
             const words = evaluation.split(' ');
             let lines = [];
             let currentLine = '';
@@ -2140,8 +2140,8 @@
                     setTimeout(reject, 3000);
                 });
                 
-                // Draw logo at bottom center (250px width)
-                const logoWidth = 250;
+                // Draw logo at bottom center (280px width)
+                const logoWidth = 280;
                 const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
                 const logoX = (canvas.width - logoWidth) / 2;
                 const logoY = canvas.height - logoHeight - 40;
