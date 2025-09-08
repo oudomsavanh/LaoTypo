@@ -473,8 +473,8 @@
             top: 15%;
             right: 1rem;
             width: 280px;
-            background: var(--md-sys-color-surface-container);
-            border: 1px solid var(--md-sys-color-outline-variant);
+            background: #3e4043;
+            border: 1px solid var(--sub-color);
             border-radius: 16px;
             padding: 1.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -503,21 +503,21 @@
         
         .account-profile-summary {
             padding: 0.75rem;
-            background: var(--md-sys-color-surface-container-low);
+            background: #2c2e31;
             border-radius: 12px;
-            border: 1px solid var(--md-sys-color-outline-variant);
+            border: 1px solid var(--sub-color);
         }
         
         .small-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--md-sys-color-primary-container);
+            background: var(--main-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
-            border: 2px solid var(--md-sys-color-primary);
+            border: 2px solid var(--main-color);
         }
         
         .quick-stats {
@@ -541,7 +541,7 @@
         
         .version-divider {
             height: 1px;
-            background: var(--md-sys-color-outline-variant);
+            background: var(--sub-color);
             margin-bottom: 0.75rem;
         }
         
@@ -686,12 +686,12 @@
                         <!-- Result Card (Image + Amber Frame + Caption Bar) -->
                         <div class="rounded-xl border-2 border-amber-400 bg-neutral-800 shadow-lg overflow-hidden max-w-sm w-full mx-auto">
                             <!-- Meme Image Container -->
-                            <div id="meme-container" class="aspect-square bg-neutral-800">
+                            <div id="meme-container" class="aspect-square bg-neutral-800 w-full">
                                 <!-- Meme image will be inserted here dynamically -->
                             </div>
                             
                             <!-- Caption Bar -->
-                            <div id="evaluation-result" class="text-xl sm:text-3xl font-bold text-center mt-2 sm:mt-4 text-black bg-amber-400 border-2 border-neutral-800 rounded-md px-4 py-2">
+                            <div id="evaluation-result" class="text-xl sm:text-3xl font-bold text-center text-black bg-amber-400 px-4 py-3">
                                 <!-- Evaluation text will be inserted here dynamically -->
                             </div>
                         </div>
@@ -760,15 +760,20 @@
                         
                         <!-- Bottom Button Section -->
                         <div class="max-w-sm mx-auto text-center space-y-3 mt-3">
-                          <!-- Top row (2 buttons) -->
-                          <div class="grid grid-cols-2 gap-3">
+                          <!-- Top row (3 buttons) -->
+                          <div class="grid grid-cols-3 gap-2">
                             <!-- Restart Game Button -->
-                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
                               ຫຼິ້ນອີກຄັ້ງ
                             </button>
 
+                            <!-- Leaderboard Button -->
+                            <button id="leaderboard-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
+                              ກະດານຄະແນນ
+                            </button>
+
                             <!-- Back to Home -->
-                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-4 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
                               ກັບໜ້າທຳອິດ
                             </button>
                           </div>
@@ -834,8 +839,8 @@
     <div id="account-panel" class="account-panel hidden">
         <div class="account-content">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-normal" style="color: var(--md-sys-color-primary);">👤 ບັນຊີ</h2>
-                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+                <h2 class="text-xl font-normal" style="color: var(--main-color);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--sub-color);">&times;</button>
             </div>
             
             <!-- Quick Profile Info -->
@@ -843,23 +848,23 @@
                 <div class="flex items-center gap-3 mb-3">
                     <div class="small-avatar" id="account-avatar">👤</div>
                     <div>
-                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--main-color);">ຜູ້ຫຼິ້ນ</div>
                     </div>
                 </div>
                 
                 <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
-                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--text-color);">0</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
-                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--text-color);">0%</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏅 ລາງວັນ:</span>
-                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--md-sys-color-on-surface);">0/8</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--text-color);">0/8</span>
                     </div>
                 </div>
             </div>
@@ -873,7 +878,7 @@
             <!-- Version Info -->
             <div class="version-info-section">
                 <div class="version-divider"></div>
-                <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
+                <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
                     <p>📦 Version 2.2.0</p>
                     <p>🎵 Sound System</p>
                     <p>Status: Testing</p>
@@ -920,6 +925,7 @@
         let playerLives = 3;
         let currentLevel = 0; // 0: easy, 1: medium, 2: hard
         let levelProgress = 0;
+        let levelsCompleted = 0; // Track how many levels have been completed
         const levelThresholds = [15, 15, 15]; // Words needed to complete each level
         const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
@@ -935,7 +941,6 @@
         const bestStreakEl = document.getElementById('best-streak');
         const finalStreakEl = document.getElementById('final-streak');
         const resultsBestStreakEl = document.getElementById('results-best-streak');
-        const accuracyStatEl = document.getElementById('accuracy-stat');
         const evaluationResultEl = document.getElementById('evaluation-result');
         const contextDisplay = document.getElementById('context-display');
         const wordCardLeft = document.getElementById('word-card-left');
@@ -1474,14 +1479,13 @@
             // Update stats displays
             document.getElementById('final-streak').textContent = currentStreak;
             document.getElementById('results-best-streak').textContent = bestStreak;
-            document.getElementById('accuracy-stat').textContent = `${accuracyRounded}%`;
             
             // Get meme container and evaluation element
             const memeContainer = document.getElementById('meme-container');
             const evaluationEl = document.getElementById('evaluation-result');
             
-            // Clear previous classes
-            evaluationEl.className = 'text-xl sm:text-3xl font-bold text-center mt-2 sm:mt-4';
+            // Set consistent box styling for all evaluation results
+            evaluationEl.className = 'text-xl sm:text-3xl font-bold text-center text-black bg-amber-400 px-4 py-3';
             
             // Determine evaluation tier and select random image based on accuracy
             let evaluation = '';
@@ -1491,27 +1495,22 @@
             if (accuracy >= 90) {
                 // 90-100%: Born to be Lao
                 evaluation = 'ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ';
-                evaluationEl.classList.add('text-yellow-400', 'animate-bounce');
                 resultFolder = '1';
             } else if (accuracy >= 70) {
                 // 70-89%: 75% True Lao Child
                 evaluation = 'ເຈົ້າແມ່ນລູກຊອດລາວ 75%';
-                evaluationEl.classList.add('text-green-400', 'animate-pulse');
                 resultFolder = '2';
             } else if (accuracy >= 40) {
                 // 40-69%: Born in Laos but grew up abroad
                 evaluation = 'ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ';
-                evaluationEl.classList.add('text-blue-400', 'animate-pulse');
                 resultFolder = '3';
             } else if (accuracy >= 20) {
                 // 20-39%: At least not "Jing Jai"
                 evaluation = 'ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ "ຈຣິງໃຈ"';
-                evaluationEl.classList.add('text-yellow-500', 'animate-pulse');
                 resultFolder = '4';
             } else {
                 // 0-19%: Foreigner whose plane crashed
                 evaluation = 'ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ';
-                evaluationEl.classList.add('text-red-500', 'animate-shake');
                 resultFolder = '5';
             }
             
@@ -1558,6 +1557,24 @@
             
             // Start result sound with fade
             startResultSound();
+            
+            // Optional: Auto-navigate to leaderboard after 10 seconds (can be enabled/disabled)
+            // Uncomment the following lines if you want automatic navigation to leaderboard
+            // setTimeout(() => {
+            //     if (confirm('ຕ້ອງການໄປກະດານຄະແນນບໍ່?')) {
+            //         window.location.href = 'leaderboard.html';
+            //     }
+            // }, 10000);
+            
+            // Auto-end game after 30 seconds if player doesn't interact (optional)
+            // Uncomment the following lines if you want automatic game end
+            // setTimeout(() => {
+            //     if (confirm('ເກມຈະສິ້ນສຸດໃນ 10 ວິນາທີ. ຕ້ອງການຫຼິ້ນຕໍ່ບໍ?')) {
+            //         // Player wants to continue, do nothing
+            //     } else {
+            //         window.location.href = 'leaderboard.html';
+            //     }
+            // }, 30000);
         }
 
         // Save game stats
@@ -1589,6 +1606,7 @@
             playerLives = 3;
             currentLevel = 0;
             levelProgress = 0;
+            levelsCompleted = 0;
             levelScores.easy = 0;
             levelScores.medium = 0;
             levelScores.hard = 0;
@@ -1760,6 +1778,14 @@
                 restartGameBtn.addEventListener('click', resetGame);
             }
             
+            // Leaderboard button
+            const leaderboardBtn = document.getElementById('leaderboard-btn');
+            if (leaderboardBtn) {
+                leaderboardBtn.addEventListener('click', () => {
+                    window.location.href = 'leaderboard.html';
+                });
+            }
+
             // Back to Home button
             const backHomeBtn = document.getElementById('back-home-btn');
             if (backHomeBtn) {
@@ -1855,7 +1881,7 @@
             
             // Return early if action buttons don't exist
             if (!downloadBtn || !shareBtn || !shareWithLinkBtn) {
-                console.log('Action buttons not found - skipping setup');
+                console.log('Action grid buttons not found - skipping setup');
                 return;
             }
             
@@ -1865,7 +1891,7 @@
             downloadBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     const url = URL.createObjectURL(blob);
@@ -1885,7 +1911,7 @@
             shareBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     if (navigator.share && navigator.canShare) {
@@ -1922,7 +1948,7 @@
             shareWithLinkBtn.addEventListener('click', async () => {
                 try {
                     await document.fonts.ready;
-                    const { blob } = await generateShareImage('square');
+                    const { blob } = await generateShareImage();
                     currentImageBlob = blob;
                     
                     if (navigator.share && navigator.canShare) {
@@ -1934,16 +1960,16 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'LaoTypo Game Result',
-                                text: 'Let\'s play with me! 🎮'
+                                text: 'Let\'s play with me! 🎮 Laotypo.com'
                             });
                         } else {
                             // Fallback: copy text to clipboard
-                            await navigator.clipboard.writeText('Let\'s play with me! 🎮');
+                            await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
                             alert('Link text copied to clipboard!');
                         }
                     } else {
                         // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText('Let\'s play with me! 🎮');
+                        await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
                         alert('Link text copied to clipboard!');
                     }
                 } catch (error) {
@@ -1960,218 +1986,176 @@
             const canvas = document.getElementById('share-canvas');
             const ctx = canvas.getContext('2d');
             
-            // Set canvas size based on format
-            if (format === 'landscape') {
-                canvas.width = 1200;
-                canvas.height = 630;
-            } else {
-                canvas.width = 1080;
-                canvas.height = 1080;
-            }
+            // Always use square format (1080x1080)
+            canvas.width = 1080;
+            canvas.height = 1080;
             
-            // Get game stats
-            const finalScore = document.getElementById('final-streak').textContent;
-            const bestScore = document.getElementById('results-best-streak').textContent;
-            const accuracy = document.getElementById('accuracy-stat').textContent;
+            // Get evaluation text
             const evaluation = document.getElementById('evaluation-result').textContent;
             
-            // Create gradient background
+            // Create dark rounded background
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#2c2e31');
-            gradient.addColorStop(0.5, '#3e4043');
-            gradient.addColorStop(1, '#2c2e31');
+            gradient.addColorStop(1, '#1e2023');
             ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Add decorative pattern
-            ctx.strokeStyle = 'rgba(248, 175, 60, 0.1)';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 20; i++) {
-                ctx.beginPath();
-                ctx.moveTo(0, i * 60);
-                ctx.lineTo(canvas.width, i * 60);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(i * 60, 0);
-                ctx.lineTo(i * 60, canvas.height);
-                ctx.stroke();
+            // Draw rounded rectangle background
+            const cornerRadius = 40;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, cornerRadius);
+            ctx.fill();
+            
+            // 1. Header text at the top: "ຜົນການປະເມີນບອກວ່າ..."
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '40px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
+            
+            // 2. Meme section (image + caption as one unified block)
+            const blockWidth = 600;
+            const blockX = (canvas.width - blockWidth) / 2;
+            const blockY = 180;
+            const blockRadius = 20;
+            const borderWidth = 3;
+            
+            // Get the meme image from #meme-container
+            const memeContainer = document.getElementById('meme-container');
+            const memeImg = memeContainer.querySelector('img');
+            
+            // Calculate caption dimensions first
+            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            
+            const captionPadding = 24; // Increased by 20% (20 * 1.2 = 24)
+            const maxWidth = blockWidth - (captionPadding * 2);
+            const lineHeight = 38; // Increased by 20% (32 * 1.2 = 38.4, rounded to 38)
+            const words = evaluation.split(' ');
+            let lines = [];
+            let currentLine = '';
+            
+            for (let n = 0; n < words.length; n++) {
+                const testLine = currentLine + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = words[n] + ' ';
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine.trim()) {
+                lines.push(currentLine.trim());
             }
             
-            // Layout adjustments based on format
-            if (format === 'landscape') {
-                // Landscape layout (1200x630)
-                
-                // Try to load and draw the Gecko mascot on the left
+            const captionHeight = (lines.length * lineHeight) + (captionPadding * 2);
+            const imageSize = blockWidth;
+            const captionY = blockY + imageSize; // Directly attached to image bottom
+            
+            if (memeImg && memeImg.src) {
                 try {
-                    const geckoImg = new Image();
-                    geckoImg.src = 'images/Gecko.png';
+                    // Load the meme image
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = memeImg.src;
+                    
                     await new Promise((resolve, reject) => {
-                        geckoImg.onload = resolve;
-                        geckoImg.onerror = reject;
+                        img.onload = resolve;
+                        img.onerror = reject;
                         setTimeout(reject, 3000);
                     });
                     
-                    const imgSize = 150;
-                    ctx.drawImage(geckoImg, 50, (canvas.height - imgSize) / 2, imgSize, imgSize);
-                } catch (error) {
-                    ctx.font = 'bold 150px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillStyle = '#f8af3c';
-                    ctx.fillText('🦎', 125, canvas.height / 2 + 50);
-                }
-                
-                // Right side content
-                const contentX = 280;
-                
-                // App title
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 42px "Montserrat", sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('LaoTypo', contentX, 80);
-                
-                // Subtitle
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '24px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', contentX, 120);
-                
-                // "I just finished!" message
-                ctx.fillStyle = '#72b483';
-                ctx.font = 'bold 32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', contentX, 180);
-                
-                // Stats
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', contentX, 240);
-                
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '24px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, contentX, 290);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, contentX, 330);
-                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, contentX, 370);
-                
-                // Evaluation
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 22px "Noto Sans Lao Looped", sans-serif';
-                const evalWords = evaluation.split(' ');
-                let evalLine = '';
-                let evalY = 440;
-                const evalMaxWidth = 850;
-                
-                for (let n = 0; n < evalWords.length; n++) {
-                    const testLine = evalLine + evalWords[n] + ' ';
-                    const metrics = ctx.measureText(testLine);
-                    if (metrics.width > evalMaxWidth && n > 0) {
-                        ctx.fillText(evalLine, contentX, evalY);
-                        evalLine = evalWords[n] + ' ';
-                        evalY += 35;
-                    } else {
-                        evalLine = testLine;
-                    }
-                }
-                ctx.fillText(evalLine, contentX, evalY);
-                
-                // Website at bottom
-                ctx.fillStyle = '#646669';
-                ctx.font = '20px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('laotypo.com', canvas.width / 2, canvas.height - 30);
-                
-            } else {
-                // Square layout (1080x1080)
-                
-                // Try to load and draw the Gecko mascot
-                try {
-                    const geckoImg = new Image();
-                    geckoImg.src = 'images/Gecko.png';
-                    await new Promise((resolve, reject) => {
-                        geckoImg.onload = resolve;
-                        geckoImg.onerror = reject;
-                        setTimeout(reject, 3000);
-                    });
+                    // Draw outer amber border for the entire block
+                    ctx.strokeStyle = '#f8af3c';
+                    ctx.lineWidth = borderWidth;
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, blockWidth, imageSize + captionHeight, blockRadius);
+                    ctx.stroke();
                     
-                    const imgSize = 180;
-                    ctx.drawImage(geckoImg, (canvas.width - imgSize) / 2, 80, imgSize, imgSize);
-                } catch (error) {
-                    ctx.font = 'bold 200px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillStyle = '#f8af3c';
-                    ctx.fillText('🦎', canvas.width / 2, 250);
-                }
-                
-                // Draw app title
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 48px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('LaoTypo', canvas.width / 2, 350);
-                
-                // Draw subtitle
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?', canvas.width / 2, 400);
-                
-                // Draw "I just finished!" message
-                ctx.fillStyle = '#72b483';
-                ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText('ຂ້ອຍຫຼິ້ນຈົບແລ້ວ! 🎉', canvas.width / 2, 480);
-                
-                // Draw stats container background
-                ctx.fillStyle = 'rgba(100, 102, 105, 0.3)';
-                ctx.fillRect(140, 520, 800, 300);
-                
-                // Draw stats
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 36px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('ຄະແນນຂອງຂ້ອຍ:', 180, 580);
-                
-                // Score details
-                ctx.fillStyle = '#d1d0c5';
-                ctx.font = '32px "Noto Sans Lao Looped", sans-serif';
-                ctx.fillText(`ຄະແນນລ່າສຸດ: ${finalScore}`, 180, 640);
-                ctx.fillText(`ຄະແນນດີທີ່ສຸດ: ${bestScore}`, 180, 690);
-                ctx.fillText(`ຄວາມຖືກຕ້ອງ: ${accuracy}`, 180, 740);
-                
-                // Draw evaluation in a box
-                ctx.fillStyle = 'rgba(248, 175, 60, 0.2)';
-                ctx.fillRect(140, 840, 800, 120);
-                
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
-                ctx.textAlign = 'center';
-                
-                // Word wrap for long evaluation text
-                const maxWidth = 750;
-                const lineHeight = 40;
-                const words = evaluation.split(' ');
-                let line = '';
-                let y = 900;
-                
-                for (let n = 0; n < words.length; n++) {
-                    const testLine = line + words[n] + ' ';
-                    const metrics = ctx.measureText(testLine);
-                    const testWidth = metrics.width;
-                    if (testWidth > maxWidth && n > 0) {
-                        ctx.fillText(line, canvas.width / 2, y);
-                        line = words[n] + ' ';
-                        y += lineHeight;
+                    // Draw image with object-fit: cover
+                    const imgAspectRatio = img.width / img.height;
+                    const containerAspectRatio = 1; // Square container
+                    
+                    let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+                    
+                    if (imgAspectRatio > containerAspectRatio) {
+                        // Image is wider than container - crop sides
+                        sourceWidth = img.height;
+                        sourceX = (img.width - sourceWidth) / 2;
                     } else {
-                        line = testLine;
+                        // Image is taller than container - crop top/bottom
+                        sourceHeight = img.width;
+                        sourceY = (img.height - sourceHeight) / 2;
                     }
+                    
+                    // Draw image with rounded corners (top only) and object-fit: cover
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, imageSize, imageSize, blockRadius);
+                    ctx.clip();
+                    ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, blockX, blockY, imageSize, imageSize);
+                    ctx.restore();
+                    
+                } catch (error) {
+                    console.log('Could not load meme image, using fallback');
+                    // Fallback: draw a placeholder
+                    ctx.fillStyle = '#2c2e31';
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, imageSize, imageSize, blockRadius);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#f8af3c';
+                    ctx.font = 'bold 80px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🦎', blockX + imageSize / 2, blockY + imageSize / 2 + 30);
                 }
-                ctx.fillText(line, canvas.width / 2, y);
-                
-                // Add website/app name at bottom
-                ctx.fillStyle = '#646669';
-                ctx.font = '24px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('laotypo.com', canvas.width / 2, 1040);
             }
             
-            // Add decorative elements
-            ctx.strokeStyle = '#f8af3c';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+            // 3. Caption bar (directly attached to image, no gap)
+            const captionX = blockX;
+            const captionWidth = blockWidth;
+            
+            // Draw amber caption bar (bottom part of the unified block)
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.roundRect(captionX, captionY, captionWidth, captionHeight, blockRadius);
+            ctx.fill();
+            
+            // Draw text centered vertically in caption bar
+            ctx.fillStyle = '#1a1a1a';
+            const textStartY = captionY + captionPadding + (lineHeight * 0.8);
+            
+            lines.forEach((line, index) => {
+                const textY = textStartY + (index * lineHeight);
+                ctx.fillText(line, captionX + captionWidth / 2, textY);
+            });
+            
+            // 4. Footer: LaoTypo logo (250px width as requested)
+            try {
+                const logoImg = new Image();
+                logoImg.src = 'images/LaoTypo-logo-04.png';
+                
+                await new Promise((resolve, reject) => {
+                    logoImg.onload = resolve;
+                    logoImg.onerror = reject;
+                    setTimeout(reject, 3000);
+                });
+                
+                // Draw logo at bottom center (280px width)
+                const logoWidth = 280;
+                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = canvas.height - logoHeight - 40;
+                
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+                
+            } catch (error) {
+                console.log('Could not load logo, using text fallback');
+                // Fallback: draw text
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 32px "Montserrat", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Laotypo', canvas.width / 2, canvas.height - 40);
+            }
             
             // Convert canvas to blob and data URL
             const dataUrl = canvas.toDataURL('image/png');
@@ -2217,7 +2201,7 @@
             const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
             if (leaderboardNavBtn) {
                 leaderboardNavBtn.addEventListener('click', () => {
-                    // Add leaderboard functionality
+                    window.location.href = 'leaderboard.html';
                 });
             }
             
@@ -2345,21 +2329,22 @@
                     ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
                 `;
             } else if (currentLevel === 2) {
-                // Completed Hard Level
-                levelIcon.textContent = '🔴';
-                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບຍາກແລ້ວ! 🏆';
-                levelQuestion.textContent = 'ທ່ານຕ້ອງການຫຼິ້ນຕໍ່ ຫຼື ຈົບເກມ?';
+                // Completed Hard Level - Game Complete!
+                levelsCompleted++;
+                levelIcon.textContent = '🏆';
+                levelMessage.textContent = 'ທ່ານຜ່ານທຸກລະດັບແລ້ວ! 🎉';
+                levelQuestion.textContent = 'ທ່ານຕ້ອງການເບິ່ງຜົນສຳເລັດ ຫຼື ຫຼິ້ນອີກຄັ້ງ?';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ຫຼິ້ນຕໍ່ (ລະດັບຍາກ)
+                    ເບິ່ງຜົນສຳເລັດ
                 `;
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    ກັບໄປໜ້າຫຼັກ
+                    ຫຼິ້ນອີກຄັ້ງ
                 `;
             }
             
@@ -2380,6 +2365,7 @@
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
                         // Advance to next level
+                        levelsCompleted++;
                         currentLevel++;
                         levelProgress = 0;
                         updateLevelDisplay();
@@ -2396,19 +2382,15 @@
                             showNewWords();
                         }, 500);
                     } else {
-                        // At hard level, continue playing hard
-                        levelProgress = 0;
-                        updateLevelDisplay();
-                        
-                        // Hide modal and continue game
+                        // At hard level, game is complete - show results
                         if (modal) {
                             modal.classList.add('hidden');
                             modal.classList.remove('flex');
                         }
                         
-                        // Resume game
+                        // End the game and show results
                         setTimeout(() => {
-                            showNewWords();
+                            endGame();
                         }, 500);
                     }
                 });
@@ -2417,8 +2399,16 @@
             if (replayBtn) {
                 replayBtn.addEventListener('click', () => {
                     if (currentLevel === 2) {
-                        // At hard level, "replay" means go to home
-                        window.location.href = 'testing.html';
+                        // At hard level, "replay" means restart the game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Reset and restart the game
+                        setTimeout(() => {
+                            resetGame();
+                        }, 500);
                     } else {
                         // Replay current level
                         levelProgress = 0;
@@ -2691,16 +2681,13 @@
                     }
                 }
                 
-                // Fallback: open image in new tab
-                const newWindow = window.open();
-                newWindow.document.write(`
-                    <html>
-                        <head><title>ຜົນການປະເມີນບອກວ່າ...</title></head>
-                        <body style="margin:0; padding:20px; background:#2c2e31; display:flex; justify-content:center; align-items:center; min-height:100vh;">
-                            <img src="${dataUrl}" style="max-width:100%; max-height:100%; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-                        </body>
-                    </html>
-                `);
+                // Fallback: copy image to clipboard
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
                 
             } catch (error) {
                 console.error('Share failed:', error);
