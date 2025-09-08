@@ -2050,38 +2050,18 @@
                         setTimeout(reject, 3000);
                     });
                     
-                    // Draw meme image (responsive, maintaining aspect ratio)
+                    // Draw meme image (simple, fill the square container)
                     const imgSize = cardWidth - 12; // Account for border
                     const imgX = cardX + 6;
                     const imgY = cardY + 6;
                     const imgRadius = cardRadius - 3;
                     
-                    // Calculate responsive scaling to maintain aspect ratio
-                    const imgAspectRatio = img.width / img.height;
-                    const containerAspectRatio = 1; // Square container
-                    
-                    let drawWidth, drawHeight, drawX, drawY;
-                    
-                    if (imgAspectRatio > containerAspectRatio) {
-                        // Image is wider than container
-                        drawWidth = imgSize;
-                        drawHeight = imgSize / imgAspectRatio;
-                        drawX = imgX;
-                        drawY = imgY + (imgSize - drawHeight) / 2;
-                    } else {
-                        // Image is taller than container
-                        drawHeight = imgSize;
-                        drawWidth = imgSize * imgAspectRatio;
-                        drawX = imgX + (imgSize - drawWidth) / 2;
-                        drawY = imgY;
-                    }
-                    
-                    // Draw image with rounded corners and proper scaling
+                    // Draw image with rounded corners - simple approach
                     ctx.save();
                     ctx.beginPath();
                     ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
                     ctx.clip();
-                    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
                     ctx.restore();
                     
                 } catch (error) {
@@ -2106,7 +2086,8 @@
             
             // Draw caption bar (amber box with evaluation text) - with better spacing
             const spacing = 45; // Better visual spacing
-            const captionY = cardY + cardWidth - 6 + spacing; // Below the image with spacing
+            const imgSize = cardWidth - 12; // Same as image size
+            const captionY = cardY + 6 + imgSize + spacing; // Below the image with spacing
             const captionHeight = 100;
             const captionX = cardX + 6;
             const captionWidth = cardWidth - 12;
