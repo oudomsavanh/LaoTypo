@@ -1960,16 +1960,16 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'LaoTypo Game Result',
-                                text: 'Let\'s play with me! 🎮'
+                                text: 'Let\'s play with me! 🎮 Laotypo.com'
                             });
                         } else {
                             // Fallback: copy text to clipboard
-                            await navigator.clipboard.writeText('Let\'s play with me! 🎮');
+                            await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
                             alert('Link text copied to clipboard!');
                         }
                     } else {
                         // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText('Let\'s play with me! 🎮');
+                        await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
                         alert('Link text copied to clipboard!');
                     }
                 } catch (error) {
