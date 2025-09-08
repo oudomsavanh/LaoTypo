@@ -1990,9 +1990,7 @@
             canvas.width = 1080;
             canvas.height = 1080;
             
-            // Get game stats
-            const finalScore = document.getElementById('final-streak').textContent;
-            const bestScore = document.getElementById('results-best-streak').textContent;
+            // Get evaluation text
             const evaluation = document.getElementById('evaluation-result').textContent;
             
             // Create dark rounded background
@@ -2013,25 +2011,12 @@
             ctx.textAlign = 'center';
             ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
             
-            // 2. Result Card (Image + Amber Frame + Caption Bar) - exact same as endgame page
-            const cardWidth = 700;
-            const cardHeight = 800;
-            const cardX = (canvas.width - cardWidth) / 2;
-            const cardY = 150;
-            const cardRadius = 20;
-            
-            // Draw result card background
-            ctx.fillStyle = '#3e4043';
-            ctx.beginPath();
-            ctx.roundRect(cardX, cardY, cardWidth, cardHeight, cardRadius);
-            ctx.fill();
-            
-            // Draw amber border
-            ctx.strokeStyle = '#f8af3c';
-            ctx.lineWidth = 6;
-            ctx.beginPath();
-            ctx.roundRect(cardX, cardY, cardWidth, cardHeight, cardRadius);
-            ctx.stroke();
+            // 2. Photo with rounded frame and amber border (object-fit: cover)
+            const photoSize = 600;
+            const photoX = (canvas.width - photoSize) / 2;
+            const photoY = 180;
+            const photoRadius = 20;
+            const borderWidth = 3;
             
             // Get the meme image from #meme-container
             const memeContainer = document.getElementById('meme-container');
@@ -2050,106 +2035,115 @@
                         setTimeout(reject, 3000);
                     });
                     
-                    // Draw meme image (simple, fill the square container)
-                    const imgSize = cardWidth - 12; // Account for border
-                    const imgX = cardX + 6;
-                    const imgY = cardY + 6;
-                    const imgRadius = cardRadius - 3;
+                    // Draw amber border first
+                    ctx.strokeStyle = '#f8af3c';
+                    ctx.lineWidth = borderWidth;
+                    ctx.beginPath();
+                    ctx.roundRect(photoX, photoY, photoSize, photoSize, photoRadius);
+                    ctx.stroke();
                     
-                    // Draw image with rounded corners - simple approach
+                    // Calculate object-fit: cover (crop to fill, maintain aspect ratio)
+                    const imgAspectRatio = img.width / img.height;
+                    const containerAspectRatio = 1; // Square container
+                    
+                    let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+                    
+                    if (imgAspectRatio > containerAspectRatio) {
+                        // Image is wider than container - crop sides
+                        sourceWidth = img.height;
+                        sourceX = (img.width - sourceWidth) / 2;
+                    } else {
+                        // Image is taller than container - crop top/bottom
+                        sourceHeight = img.width;
+                        sourceY = (img.height - sourceHeight) / 2;
+                    }
+                    
+                    // Draw image with rounded corners and object-fit: cover
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.roundRect(photoX, photoY, photoSize, photoSize, photoRadius);
                     ctx.clip();
-                    ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+                    ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, photoX, photoY, photoSize, photoSize);
                     ctx.restore();
                     
                 } catch (error) {
                     console.log('Could not load meme image, using fallback');
                     // Fallback: draw a placeholder
-                    const imgSize = cardWidth - 12;
-                    const imgX = cardX + 6;
-                    const imgY = cardY + 6;
-                    const imgRadius = cardRadius - 3;
-                    
                     ctx.fillStyle = '#2c2e31';
                     ctx.beginPath();
-                    ctx.roundRect(imgX, imgY, imgSize, imgSize, imgRadius);
+                    ctx.roundRect(photoX, photoY, photoSize, photoSize, photoRadius);
                     ctx.fill();
                     
                     ctx.fillStyle = '#f8af3c';
                     ctx.font = 'bold 80px Arial';
                     ctx.textAlign = 'center';
-                    ctx.fillText('🦎', cardX + cardWidth / 2, cardY + cardWidth / 2 + 30);
+                    ctx.fillText('🦎', photoX + photoSize / 2, photoY + photoSize / 2 + 30);
                 }
             }
             
-            // Draw caption bar (amber box with evaluation text) - no spacing
-            const imgSize = cardWidth - 12; // Same as image size
-            const captionY = cardY + 6 + imgSize; // Directly below the image, no spacing
-            const captionHeight = 100;
-            const captionX = cardX + 6;
-            const captionWidth = cardWidth - 12;
+            // 3. Caption pill (grows with text, centers content)
+            const captionPadding = 20;
+            const captionMaxWidth = photoSize;
+            const captionX = photoX;
+            const captionY = photoY + photoSize + 20; // 20px spacing from photo
             
-            // Draw amber caption bar
-            ctx.fillStyle = '#f8af3c';
-            ctx.beginPath();
-            ctx.roundRect(captionX, captionY, captionWidth, captionHeight, cardRadius - 3);
-            ctx.fill();
-            
-            // Draw evaluation text
-            ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 35px "Noto Sans Lao Looped", sans-serif';
+            // Calculate text dimensions and wrap lines
+            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
             ctx.textAlign = 'center';
             
-            // Word wrap for evaluation text with perfect centering
-            const maxWidth = captionWidth - 20;
-            const lineHeight = 35;
+            const maxWidth = captionMaxWidth - (captionPadding * 2);
+            const lineHeight = 32;
             const words = evaluation.split(' ');
-            let line = '';
-            let y = captionY + 50; // Better vertical centering
+            let lines = [];
+            let currentLine = '';
             
             for (let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
+                const testLine = currentLine + words[n] + ' ';
                 const metrics = ctx.measureText(testLine);
                 if (metrics.width > maxWidth && n > 0) {
-                    ctx.fillText(line, cardX + cardWidth / 2, y);
-                    line = words[n] + ' ';
-                    y += lineHeight;
+                    lines.push(currentLine.trim());
+                    currentLine = words[n] + ' ';
                 } else {
-                    line = testLine;
+                    currentLine = testLine;
                 }
             }
-            ctx.fillText(line, cardX + cardWidth / 2, y);
-            
-            // 3. Footer: LaoTypo logo
-            try {
-                const logoImg = new Image();
-                logoImg.src = 'images/LaoTypo-logo-04.png';
-                
-                await new Promise((resolve, reject) => {
-                    logoImg.onload = resolve;
-                    logoImg.onerror = reject;
-                    setTimeout(reject, 3000);
-                });
-                
-                // Draw logo at bottom center (250px width)
-                const logoWidth = 250;
-                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
-                const logoX = (canvas.width - logoWidth) / 2;
-                const logoY = canvas.height - logoHeight - 40;
-                
-                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
-                
-            } catch (error) {
-                console.log('Could not load logo, using text fallback');
-                // Fallback: draw text
-                ctx.fillStyle = '#f8af3c';
-                ctx.font = 'bold 32px "Montserrat", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Laotypo', canvas.width / 2, canvas.height - 40);
+            if (currentLine.trim()) {
+                lines.push(currentLine.trim());
             }
             
+            // Calculate caption pill dimensions
+            const captionHeight = (lines.length * lineHeight) + (captionPadding * 2);
+            const captionWidth = captionMaxWidth;
+            
+            // Draw amber caption pill
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.roundRect(captionX, captionY, captionWidth, captionHeight, photoRadius);
+            ctx.fill();
+            
+            // Draw text centered in pill
+            ctx.fillStyle = '#1a1a1a';
+            const textStartY = captionY + captionPadding + (lineHeight * 0.8); // Adjust for baseline
+            
+            lines.forEach((line, index) => {
+                const textY = textStartY + (index * lineHeight);
+                ctx.fillText(line, captionX + captionWidth / 2, textY);
+            });
+            
+            // 4. Footer brand "Laotypo" with small amber dot
+            const footerY = canvas.height - 80;
+            
+            // Draw amber dot
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2 - 60, footerY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw "Laotypo" text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px "Montserrat", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Laotypo', canvas.width / 2, footerY + 8);
             
             // Convert canvas to blob and data URL
             const dataUrl = canvas.toDataURL('image/png');
