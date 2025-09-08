@@ -473,8 +473,8 @@
             top: 15%;
             right: 1rem;
             width: 280px;
-            background: var(--md-sys-color-surface-container);
-            border: 1px solid var(--md-sys-color-outline-variant);
+            background: #3e4043;
+            border: 1px solid var(--sub-color);
             border-radius: 16px;
             padding: 1.5rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -503,21 +503,21 @@
         
         .account-profile-summary {
             padding: 0.75rem;
-            background: var(--md-sys-color-surface-container-low);
+            background: #2c2e31;
             border-radius: 12px;
-            border: 1px solid var(--md-sys-color-outline-variant);
+            border: 1px solid var(--sub-color);
         }
         
         .small-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--md-sys-color-primary-container);
+            background: var(--main-color);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
-            border: 2px solid var(--md-sys-color-primary);
+            border: 2px solid var(--main-color);
         }
         
         .quick-stats {
@@ -541,7 +541,7 @@
         
         .version-divider {
             height: 1px;
-            background: var(--md-sys-color-outline-variant);
+            background: var(--sub-color);
             margin-bottom: 0.75rem;
         }
         
@@ -839,8 +839,8 @@
     <div id="account-panel" class="account-panel hidden">
         <div class="account-content">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-normal" style="color: var(--md-sys-color-primary);">👤 ບັນຊີ</h2>
-                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+                <h2 class="text-xl font-normal" style="color: var(--main-color);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--sub-color);">&times;</button>
             </div>
             
             <!-- Quick Profile Info -->
@@ -848,23 +848,23 @@
                 <div class="flex items-center gap-3 mb-3">
                     <div class="small-avatar" id="account-avatar">👤</div>
                     <div>
-                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--main-color);">ຜູ້ຫຼິ້ນ</div>
                     </div>
                 </div>
                 
                 <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
-                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--text-color);">0</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
-                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--text-color);">0%</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏅 ລາງວັນ:</span>
-                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--md-sys-color-on-surface);">0/8</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--text-color);">0/8</span>
                     </div>
                 </div>
             </div>
@@ -878,7 +878,7 @@
             <!-- Version Info -->
             <div class="version-info-section">
                 <div class="version-divider"></div>
-                <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
+                <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
                     <p>📦 Version 2.2.0</p>
                     <p>🎵 Sound System</p>
                     <p>Status: Testing</p>
