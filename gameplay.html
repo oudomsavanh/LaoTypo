@@ -659,6 +659,11 @@
                     <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
                 </div>
                 
+                <!-- Total Progress Display -->
+                <div class="text-center mb-4 sm:mb-6">
+                    <div class="text-sub-color text-sm sm:text-base">ຄຳສັບທັງໝົດທີ່ຜ່ານ: <span id="total-words-completed" class="text-main-color font-bold">0</span></div>
+                </div>
+                
                 <div class="text-center mb-3 sm:mb-4">
                     <span id="game-settings-display" class="text-xs sm:text-sm text-main-color">ລະດັບຄຳສັບ: <span id="difficulty-display" class="font-bold"></span> | ຈຳກັດເວລາ: <span id="timer-status">ປິດ</span></span>
                 </div>
@@ -926,6 +931,7 @@
         let currentLevel = 0; // 0: easy, 1: medium, 2: hard
         let levelProgress = 0;
         let levelsCompleted = 0; // Track how many levels have been completed
+        let totalWordsCompleted = 0; // Track total words completed across all sessions
         const levelThresholds = [15, 15, 15]; // Words needed to complete each level
         const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
@@ -957,6 +963,7 @@
         // Life system elements
         const heartsContainer = document.getElementById('hearts-container');
         const motivationText = document.getElementById('motivation-text');
+        const totalWordsCompletedEl = document.getElementById('total-words-completed');
 
         // Test Google Sheets connection (for debugging)
         async function testGoogleSheetsConnection() {
@@ -1235,12 +1242,31 @@
 
         // Show new words
         function showNewWords() {
-            if (currentWordIndex >= wordPairs.length) {
-                currentWordIndex = 0;
-                wordPairs = shuffleArray(wordPairs);
+            // Filter words by current difficulty level (Column D: 1=Easy, 2=Medium, 3=Hard)
+            const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
+            const filteredWords = wordPairs.filter(word => word.difficulty === difficultyLevel);
+            
+            let wordPair;
+            if (filteredWords.length === 0) {
+                console.warn(`No words found for difficulty level ${difficultyLevel}, using all words`);
+                // Fallback to all words if no words found for current difficulty
+                if (currentWordIndex >= wordPairs.length) {
+                    currentWordIndex = 0;
+                    wordPairs = shuffleArray(wordPairs);
+                }
+                wordPair = wordPairs[currentWordIndex];
+                currentWordIndex++;
+            } else {
+                // Use filtered words
+                if (currentWordIndex >= filteredWords.length) {
+                    currentWordIndex = 0;
+                    // Shuffle filtered words for next cycle
+                    filteredWords.sort(() => Math.random() - 0.5);
+                }
+                wordPair = filteredWords[currentWordIndex];
+                currentWordIndex++;
             }
-
-            const wordPair = wordPairs[currentWordIndex];
+            
             contextDisplay.textContent = wordPair.context;
             
             const options = [wordPair.correct, wordPair.incorrect];
@@ -1255,7 +1281,6 @@
             selectedLeftCard = false;
             selectedRightCard = false;
             
-            currentWordIndex++;
             gameActive = true;
             
             if (timerEnabled) {
@@ -1289,6 +1314,15 @@
                 
                 // Check level progression
                 if (levelProgress >= levelThresholds[currentLevel]) {
+                    // Add to total words completed
+                    totalWordsCompleted += levelThresholds[currentLevel];
+                    
+                    // Life recovery bonus: restore +1 life if below max (capped at 3)
+                    if (playerLives < 3) {
+                        playerLives++;
+                        updateLifeDisplay();
+                    }
+                    
                     // Show level transition modal
                     showLevelTransitionModal();
                 }
@@ -1454,6 +1488,9 @@
         function updateUI() {
             currentStreakEl.textContent = currentStreak;
             bestStreakEl.textContent = bestStreak;
+            if (totalWordsCompletedEl) {
+                totalWordsCompletedEl.textContent = totalWordsCompleted;
+            }
             
             // Update account panel if it exists and is visible
             const accountPanel = document.getElementById('account-panel');
@@ -1607,6 +1644,7 @@
             currentLevel = 0;
             levelProgress = 0;
             levelsCompleted = 0;
+            totalWordsCompleted = 0; // Reset total words completed
             levelScores.easy = 0;
             levelScores.medium = 0;
             levelScores.hard = 0;
@@ -2368,6 +2406,7 @@
                         levelsCompleted++;
                         currentLevel++;
                         levelProgress = 0;
+                        currentWordIndex = 0; // Reset word index for new level
                         updateLevelDisplay();
                         updateDifficultyDisplay();
                         
@@ -2410,9 +2449,14 @@
                             resetGame();
                         }, 500);
                     } else {
-                        // Replay current level
+                        // Replay current level - reset score and lives
+                        currentStreak = 0;
+                        playerLives = 3;
                         levelProgress = 0;
+                        currentWordIndex = 0; // Reset word index for replay
                         updateLevelDisplay();
+                        updateLifeDisplay();
+                        updateUI();
                         
                         // Hide modal and continue game
                         if (modal) {
