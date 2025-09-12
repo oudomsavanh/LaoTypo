@@ -289,7 +289,7 @@ This application uses modern web technologies with a focus on real-time performa
 
 ## 🛠️ Development Status
 
-### Current Phase (v2.5.0)
+### Current Phase (v2.5.1)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -297,7 +297,7 @@ This application uses modern web technologies with a focus on real-time performa
   - Smart word filtering by difficulty levels
   - Replay randomization system
   - Life recovery bonus system
-  - Progress tracking with cumulative display
+  - Progress tracking with per-level display
   - Fixed answer validation logic
   - Enhanced UI with total words completed counter
   - Fixed endgame meme selection to use latest score
@@ -305,9 +305,11 @@ This application uses modern web technologies with a focus on real-time performa
   - Mobile device detection and tracking
   - Removed testing references, now live
   - **Advanced Analytics**: Session tracking, word timing, player engagement, difficulty progression, streak analysis, answer patterns, performance metrics, feature usage, UI interactions, error tracking
+  - **UI Fix**: Fixed level progression display to show per-level progress (15/15) instead of cumulative
 
 ### Version History
-- **v2.5.0** (Current): Added comprehensive analytics tracking, performance monitoring, error handling
+- **v2.5.1** (Current): Fixed level progression display bug, improved UI clarity
+- **v2.5.0**: Added comprehensive analytics tracking, performance monitoring, error handling
 - **v2.4.0**: Added Google Analytics 4 tracking, mobile device detection, removed testing references
 - **v2.3.2**: Fixed endgame meme selection logic to use latest score instead of accuracy
 - **v2.3.1**: Game logic improvements, UI fixes, answer validation fixes
@@ -316,15 +318,15 @@ This application uses modern web technologies with a focus on real-time performa
 - **v2.1.0**: Authentication and scoring system
 - **v2.0.0**: Progressive difficulty system with lives
 
-### Recent Development Summary (v2.3.0 - v2.4.0)
+### Recent Development Summary (v2.3.0 - v2.5.1)
 
 #### **Game Logic Improvements:**
 - **Smart Word Filtering**: Words now filtered by Column D values (1=Easy, 2=Medium, 3=Hard)
 - **Replay Randomization**: Fresh word order on every replay and level restart
 - **Life Recovery System**: +1 life bonus when completing sessions (capped at 3)
+- **Level Progression Display (v2.5.1)**: Fixed UI to show per-level progress (15/15) instead of cumulative (15/45)
 - **Progress Tracking**: Total words completed counter with UI display
 - **Answer Validation Fix**: Fixed word pair matching for accurate scoring
-- **Cumulative Progress Display**: Shows 15/30/45 progress across levels
 
 #### **Endgame System Enhancements:**
 - **Meme Selection Logic**: Changed from accuracy-based to latest score-based
@@ -352,10 +354,16 @@ This application uses modern web technologies with a focus on real-time performa
 - **Real-time Monitoring**: Live player activity and device usage
 - **Performance Metrics**: Level completion rates, accuracy, replay patterns
 
-#### **UI/UX Updates (v2.4.0):**
+#### **UI/UX Updates (v2.4.0 - v2.5.1):**
 - **Removed Testing References**: Clean production-ready interface
 - **Status Update**: Changed from "Testing" to "Live" status
 - **Device-Aware Design**: Optimized for mobile and desktop tracking
+- **Level Progression Fix (v2.5.1)**: Fixed confusing cumulative display (15/45) to per-level display (15/15)
+
+#### **Bug Fixes (v2.5.1):**
+- **Level Display Bug**: Fixed level progression showing cumulative progress instead of per-level progress
+- **UI Clarity**: Each difficulty level now correctly shows "0 / 15" instead of confusing cumulative numbers
+- **User Experience**: Players now see consistent progress display across all difficulty levels
 
 ### Future Development
 - Additional features planned
