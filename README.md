@@ -249,6 +249,18 @@ This application uses modern web technologies with a focus on real-time performa
 - **`game_replay`**: Player replays a level
 - **`device_info`**: Device and browser information
 
+### Advanced Analytics Events (v2.5.0)
+- **`session_start`**: Unique session tracking with referrer and UTM data
+- **`word_time_spent`**: Time spent on each word (learning curve analysis)
+- **`player_engagement`**: Session duration, words per minute, focus metrics
+- **`difficulty_progression`**: Completion rates by difficulty, preferred difficulty
+- **`streak_analysis`**: Streak patterns, recovery rates, motivation analysis
+- **`answer_pattern`**: Accuracy trends, common mistakes, learning curve
+- **`performance_metrics`**: Load times, memory usage, connection speed
+- **`feature_usage`**: UI feature interaction tracking
+- **`ui_interaction`**: Detailed click and interaction analytics
+- **`game_error`**: Error tracking with context and user actions
+
 ### Mobile Device Detection
 - **Device Types**: Mobile, Tablet, Desktop
 - **Brand Detection**: iPhone, Samsung, Huawei, Xiaomi, OnePlus, Oppo, Vivo, Realme
@@ -263,9 +275,21 @@ This application uses modern web technologies with a focus on real-time performa
 - **Geographic Data**: Player locations worldwide
 - **Technical Metrics**: Load times, error rates, device performance
 
+### Advanced Analytics Insights (v2.5.0)
+- **Learning Curve Analysis**: How quickly players improve over time
+- **Difficulty Preference**: Which difficulty levels players prefer and perform best in
+- **Streak Psychology**: When players break streaks and recovery patterns
+- **Time-based Metrics**: Average time per word, session engagement duration
+- **Error Pattern Analysis**: Most common mistakes and difficulty spikes
+- **Feature Adoption**: Which UI features are most/least used
+- **Performance Optimization**: Device-specific performance issues
+- **User Journey Mapping**: Complete player flow from start to finish
+- **Retention Analysis**: Session patterns and re-engagement triggers
+- **A/B Testing Data**: Feature effectiveness and user preference data
+
 ## 🛠️ Development Status
 
-### Current Phase (v2.4.0)
+### Current Phase (v2.5.0)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -280,9 +304,11 @@ This application uses modern web technologies with a focus on real-time performa
   - Google Analytics 4 integration with custom game events
   - Mobile device detection and tracking
   - Removed testing references, now live
+  - **Advanced Analytics**: Session tracking, word timing, player engagement, difficulty progression, streak analysis, answer patterns, performance metrics, feature usage, UI interactions, error tracking
 
 ### Version History
-- **v2.4.0** (Current): Added Google Analytics 4 tracking, mobile device detection, removed testing references
+- **v2.5.0** (Current): Added comprehensive analytics tracking, performance monitoring, error handling
+- **v2.4.0**: Added Google Analytics 4 tracking, mobile device detection, removed testing references
 - **v2.3.2**: Fixed endgame meme selection logic to use latest score instead of accuracy
 - **v2.3.1**: Game logic improvements, UI fixes, answer validation fixes
 - **v2.3.0**: Smart word filtering, replay randomization, life recovery system

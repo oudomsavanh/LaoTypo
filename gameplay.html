@@ -893,8 +893,8 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-                    <p>📦 Version 2.4.0</p>
-                    <p>Status: Live</p>
+        <p>📦 Version 2.5.0</p>
+        <p>Status: Live</p>
                 </div>
             </div>
         </div>
@@ -910,6 +910,22 @@
         let wordPairs = [];
         let correctAnswers = 0;
         let totalAnswers = 0;
+        
+        // Enhanced tracking variables
+        let sessionId = null;
+        let sessionStartTime = null;
+        let wordStartTime = null;
+        let lastUserAction = null;
+        let difficultyStats = { easy: 0, medium: 0, hard: 0 };
+        let streakHistory = [];
+        let answerHistory = [];
+        let performanceMetrics = {};
+        let featureUsage = {
+            soundEnabled: false,
+            settingsAccessed: 0,
+            helpAccessed: 0,
+            replayUsed: 0
+        };
         
         // Device Detection
         function getDeviceInfo() {
@@ -1042,6 +1058,197 @@
                 to_level_number: toLevel + 1
             });
         }
+        
+        // Enhanced tracking functions
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        function trackSessionStart() {
+            sessionId = generateSessionId();
+            sessionStartTime = Date.now();
+            
+            trackGameEvent('session_start', {
+                session_id: sessionId,
+                timestamp: sessionStartTime,
+                referrer: document.referrer || 'direct',
+                utm_source: getUrlParameter('utm_source') || 'unknown',
+                utm_campaign: getUrlParameter('utm_campaign') || 'unknown',
+                page_title: document.title,
+                page_url: window.location.href
+            });
+        }
+        
+        function trackWordTimeSpent() {
+            if (wordStartTime) {
+                const timeSpent = Date.now() - wordStartTime;
+                trackGameEvent('word_time_spent', {
+                    time_seconds: Math.round(timeSpent / 1000),
+                    difficulty: levelNames[currentLevel],
+                    word_context: currentWordPair ? currentWordPair.context.substring(0, 50) : 'unknown',
+                    current_streak: currentStreak,
+                    word_index: currentWordIndex
+                });
+            }
+        }
+        
+        function trackPlayerEngagement() {
+            const sessionDuration = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
+            const wordsPerMinute = sessionDuration > 0 ? Math.round((totalAnswers * 60) / sessionDuration) : 0;
+            
+            trackGameEvent('player_engagement', {
+                session_duration: sessionDuration,
+                words_per_minute: wordsPerMinute,
+                total_words_answered: totalAnswers,
+                current_streak: currentStreak,
+                best_streak: bestStreak,
+                lives_remaining: playerLives,
+                levels_completed: levelsCompleted
+            });
+        }
+        
+        function trackDifficultyProgression() {
+            const totalPlayed = difficultyStats.easy + difficultyStats.medium + difficultyStats.hard;
+            const easyRate = totalPlayed > 0 ? Math.round((difficultyStats.easy / totalPlayed) * 100) : 0;
+            const mediumRate = totalPlayed > 0 ? Math.round((difficultyStats.medium / totalPlayed) * 100) : 0;
+            const hardRate = totalPlayed > 0 ? Math.round((difficultyStats.hard / totalPlayed) * 100) : 0;
+            
+            trackGameEvent('difficulty_progression', {
+                easy_completion_rate: easyRate,
+                medium_completion_rate: mediumRate,
+                hard_completion_rate: hardRate,
+                total_words_played: totalPlayed,
+                preferred_difficulty: getPreferredDifficulty(),
+                current_difficulty: levelNames[currentLevel]
+            });
+        }
+        
+        function getPreferredDifficulty() {
+            const max = Math.max(difficultyStats.easy, difficultyStats.medium, difficultyStats.hard);
+            if (max === difficultyStats.easy) return 'Easy';
+            if (max === difficultyStats.medium) return 'Medium';
+            return 'Hard';
+        }
+        
+        function trackStreakAnalysis() {
+            if (streakHistory.length > 0) {
+                const avgStreak = Math.round(streakHistory.reduce((a, b) => a + b, 0) / streakHistory.length);
+                const maxStreak = Math.max(...streakHistory);
+                const recoveryRate = calculateRecoveryRate();
+                
+                trackGameEvent('streak_analysis', {
+                    max_streak_achieved: maxStreak,
+                    average_streak: avgStreak,
+                    streak_count: streakHistory.length,
+                    recovery_rate: recoveryRate,
+                    current_streak: currentStreak,
+                    best_streak: bestStreak
+                });
+            }
+        }
+        
+        function calculateRecoveryRate() {
+            if (streakHistory.length < 2) return 0;
+            let recoveries = 0;
+            for (let i = 1; i < streakHistory.length; i++) {
+                if (streakHistory[i] > streakHistory[i-1]) {
+                    recoveries++;
+                }
+            }
+            return Math.round((recoveries / (streakHistory.length - 1)) * 100);
+        }
+        
+        function trackAnswerPatterns() {
+            if (answerHistory.length > 0) {
+                const correctAnswers = answerHistory.filter(a => a.correct).length;
+                const accuracy = Math.round((correctAnswers / answerHistory.length) * 100);
+                const commonMistakes = getCommonMistakes();
+                
+                trackGameEvent('answer_pattern', {
+                    correct_answer_rate: accuracy,
+                    total_answers: answerHistory.length,
+                    common_mistakes: commonMistakes,
+                    learning_curve: calculateLearningCurve(),
+                    current_accuracy: Math.round((correctAnswers / totalAnswers) * 100)
+                });
+            }
+        }
+        
+        function getCommonMistakes() {
+            const mistakes = answerHistory.filter(a => !a.correct);
+            const mistakeCounts = {};
+            mistakes.forEach(mistake => {
+                const key = mistake.difficulty + '_' + mistake.wordContext;
+                mistakeCounts[key] = (mistakeCounts[key] || 0) + 1;
+            });
+            return Object.keys(mistakeCounts).slice(0, 3); // Top 3 mistakes
+        }
+        
+        function calculateLearningCurve() {
+            if (answerHistory.length < 10) return 'insufficient_data';
+            const recent = answerHistory.slice(-10);
+            const recentAccuracy = recent.filter(a => a.correct).length / recent.length;
+            const early = answerHistory.slice(0, 10);
+            const earlyAccuracy = early.filter(a => a.correct).length / early.length;
+            
+            if (recentAccuracy > earlyAccuracy + 0.1) return 'improving';
+            if (recentAccuracy < earlyAccuracy - 0.1) return 'declining';
+            return 'stable';
+        }
+        
+        function trackPerformanceMetrics() {
+            const loadTime = performance.timing ? 
+                performance.timing.loadEventEnd - performance.timing.navigationStart : 0;
+            
+            trackGameEvent('performance_metrics', {
+                page_load_time: loadTime,
+                memory_usage: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) : null,
+                connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                device_pixel_ratio: window.devicePixelRatio || 1,
+                viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+                screen_resolution: `${screen.width}x${screen.height}`
+            });
+        }
+        
+        function trackFeatureUsage(feature) {
+            featureUsage[feature] = (featureUsage[feature] || 0) + 1;
+            
+            trackGameEvent('feature_usage', {
+                feature_name: feature,
+                usage_count: featureUsage[feature],
+                session_id: sessionId,
+                timestamp: Date.now()
+            });
+        }
+        
+        function trackUIInteraction(elementId, elementType) {
+            trackGameEvent('ui_interaction', {
+                element_clicked: elementId,
+                element_type: elementType,
+                interaction_time: Date.now(),
+                session_id: sessionId,
+                current_streak: currentStreak,
+                current_level: levelNames[currentLevel]
+            });
+        }
+        
+        function trackGameError(errorType, errorMessage, gameState) {
+            trackGameEvent('game_error', {
+                error_type: errorType,
+                error_message: errorMessage,
+                game_state: gameState,
+                session_id: sessionId,
+                current_streak: currentStreak,
+                current_level: levelNames[currentLevel],
+                user_action: lastUserAction,
+                timestamp: Date.now()
+            });
+        }
         let timerInterval;
         let timerEnabled = false;
         let timeLimit = 5000; // 5 seconds
@@ -1161,6 +1368,10 @@
             }
             
             showNewWords();
+            
+            // Start enhanced tracking
+            trackSessionStart();
+            trackPerformanceMetrics();
             
             // Track game start
             trackGameStart();
@@ -1397,6 +1608,9 @@
 
         // Show new words
         function showNewWords() {
+            // Track time spent on previous word
+            trackWordTimeSpent();
+            
             // Get current difficulty level (Column D: 1=Easy, 2=Medium, 3=Hard)
             const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
             const shuffledWords = shuffledWordsByDifficulty[difficultyLevel];
@@ -1432,6 +1646,9 @@
             // Reset card states
             wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
             wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            
+            // Start timing for new word
+            wordStartTime = Date.now();
             selectedLeftCard = false;
             selectedRightCard = false;
             
@@ -1444,12 +1661,25 @@
 
         // Check answer
         function checkAnswer(selectedWord) {
-            if (!gameActive) return;
+            try {
+                if (!gameActive) return;
+                
+                gameActive = false;
+                cancelAnimationFrame(currentTimeout);
+                
+                const isCorrect = selectedWord === currentWordPair.correct;
             
-            gameActive = false;
-            cancelAnimationFrame(currentTimeout);
+            // Track answer pattern
+            answerHistory.push({
+                correct: isCorrect,
+                difficulty: levelNames[currentLevel],
+                wordContext: currentWordPair.context.substring(0, 30),
+                timeSpent: wordStartTime ? Date.now() - wordStartTime : 0,
+                streak: currentStreak
+            });
             
-            const isCorrect = selectedWord === currentWordPair.correct;
+            // Update difficulty stats
+            difficultyStats[levelNames[currentLevel].toLowerCase()]++;
             
             totalAnswers++;
             
@@ -1473,9 +1703,18 @@
                     // Add to total words completed
                     totalWordsCompleted += levelThresholds[currentLevel];
                     
+                    // Track streak history
+                    streakHistory.push(currentStreak);
+                    
                     // Track level completion
                     const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
                     trackLevelComplete(currentLevel, currentStreak, accuracy);
+                    
+                    // Track enhanced analytics
+                    trackDifficultyProgression();
+                    trackStreakAnalysis();
+                    trackAnswerPatterns();
+                    trackPlayerEngagement();
                     
                     // Life recovery bonus: restore +1 life if below max (capped at 3)
                     if (playerLives < 3) {
@@ -1504,6 +1743,10 @@
                 setTimeout(() => {
                     showNewWords();
                 }, 1500);
+            }
+            } catch (error) {
+                trackGameError('checkAnswer_error', error.message, 'checking_answer');
+                console.error('Error in checkAnswer:', error);
             }
         }
 
@@ -1820,6 +2063,22 @@
             levelProgress = 0;
             levelsCompleted = 0;
             totalWordsCompleted = 0; // Reset total words completed
+            
+            // Reset enhanced tracking variables
+            sessionId = null;
+            sessionStartTime = null;
+            wordStartTime = null;
+            lastUserAction = null;
+            difficultyStats = { easy: 0, medium: 0, hard: 0 };
+            streakHistory = [];
+            answerHistory = [];
+            performanceMetrics = {};
+            featureUsage = {
+                soundEnabled: false,
+                settingsAccessed: 0,
+                helpAccessed: 0,
+                replayUsed: 0
+            };
             levelScores.easy = 0;
             levelScores.medium = 0;
             levelScores.hard = 0;
@@ -1956,6 +2215,8 @@
             if (wordCardLeft) {
                 wordCardLeft.addEventListener('click', () => {
                     if (gameActive) {
+                        lastUserAction = 'left_card_click';
+                        trackUIInteraction('wordCardLeft', 'word_card');
                         checkAnswer(wordCardLeft.textContent);
                     }
                 });
@@ -1964,6 +2225,8 @@
             if (wordCardRight) {
                 wordCardRight.addEventListener('click', () => {
                     if (gameActive) {
+                        lastUserAction = 'right_card_click';
+                        trackUIInteraction('wordCardRight', 'word_card');
                         checkAnswer(wordCardRight.textContent);
                     }
                 });
@@ -2631,6 +2894,10 @@
             
             if (replayBtn) {
                 replayBtn.addEventListener('click', () => {
+                    // Track feature usage
+                    trackFeatureUsage('replayUsed');
+                    lastUserAction = 'replay_click';
+                    
                     if (currentLevel === 2) {
                         // At hard level, "replay" means restart the game
                         if (modal) {
