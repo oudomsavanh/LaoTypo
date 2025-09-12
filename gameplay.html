@@ -932,6 +932,7 @@
         let levelProgress = 0;
         let levelsCompleted = 0; // Track how many levels have been completed
         let totalWordsCompleted = 0; // Track total words completed across all sessions
+        let currentWordPair = null; // Store current word pair for answer checking
         const levelThresholds = [15, 15, 15]; // Words needed to complete each level
         const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
@@ -1246,7 +1247,6 @@
             const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
             const filteredWords = wordPairs.filter(word => word.difficulty === difficultyLevel);
             
-            let wordPair;
             if (filteredWords.length === 0) {
                 console.warn(`No words found for difficulty level ${difficultyLevel}, using all words`);
                 // Fallback to all words if no words found for current difficulty
@@ -1254,7 +1254,7 @@
                     currentWordIndex = 0;
                     wordPairs = shuffleArray(wordPairs);
                 }
-                wordPair = wordPairs[currentWordIndex];
+                currentWordPair = wordPairs[currentWordIndex];
                 currentWordIndex++;
             } else {
                 // Use filtered words
@@ -1263,13 +1263,13 @@
                     // Shuffle filtered words for next cycle
                     filteredWords.sort(() => Math.random() - 0.5);
                 }
-                wordPair = filteredWords[currentWordIndex];
+                currentWordPair = filteredWords[currentWordIndex];
                 currentWordIndex++;
             }
             
-            contextDisplay.textContent = wordPair.context;
+            contextDisplay.textContent = currentWordPair.context;
             
-            const options = [wordPair.correct, wordPair.incorrect];
+            const options = [currentWordPair.correct, currentWordPair.incorrect];
             const shuffled = Math.random() > 0.5 ? options : options.reverse();
             
             wordCardLeft.textContent = shuffled[0];
@@ -1295,8 +1295,7 @@
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
             
-            const wordPair = wordPairs[currentWordIndex - 1];
-            const isCorrect = selectedWord === wordPair.correct;
+            const isCorrect = selectedWord === currentWordPair.correct;
             
             totalAnswers++;
             
@@ -1638,6 +1637,7 @@
             
             currentStreak = 0;
             currentWordIndex = 0;
+            currentWordPair = null;
             correctAnswers = 0;
             totalAnswers = 0;
             playerLives = 3;
