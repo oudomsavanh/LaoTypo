@@ -231,9 +231,41 @@ This application uses modern web technologies with a focus on real-time performa
 - **Color Contrast**: WCAG 2.1 AA compliance
 - **Text Size**: Scalable text for readability
 
+## 📊 Analytics & Tracking
+
+### Google Analytics 4 Integration
+- **Measurement ID**: G-2F516DW62Z
+- **Real-time Tracking**: Live player activity monitoring
+- **Custom Events**: Game-specific action tracking
+- **Device Detection**: Mobile, tablet, desktop identification
+
+### Tracked Game Events
+- **`game_start`**: Player begins game session
+- **`word_answer`**: Each word selection (correct/incorrect)
+- **`level_complete`**: Level finished (15 words completed)
+- **`level_advance`**: Moving to next difficulty level
+- **`life_lost`**: Player loses a life
+- **`game_end`**: Game session completed
+- **`game_replay`**: Player replays a level
+- **`device_info`**: Device and browser information
+
+### Mobile Device Detection
+- **Device Types**: Mobile, Tablet, Desktop
+- **Brand Detection**: iPhone, Samsung, Huawei, Xiaomi, OnePlus, Oppo, Vivo, Realme
+- **Screen Analytics**: Resolution, viewport size, orientation
+- **Browser Tracking**: User agent, browser type, version
+
+### Analytics Reports Available
+- **Player Demographics**: Age, gender, location
+- **Device Distribution**: Mobile vs desktop usage
+- **Game Performance**: Completion rates, average scores
+- **User Behavior**: Session duration, replay patterns
+- **Geographic Data**: Player locations worldwide
+- **Technical Metrics**: Load times, error rates, device performance
+
 ## 🛠️ Development Status
 
-### Current Phase (v2.3.2)
+### Current Phase (v2.4.0)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -245,16 +277,20 @@ This application uses modern web technologies with a focus on real-time performa
   - Fixed answer validation logic
   - Enhanced UI with total words completed counter
   - Fixed endgame meme selection to use latest score
+  - Google Analytics 4 integration with custom game events
+  - Mobile device detection and tracking
+  - Removed testing references, now live
 
 ### Version History
-- **v2.3.2** (Current): Fixed endgame meme selection logic to use latest score instead of accuracy
+- **v2.4.0** (Current): Added Google Analytics 4 tracking, mobile device detection, removed testing references
+- **v2.3.2**: Fixed endgame meme selection logic to use latest score instead of accuracy
 - **v2.3.1**: Game logic improvements, UI fixes, answer validation fixes
 - **v2.3.0**: Smart word filtering, replay randomization, life recovery system
 - **v2.2.0**: Sound system implementation
 - **v2.1.0**: Authentication and scoring system
 - **v2.0.0**: Progressive difficulty system with lives
 
-### Recent Development Summary (v2.3.0 - v2.3.2)
+### Recent Development Summary (v2.3.0 - v2.4.0)
 
 #### **Game Logic Improvements:**
 - **Smart Word Filtering**: Words now filtered by Column D values (1=Easy, 2=Medium, 3=Hard)
@@ -281,6 +317,19 @@ This application uses modern web technologies with a focus on real-time performa
 - **Re-shuffling Logic**: Proper word randomization on replays
 - **Level Progression**: Fixed level advancement and word filtering
 - **Reset Logic**: Proper game and level reset functionality
+
+#### **Analytics & Tracking (v2.4.0):**
+- **Google Analytics 4**: Comprehensive game analytics with custom events
+- **Mobile Device Detection**: Tracks specific phone brands and models
+- **Device Analytics**: Screen resolution, viewport size, browser detection
+- **Game Event Tracking**: All player actions and game progression
+- **Real-time Monitoring**: Live player activity and device usage
+- **Performance Metrics**: Level completion rates, accuracy, replay patterns
+
+#### **UI/UX Updates (v2.4.0):**
+- **Removed Testing References**: Clean production-ready interface
+- **Status Update**: Changed from "Testing" to "Live" status
+- **Device-Aware Design**: Optimized for mobile and desktop tracking
 
 ### Future Development
 - Additional features planned
