@@ -18,12 +18,17 @@ LaoTypo is an educational word-selection race game where players compete in real
 - **Real-time Multiplayer**: Low-latency competition
 - **Word-Selection Mechanics**: Click correct words in sequence 
 - **Three Difficulty Levels**: Easy, Medium, and Hard with progressive scoring
-- **Lives System**: Limited attempts per level
+- **Smart Word Filtering**: Words filtered by difficulty (Column D values from Google Sheets)
+- **Lives System**: Limited attempts per level with recovery bonus
 - **Live Leaderboard**: Real-time ranking system
+- **Replay Randomization**: Fresh word order on every replay
 
 ### Scoring & Evaluation
 - **Percentage-based Scoring**: Performance-based evaluation
 - **Humorous Evaluation Tiers**: Fun feedback based on score ranges
+- **Progress Tracking**: Total words completed counter
+- **Cumulative Progress Display**: Shows 15/30/45 progress across levels
+- **Life Recovery System**: +1 life bonus after completing sessions
 
 ### User Experience
 - **Two User Roles**: Host/Admin and Player/Student
@@ -31,6 +36,7 @@ LaoTypo is an educational word-selection race game where players compete in real
 - **Progressive Web App**: Mobile-friendly experience
 - **Responsive Design**: Works on various devices
 - **Social Sharing**: Share results feature
+- **Enhanced Answer Validation**: Fixed word pair matching for accurate scoring
 
 ## 🏗️ Architecture
 
@@ -83,10 +89,24 @@ This application uses modern web technologies with a focus on real-time performa
 
 ## 🛠️ Development Status
 
-### Current Phase
+### Current Phase (v2.3.1)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
+- **Latest Updates**:
+  - Smart word filtering by difficulty levels
+  - Replay randomization system
+  - Life recovery bonus system
+  - Progress tracking with cumulative display
+  - Fixed answer validation logic
+  - Enhanced UI with total words completed counter
+
+### Version History
+- **v2.3.1** (Current): Game logic improvements, UI fixes, answer validation fixes
+- **v2.3.0**: Smart word filtering, replay randomization, life recovery system
+- **v2.2.0**: Sound system implementation
+- **v2.1.0**: Authentication and scoring system
+- **v2.0.0**: Progressive difficulty system with lives
 
 ### Future Development
 - Additional features planned
