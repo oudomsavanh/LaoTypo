@@ -26,6 +26,15 @@
     
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
     <style>
         :root {
             --bg-color: #2c2e31;
@@ -909,6 +918,74 @@
         let wordPairs = [];
         let correctAnswers = 0;
         let totalAnswers = 0;
+        
+        // Google Analytics 4 Event Tracking
+        function trackGameEvent(eventName, parameters = {}) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    event_category: 'Game',
+                    event_label: 'LaoTypo',
+                    ...parameters
+                });
+            }
+        }
+        
+        function trackGameStart() {
+            trackGameEvent('game_start', {
+                difficulty: levelNames[currentLevel],
+                level: currentLevel + 1
+            });
+        }
+        
+        function trackLevelComplete(level, score, accuracy) {
+            trackGameEvent('level_complete', {
+                level_name: levelNames[level],
+                level_number: level + 1,
+                final_score: score,
+                accuracy: accuracy,
+                words_completed: levelProgress
+            });
+        }
+        
+        function trackGameEnd(finalScore, accuracy, totalWords) {
+            trackGameEvent('game_end', {
+                final_score: finalScore,
+                accuracy: accuracy,
+                total_words: totalWords,
+                levels_completed: levelsCompleted
+            });
+        }
+        
+        function trackReplay(level) {
+            trackGameEvent('game_replay', {
+                level_name: levelNames[level],
+                level_number: level + 1
+            });
+        }
+        
+        function trackWordAnswer(isCorrect, difficulty) {
+            trackGameEvent('word_answer', {
+                correct: isCorrect,
+                difficulty: levelNames[difficulty],
+                current_streak: currentStreak
+            });
+        }
+        
+        function trackLifeLost(remainingLives) {
+            trackGameEvent('life_lost', {
+                remaining_lives: remainingLives,
+                current_streak: currentStreak
+            });
+        }
+        
+        function trackLevelAdvance(fromLevel, toLevel) {
+            trackGameEvent('level_advance', {
+                from_level: levelNames[fromLevel],
+                to_level: levelNames[toLevel],
+                from_level_number: fromLevel + 1,
+                to_level_number: toLevel + 1
+            });
+        }
         let timerInterval;
         let timerEnabled = false;
         let timeLimit = 5000; // 5 seconds
@@ -1028,6 +1105,9 @@
             }
             
             showNewWords();
+            
+            // Track game start
+            trackGameStart();
         }
 
         // Load game settings from localStorage
@@ -1329,10 +1409,17 @@
                 selectedCard.classList.add('feedback-correct');
                 playSound('correct');
                 
+                // Track correct answer
+                trackWordAnswer(true, currentLevel);
+                
                 // Check level progression
                 if (levelProgress >= levelThresholds[currentLevel]) {
                     // Add to total words completed
                     totalWordsCompleted += levelThresholds[currentLevel];
+                    
+                    // Track level completion
+                    const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
+                    trackLevelComplete(currentLevel, currentStreak, accuracy);
                     
                     // Life recovery bonus: restore +1 life if below max (capped at 3)
                     if (playerLives < 3) {
@@ -1350,6 +1437,10 @@
                 selectedCard.classList.add('feedback-incorrect');
                 otherCard.classList.add('feedback-correct');
                 playSound('incorrect');
+                
+                // Track incorrect answer
+                trackWordAnswer(false, currentLevel);
+                
                 loseLife();
             }
             
@@ -1431,6 +1522,9 @@
         function loseLife() {
             if (playerLives > 0) {
                 playerLives--;
+                
+                // Track life lost
+                trackLifeLost(playerLives);
                 
                 const hearts = heartsContainer.querySelectorAll('.heart');
                 const heartToBreak = hearts[playerLives];
@@ -1532,6 +1626,9 @@
             // Calculate final percentage score for display
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
             const accuracyRounded = accuracy.toFixed(1);
+            
+            // Track game end
+            trackGameEnd(currentStreak, accuracy, totalWordsCompleted);
             
             // Update stats displays
             document.getElementById('final-streak').textContent = currentStreak;
@@ -2433,10 +2530,14 @@
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
                         // Advance to next level
+                        const previousLevel = currentLevel;
                         levelsCompleted++;
                         currentLevel++;
                         levelProgress = 0;
                         currentWordIndex = 0; // Reset word index for new level
+                        
+                        // Track level advance
+                        trackLevelAdvance(previousLevel, currentLevel);
                         
                         // Re-shuffle words for the new difficulty level
                         const newDifficultyLevel = currentLevel + 1;
@@ -2491,6 +2592,9 @@
                         playerLives = 3;
                         levelProgress = 0;
                         currentWordIndex = 0; // Reset word index for replay
+                        
+                        // Track replay
+                        trackReplay(currentLevel);
                         
                         // Re-shuffle words for this difficulty level
                         const difficultyLevel = currentLevel + 1;
