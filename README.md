@@ -153,6 +153,17 @@ This application uses modern web technologies with a focus on real-time performa
 - **Visual Feedback**: Green for correct, red for incorrect
 - **Sound Feedback**: Different sounds for correct/incorrect answers
 
+### Endgame Evaluation System
+- **Meme Selection**: Based on latest score (`currentStreak`) not accuracy percentage
+- **Score Tiers**:
+  - **12+ streak**: Born to be Lao (Folder 1) - 5 images
+  - **9-11 streak**: 75% True Lao Child (Folder 2) - 5 images
+  - **6-8 streak**: Born in Laos but grew up abroad (Folder 3) - 2 images
+  - **3-5 streak**: At least not "Jing Jai" (Folder 4) - 2 images
+  - **0-2 streak**: Foreigner whose plane crashed (Folder 5) - 3 images
+- **Random Selection**: Random image chosen from appropriate folder
+- **Total Images**: 17 possible endgame images across all tiers
+
 ### UI Elements & Display
 - **Progress Counter**: Shows current/total words for level
 - **Total Progress**: Displays cumulative words completed
@@ -222,7 +233,7 @@ This application uses modern web technologies with a focus on real-time performa
 
 ## 🛠️ Development Status
 
-### Current Phase (v2.3.1)
+### Current Phase (v2.3.2)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -233,13 +244,43 @@ This application uses modern web technologies with a focus on real-time performa
   - Progress tracking with cumulative display
   - Fixed answer validation logic
   - Enhanced UI with total words completed counter
+  - Fixed endgame meme selection to use latest score
 
 ### Version History
-- **v2.3.1** (Current): Game logic improvements, UI fixes, answer validation fixes
+- **v2.3.2** (Current): Fixed endgame meme selection logic to use latest score instead of accuracy
+- **v2.3.1**: Game logic improvements, UI fixes, answer validation fixes
 - **v2.3.0**: Smart word filtering, replay randomization, life recovery system
 - **v2.2.0**: Sound system implementation
 - **v2.1.0**: Authentication and scoring system
 - **v2.0.0**: Progressive difficulty system with lives
+
+### Recent Development Summary (v2.3.0 - v2.3.2)
+
+#### **Game Logic Improvements:**
+- **Smart Word Filtering**: Words now filtered by Column D values (1=Easy, 2=Medium, 3=Hard)
+- **Replay Randomization**: Fresh word order on every replay and level restart
+- **Life Recovery System**: +1 life bonus when completing sessions (capped at 3)
+- **Progress Tracking**: Total words completed counter with UI display
+- **Answer Validation Fix**: Fixed word pair matching for accurate scoring
+- **Cumulative Progress Display**: Shows 15/30/45 progress across levels
+
+#### **Endgame System Enhancements:**
+- **Meme Selection Logic**: Changed from accuracy-based to latest score-based
+- **Expanded Image Pool**: Added more images to folders 1, 2, and 5
+- **Score-Based Tiers**: 5 tiers based on final streak performance
+- **Random Image Selection**: 17 total possible endgame images
+
+#### **UI/UX Improvements:**
+- **Total Progress Display**: Shows cumulative words completed
+- **Enhanced Progress Counter**: Displays cumulative progress (15/30/45)
+- **Version Tracking**: Updated version displays in both testing and gameplay
+- **Better Visual Feedback**: Improved answer validation and display
+
+#### **Technical Fixes:**
+- **Word Pair Storage**: Global storage for accurate answer checking
+- **Re-shuffling Logic**: Proper word randomization on replays
+- **Level Progression**: Fixed level advancement and word filtering
+- **Reset Logic**: Proper game and level reset functionality
 
 ### Future Development
 - Additional features planned
