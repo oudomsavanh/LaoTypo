@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cache Busting Headers v2.4.0 - Added Google Analytics 4 tracking -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ? v2</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <meta name="theme-color" content="#f8af3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LaoTypo">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="LaoTypo">
+    <meta name="msapplication-TileColor" content="#f8af3c">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-2F516DW62Z');
+        
+        // Device Detection and Tracking
+        function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const isTablet = /iPad|Android(?=.*\bMobile\b)/i.test(userAgent);
+            
+            let deviceType = 'Desktop';
+            let deviceModel = 'Unknown';
+            
+            if (isTablet) {
+                deviceType = 'Tablet';
+            } else if (isMobile) {
+                deviceType = 'Mobile';
+            }
+            
+            // Detect specific mobile devices
+            if (/iPhone/i.test(userAgent)) {
+                deviceModel = 'iPhone';
+            } else if (/iPad/i.test(userAgent)) {
+                deviceModel = 'iPad';
+            } else if (/Android/i.test(userAgent)) {
+                deviceModel = 'Android';
+            } else if (/Samsung/i.test(userAgent)) {
+                deviceModel = 'Samsung';
+            } else if (/Huawei/i.test(userAgent)) {
+                deviceModel = 'Huawei';
+            } else if (/Xiaomi/i.test(userAgent)) {
+                deviceModel = 'Xiaomi';
+            } else if (/OnePlus/i.test(userAgent)) {
+                deviceModel = 'OnePlus';
+            } else if (/Oppo/i.test(userAgent)) {
+                deviceModel = 'Oppo';
+            } else if (/Vivo/i.test(userAgent)) {
+                deviceModel = 'Vivo';
+            } else if (/Realme/i.test(userAgent)) {
+                deviceModel = 'Realme';
+            }
+            
+            return {
+                deviceType: deviceType,
+                deviceModel: deviceModel,
+                userAgent: userAgent,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                viewportWidth: window.innerWidth,
+                viewportHeight: window.innerHeight
+            };
+        }
+        
+        // Track device info when page loads
+        window.addEventListener('load', function() {
+            const deviceInfo = getDeviceInfo();
+            gtag('event', 'device_info', {
+                event_category: 'Device',
+                event_label: 'LaoTypo',
+                device_type: deviceInfo.deviceType,
+                device_model: deviceInfo.deviceModel,
+                screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
+                viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
+                user_agent: deviceInfo.userAgent
+            });
+        });
+    </script>
+    <style>
+        :root {
+            /* Your Original Color Scheme */
+            --bg-color: #2c2e31;
+            --main-color: #f8af3c;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
+            
+            /* Material 3 Color Tokens - Optimized for your colors */
+            --md-sys-color-primary: #f8af3c;
+            --md-sys-color-on-primary: #2c2e31;
+            --md-sys-color-primary-container: #3d2f00;
+            --md-sys-color-on-primary-container: #f8af3c;
+            
+            --md-sys-color-secondary: #646669;
+            --md-sys-color-on-secondary: #2c2e31;
+            --md-sys-color-secondary-container: #4a4c4f;
+            --md-sys-color-on-secondary-container: #d1d0c5;
+            
+            --md-sys-color-tertiary: #72b483;
+            --md-sys-color-on-tertiary: #2c2e31;
+            --md-sys-color-tertiary-container: #4a5c4f;
+            --md-sys-color-on-tertiary-container: #d1d0c5;
+            
+            --md-sys-color-error: #ca4754;
+            --md-sys-color-on-error: #2c2e31;
+            --md-sys-color-error-container: #5a2a2f;
+            --md-sys-color-on-error-container: #d1d0c5;
+            
+            --md-sys-color-surface: #2c2e31;
+            --md-sys-color-on-surface: #d1d0c5;
+            --md-sys-color-surface-variant: #3e4043;
+            --md-sys-color-on-surface-variant: #646669;
+            
+            --md-sys-color-outline: #646669;
+            --md-sys-color-outline-variant: #3e4043;
+            
+            --md-sys-color-surface-container-lowest: #1d1f22;
+            --md-sys-color-surface-container-low: #2c2e31;
+            --md-sys-color-surface-container: #3e4043;
+            --md-sys-color-surface-container-high: #4a4c4f;
+            --md-sys-color-surface-container-highest: #56585b;
+        }
+        body {
+            font-family: 'Noto Sans Lao Looped', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding-top: 80px; /* Space for fixed nav */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.5;
+        }
+        nav {
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .word-card {
+            background-color: #3e4043;
+            border-radius: 1rem;
+            padding: 2rem 1.5rem;
+            font-size: 2.25rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: 2px solid transparent;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            transform-origin: center;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+        .word-card:hover, .word-card.focused {
+            background-color: #4a4c4f;
+            border-color: var(--main-color);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+        .word-card:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+        .word-card.animate-slide-in-left {
+            animation: slide-in-left 0.5s ease-out;
+        }
+        .word-card.animate-slide-in-right {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        .btn {
+            background-color: var(--sub-color);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: 1px solid var(--sub-color);
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0.1px;
+            min-height: 40px;
+        }
+        .btn:hover {
+            background-color: #7a7c7e;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: var(--main-color);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 1.25rem;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            transform-origin: center;
+            min-width: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+        }
+        .btn-icon:active {
+            transform: scale(0.95);
+        }
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .feedback-correct {
+            animation: glow-correct 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+        .feedback-incorrect {
+            animation: shake-horizontal 0.3s cubic-bezier(0.2, 0, 0, 1);
+        }
+        @keyframes glow-correct {
+            0% { 
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+                border-color: transparent;
+            }
+            50% { 
+                box-shadow: 0 0 0 2px var(--correct-color), 0 0 20px 5px rgba(114, 180, 131, 0.3);
+                border-color: var(--correct-color);
+            }
+            100% { 
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+                border-color: transparent;
+            }
+        }
+        @keyframes shake-horizontal {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .timer-bar {
+            height: 4px;
+            background-color: var(--main-color);
+            width: 100%;
+            transform-origin: left;
+            transition: transform 0.1s linear;
+            border-radius: 2px;
+        }
+        .leaderboard-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .leaderboard-panel.hidden {
+            opacity: 0;
+            transform: translateX(120%) scale(0.95);
+            pointer-events: none;
+        }
+        
+        .leaderboard-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        .tab-button {
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border-bottom: 2px solid transparent;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .tab-button.active {
+            color: var(--main-color) !important;
+            border-bottom-color: var(--main-color) !important;
+            background-color: #3e4043;
+        }
+        .tab-content {
+            min-height: 400px;
+        }
+        
+        /* Difficulty Button Styles - Matching the design */
+        .difficulty-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        
+        .difficulty-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            border: 2px solid;
+            background: transparent;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            transform-origin: center;
+        }
+        
+        .difficulty-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .difficulty-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .difficulty-btn.easy {
+            border-color: #4ade80;
+        }
+        
+        .difficulty-btn.easy.active {
+            background-color: #4ade80;
+            color: var(--bg-color);
+            border-color: #4ade80;
+        }
+        
+        .difficulty-btn.medium {
+            border-color: #fbbf24;
+        }
+        
+        .difficulty-btn.medium.active {
+            background-color: #fbbf24;
+            color: var(--bg-color);
+            border-color: #fbbf24;
+        }
+        
+        .difficulty-btn.hard {
+            border-color: #ef4444;
+        }
+        
+        .difficulty-btn.hard.active {
+            background-color: #ef4444;
+            color: var(--bg-color);
+            border-color: #ef4444;
+        }
+        
+        /* Custom input field with dotted border */
+        .custom-input {
+            width: 100%;
+            background-color: transparent;
+            border: 2px dashed var(--sub-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 1.125rem;
+            text-align: center;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            margin: 1.5rem 0;
+        }
+        
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--main-color);
+            border-style: solid;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(248, 175, 60, 0.3);
+        }
+        
+        .custom-input::placeholder {
+            color: var(--sub-color);
+        }
+        
+        /* Start button matching design */
+        .start-button {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 1rem 3rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            transform-origin: center;
+        }
+        
+        .start-button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(248, 175, 60, 0.4);
+        }
+        
+        .start-button:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        
+        .start-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+
+        /* Independent Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 320px;
+            max-width: 380px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .settings-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .settings-panel.hidden {
+            opacity: 0;
+            transform: translateX(120%) scale(0.95);
+            pointer-events: none;
+        }
+        
+        .settings-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .settings-content label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        /* Toggle Switch Styles - Previous design */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--sub-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--main-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Timer toggle container */
+        .timer-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+        
+        .timer-label {
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+        
+        /* ADDED: Life Bar System Styles */
+        .life-bar-header {
+            background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%);
+            border: 2px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .life-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hearts {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .heart {
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            display: inline-block;
+        }
+        
+        .heart.active {
+            animation: heartPulse 3s infinite;
+        }
+        
+        .heart.losing-life {
+            animation: heartBreak 0.6s ease-out forwards;
+        }
+        
+        @keyframes heartBreak {
+            0% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(-15deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0.8) rotate(0);
+                opacity: 0.3;
+            }
+        }
+        
+        .heart.lost {
+            opacity: 0.3;
+            filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            transform: scale(0.8);
+        }
+        
+        .heart.losing {
+            animation: heartBreak 0.6s ease-in-out forwards;
+        }
+        
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes heartBreak {
+            0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+            25% { transform: scale(1.2) rotate(5deg); color: #ff4444; }
+            50% { transform: scale(1.3) rotate(-5deg); color: #ff0000; }
+            75% { transform: scale(0.9) rotate(2deg); opacity: 0.7; }
+            100% { transform: scale(0.8); opacity: 0.3; filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        }
+        
+        @keyframes lifeBarFlash {
+            0%, 100% { background: linear-gradient(135deg, #3e4043 0%, #2c2e31 100%); }
+            50% { background: linear-gradient(135deg, #ca4754 0%, #8b2635 100%); }
+        }
+        
+        .motivation-text {
+            font-size: 1rem;
+            color: var(--sub-color);
+            font-style: italic;
+            font-weight: 500;
+        }
+        
+        .life-text, .life-count {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        .panel-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--sub-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-color);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--main-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        .leaderboard-table th {
+            color: var(--sub-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+        .leaderboard-table tr:not(:first-child) {
+            border-top: 1px solid #3a3c3e;
+        }
+        .leaderboard-table td.rank {
+            font-weight: bold;
+            color: var(--main-color);
+            text-align: center;
+        }
+        .leaderboard-table td.score {
+            font-weight: bold;
+        }
+        .leaderboard-table tr.user-best {
+            background-color: rgba(248, 175, 60, 0.1);
+            border-left: 3px solid var(--main-color);
+        }
+        .input-error {
+            border-color: var(--error-color) !important;
+        }
+                .loading-indicator {
+            color: var(--main-color);
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        
+        /* Gecko Mascot - Restored with click functionality */
+        .gecko-mascot {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 40;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .gecko-mascot:hover {
+            transform: scale(1.1);
+        }
+        
+        .gecko-mascot:active {
+            transform: scale(0.95);
+        }
+        
+        .gecko-mascot img {
+            width: 70px;
+            height: auto;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            /* Maintains the 412:327 aspect ratio */
+        }
+        
+        /* Responsive gecko size - width only, height auto */
+        @media (min-width: 640px) {
+            .gecko-mascot img {
+                width: 90px;
+                height: auto;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .gecko-mascot img {
+                width: 120px;
+                height: auto;
+            }
+        }
+        
+        .gecko-mascot:hover img {
+            opacity: 1;
+        }
+        
+        /* Custom typography for main title and subtitle - Material 3 */
+        .main-title {
+            font-size: 1.75rem;
+            line-height: 1.2;
+            font-weight: 400;
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 1rem;
+            animation: fade-in-down 1s ease-out;
+            letter-spacing: -0.01em;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: 0.5rem;
+            animation: fade-in-up 1s ease-out 0.3s both;
+            font-weight: 400;
+        }
+        
+
+        
+        /* Enhanced Account Screen Styles */
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #f8af3c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--bg-color);
+            border: 3px solid var(--main-color);
+        }
+        
+        .achievement-badge {
+            background: rgba(62, 64, 67, 0.5);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .achievement-badge.unlocked {
+            background: linear-gradient(135deg, var(--main-color) 0%, #f8af3c 100%);
+            border-color: var(--main-color);
+            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .achievement-badge.locked {
+            opacity: 0.4;
+            filter: grayscale(100%);
+        }
+        
+        .badge-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+        
+        .badge-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .achievement-badge.unlocked .badge-name {
+            color: var(--bg-color);
+            font-weight: bold;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-label {
+            color: var(--sub-color);
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .stat-value-with-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--main-color) 0%, #f8af3c 100%);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .difficulty-progress {
+            margin-bottom: 12px;
+        }
+        
+        .difficulty-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .difficulty-icon {
+            font-size: 1.2rem;
+        }
+        
+        .difficulty-name {
+            flex: 1;
+            margin-left: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .difficulty-score {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        @keyframes achievementUnlock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.05); }
+        }
+        
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .account-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(120%) scale(0.95);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #f8af3c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+            border: 2px solid var(--main-color);
+        }
+        
+        .account-name {
+            font-weight: bold;
+            color: var(--main-color);
+            font-size: 1.1rem;
+        }
+        
+        .account-rank {
+            font-size: 0.8rem;
+            color: var(--sub-color);
+        }
+        
+        .quick-stats {
+            border-top: 1px solid rgba(248, 175, 60, 0.2);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+        
+        .quick-stat .stat-label {
+            color: var(--sub-color);
+        }
+        
+        .quick-stat .stat-value {
+            color: var(--main-color);
+            font-weight: bold;
+        }
+        
+        /* Version Info Styling */
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--sub-color), transparent);
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+        
+        .version-details {
+            text-align: center;
+            color: var(--sub-color);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        
+        .version-details p {
+            margin: 0.25rem 0;
+        }
+        
+        /* Custom animations for enhanced UI */
+        @keyframes fade-in-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slide-in-left {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slide-in-right {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes gentle-bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes scale-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Animation utility classes */
+        .animate-fade-in-down {
+            animation: fade-in-down 0.6s ease-out;
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.6s ease-out;
+        }
+        
+        .animate-slide-in-left {
+            animation: slide-in-left 0.5s ease-out;
+        }
+        
+        .animate-slide-in-right {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .animate-gentle-bounce {
+            animation: gentle-bounce 2s ease-in-out infinite;
+        }
+        
+        .animate-scale-in {
+            animation: scale-in 0.4s ease-out;
+        }
+        
+        /* Enhanced navigation animations */
+        .nav-link {
+            color: var(--sub-color);
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-color);
+            transform: scale(1.1) rotate(3deg);
+        }
+        
+        /* Logo animation */
+        #home-btn img {
+            transition: transform 0.5s ease;
+        }
+        
+        #home-btn:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Gecko mascot animation */
+        .gecko-mascot {
+            animation: gentle-bounce 3s ease-in-out infinite;
+        }
+        
+        /* Score animation */
+        .score-update {
+            animation: scorePopup 0.6s ease-out;
+        }
+        
+        /* Close button animation */
+        .panel-content button[id$="-btn"]:hover {
+            transition: all 0.2s ease;
+            transform: rotate(90deg) scale(1.1);
+        }
+        
+        /* Results screen animations */
+        #results-screen.active > * {
+            animation: fade-in-up 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        #results-screen.active > *:nth-child(1) { animation-delay: 0.1s; }
+        #results-screen.active > *:nth-child(2) { animation-delay: 0.3s; }
+        #results-screen.active > *:nth-child(3) { animation-delay: 0.5s; }
+        #results-screen.active > *:nth-child(4) { animation-delay: 0.7s; }
+        
+        @keyframes scorePopup {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+                color: var(--main-color);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .timer-bar {
+            height: 5px;
+            background-color: var(--main-color);
+            width: 100%;
+            transform-origin: left;
+            transition: transform 0.1s linear;
+        }
+        
+        .timer-bar.warning {
+            animation: pulse 0.5s ease-in-out infinite;
+            background-color: var(--error-color);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        /* Loading animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--sub-color);
+            border-radius: 50%;
+            border-top-color: var(--main-color);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Toggle switch animation */
+        .switch input:checked + .slider {
+            transition: all 0.3s ease;
+        }
+        
+        .switch input:checked + .slider:before {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- 🔥 Firebase Integration (Player Data Only) -->
+    <script type="module" src="firebase-config.js"></script>
+    <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> 
+    <script type="module" src="test-firebase-player-sync.js"></script>
+    
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="images/LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Gecko Mascot -->
+    <div class="gecko-mascot" id="gecko-mascot">
+        <img src="images/Gecko.png" alt="Gecko Mascot">
+    </div>
+
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <div class="flex flex-col items-center justify-center h-full">
+                <h1 class="main-title text-3xl font-normal leading-tight tracking-tight">ເຈົ້າແມ່ນຄົນລາວຈຣິງ<br>ຫຼື ລາວອີ່ຫລີ?</h1>
+                <p class="subtitle text-base font-normal leading-relaxed">ມາທົດສອບຄວາມຊອດກະຈາ<br>ຕອບຖືກໄດ້ໄປຕໍ່ ແລະ ເກມຈະຈົບລົງເມື່ອຕອບຜິດ</p>
+
+                
+                <!-- Player name input with dotted border -->
+                <input type="text" id="player-name-input" 
+                       placeholder="ໃສ່ຊື່ຂອງເຈົ້າ..." 
+                       class="custom-input">
+            
+                <!-- Difficulty selection -->
+                <div class="text-center">
+                    <p class="text-sm font-medium mb-2" style="color: var(--md-sys-color-on-surface-variant);">ເລືອກລະດັບຄວາມຍາກ:</p>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn easy" data-difficulty="easy">ງ່າຍ</button>
+                        <button class="difficulty-btn medium" data-difficulty="medium">ປານກາງ</button>
+                        <button class="difficulty-btn hard" data-difficulty="hard">ຍາກ</button>
+                    </div>
+                </div>
+            
+                <!-- Timer toggle -->
+                <div class="timer-toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="main-timer-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="timer-label text-sm font-medium">⏱️ ຈັບເວລາ (5 ວິນາທີ)</span>
+                </div>
+
+
+
+                <!-- Start button -->
+                <button id="start-game-btn" class="start-button" disabled>ເລີ່ມເກມ</button>
+            </div>
+            
+
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- ADDED: Life Bar System -->
+            <div class="life-bar-header mb-6">
+                <div class="life-container">
+                    <span class="life-text">Lives:</span>
+                    <div class="hearts">
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                        <span class="heart active">❤️</span>
+                    </div>
+                    <span class="life-count">3/3</span>
+                </div>
+                <div class="motivation-text">You've got 3 lives—spend them wisely!</div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-6 text-xl">
+                <div class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນ: <span id="current-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></div>
+                <div class="font-medium text-center" style="color: var(--md-sys-color-on-surface-variant);">Player: <span id="game-player-name" class="font-semibold" style="color: var(--md-sys-color-on-surface);"></span></div>
+                <div class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></div>
+            </div>
+            <div id="timer-container" class="h-2 mb-6">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+            
+            <!-- Context display area for showing word -->
+            <div class="mb-6 text-center">
+                <h3 class="text-xl font-medium mb-2" style="color: var(--md-sys-color-on-surface-variant);">ຄຳສັບທີ່ຕ້ອງຕອບ:</h3>
+                <div id="context-display" class="text-4xl font-semibold rounded-xl py-4 px-6 min-h-[100px] flex items-center justify-center" style="color: var(--md-sys-color-on-surface); background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);"></div>
+            </div>
+            
+            <!-- ADDED: Difficulty level display with color coding -->
+            <div class="mb-4 text-center">
+                <span class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ລະດັບຄວາມຍາກ: </span>
+                <span id="difficulty-display" class="font-semibold"></span>
+            </div>
+            
+            <div id="word-area" class="grid grid-cols-2 gap-4 md:gap-8 mb-8">
+                <div id="word-card-left" class="word-card"></div>
+                <div id="word-card-right" class="word-card"></div>
+            </div>
+            <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ໃຊ້ <kbd class="border-b-2 font-mono text-sm px-1 rounded" style="border-color: var(--md-sys-color-outline);">A</kbd> ສຳລັບຊ້າຍ, <kbd class="border-b-2 font-mono text-sm px-1 rounded" style="border-color: var(--md-sys-color-outline);">D</kbd> ສຳລັບຂວາ.</p>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen space-y-6">
+            <h2 class="text-4xl font-normal" style="color: var(--md-sys-color-primary);">ເກມຈົບ</h2>
+            <div class="text-xl space-y-2">
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນຫຼ້າສຸດ: <span id="final-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="results-best-streak" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄວາມຖືກຕ້ອງ: <span id="accuracy-stat" class="font-semibold" style="color: var(--md-sys-color-on-surface);">0%</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຜົນການປະເມີນ: <span id="evaluation-result" class="font-semibold"></span></p>
+            </div>
+            
+            <!-- NEW: Score Breakdown -->
+            <div id="score-breakdown"></div>
+            <div class="flex justify-center space-x-4">
+                <button id="restart-game-btn" class="btn btn-primary">ຫຼິ້ນອີກຄັ້ງ</button>
+                <button id="back-to-menu-btn" class="btn">ເມນູຫຼັກ</button>
+            </div>
+        </div>
+
+        <!-- Stats Screen -->
+        <div id="stats-screen" class="screen space-y-6">
+            <h2 class="text-4xl font-normal" style="color: var(--md-sys-color-primary);">ສະຖິຕິສ່ວນຕົວ</h2>
+            <div class="text-lg space-y-3 text-left max-w-md mx-auto p-6 rounded-xl" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຊື່: <span id="stats-display-name" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);"></span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="stats-best-streak" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນເກມທັງໝົດ: <span id="stats-total-games" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນຄຳຕອບທີ່ຖືກຕ້ອງ: <span id="stats-total-correct" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຈຳນວນຄຳຕອບທີ່ຜິດ: <span id="stats-total-mistakes" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0</span></p>
+                <p class="font-medium" style="color: var(--md-sys-color-on-surface-variant);">ຄວາມຖືກຕ້ອງທັງໝົດ: <span id="stats-overall-accuracy" class="font-semibold float-right" style="color: var(--md-sys-color-on-surface);">0%</span></p>
+            </div>
+            <div>
+                <button id="stats-back-btn" class="btn">ກັບຄືນ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Panel (Separated from Settings) -->
+    <div id="leaderboard-panel" class="leaderboard-panel hidden">
+        <div class="panel-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-normal" style="color: var(--md-sys-color-primary);">📊 ສະຖິຕິ</h2>
+                <button id="close-leaderboard-btn" class="text-3xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+            </div>
+            
+            <!-- Tab Navigation (Removed Settings Tab) -->
+            <div class="flex border-b mb-6" style="border-color: var(--md-sys-color-outline-variant);">
+                <button id="leaderboard-tab" class="tab-button active px-4 py-2 border-b-2" style="color: var(--md-sys-color-primary); border-color: var(--md-sys-color-primary);">
+                    🏆 ກະດານຈັດອັນດັບ
+                </button>
+                <button id="personal-records-tab" class="tab-button px-4 py-2 hover:opacity-70 transition-opacity hidden" style="color: var(--md-sys-color-on-surface-variant);" aria-hidden="true" tabindex="-1">
+                    📈 ບັນທຶກສ່ວນຕົວ
+                </button>
+            </div>
+
+            <!-- Leaderboard Tab Content -->
+            <div id="leaderboard-content" class="tab-content">
+                <div id="leaderboard-container">
+                    <!-- Firebase leaderboard will be injected here -->
+                    <div class="text-center text-sub-color py-8">
+                        <p>🔄 Loading global leaderboard...</p>
+                        <p class="text-xs mt-2">Syncing with Firebase</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Personal Records Tab Content -->
+            <div id="personal-records-content" class="tab-content hidden">
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-tertiary);">ງ່າຍ (Easy)</div>
+                        <div id="easy-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="easy-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="easy-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
+                    </div>
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-primary);">ປານກາງ (Medium)</div>
+                        <div id="medium-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="medium-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="medium-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
+                    </div>
+                    <div class="text-center rounded-xl p-4" style="background-color: var(--md-sys-color-surface-container-high); border: 1px solid var(--md-sys-color-outline-variant);">
+                        <div class="font-semibold mb-2" style="color: var(--md-sys-color-error);">ຍາກ (Hard)</div>
+                        <div id="hard-best-score-main" class="text-2xl font-semibold" style="color: var(--md-sys-color-on-surface);">0</div>
+                        <div id="hard-best-accuracy-main" class="text-sm" style="color: var(--md-sys-color-on-surface-variant);">0%</div>
+                        <div id="hard-games-count-main" class="text-xs mt-2" style="color: var(--md-sys-color-on-surface-variant);">0 games</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Independent Settings Panel (Floating) -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <div class="settings-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-normal" style="color: var(--md-sys-color-primary);">⚙️ ຕັ້ງຄ່າ</h2>
+                <button id="close-settings-btn" class="text-2xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="text-left space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="font-medium" style="color: var(--md-sys-color-on-surface);">🔊 ສຽງເກມປະກອບ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label class="font-medium" style="color: var(--md-sys-color-on-surface);">🎵 ສຽງປະກອບພື້ນຫຼັງເກມ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="music-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button id="save-settings-btn" class="btn btn-primary">ບັນທຶກ ແລະ ປິດ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-normal" style="color: var(--md-sys-color-primary);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--md-sys-color-on-surface-variant);">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--md-sys-color-primary);">ຜູ້ຫຼິ້ນ</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--md-sys-color-on-surface);">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--md-sys-color-on-surface);">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--md-sys-color-on-surface-variant);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--md-sys-color-on-surface);">0/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm hidden" aria-hidden="true" tabindex="-1">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
+            </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
+        <p>📦 Version 2.6.0</p>
+        <p>Status: Live</p>
+        <p>🚀 PWA Ready</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
+        
+        // --- PWA SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('🎉 PWA Service Worker registered:', registration.scope);
+                    
+                    // Handle updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 New version available');
+                                // Could show update notification here
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.warn('⚠️ PWA Service Worker registration failed:', error);
+                }
+            });
+        }
+
+        // --- FIREBASE INITIALIZATION ---
+        let firebaseSync = null;
+        
+        window.addEventListener('load', async () => {
+            const firebaseInitialized = await initializeFirebase();
+            if (firebaseInitialized) {
+                firebaseSync = new FirebaseSync();
+                console.log('🔥 Firebase sync ready');
+            }
+        });
+
+        // --- DOM ELEMENTS ---
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            results: document.getElementById('results-screen'),
+            stats: document.getElementById('stats-screen'),
+        };
+        const playerNameInput = document.getElementById('player-name-input');
+        const wordCardLeft = document.getElementById('word-card-left');
+        const wordCardRight = document.getElementById('word-card-right');
+        const currentStreakEl = document.getElementById('current-streak');
+        const bestStreakEl = document.getElementById('best-streak');
+        const timerContainer = document.getElementById('timer-container');
+        const timerBar = document.getElementById('timer-bar');
+        const leaderboardPanel = document.getElementById('leaderboard-panel');
+        const leaderboardContainer = document.getElementById('leaderboard-container');
+        const firebaseSyncToggle = document.getElementById('firebase-sync-toggle');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const mainTimerToggle = document.getElementById('main-timer-toggle');
+        const soundToggle = document.getElementById('sound-toggle');
+        const musicToggle = document.getElementById('music-toggle');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const contextDisplay = document.getElementById('context-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const gamePlayerName = document.getElementById('game-player-name');
+
+        // --- AUDIO SYSTEM v2.2.0 ---
+        // Initialize sound settings from localStorage
+        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
+        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let userHasInteracted = false;
+        
+        // Audio objects
+        const backgroundMusic = new Audio("sounds/bg_sound.mp3");
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 1.0;
+        
+        const resultSound = new Audio("sounds/result_sound.mp3");
+        resultSound.loop = true;
+        resultSound.volume = 0.0;
+        
+        // Audio fade utility
+        function fadeAudio(audioEl, targetVolume, durationMs, onComplete) {
+            const steps = 20;
+            const stepTime = durationMs / steps;
+            const volumeStep = (targetVolume - audioEl.volume) / steps;
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                audioEl.volume = Math.max(0, Math.min(1, audioEl.volume + volumeStep));
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    audioEl.volume = targetVolume;
+                    if (targetVolume === 0) audioEl.pause();
+                    if (onComplete) onComplete();
+                }
+            }, stepTime);
+            if (targetVolume > 0 && audioEl.paused) {
+                audioEl.play().catch(() => {});
+            }
+        }
+        
+        function toggleBackgroundMusic() {
+            if (musicEnabled) {
+                // Try to play music, but handle autoplay restrictions
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        if (e.name === 'NotAllowedError') {
+                            console.log('Autoplay blocked by browser. User needs to interact with page first.');
+                        } else {
+                            console.log('Make sure bg_sound.mp3 exists in your sounds directory');
+                        }
+                    });
+                }
+            } else {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+        }
+        
+        function enableMusicAfterInteraction() {
+            if (!userHasInteracted && musicEnabled) {
+                userHasInteracted = true;
+                console.log('User interaction detected. Enabling background music...');
+                toggleBackgroundMusic();
+            }
+        }
+        
+        function startResultSound() {
+            if (soundEnabled) {
+                // Fade out background music
+                fadeAudio(backgroundMusic, 0, 1500);
+                // Fade in result sound
+                fadeAudio(resultSound, 1.0, 1500);
+            }
+        }
+        
+        function stopResultSound() {
+            // Fade out result sound
+            fadeAudio(resultSound, 0, 1500, () => {
+                resultSound.pause();
+                resultSound.currentTime = 0;
+                // Resume background music if enabled
+                if (musicEnabled) {
+                    fadeAudio(backgroundMusic, 1.0, 1500);
+                }
+            });
+        }
+        
+        function initializeSoundSystem() {
+            // Initialize sound toggle state
+            if (soundToggle) {
+                soundToggle.checked = soundEnabled;
+            }
+            
+            // Initialize music toggle state
+            if (musicToggle) {
+                musicToggle.checked = musicEnabled;
+            }
+            
+            // Sound toggle event listener
+            if (soundToggle) {
+                soundToggle.addEventListener('change', () => {
+                    soundEnabled = soundToggle.checked;
+                    localStorage.setItem('soundEnabled', soundEnabled.toString());
+                    
+                    // Update Tone.js mute state
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
+                    }
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                        detail: { soundEnabled }
+                    }));
+                });
+            }
+            
+            // Music toggle event listener
+            if (musicToggle) {
+                musicToggle.addEventListener('change', () => {
+                    musicEnabled = musicToggle.checked;
+                    localStorage.setItem('musicEnabled', musicEnabled.toString());
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
+                    // Toggle music immediately
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
+                });
+            }
+            
+            // Listen for storage events (cross-tab sync)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'soundEnabled') {
+                    soundEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (soundToggle) {
+                        soundToggle.checked = soundEnabled;
+                    }
+                    
+                    // Update Tone.js mute state
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
+                    }
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('soundSettingChanged', {
+                        detail: { soundEnabled }
+                    }));
+                } else if (e.key === 'musicEnabled') {
+                    musicEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (musicToggle) {
+                        musicToggle.checked = musicEnabled;
+                    }
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
+                    // Toggle music immediately
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
+                }
+            });
+            
+            // Listen for custom sound setting changes
+            window.addEventListener('soundSettingChanged', (e) => {
+                soundEnabled = e.detail.soundEnabled;
+            });
+            
+            // Listen for custom music setting changes
+            window.addEventListener('musicSettingChanged', (e) => {
+                musicEnabled = e.detail.musicEnabled;
+            });
+            
+            // Add user interaction listeners to enable music after first interaction
+            document.addEventListener('click', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('keydown', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('touchstart', enableMusicAfterInteraction, { once: true });
+        }
+
+        // --- AUTHENTICATION STATE ---
+        let currentUser = null;
+        let userType = null; // 'gmail' or 'guest'
+        
+        // --- GAME STATE & SETTINGS ---
+        let userId = 'local_user_' + Math.random().toString(36).substr(2, 9);
+        let currentStreak = 0;
+        let currentEntry, correctAnswer, wrongAnswer, correctWordPosition;
+        let timerInterval;
+        let gameInProgress = false;
+        let displayName = '';
+        
+        // NEW: Tracking for new scoring system
+        let levelScores = {
+            easy: { correct: 0, total: 0, completed: false },
+            medium: { correct: 0, total: 0, completed: false },
+            hard: { correct: 0, total: 0, completed: false }
+        };
+        
+        // --- LIFE SYSTEM ---
+        let playerLives = 3;
+        let maxLives = 3;
+        let heartsContainer, lifeCountEl, motivationText;
+        
+        // --- PERSONAL RECORDS SYSTEM ---
+        let personalRecords = {
+            easy: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
+            medium: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 },
+            hard: { bestScore: 0, bestAccuracy: 0, gamesPlayed: 0, totalScore: 0 }
+        };
+        
+
+        let settings = {
+            difficulty: 'easy',
+            timer: false,
+            sound: true,
+            music: false,
+        };
+
+        let stats = {
+            bestStreak: 0,
+            totalGames: 0,
+            totalCorrect: 0,
+            totalMistakes: 0,
+        };
+        
+
+
+
+
+        // COPIED FROM index.html (working version)
+        function getDifficultyLabel(level) {
+            switch(level) {
+                case 1: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+                case 2: return { text: 'ປານກາງ', color: 'var(--main-color)' };
+                case 3: return { text: 'ຍາກ', color: 'var(--error-color)' };
+                default: return { text: 'ງ່າຍ', color: 'var(--correct-color)' };
+            }
+        }
+
+        function filterWordsByDifficulty(difficulty) {
+            // Filter words based on settings difficulty
+            let targetLevel;
+            switch(difficulty) {
+                case 'easy': targetLevel = 1; break;
+                case 'medium': targetLevel = 2; break;
+                case 'hard': targetLevel = 3; break;
+                default: targetLevel = 1;
+            }
+            
+            const filtered = wordList.filter(entry => entry.difficulty === targetLevel);
+            return filtered.length > 0 ? filtered : wordList; // Fallback to all if none found
+        }
+
+        // --- LIFE SYSTEM FUNCTIONS ---
+        function updateLifeDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            lifeCountEl.textContent = `${playerLives}/${maxLives}`;
+            
+            hearts.forEach((heart, index) => {
+                if (index < playerLives) {
+                    heart.classList.remove('lost');
+                    heart.classList.add('active');
+                } else {
+                    heart.classList.add('lost');
+                    heart.classList.remove('active');
+                }
+            });
+            
+            updateMotivationText();
+        }
+
+        function loseLife() {
+            if (playerLives > 0) {
+                playerLives--;
+                
+                // Animate the heart breaking
+                const hearts = heartsContainer.querySelectorAll('.heart');
+                const heartToBreak = hearts[playerLives];
+                heartToBreak.classList.add('losing');
+                
+                setTimeout(() => {
+                    heartToBreak.classList.remove('losing');
+                    updateLifeDisplay();
+                    
+                    // Check if game over
+                    if (playerLives === 0) {
+                        gameOver();
+                    } else {
+                        showLifeWarning();
+                        // Continue to next round after a delay
+                        setTimeout(nextRound, 1500);
+                    }
+                }, 600);
+            }
+        }
+
+        function updateMotivationText() {
+            switch(playerLives) {
+                case 3:
+                    motivationText.textContent = "You've got 3 lives—spend them wisely!";
+                    motivationText.style.color = 'var(--correct-color)';
+                    break;
+                case 2:
+                    motivationText.textContent = "Be careful! 2 lives remaining.";
+                    motivationText.style.color = 'var(--main-color)';
+                    break;
+                case 1:
+                    motivationText.textContent = "Last chance! Don't waste it!";
+                    motivationText.style.color = 'var(--error-color)';
+                    break;
+                case 0:
+                    motivationText.textContent = "Game Over! No lives left.";
+                    motivationText.style.color = 'var(--error-color)';
+                    break;
+            }
+        }
+
+        function showLifeWarning() {
+            const lifeBar = document.querySelector('.life-bar-header');
+            lifeBar.style.animation = 'lifeBarFlash 0.5s ease-in-out 2';
+            
+            setTimeout(() => {
+                lifeBar.style.animation = '';
+            }, 1000);
+        }
+
+        function resetLives() {
+            playerLives = maxLives;
+            updateLifeDisplay();
+        }
+
+        function gameOver() {
+            gameInProgress = false;
+            clearInterval(timerInterval);
+            
+            // Show results screen with final stats
+            switchScreen('results');
+            
+            // Update final stats
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('accuracy-stat').textContent = '0.0%';
+            
+            // Update evaluation for game over due to no lives
+            const evaluationEl = document.getElementById('evaluation-result');
+            evaluationEl.textContent = "No lives left! Better luck next time!";
+            evaluationEl.style.color = 'var(--error-color)';
+        }
+
+        // --- LOCAL STORAGE DATA PERSISTENCE ---
+        function loadUserData() {
+            try {
+                const savedData = localStorage.getItem('laoTypoGame_userData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    settings = { ...settings, ...data.settings };
+                    stats = { ...stats, ...data.stats };
+                    personalRecords = { ...personalRecords, ...data.personalRecords };
+                    displayName = data.displayName || '';
+                    playerNameInput.value = displayName;
+                }
+            } catch (error) {
+                console.error("Error loading user data from localStorage:", error);
+            }
+        }
+
+        function saveUserData() {
+            try {
+                const userData = {
+                    settings,
+                    stats,
+                    personalRecords,
+                    displayName,
+                    lastPlayed: new Date().toISOString()
+                };
+                localStorage.setItem('laoTypoGame_userData', JSON.stringify(userData));
+            } catch (error) {
+                console.error("Error saving user data to localStorage:", error);
+            }
+        }
+
+        function updateLeaderboard(score) {
+            try {
+                const finalDisplayName = displayName || 'Anonymous';
+                let leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                
+                // Check if user already exists in leaderboard
+                const existingIndex = leaderboard.findIndex(entry => entry.userId === userId);
+                
+                if (existingIndex !== -1) {
+                    // Update existing entry only if new score is higher
+                    if (score > leaderboard[existingIndex].score) {
+                        leaderboard[existingIndex] = {
+                            userId,
+                            score,
+                            displayName: finalDisplayName,
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                } else {
+                    // Add new entry
+                    leaderboard.push({
+                        userId,
+                        score,
+                        displayName: finalDisplayName,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                // Sort and keep top 20
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 20);
+                
+                localStorage.setItem('laoTypoGame_leaderboard', JSON.stringify(leaderboard));
+                console.log(`Leaderboard updated with score: ${score}`);
+            } catch (error) {
+                console.error("Error updating leaderboard:", error);
+            }
+        }
+
+        function formatDate(isoString) {
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (error) {
+                return 'N/A';
+            }
+        }
+
+        async function showLeaderboard() {
+            leaderboardPanel.classList.remove('hidden');
+            switchTab('leaderboard');
+        }
+        
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'text-main-color', 'border-main-color');
+                btn.classList.add('text-sub-color');
+            });
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show selected tab
+            const activeTab = document.getElementById(`${tabName}-tab`);
+            const activeContent = document.getElementById(`${tabName}-content`);
+            
+            if (activeTab && activeContent) {
+                activeTab.classList.add('active', 'text-main-color', 'border-main-color');
+                activeTab.classList.remove('text-sub-color');
+                activeContent.classList.remove('hidden');
+                
+                // Load content based on tab
+                if (tabName === 'leaderboard') {
+                    renderLeaderboard();
+                } else if (tabName === 'personal-records') {
+                    updatePersonalRecordsMainDisplay();
+                }
+            }
+        }
+        
+        function updatePersonalRecordsMainDisplay() {
+            // Update main panel personal records display
+            if (personalRecords.easy) {
+                document.getElementById('easy-best-score-main').textContent = personalRecords.easy.bestScore || 0;
+                document.getElementById('easy-best-accuracy-main').textContent = `${(personalRecords.easy.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('easy-games-count-main').textContent = `${personalRecords.easy.gamesPlayed || 0} games`;
+            }
+            
+            if (personalRecords.medium) {
+                document.getElementById('medium-best-score-main').textContent = personalRecords.medium.bestScore || 0;
+                document.getElementById('medium-best-accuracy-main').textContent = `${(personalRecords.medium.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('medium-games-count-main').textContent = `${personalRecords.medium.gamesPlayed || 0} games`;
+            }
+            
+            if (personalRecords.hard) {
+                document.getElementById('hard-best-score-main').textContent = personalRecords.hard.bestScore || 0;
+                document.getElementById('hard-best-accuracy-main').textContent = `${(personalRecords.hard.bestAccuracy || 0).toFixed(1)}%`;
+                document.getElementById('hard-games-count-main').textContent = `${personalRecords.hard.gamesPlayed || 0} games`;
+            }
+        }
+        
+        async function renderLeaderboard() {
+            leaderboardContainer.innerHTML = '<p class="text-center">ກຳລັງໂຫຼດ...</p>';
+
+            try {
+                let leaderboard = [];
+                
+                // Try Firebase first
+                if (firebaseSync && firebaseSync.enabled) {
+                    try {
+                        const difficulties = ['easy', 'medium', 'hard'];
+                        leaderboardContainer.innerHTML = '<p class="text-center">🔄 Loading from Firebase...</p>';
+                        
+                        for (const difficulty of difficulties) {
+                            const firebaseLeaderboard = await firebaseSync.getLeaderboard(difficulty, 50);
+                            leaderboard = leaderboard.concat(firebaseLeaderboard.map(entry => ({
+                                ...entry,
+                                difficulty: difficulty
+                            })));
+                        }
+                    } catch (error) {
+                        console.warn('Failed to load from Firebase, using local data');
+                    }
+                }
+                
+                // Fallback to localStorage
+                if (leaderboard.length === 0) {
+                    leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                }
+                
+                if (leaderboard.length === 0) {
+                    leaderboardContainer.innerHTML = '<p class="text-center">ຈະເປີດໃຫ້ແຂ່ງກັນໄວໆນີ້!</p>';
+                    return;
+                }
+
+                let tableHTML = `
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/12 text-center">#</th>
+                                <th class="w-5/12">ຊື່</th>
+                                <th class="w-3/12">ຄະແນນ</th>
+                                <th class="w-3/12">ວັນທີ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                leaderboard.forEach((entry, index) => {
+                    const isCurrentUser = entry.userId === userId;
+                    tableHTML += `
+                        <tr class="${isCurrentUser ? 'user-best' : ''}">
+                            <td class="rank">${index + 1}</td>
+                            <td>${entry.displayName}</td>
+                            <td class="score">${entry.score}</td>
+                            <td>${formatDate(entry.timestamp)}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `</tbody></table>`;
+                leaderboardContainer.innerHTML = tableHTML;
+
+            } catch (error) {
+                console.error("Error fetching leaderboard:", error);
+                leaderboardContainer.innerHTML = '<p class="text-center text-error-color">ບໍ່ສາມາດໂຫຼດກະດານຈັດອັນດັບໄດ້.</p>';
+            }
+        }
+        
+        // --- SOUND EFFECTS (Tone.js) ---
+        const sounds = {
+            correct: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
+            incorrect: new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 } }).toDestination(),
+            start: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 } }).toDestination(),
+            uhoh: new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.05, decay: 0.3, sustain: 0.2, release: 0.5 } }).toDestination(),
+        };
+
+        function playSound(sound) {
+            if (!soundEnabled) return;
+            try {
+                Tone.start(); // Required for browsers that autoplay
+                if (sound === 'correct') sounds.correct.triggerAttackRelease('C5', '8n');
+                else if (sound === 'incorrect') sounds.incorrect.triggerAttackRelease('C3', '8n');
+                else if (sound === 'start') sounds.start.triggerAttackRelease('C4', '8n');
+                else if (sound === 'uhoh') {
+                    // Play "uh-oh" sound with two descending notes
+                    sounds.uhoh.triggerAttackRelease('G3', '8n');
+                    setTimeout(() => sounds.uhoh.triggerAttackRelease('E3', '8n'), 150);
+                }
+            } catch (e) {
+                console.error("Sound playback error", e);
+            }
+        }
+
+        // --- WORD & TYPO GENERATION (LAO) ---
+        function generateTypo(word, difficulty) {
+            const chars = [...word];
+            const len = chars.length;
+            if (len < 2) return word + 'ກ';
+            const type = Math.random();
+            
+            if (difficulty === 'easy') {
+                if (type < 0.5 && len > 1) {
+                    const randomIndex = Math.floor(Math.random() * len);
+                    chars.splice(randomIndex, 1);
+                } else {
+                    const randomIndex = Math.floor(Math.random() * len);
+                    chars.splice(randomIndex, 0, chars[randomIndex]);
+                }
+            } 
+            else if (difficulty === 'medium') {
+                if (type < 0.5 && len > 1) {
+                    const randomIndex = Math.floor(Math.random() * (len - 1));
+                    [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
+                } else {
+                    const subs = {'ກ': 'ຂ', 'ຂ': 'ຄ', 'ຄ': 'ກ', 'ດ': 'ຕ', 'ຕ': 'ດ', 'ບ': 'ປ', 'ປ': 'ບ', 'ສ': 'ຊ', 'ຊ': 'ສ', 'ຫ': 'ຮ', 'ຮ': 'ຫ'};
+                    const subIndices = chars.map((c, i) => subs[c] ? i : -1).filter(i => i !== -1);
+                    if (subIndices.length > 0) {
+                        const indexToChange = subIndices[Math.floor(Math.random() * subIndices.length)];
+                        chars[indexToChange] = subs[chars[indexToChange]];
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * (len - 1));
+                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
+                    }
+                }
+            }
+            else if (difficulty === 'hard') {
+                 const toneMarks = ['່', '້', '໊', '໋'];
+                 const toneMarkIndices = chars.map((c, i) => toneMarks.includes(c) ? i : -1).filter(i => i !== -1);
+                 if (type < 0.5 && toneMarkIndices.length > 0) {
+                    const indexToRemove = toneMarkIndices[Math.floor(Math.random() * toneMarkIndices.length)];
+                    chars.splice(indexToRemove, 1);
+                 } else {
+                    const vowelSubs = {'ະ': 'າ', 'າ': 'ະ', 'ິ': 'ີ', 'ີ': 'ິ', 'ຶ': 'ື', 'ື': 'ຶ', 'ຸ': 'ູ', 'ູ': 'ຸ'};
+                    const vowelIndices = chars.map((c, i) => vowelSubs[c] ? i : -1).filter(i => i !== -1);
+                     if (vowelIndices.length > 0) {
+                        const indexToChange = vowelIndices[Math.floor(Math.random() * vowelIndices.length)];
+                        chars[indexToChange] = vowelSubs[chars[indexToChange]];
+                    } else {
+                         const randomIndex = Math.floor(Math.random() * (len - 1));
+                        [chars[randomIndex], chars[randomIndex + 1]] = [chars[randomIndex + 1], chars[randomIndex]];
+                    }
+                 }
+            }
+            return chars.join('');
+        }
+
+        // --- UI & GAME FLOW ---
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            if (screens[screenName]) screens[screenName].classList.add('active');
+        }
+
+        function updateUI() {
+            bestStreakEl.textContent = stats.bestStreak;
+            document.getElementById('stats-display-name').textContent = displayName || 'ບໍ່ມີຊື່';
+            document.getElementById('stats-best-streak').textContent = stats.bestStreak;
+            document.getElementById('results-best-streak').textContent = stats.bestStreak;
+            document.getElementById('stats-total-games').textContent = stats.totalGames;
+            document.getElementById('stats-total-correct').textContent = stats.totalCorrect;
+            document.getElementById('stats-total-mistakes').textContent = stats.totalMistakes;
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const overallAccuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('stats-overall-accuracy').textContent = `${overallAccuracy}%`;
+            
+            // Update difficulty buttons
+            difficultyButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === settings.difficulty) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Set default difficulty if none selected
+            if (!document.querySelector('.difficulty-btn.active')) {
+                const defaultBtn = document.querySelector('.difficulty-btn[data-difficulty="easy"]');
+                if (defaultBtn) {
+                    defaultBtn.classList.add('active');
+                    settings.difficulty = 'easy';
+                }
+            }
+            mainTimerToggle.checked = settings.timer;
+            // soundToggle.checked is already set by the sound system initialization
+            musicToggle.checked = settings.music;
+            
+            // Update user display
+            updateUserDisplay();
+        }
+
+        async function startGame() {
+            const newName = playerNameInput.value.trim();
+            if (!newName) {
+                playerNameInput.classList.add('input-error', 'feedback-incorrect');
+                playerNameInput.placeholder = "ກະລຸນາໃສ່ຊື່ກ່ອນ!";
+                setTimeout(() => {
+                    playerNameInput.classList.remove('input-error', 'feedback-incorrect');
+                    playerNameInput.placeholder = "ໃສ່ຊື່ຂອງເຈົ້າ...";
+                }, 600);
+                return;
+            }
+
+            if (newName !== displayName) {
+                displayName = newName;
+                await saveUserDataWithSync();
+            }
+
+            // Display player name in game screen
+            gamePlayerName.textContent = displayName;
+
+            playSound('start');
+            
+            // Save current settings and player data before navigation
+            await saveUserDataWithSync();
+            
+            // Navigate to gameplay page with enhanced parameters
+            console.log('🚀 Starting game with settings:', settings);
+            console.log('👤 Player name:', displayName);
+            
+            const params = new URLSearchParams({
+                player: encodeURIComponent(displayName),
+                difficulty: settings.difficulty,
+                timer: settings.timer.toString(),
+                sound: soundEnabled.toString(),
+                music: musicEnabled.toString()
+            });
+            
+            const gameURL = `gameplay.html?${params.toString()}`;
+            console.log('🔗 Navigating to:', gameURL);
+            
+            window.location.href = gameURL;
+        }
+
+        function nextRound() {
+            currentStreakEl.textContent = currentStreak;
+            bestStreakEl.textContent = stats.bestStreak;
+            wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            
+            // Filter words by difficulty setting
+            const availableWords = filterWordsByDifficulty(settings.difficulty);
+            
+            // Select random entry from filtered list
+            currentEntry = availableWords[Math.floor(Math.random() * availableWords.length)];
+            
+            // Display context from Column A
+            contextDisplay.textContent = currentEntry.context;
+            
+            // Display difficulty level with color coding
+            const difficultyInfo = getDifficultyLabel(currentEntry.difficulty);
+            difficultyDisplay.textContent = difficultyInfo.text;
+            difficultyDisplay.style.color = difficultyInfo.color;
+            
+            // Set correct and wrong answers from Columns B and C
+            correctAnswer = currentEntry.correct;
+            wrongAnswer = currentEntry.wrong;
+
+            // Randomly position correct answer
+            correctWordPosition = Math.random() < 0.5 ? 'left' : 'right';
+
+            if (correctWordPosition === 'left') {
+                wordCardLeft.textContent = correctAnswer;
+                wordCardRight.textContent = wrongAnswer;
+            } else {
+                wordCardLeft.textContent = wrongAnswer;
+                wordCardRight.textContent = correctAnswer;
+            }
+            startTimer();
+        }
+
+        function handleSelection(selectedPosition) {
+            if (!gameInProgress) return;
+            clearInterval(timerInterval);
+            const isCorrect = selectedPosition === correctWordPosition;
+            const selectedCard = selectedPosition === 'left' ? wordCardLeft : wordCardRight;
+
+            if (isCorrect) {
+                playSound('correct');
+                selectedCard.classList.add('feedback-correct');
+                currentStreak++;
+                
+                // NEW: Track score for current level
+                const levelName = settings.difficulty;
+                levelScores[levelName].correct++;
+                levelScores[levelName].total++;
+                
+                if (currentStreak > stats.bestStreak) {
+                    stats.bestStreak = currentStreak;
+                }
+                setTimeout(nextRound, 400);
+            } else {
+                playSound('incorrect');
+                selectedCard.classList.add('feedback-incorrect');
+                stats.totalMistakes += 1;
+                
+                // NEW: Track incorrect answer for current level
+                const levelName = settings.difficulty;
+                levelScores[levelName].total++;
+                
+                // Lose a life instead of ending game immediately
+                loseLife();
+                
+                // Note: loseLife() handles the rest (next round or game over)
+            }
+        }
+
+        function endGame() {
+            gameInProgress = false;
+            stats.totalCorrect += currentStreak;
+            stats.totalMistakes += 1;
+
+            switchScreen('results');
+            document.getElementById('final-streak').textContent = currentStreak;
+            
+            // NEW: Calculate weighted score
+            const scoreResult = calculateWeightedScore();
+            
+            // Update accuracy display with weighted percentage
+            document.getElementById('accuracy-stat').textContent = `${scoreResult.percentage.toFixed(1)}%`;
+            
+            // NEW: Display score breakdown
+            displayScoreBreakdown(scoreResult);
+            
+            const evaluationEl = document.getElementById('evaluation-result');
+            evaluationEl.textContent = scoreResult.evaluation.text;
+            evaluationEl.style.color = scoreResult.evaluation.color;
+
+            if (currentStreak > 0) {
+               updateLeaderboard(currentStreak);
+            }
+            saveUserData();
+            updateUI();
+            
+            // Start result sound with fade
+            startResultSound();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            if (!settings.timer) {
+                timerContainer.style.display = 'none';
+                return;
+            }
+            timerContainer.style.display = 'block';
+            let duration = 5000;
+            
+            timerBar.style.transition = 'none';
+            timerBar.style.transform = 'scaleX(1)';
+            
+            requestAnimationFrame(() => {
+                timerBar.style.transition = `transform ${duration / 1000}s linear`;
+                timerBar.style.transform = 'scaleX(0)';
+            });
+
+            timerInterval = setTimeout(() => {
+                if (gameInProgress) {
+                    playSound('incorrect');
+                    gameInProgress = false;
+                    endGame();
+                }
+            }, duration);
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.getElementById('home-btn').addEventListener('click', () => switchScreen('start'));
+        document.getElementById('home-nav-btn').addEventListener('click', () => switchScreen('start'));
+        document.getElementById('start-game-btn').addEventListener('click', startGame);
+        document.getElementById('restart-game-btn').addEventListener('click', () => {
+            stopResultSound();
+            startGame();
+        });
+        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+            stopResultSound();
+            switchScreen('start');
+            updateUI(); // Ensure name is displayed correctly when going back to menu
+        });
+        wordCardLeft.addEventListener('click', () => handleSelection('left'));
+        wordCardRight.addEventListener('click', () => handleSelection('right'));
+
+        // Panels and Tab Navigation
+        const settingsPanel = document.getElementById('settings-panel');
+        const accountPanel = document.getElementById('account-panel');
+        
+        // Toggle functionality for all panels
+        document.getElementById('leaderboard-nav-btn').addEventListener('click', () => {
+            console.log('🏆 Toggling leaderboard panel');
+            const isHidden = leaderboardPanel.classList.contains('hidden');
+            
+            // Close other panels
+            settingsPanel.classList.add('hidden');
+            accountPanel.classList.add('hidden');
+            
+            // Toggle leaderboard
+            if (isHidden) {
+                leaderboardPanel.classList.remove('hidden');
+                switchTab('leaderboard');
+            } else {
+                leaderboardPanel.classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('open-settings-btn').addEventListener('click', () => {
+            console.log('⚙️ Toggling settings panel');
+            const isHidden = settingsPanel.classList.contains('hidden');
+            
+            // Close other panels
+            leaderboardPanel.classList.add('hidden');
+            accountPanel.classList.add('hidden');
+            
+            // Toggle settings
+            settingsPanel.classList.toggle('hidden');
+        });
+        
+        document.getElementById('account-nav-btn').addEventListener('click', () => {
+            console.log('👤 Toggling account panel');
+            const isHidden = accountPanel.classList.contains('hidden');
+            
+            // Close other panels
+            leaderboardPanel.classList.add('hidden');
+            settingsPanel.classList.add('hidden');
+            
+            // Toggle account panel
+            if (isHidden) {
+                updateAccountPanel(); // Update account panel with latest data
+                accountPanel.classList.remove('hidden');
+            } else {
+                accountPanel.classList.add('hidden');
+            }
+        });
+        
+        // Close buttons
+        document.getElementById('close-leaderboard-btn').addEventListener('click', () => leaderboardPanel.classList.add('hidden'));
+        document.getElementById('close-settings-btn').addEventListener('click', () => settingsPanel.classList.add('hidden'));
+        document.getElementById('close-account-btn').addEventListener('click', () => accountPanel.classList.add('hidden'));
+        
+        // Tab Navigation
+        document.getElementById('leaderboard-tab').addEventListener('click', () => switchTab('leaderboard'));
+
+        document.getElementById('personal-records-tab').addEventListener('click', () => switchTab('personal-records'));
+        
+        document.getElementById('save-settings-btn').addEventListener('click', () => {
+            console.log('💾 Saving settings and closing panel');
+            // soundEnabled and musicEnabled are already handled by their respective event listeners
+            if (firebaseSync) {
+                firebaseSync.setEnabled(firebaseSyncToggle.checked);
+            }
+            saveUserData();
+            settingsPanel.classList.add('hidden');
+        });
+        
+        // Main page controls event listeners
+        // Difficulty button selection
+        difficultyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                difficultyButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                settings.difficulty = btn.dataset.difficulty;
+                saveUserData();
+            });
+        });
+        
+        mainTimerToggle.addEventListener('change', () => {
+            settings.timer = mainTimerToggle.checked;
+            saveUserData();
+        });
+        
+        // Music toggle event listener  
+        musicToggle.addEventListener('change', () => {
+            settings.music = musicToggle.checked;
+            saveUserData();
+            toggleBackgroundMusic();
+        });
+
+        document.getElementById('stats-back-btn').addEventListener('click', () => switchScreen('start'));
+        
+        // Gecko mascot click event
+        document.getElementById('gecko-mascot').addEventListener('click', () => {
+            playSound('uhoh');
+            // Optional: Add a little animation
+            const gecko = document.getElementById('gecko-mascot');
+            gecko.style.transform = 'scale(0.9) rotate(-5deg)';
+            setTimeout(() => {
+                gecko.style.transform = 'scale(1) rotate(0deg)';
+            }, 200);
+        });
+        
+        // Account panel controls
+        document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
+            const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+            if (newName && newName.trim()) {
+                displayName = newName.trim();
+                localStorage.setItem('displayName', displayName);
+                updateUI();
+                updateAccountPanel();
+            }
+        });
+        
+        document.getElementById('view-full-profile-btn').addEventListener('click', () => {
+            // Close account panel and navigate to full profile page
+            accountPanel.classList.add('hidden');
+            window.location.href = 'player_account_info.html';
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') {
+                settingsPanel.classList.add('hidden');
+                leaderboardPanel.classList.add('hidden');
+                accountPanel.classList.add('hidden');
+            }
+            if (screens.start.classList.contains('active') && e.key === 'Enter') {
+                if (!startGameBtn.disabled) startGame();
+            }
+            if (gameInProgress) {
+                if (e.key.toLowerCase() === 'a') {
+                    wordCardLeft.classList.add('focused');
+                    handleSelection('left');
+                } else if (e.key.toLowerCase() === 'd') {
+                    wordCardRight.classList.add('focused');
+                    handleSelection('right');
+                }
+            } else if (screens.results.classList.contains('active') && e.code === 'Space') {
+                startGame();
+            }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+             if (e.key.toLowerCase() === 'a') wordCardLeft.classList.remove('focused');
+             if (e.key.toLowerCase() === 'd') wordCardRight.classList.remove('focused');
+        });
+
+        // --- INITIALIZATION ---
+        window.onload = async () => {
+            // Initialize sound system first (always needed)
+            initializeSoundSystem();
+            
+            // Try to auto-start music if enabled (may be blocked by browser)
+            if (musicEnabled) {
+                setTimeout(() => {
+                    toggleBackgroundMusic();
+                }, 1000); // Small delay to ensure audio is ready
+            }
+            
+            // Check authentication
+            if (!checkUserAuthentication()) {
+                return; // Will redirect to registration
+            }
+            
+            // Initialize DOM references for life system
+            heartsContainer = document.querySelector('.hearts');
+            lifeCountEl = document.querySelector('.life-count');
+            motivationText = document.querySelector('.motivation-text');
+            
+            // Initialize Firebase sync
+            await initializeFirebaseSync();
+            
+            loadUserData();
+            updateUI();
+            
+            // Word loading now handled in gameplay.html
+            startGameBtn.disabled = false;
+            startGameBtn.textContent = 'ເລີ່ມເກມ';
+        };
+
+        // --- AUTHENTICATION GUARD ---
+        function checkUserAuthentication() {
+            // Check if we're in test mode (bypass authentication)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('testmode') === 'true') {
+                console.log('🧪 Test mode enabled - bypassing authentication');
+                userType = 'guest';
+                displayName = 'Test User';
+                userId = 'test_user_' + Math.random().toString(36).substr(2, 9);
+                updateUserDisplay();
+                return true;
+            }
+            
+            // Check for guest user in sessionStorage
+            const guestUser = sessionStorage.getItem('guestUser');
+            const storedUserType = sessionStorage.getItem('userType');
+            
+            // Check for Gmail user data in localStorage
+            const gmailUserData = localStorage.getItem('firebaseUser');
+            
+            if (guestUser && storedUserType === 'guest') {
+                console.log('👤 Guest user found');
+                userType = 'guest';
+                const userData = JSON.parse(guestUser);
+                displayName = userData.name;
+                userId = userData.id;
+                updateUserDisplay();
+                return true;
+            } else if (gmailUserData) {
+                console.log('📧 Gmail user data found');
+                userType = 'gmail';
+                // Will be fully loaded by Firebase auth listener
+                return true;
+            } else {
+                // For testing purposes, create a temporary guest session instead of redirecting
+                console.log('🔐 No authenticated user found - creating temporary test session');
+                
+                // Uncomment the next line to enable auto-redirect to registration
+                // redirectToRegistration();
+                // return false;
+                
+                // Create temporary guest session for testing
+                const tempUser = {
+                    id: 'temp_guest_' + Math.random().toString(36).substr(2, 9),
+                    name: 'Temporary Guest',
+                    age: 0,
+                    createdAt: new Date().toISOString(),
+                    userType: 'guest'
+                };
+                
+                sessionStorage.setItem('guestUser', JSON.stringify(tempUser));
+                sessionStorage.setItem('userType', 'guest');
+                
+                userType = 'guest';
+                displayName = tempUser.name;
+                userId = tempUser.id;
+                updateUserDisplay();
+                
+                console.log('✅ Temporary guest session created for testing');
+                return true;
+            }
+        }
+        
+        function redirectToRegistration() {
+            console.log('🔀 Redirecting to registration page...');
+            window.location.href = 'registration.html';
+        }
+        
+        function updateUserDisplay() {
+            const userTypeElement = document.getElementById('user-type-display');
+            const userIdElement = document.getElementById('user-id-display');
+            
+            if (userType === 'guest') {
+                if (userTypeElement) userTypeElement.textContent = '👤 Guest Mode';
+                if (userIdElement) userIdElement.textContent = '...' + userId.slice(-6);
+            } else if (userType === 'gmail' && currentUser) {
+                if (userTypeElement) userTypeElement.textContent = `📧 ${currentUser.email}`;
+                if (userIdElement) userIdElement.textContent = currentUser.uid;
+            }
+            
+            // Update account nav link visibility
+            const accountNavLink = document.getElementById('account-nav-link');
+            if (accountNavLink) {
+                if (userType === 'gmail') {
+                    accountNavLink.style.display = 'block';
+                } else {
+                    accountNavLink.style.display = 'none';
+                }
+            }
+        }
+
+        // NEW: Calculate weighted score based on new scoring system
+        function calculateWeightedScore() {
+            let rawScore = 0;
+            let maxPossibleScore = 0;
+            
+            // Calculate raw score with weights
+            if (levelScores.easy.total > 0) {
+                rawScore += levelScores.easy.correct * 1; // Easy = 1 point each
+                maxPossibleScore += levelScores.easy.total * 1; // Max points for attempted questions
+            }
+            
+            if (levelScores.medium.total > 0) {
+                rawScore += levelScores.medium.correct * 2; // Medium = 2 points each
+                maxPossibleScore += levelScores.medium.total * 2; // Max points for attempted questions
+            }
+            
+            if (levelScores.hard.total > 0) {
+                rawScore += levelScores.hard.correct * 3; // Hard = 3 points each
+                maxPossibleScore += levelScores.hard.total * 3; // Max points for attempted questions
+            }
+            
+            // Calculate percentage
+            const percentage = maxPossibleScore > 0 ? (rawScore / maxPossibleScore) * 100 : 0;
+            
+            return {
+                rawScore,
+                maxPossibleScore,
+                percentage,
+                evaluation: getEvaluationTier(percentage)
+            };
+        }
+        
+        // NEW: Get evaluation tier based on percentage
+        function getEvaluationTier(percentage) {
+            if (percentage >= 90) {
+                return {
+                    text: "ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ",
+                    color: 'var(--correct-color)'
+                };
+            } else if (percentage >= 70) {
+                return {
+                    text: "ເຈົ້າແມ່ນລູກຊອດລາວ 75%",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 40) {
+                return {
+                    text: "ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ",
+                    color: 'var(--main-color)'
+                };
+            } else if (percentage >= 20) {
+                return {
+                    text: "ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ \"ຈຣິງໃຈ\"",
+                    color: 'var(--warning-color)'
+                };
+            } else {
+                return {
+                    text: "ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ",
+                    color: 'var(--error-color)'
+                };
+            }
+        }
+        
+        // NEW: Display score breakdown in results
+        function displayScoreBreakdown(scoreResult) {
+            const breakdownEl = document.getElementById('score-breakdown');
+            if (!breakdownEl) return;
+            
+            let breakdownHTML = '<div class="bg-[#3e4043] rounded-lg p-4 mt-4">';
+            breakdownHTML += '<h3 class="text-lg font-bold mb-3">ຄະແນນລາຍລະອຽດ:</h3>';
+            
+            // Show each level's performance
+            if (levelScores.easy.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--correct-color)">ງ່າຍ:</span> 
+                        ${levelScores.easy.correct}/${levelScores.easy.total} ຖືກ 
+                        (${levelScores.easy.correct} × 1 = ${levelScores.easy.correct} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.medium.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--main-color)">ປານກາງ:</span> 
+                        ${levelScores.medium.correct}/${levelScores.medium.total} ຖືກ 
+                        (${levelScores.medium.correct} × 2 = ${levelScores.medium.correct * 2} ຄະແນນ)
+                    </div>`;
+            }
+            
+            if (levelScores.hard.total > 0) {
+                breakdownHTML += `
+                    <div class="mb-2">
+                        <span style="color: var(--error-color)">ຍາກ:</span> 
+                        ${levelScores.hard.correct}/${levelScores.hard.total} ຖືກ 
+                        (${levelScores.hard.correct} × 3 = ${levelScores.hard.correct * 3} ຄະແນນ)
+                    </div>`;
+            }
+            
+            breakdownHTML += `
+                <div class="mt-3 pt-3 border-t border-gray-600">
+                    <div class="font-bold">ຄະແນນລວມ: ${scoreResult.rawScore}/${scoreResult.maxPossibleScore}</div>
+                    <div class="font-bold text-main-color">ເປີເຊັນ: ${scoreResult.percentage.toFixed(1)}%</div>
+                </div>
+            </div>`;
+            
+            breakdownEl.innerHTML = breakdownHTML;
+        }
+        
+        // ... existing code ...
+        
+        // Enhanced Account Functions
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = displayName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = stats.bestStreak;
+            
+            // Calculate accuracy
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? ((stats.totalCorrect / totalPlays) * 100).toFixed(1) : 0;
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
+            
+            // Calculate achievement count
+            const achievements = calculateAchievements();
+            document.getElementById('account-achievements').textContent = `${achievements.length}/8`;
+        }
+        
+        function calculateUserRank() {
+            // Simple rank calculation based on best streak
+            if (stats.bestStreak >= 50) return Math.floor(Math.random() * 10) + 1;
+            if (stats.bestStreak >= 25) return Math.floor(Math.random() * 25) + 10;
+            if (stats.bestStreak >= 10) return Math.floor(Math.random() * 50) + 25;
+            return Math.floor(Math.random() * 100) + 50;
+        }
+        
+        function calculateAchievements() {
+            const unlocked = [];
+            const totalPlays = stats.totalCorrect + stats.totalMistakes;
+            const accuracy = totalPlays > 0 ? (stats.totalCorrect / totalPlays) * 100 : 0;
+            
+            // First game
+            if (stats.totalGames >= 1) unlocked.push('first-game');
+            
+            // Streak achievements
+            if (stats.bestStreak >= 5) unlocked.push('streak-5');
+            if (stats.bestStreak >= 10) unlocked.push('streak-10');
+            
+            // Perfect accuracy
+            if (accuracy === 100 && stats.totalCorrect >= 5) unlocked.push('perfectionist');
+            
+            // Word master
+            if (stats.totalCorrect >= 50) unlocked.push('word-master');
+            
+            // Difficulty master (played all levels)
+            if (stats.difficulties?.easy?.bestStreak > 0 && 
+                stats.difficulties?.medium?.bestStreak > 0 && 
+                stats.difficulties?.hard?.bestStreak > 0) {
+                unlocked.push('difficulty-master');
+            }
+            
+            // Consistent player (7 days - mock for now)
+            if (stats.totalGames >= 7) unlocked.push('consistent-player');
+            
+            // Champion (top rank - mock)
+            if (stats.bestStreak >= 50) unlocked.push('champion');
+            
+            return unlocked;
+        }
+        
+        // 🔥 FIREBASE INTEGRATION FUNCTIONS
+        let firebaseEnabled = false;
+        
+        // Initialize Firebase connection
+        async function initializeFirebaseSync() {
+            try {
+                // Check if Firebase managers are available
+                if (typeof FirebaseSyncManager !== 'undefined') {
+                    const isConnected = await FirebaseSyncManager.checkConnection();
+                    if (isConnected) {
+                        firebaseEnabled = true;
+                        console.log('🔥 Firebase sync enabled');
+                        
+                        // Try to sync existing local data to cloud
+                        await syncLocalDataToFirebase();
+                        
+                        // Try to load cloud data
+                        await syncCloudDataToLocal();
+                    } else {
+                        console.warn('🔌 Firebase connection failed, using local mode');
+                    }
+                } else {
+                    console.warn('🔥 Firebase not loaded, using local mode');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                firebaseEnabled = false;
+            }
+        }
+        
+        // Sync local data to Firebase
+        async function syncLocalDataToFirebase() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const localData = {
+                    displayName: displayName,
+                    settings: settings,
+                    stats: stats,
+                    personalRecords: personalRecords
+                };
+                
+                const success = await FirebaseSyncManager.syncToCloud(userId, localData);
+                if (success) {
+                    console.log('☁️ Local data synced to Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Error syncing to Firebase:', error);
+            }
+        }
+        
+        // Sync Firebase data to local
+        async function syncCloudDataToLocal() {
+            if (!firebaseEnabled) return;
+            
+            try {
+                const cloudData = await FirebaseSyncManager.syncFromCloud(userId);
+                if (cloudData) {
+                    // Merge cloud data with local data (cloud takes priority)
+                    displayName = cloudData.displayName || displayName;
+                    settings = { ...settings, ...cloudData.settings };
+                    stats = { ...stats, ...cloudData.stats };
+                    personalRecords = { ...personalRecords, ...cloudData.personalRecords };
+                    
+                    console.log('📥 Cloud data synced to local');
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('❌ Error syncing from Firebase:', error);
+            }
+        }
+        
+        // Enhanced save function with Firebase sync
+        async function saveUserDataWithSync() {
+            // Always save locally first
+            saveUserData();
+            
+            // Then sync to Firebase if enabled
+            if (firebaseEnabled) {
+                await syncLocalDataToFirebase();
+            }
+        }
+        
+        // Animation Enhancements
+        
+        // Animate word cards when new words appear
+        function animateWordCards() {
+            const leftCard = document.getElementById('word-card-left');
+            const rightCard = document.getElementById('word-card-right');
+            
+            if (leftCard && rightCard) {
+                leftCard.classList.add('animate-slide-in-left');
+                rightCard.classList.add('animate-slide-in-right');
+                
+                setTimeout(() => {
+                    leftCard.classList.remove('animate-slide-in-left');
+                    rightCard.classList.remove('animate-slide-in-right');
+                }, 500);
+            }
+        }
+        
+        // Animate score on update
+        function animateScore() {
+            const scoreElement = document.getElementById('current-streak');
+            if (scoreElement) {
+                scoreElement.classList.add('score-update');
+                setTimeout(() => {
+                    scoreElement.classList.remove('score-update');
+                }, 600);
+            }
+        }
+        
+        // Animate heart loss
+        function animateHeartLoss(heartIndex) {
+            const hearts = document.querySelectorAll('.heart');
+            if (hearts[heartIndex]) {
+                hearts[heartIndex].classList.add('losing-life');
+                setTimeout(() => {
+                    hearts[heartIndex].classList.remove('active');
+                    hearts[heartIndex].classList.add('lost');
+                }, 600);
+            }
+        }
+        
+        // Add warning pulse to timer when < 2 seconds
+        function updateTimerWarning(remainingTime) {
+            const timerBar = document.getElementById('timer-bar');
+            if (timerBar) {
+                if (remainingTime < 2000) {
+                    timerBar.classList.add('warning');
+                } else {
+                    timerBar.classList.remove('warning');
+                }
+            }
+        }
+        
+        // Hook animations into existing game functions
+        const originalShowNewWords = window.showNewWords;
+        if (originalShowNewWords) {
+            window.showNewWords = function(...args) {
+                const result = originalShowNewWords.apply(this, args);
+                animateWordCards();
+                return result;
+            };
+        }
+        
+        const originalUpdateScore = window.updateScore;
+        if (originalUpdateScore) {
+            window.updateScore = function(...args) {
+                const result = originalUpdateScore.apply(this, args);
+                animateScore();
+                return result;
+            };
+        }
+        
+        // ... existing code ...
+    </script>
+</body>
+</html>

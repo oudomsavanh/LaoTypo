@@ -1,0 +1,3544 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cache Busting Headers v2.4.0 - Added Google Analytics 4 tracking -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <meta name="theme-color" content="#f8af3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LaoTypo">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="LaoTypo">
+    <meta name="msapplication-TileColor" content="#f8af3c">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-2F516DW62Z');
+    </script>
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #f8af3c;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
+        }
+        
+        /* Global font rules - Montserrat for English, Noto Sans Lao Looped for Lao */
+        * {
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
+        }
+        
+        /* Specific rule for elements containing Lao text */
+        :lang(lo), 
+        [lang="lo"] {
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+        }
+        body {
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            padding-top: 60px; /* Space for fixed nav - responsive */
+            padding-bottom: 60px; /* Space for fixed footer - responsive */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        @media (min-width: 640px) {
+            body {
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+        }
+        nav {
+            background-color: #222426;
+            border-bottom: 2px solid var(--main-color);
+        }
+        .nav-link {
+            color: var(--sub-color);
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        .nav-link:hover {
+            color: var(--text-color);
+            transform: scale(1.1) rotate(3deg);
+        }
+        /* Logo animation */
+        #home-btn img {
+            transition: transform 0.5s ease;
+        }
+        #home-btn:hover img {
+            transform: scale(1.05);
+        }
+        .btn-icon {
+            background-color: transparent;
+            color: var(--sub-color);
+            padding: 0.5rem;
+            border-radius: 9999px; /* circle */
+            transition: all 0.3s ease-in-out;
+            transform-origin: center;
+        }
+        .btn-icon:hover {
+            color: var(--text-color);
+            background-color: #3e4043;
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+        }
+        .btn-icon:active {
+            transform: scale(0.95);
+        }
+        .btn-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .game-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem;
+            text-align: center;
+        }
+        @media (min-width: 640px) {
+            .game-container {
+                padding: 2rem;
+            }
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .btn {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1rem;
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-primary {
+            background-color: var(--main-color);
+            color: var(--bg-color);
+        }
+        .btn-primary:hover {
+            background-color: #f8af3c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .btn-secondary {
+            background-color: var(--sub-color);
+            color: var(--text-color);
+        }
+        .word-card {
+            background-color: #3e4043;
+            border: 2px solid #4a4d50;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+            padding: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .word-card {
+                padding: 1.5rem;
+            }
+        }
+        .word-card:hover {
+            border-color: var(--main-color);
+            transform: scale(1.02);
+        }
+        .word-card.focused {
+            border-color: var(--main-color);
+            box-shadow: 0 0 0 3px rgba(248, 175, 60, 0.3);
+        }
+        .word-card.feedback-correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+        }
+        .word-card.feedback-incorrect {
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+        .timer-bar {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--correct-color) 0%, var(--main-color) 50%, var(--error-color) 100%);
+            border-radius: 1rem;
+            transform-origin: left;
+            transition: transform 0.1s linear;
+        }
+        
+        /* Life Bar Container with solid color */
+        .life-bar-container {
+            background: #fbb03b;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(248, 175, 60, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 640px) {
+            .life-bar-container {
+                padding: 1rem 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        /* Removed shimmer effect */
+        .life-bar-container::before {
+            display: none;
+        }
+        
+        .life-bar-container h2 {
+            margin: 0;
+        }
+        
+        /* Shimmer animation removed */
+        /* @keyframes shimmer - removed */
+        
+        .life-hearts-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .life-label {
+            color: #000000; /* Black to match background */
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .hearts-container {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        /* Minimal flat heart icon */
+        .heart {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @media (min-width: 640px) {
+            .heart {
+                width: 28px;
+                height: 28px;
+            }
+        }
+        
+        .heart svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .heart.active svg path {
+            fill: #ff4b4b;
+        }
+        
+        .heart.lost svg path {
+            fill: #000000; /* Black heart for lost lives */
+        }
+        
+        /* Subtle Duolingo-style animation when losing a life */
+        .heart.losing {
+            animation: heartPop 0.4s ease-out;
+        }
+        
+        @keyframes heartPop {
+            0% { 
+                transform: scale(1);
+            }
+            30% { 
+                transform: scale(1.3);
+            }
+            60% {
+                transform: scale(0.8);
+            }
+            100% { 
+                transform: scale(1);
+            }
+        }
+        
+        /* Animation when life value changes */
+        .heart.life-change {
+            animation: lifeChange 0.5s ease-out;
+        }
+        
+        @keyframes lifeChange {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+            25% {
+                transform: scale(1.15) translateY(-4px);
+            }
+            50% {
+                transform: scale(0.95) translateY(0);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .motivation-text {
+            text-align: center;
+            color: #000000; /* Black text */
+            font-weight: 600;
+            font-style: italic;
+            font-size: 0.875rem;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            text-shadow: none;
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+        }
+        
+        @media (min-width: 640px) {
+            .motivation-text {
+                font-size: 0.9rem;
+            }
+        }
+        
+        .motivation-text.warning {
+            color: #000000; /* Keep black for warning */
+            opacity: 1;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        
+        .motivation-text.critical {
+            color: #7f1d1d; /* Dark red for critical */
+            opacity: 1;
+            font-weight: 800;
+            animation: pulse 1s infinite;
+            text-shadow: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Custom shake animation for 0 streak */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        /* Player name styles - no background or box */
+        .player-name {
+            background: none !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Meme container styling */
+        #meme-container {
+            min-height: 200px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        #meme-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        @media (max-width: 640px) {
+            #meme-container {
+                min-height: 150px;
+                aspect-ratio: 1 / 1;
+            }
+        }
+        
+        /* Enhanced button hover effects */
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Format button styles */
+        .format-btn {
+            opacity: 0.7;
+            border: 2px solid transparent;
+        }
+        .format-btn.active {
+            opacity: 1;
+            border-color: #f8af3c;
+            background-color: #3e4043 !important;
+        }
+        
+        /* Rainbow text animation for perfect scores */
+        @keyframes rainbow {
+            0% { color: #ff0000; }
+            17% { color: #ff8800; }
+            33% { color: #ffff00; }
+            50% { color: #00ff00; }
+            67% { color: #0088ff; }
+            83% { color: #8800ff; }
+            100% { color: #ff0000; }
+        }
+        
+        .animate-rainbow {
+            animation: rainbow 3s linear infinite;
+        }
+        
+        /* Custom responsive typography */
+        .context-display-custom {
+            font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        
+        .results-header-custom {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        /* Desktop responsive sizes */
+        @media (min-width: 768px) {
+            .results-header-custom {
+                font-size: 2.4rem;
+            }
+        }
+        
+        /* Small Account Panel */
+        .account-panel {
+            position: fixed;
+            top: 15%;
+            right: 1rem;
+            background: var(--bg-color);
+            border: 3px solid var(--main-color);
+            border-radius: 1rem;
+            padding: 0;
+            min-width: 300px;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            max-height: 80vh;
+            overflow-y: auto;
+            transform-origin: right center;
+        }
+        
+        .account-panel:not(.hidden) {
+            animation: slide-in-right 0.5s ease-out;
+        }
+        
+        .account-panel.hidden {
+            opacity: 0;
+            transform: translateX(120%) scale(0.95);
+            pointer-events: none;
+        }
+        
+        .account-content {
+            padding: 1.5rem;
+            color: var(--text-color);
+        }
+        
+        .account-profile-summary {
+            padding: 0.75rem;
+            background: #2c2e31;
+            border-radius: 12px;
+            border: 1px solid var(--sub-color);
+        }
+        
+        .small-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--main-color) 0%, #f8af3c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--bg-color);
+        }
+        
+        .quick-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+        }
+        
+        .version-info-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+        
+        .version-divider {
+            height: 1px;
+            background: var(--sub-color);
+            margin-bottom: 0.75rem;
+        }
+        
+        .version-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        @keyframes slide-in-right {
+            from {
+                opacity: 0;
+                transform: translateX(120%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .account-panel {
+                width: calc(100vw - 2rem);
+                right: 1rem;
+                left: 1rem;
+                top: 10%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation from testing.html -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" id="home-btn" class="flex items-center">
+                <img src="images/LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
+            </a>
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <button id="home-nav-btn" class="nav-link btn-icon" title="ໜ້າຫຼັກ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                </button>
+                <button id="leaderboard-nav-btn" class="nav-link btn-icon" title="ກະດານຄະແນນ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M5 7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V11C19 12.8638 17.7252 14.4299 16 14.874V17H13L12 20L11 17H8V14.874C6.27477 14.4299 5 12.8638 5 11V7Z" />
+                        <path d="M8 8H16" />
+                        <path d="M12 3V5" />
+                        <path d="M8 5C8 5 6.5 3 5 3" />
+                        <path d="M16 5C16 5 17.5 3 19 3" />
+                        <path d="M9 20H15" />
+                        <path d="M12 17V20" />
+                    </svg>
+                </button>
+                <button id="open-settings-btn" class="nav-link btn-icon" title="⚙️ ຕັ້ງຄ່າ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+                <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <div class="w-full">
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen active">
+                <!-- Word Loading Status -->
+                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
+                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+                </div>
+                
+                <!-- Retry Button (hidden by default) -->
+                <div id="retry-loading-container" class="text-center mb-4 hidden">
+                    <button id="retry-loading-btn" class="bg-amber-500 hover:bg-amber-400 text-neutral-900 px-4 py-2 rounded-lg font-semibold transition-colors">
+                        🔄 ລອງໂຫຼດອີກຄັ້ງ
+                    </button>
+                </div>
+                    <!-- Player Name Display without background -->
+                    <div class="text-center mb-3 sm:mb-4">
+                        <div class="inline-flex items-center gap-2 player-name">
+                            <svg width="20" height="20" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M128 28C70.562 28 24 74.562 24 132C24 189.438 70.562 236 128 236C185.438 236 232 189.438 232 132C232 74.562 185.438 28 128 28ZM128 44C176.604 44 216 83.396 216 132C216 156.48 206.792 178.712 191.636 195.364C186.768 182.968 178.572 172.504 168.02 165.012C175.652 157.036 180 146.248 180 134.5C180 110.804 159.196 90 135.5 90H120.5C96.804 90 76 110.804 76 134.5C76 146.248 80.348 157.036 87.98 165.012C77.428 172.504 69.232 182.968 64.364 195.364C49.208 178.712 40 156.48 40 132C40 83.396 79.396 44 128 44ZM120.5 106H135.5C150.412 106 164 119.588 164 134.5C164 149.412 150.412 163 135.5 163H120.5C105.588 163 92 149.412 92 134.5C92 119.588 105.588 106 120.5 106ZM78.692 203.872C82.66 187.616 96.94 175 114 175H142C159.06 175 173.34 187.616 177.308 203.872C161.816 215.156 145.704 220 128 220C110.296 220 94.184 215.156 78.692 203.872Z" fill="#fbb03b"/>
+                            </svg>
+                            <span style="color: #d1d0c5; font-weight: 600; font-size: 14px; font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;" class="sm:text-base"> <span id="game-player-name" style="font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;"></span></span>
+                        </div>
+                    </div>
+                <!-- Redesigned Life Bar with Enhanced Visual Design -->
+                <div class="life-bar-container mb-4">
+                    <div class="motivation-text text-sm sm:text-base" id="motivation-text">ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!</div>
+                    <div class="life-hearts-row">
+                        <div class="hearts-container" id="hearts-container">
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                            <span class="heart active">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4 sm:mb-6 text-base sm:text-xl">
+                    <div class="text-sub-color">ຕອບຖືກ: <span id="current-streak" class="text-text-color font-bold">0</span> / <span id="level-progress" class="text-main-color">15</span></div>
+                    <div class="text-sub-color">ຄະແນນທີ່ດີທີ່ສຸດ: <span id="best-streak" class="text-text-color font-bold">0</span></div>
+                </div>
+                
+                <!-- Total Progress Display -->
+                <div class="text-center mb-4 sm:mb-6">
+                    <div class="text-sub-color text-sm sm:text-base">ຄຳສັບທັງໝົດທີ່ຜ່ານ: <span id="total-words-completed" class="text-main-color font-bold">0</span></div>
+                </div>
+                
+                <div class="text-center mb-3 sm:mb-4">
+                    <span id="game-settings-display" class="text-xs sm:text-sm text-main-color">ລະດັບຄຳສັບ: <span id="difficulty-display" class="font-bold"></span> | ຈຳກັດເວລາ: <span id="timer-status">ປິດ</span></span>
+                </div>
+                <div id="timer-container" class="h-2 mb-4 sm:mb-6">
+                    <div id="timer-bar" class="timer-bar"></div>
+                </div>
+                
+                <!-- Context display area for showing word from Google Sheets Column A -->
+                <div class="mb-4 sm:mb-6 text-center">
+                    <h3 class="text-lg sm:text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນວ່າງ:</h3>
+                    <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-3 sm:py-4 px-4 sm:px-6 min-h-[80px] sm:min-h-[100px] flex items-center justify-center text-base sm:text-2xl"></div>
+                </div>
+                
+                <div id="word-area" class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-8 mb-6 sm:mb-8">
+                    <div id="word-card-left" class="word-card p-4 sm:p-6 text-base sm:text-xl md:text-2xl min-h-[80px] sm:min-h-[100px]"></div>
+                    <div id="word-card-right" class="word-card p-4 sm:p-6 text-base sm:text-xl md:text-2xl min-h-[80px] sm:min-h-[100px]"></div>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-screen" class="screen pb-20 opacity-0 scale-95 transition-all duration-250">
+                <div class="flex flex-col items-center pt-6 px-4">
+                    <div class="w-full max-w-sm mx-auto space-y-3">
+                        
+                        <!-- Result Card (Image + Amber Frame + Caption Bar) -->
+                        <div class="rounded-xl border-2 border-amber-400 bg-neutral-800 shadow-lg overflow-hidden max-w-sm w-full mx-auto">
+                            <!-- Meme Image Container -->
+                            <div id="meme-container" class="aspect-square bg-neutral-800 w-full">
+                                <!-- Meme image will be inserted here dynamically -->
+                            </div>
+                            
+                            <!-- Caption Bar -->
+                            <div id="evaluation-result" class="text-xl sm:text-3xl font-bold text-center text-black bg-amber-400 px-4 py-3">
+                                <!-- Evaluation text will be inserted here dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Stats Block (Two Compact Rows with Right Badges) -->
+                        <div class="w-full max-w-sm mx-auto bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 grid gap-1 mt-3">
+                            <!-- Row B: Final Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນຫຼ້າສຸດ</span>
+                                <span id="final-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                            <!-- Row A: Best Score -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-neutral-300">ຄະແນນສູງສຸດ</span>
+                                <span id="results-best-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Icon Grid -->
+                        <div class="max-w-sm mx-auto grid grid-cols-3 gap-4 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-4 text-center">
+                          
+                          <!-- 1) Share with Link -->
+                          <button id="share-with-link-btn" class="flex flex-col items-center gap-1 text-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
+                            <!-- Icon same color as text, but turns gray when button is hovered -->
+                            <svg class="w-5 h-5 text-amber-400 group-hover:text-neutral-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            <span class="text-xs text-amber-400">ສົ່ງທ້າໝູ່ຫຼິ້ນ</span>
+                          </button>
+
+                          <!-- 2) Share -->
+                          <button id="share-btn" class="flex flex-col items-center gap-1 text-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
+                            <!-- Paper Plane Icon -->
+                            <svg class="w-6 h-6 text-amber-400 group-hover:text-neutral-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M3 10l19-7-7 19-4-7-8-5z" />
+                            </svg>
+                            <span class="text-xs text-amber-400">ສົ່ງໄປອ້າງໝູ່</span>
+                          </button>
+
+                          <!-- 3) Save -->
+                          <button id="download-btn" class="flex flex-col items-center gap-1 text-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
+                            <svg class="w-5 h-5 text-amber-400 group-hover:text-neutral-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v12m0 0l-4-4m4 4l4-4M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
+                            </svg>
+                            <span class="text-xs text-amber-400">ບັນທຶກຜົນສຳເລັດ</span>
+                          </button>
+
+                        </div>
+                        
+                        <!-- Share Preview Container (hidden by default) -->
+                        <div id="share-preview-container" class="max-w-sm mx-auto hidden">
+                            <img id="share-preview" class="w-full rounded-lg shadow-lg" alt="Share preview">
+                        </div>
+                        
+                        <!-- Copy Status Message -->
+                        <div id="copy-status" class="text-center text-sm text-green-400 hidden">
+                            ✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!
+                        </div>
+                        
+                        <!-- Canvas for shareable image (hidden) -->
+                        <canvas id="share-canvas" class="hidden"></canvas>
+                        
+                        
+                        <!-- Bottom Button Section -->
+                        <div class="max-w-sm mx-auto text-center space-y-3 mt-3">
+                          <!-- Top row (3 buttons) -->
+                          <div class="grid grid-cols-3 gap-2">
+                            <!-- Restart Game Button -->
+                            <button id="restart-game-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
+                              ຫຼິ້ນອີກຄັ້ງ
+                            </button>
+
+                            <!-- Leaderboard Button -->
+                            <button id="leaderboard-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
+                              ກະດານຄະແນນ
+                            </button>
+
+                            <!-- Back to Home -->
+                            <button id="back-home-btn" class="w-full rounded-xl bg-neutral-800 text-amber-400 font-semibold px-3 py-3 shadow hover:bg-neutral-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 text-sm">
+                              ກັບໜ້າທຳອິດ
+                            </button>
+                          </div>
+
+                          <!-- Add Word (Facebook Redirect) -->
+                          <button id="add-word-btn" class="w-1/3 mx-auto block rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-2.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
+                            ຕື່ມຄຳສັບ
+                          </button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Level Transition Interstitial Modal -->
+            <div id="level-transition-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black bg-opacity-75">
+                <div class="bg-gray-800 rounded-xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-2 border-[#f8af3c]">
+                    <div class="text-center">
+                        <!-- Success Icon -->
+                        <div class="text-6xl sm:text-8xl mb-4" id="level-icon">🎉</div>
+                        
+                        <!-- Level Completion Message -->
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#f8af3c] mb-4" id="level-message">
+                            ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!
+                        </h2>
+                        
+                        <!-- Progress Stats -->
+                        <div class="bg-gray-900/50 rounded-lg p-4 mb-6">
+                            <p class="text-gray-400 text-sm mb-2">ຄະແນນລະດັບນີ້</p>
+                            <p class="text-2xl font-bold text-white"><span id="level-score">15</span>/15</p>
+                        </div>
+                        
+                        <!-- Question -->
+                        <p class="text-lg sm:text-xl text-gray-300 mb-6" id="level-question">
+                            ສືບຕໍ່ໄປລະດັບປານກາງບໍ?
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ແມ່ນແລ້ວ, ສືບຕໍ່!
+                            </button>
+                            <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                ຫຼິ້ນລະດັບນີ້ຕໍ່
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas for Shareable Image -->
+    <canvas id="share-canvas" style="display: none;"></canvas>
+
+    <!-- Small Account Panel (Floating) -->
+    <div id="account-panel" class="account-panel hidden">
+        <div class="account-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-normal" style="color: var(--main-color);">👤 ບັນຊີ</h2>
+                <button id="close-account-btn" class="text-xl font-medium hover:opacity-70 transition-opacity" style="color: var(--sub-color);">&times;</button>
+            </div>
+            
+            <!-- Quick Profile Info -->
+            <div class="account-profile-summary">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="small-avatar" id="account-avatar">👤</div>
+                    <div>
+                        <div class="account-name font-semibold text-lg" id="account-display-name" style="color: var(--main-color);">ຜູ້ຫຼິ້ນ</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏆 ຄະແນນສູງສຸດ:</span>
+                        <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--text-color);">0</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🎯 ຄວາມຖືກຕ້ອງ:</span>
+                        <span class="stat-value font-semibold" id="account-accuracy" style="color: var(--text-color);">0%</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏅 ລາງວັນ:</span>
+                        <span class="stat-value font-semibold" id="account-achievements" style="color: var(--text-color);">0/8</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2 mt-4">
+                <button id="view-full-profile-btn" class="btn btn-primary text-sm hidden" aria-hidden="true" tabindex="-1">📄 ເບິ່ງໂປຣໄຟລ໌ຄົບຖ້ວນ</button>
+                <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
+            </div>
+            
+            <!-- Analytics Dashboard Toggle -->
+            <div class="analytics-section mb-4">
+                <button id="analytics-toggle-btn" class="w-full bg-main-color hover:bg-yellow-500 text-white py-2 px-3 rounded text-sm transition-colors duration-200">
+                    📊 Live Analytics
+                </button>
+            </div>
+            
+            <!-- Version Info -->
+            <div class="version-info-section">
+                <div class="version-divider"></div>
+                <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
+        <p>📦 Version 2.6.0</p>
+        <p>Status: Live</p>
+        <p>🚀 PWA Ready</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
+        
+        // Global variables
+        let currentStreak = 0;
+        let bestStreak = 0;
+        let currentWordIndex = 0;
+        let wordPairs = [];
+        let correctAnswers = 0;
+        let totalAnswers = 0;
+        
+        // Enhanced tracking variables
+        let sessionId = null;
+        let sessionStartTime = null;
+        let wordStartTime = null;
+        let lastUserAction = null;
+        let difficultyStats = { easy: 0, medium: 0, hard: 0 };
+        let streakHistory = [];
+        let answerHistory = [];
+        let performanceMetrics = {};
+        let featureUsage = {
+            soundEnabled: false,
+            settingsAccessed: 0,
+            helpAccessed: 0,
+            replayUsed: 0
+        };
+        
+        // Device Detection
+        function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const isTablet = /iPad|Android(?=.*\bMobile\b)/i.test(userAgent);
+            
+            let deviceType = 'Desktop';
+            let deviceModel = 'Unknown';
+            
+            if (isTablet) {
+                deviceType = 'Tablet';
+            } else if (isMobile) {
+                deviceType = 'Mobile';
+            }
+            
+            // Detect specific mobile devices
+            if (/iPhone/i.test(userAgent)) {
+                deviceModel = 'iPhone';
+            } else if (/iPad/i.test(userAgent)) {
+                deviceModel = 'iPad';
+            } else if (/Android/i.test(userAgent)) {
+                deviceModel = 'Android';
+            } else if (/Samsung/i.test(userAgent)) {
+                deviceModel = 'Samsung';
+            } else if (/Huawei/i.test(userAgent)) {
+                deviceModel = 'Huawei';
+            } else if (/Xiaomi/i.test(userAgent)) {
+                deviceModel = 'Xiaomi';
+            } else if (/OnePlus/i.test(userAgent)) {
+                deviceModel = 'OnePlus';
+            } else if (/Oppo/i.test(userAgent)) {
+                deviceModel = 'Oppo';
+            } else if (/Vivo/i.test(userAgent)) {
+                deviceModel = 'Vivo';
+            } else if (/Realme/i.test(userAgent)) {
+                deviceModel = 'Realme';
+            }
+            
+            return {
+                deviceType: deviceType,
+                deviceModel: deviceModel,
+                userAgent: userAgent,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                viewportWidth: window.innerWidth,
+                viewportHeight: window.innerHeight
+            };
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        let isInstalled = false;
+        
+        // Check if app is already installed
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            isInstalled = true;
+        }
+        
+        // Listen for beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallButton();
+        });
+        
+        // Listen for app installed event
+        window.addEventListener('appinstalled', (e) => {
+            console.log('✅ PWA installed successfully');
+            isInstalled = true;
+            hideInstallButton();
+            trackGameEvent('pwa_installed', {
+                install_method: 'prompt',
+                timestamp: Date.now()
+            });
+        });
+        
+        // Show install button
+        function showInstallButton() {
+            if (isInstalled) return;
+            
+            const installBtn = document.createElement('button');
+            installBtn.id = 'install-btn';
+            installBtn.innerHTML = '📱 Install App';
+            installBtn.className = 'fixed bottom-4 right-4 bg-main-color text-white px-4 py-2 rounded-lg shadow-lg z-50 hover:bg-yellow-500 transition-all duration-300';
+            installBtn.style.display = 'none';
+            document.body.appendChild(installBtn);
+            
+            // Show after 3 seconds
+            setTimeout(() => {
+                installBtn.style.display = 'block';
+                installBtn.addEventListener('click', installApp);
+            }, 3000);
+        }
+        
+        // Hide install button
+        function hideInstallButton() {
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.remove();
+            }
+        }
+        
+        // Install app
+        async function installApp() {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            trackGameEvent('pwa_install_prompt', {
+                outcome: outcome,
+                timestamp: Date.now()
+            });
+            
+            deferredPrompt = null;
+            hideInstallButton();
+        }
+        
+        // Enhanced Analytics Dashboard
+        function createAnalyticsDashboard() {
+            const dashboard = document.createElement('div');
+            dashboard.id = 'analytics-dashboard';
+            dashboard.className = 'fixed top-20 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm';
+            dashboard.style.display = 'none';
+            
+            dashboard.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-bold">📊 Live Analytics</h3>
+                    <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>🎮 Active Players:</span>
+                        <span id="active-players">1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>⚡ Current Streak:</span>
+                        <span id="current-streak">${currentStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🏆 Best Streak:</span>
+                        <span id="best-streak">${bestStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📊 Words Completed:</span>
+                        <span id="words-completed">${totalWordsCompleted || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>❤️ Lives Left:</span>
+                        <span id="lives-left">${playerLives || 3}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📱 Device:</span>
+                        <span id="device-type">${getDeviceInfo().deviceType}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🌐 Online:</span>
+                        <span id="connection-status">${navigator.onLine ? 'Yes' : 'No'}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dashboard);
+            
+            // Close dashboard
+            document.getElementById('close-dashboard').addEventListener('click', () => {
+                dashboard.style.display = 'none';
+            });
+            
+            return dashboard;
+        }
+        
+        // Toggle analytics dashboard
+        function toggleAnalyticsDashboard() {
+            let dashboard = document.getElementById('analytics-dashboard');
+            if (!dashboard) {
+                dashboard = createAnalyticsDashboard();
+            }
+            
+            dashboard.style.display = dashboard.style.display === 'none' ? 'block' : 'none';
+            
+            if (dashboard.style.display === 'block') {
+                updateAnalyticsDashboard();
+            }
+        }
+        
+        // Update analytics dashboard
+        function updateAnalyticsDashboard() {
+            const dashboard = document.getElementById('analytics-dashboard');
+            if (!dashboard) return;
+            
+            document.getElementById('current-streak').textContent = currentStreak || 0;
+            document.getElementById('best-streak').textContent = bestStreak || 0;
+            document.getElementById('words-completed').textContent = totalWordsCompleted || 0;
+            document.getElementById('lives-left').textContent = playerLives || 3;
+            document.getElementById('device-type').textContent = getDeviceInfo().deviceType;
+            document.getElementById('connection-status').textContent = navigator.onLine ? 'Yes' : 'No';
+        }
+        
+        // Performance monitoring
+        function trackPerformanceMetrics() {
+            const metrics = {
+                load_time: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                dom_ready: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                first_paint: performance.getEntriesByType('paint')[0]?.startTime || 0,
+                memory_usage: performance.memory ? {
+                    used: performance.memory.usedJSHeapSize,
+                    total: performance.memory.totalJSHeapSize,
+                    limit: performance.memory.jsHeapSizeLimit
+                } : null,
+                connection: navigator.connection ? {
+                    effective_type: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : null
+            };
+            
+            trackGameEvent('performance_metrics', metrics);
+        }
+        
+        // Real-time analytics updates
+        function startRealTimeAnalytics() {
+            setInterval(() => {
+                if (document.getElementById('analytics-dashboard')?.style.display === 'block') {
+                    updateAnalyticsDashboard();
+                }
+            }, 1000);
+        }
+        
+        // Initialize PWA features
+        function initializePWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration);
+                        trackGameEvent('pwa_service_worker_registered', {
+                            scope: registration.scope,
+                            timestamp: Date.now()
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Service Worker registration failed:', error);
+                        trackGameEvent('pwa_service_worker_error', {
+                            error: error.message,
+                            timestamp: Date.now()
+                        });
+                    });
+            }
+            
+            // Track PWA installability
+            trackGameEvent('pwa_installability_check', {
+                is_installable: !!deferredPrompt,
+                is_installed: isInstalled,
+                display_mode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
+                timestamp: Date.now()
+            });
+        }
+        
+        // Initialize Analytics features
+        function initializeAnalytics() {
+            // Start real-time analytics updates
+            startRealTimeAnalytics();
+            
+            // Track performance metrics on load
+            setTimeout(() => {
+                trackPerformanceMetrics();
+            }, 2000);
+            
+            // Track page visibility changes
+            document.addEventListener('visibilitychange', () => {
+                trackGameEvent('page_visibility_change', {
+                    is_visible: !document.hidden,
+                    timestamp: Date.now()
+                });
+            });
+            
+            // Track online/offline status
+            window.addEventListener('online', () => {
+                trackGameEvent('connection_status', {
+                    status: 'online',
+                    timestamp: Date.now()
+                });
+            });
+            
+            window.addEventListener('offline', () => {
+                trackGameEvent('connection_status', {
+                    status: 'offline',
+                    timestamp: Date.now()
+                });
+            });
+            
+            // Add analytics toggle button event listener
+            document.addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'analytics-toggle-btn') {
+                    toggleAnalyticsDashboard();
+                    trackGameEvent('analytics_dashboard_toggle', {
+                        action: 'open',
+                        timestamp: Date.now()
+                    });
+                }
+            });
+        }
+        
+        // Google Analytics 4 Event Tracking
+        function trackGameEvent(eventName, parameters = {}) {
+            if (typeof gtag !== 'undefined') {
+                const deviceInfo = getDeviceInfo();
+                gtag('event', eventName, {
+                    event_category: 'Game',
+                    event_label: 'LaoTypo',
+                    device_type: deviceInfo.deviceType,
+                    device_model: deviceInfo.deviceModel,
+                    screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
+                    viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
+                    ...parameters
+                });
+            }
+        }
+        
+        function trackGameStart() {
+            const deviceInfo = getDeviceInfo();
+            trackGameEvent('game_start', {
+                difficulty: levelNames[currentLevel],
+                level: currentLevel + 1,
+                player_name: playerName || 'anonymous'
+            });
+            
+            // Track device information separately
+            trackGameEvent('device_info', {
+                device_type: deviceInfo.deviceType,
+                device_model: deviceInfo.deviceModel,
+                screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
+                viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
+                user_agent: deviceInfo.userAgent,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackLevelComplete(level, score, accuracy) {
+            trackGameEvent('level_complete', {
+                level_name: levelNames[level],
+                level_number: level + 1,
+                final_score: score,
+                accuracy: accuracy,
+                words_completed: levelProgress,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackGameEnd(finalScore, accuracy, totalWords) {
+            trackGameEvent('game_end', {
+                final_score: finalScore,
+                accuracy: accuracy,
+                total_words: totalWords,
+                levels_completed: levelsCompleted,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackReplay(level) {
+            trackGameEvent('game_replay', {
+                level_name: levelNames[level],
+                level_number: level + 1,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackWordAnswer(isCorrect, difficulty) {
+            trackGameEvent('word_answer', {
+                correct: isCorrect,
+                difficulty: levelNames[difficulty],
+                current_streak: currentStreak,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackLifeLost(remainingLives) {
+            trackGameEvent('life_lost', {
+                remaining_lives: remainingLives,
+                current_streak: currentStreak,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackLevelAdvance(fromLevel, toLevel) {
+            trackGameEvent('level_advance', {
+                from_level: levelNames[fromLevel],
+                to_level: levelNames[toLevel],
+                from_level_number: fromLevel + 1,
+                to_level_number: toLevel + 1,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        // Enhanced tracking functions
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+        
+        function trackSessionStart() {
+            sessionId = generateSessionId();
+            sessionStartTime = Date.now();
+            
+            trackGameEvent('session_start', {
+                session_id: sessionId,
+                timestamp: sessionStartTime,
+                referrer: document.referrer || 'direct',
+                utm_source: getUrlParameter('utm_source') || 'unknown',
+                utm_campaign: getUrlParameter('utm_campaign') || 'unknown',
+                page_title: document.title,
+                page_url: window.location.href,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackWordTimeSpent() {
+            if (wordStartTime) {
+                const timeSpent = Date.now() - wordStartTime;
+                trackGameEvent('word_time_spent', {
+                    time_seconds: Math.round(timeSpent / 1000),
+                    difficulty: levelNames[currentLevel],
+                    word_context: currentWordPair ? currentWordPair.context.substring(0, 50) : 'unknown',
+                    current_streak: currentStreak,
+                    word_index: currentWordIndex
+                });
+            }
+        }
+        
+        function trackPlayerEngagement() {
+            const sessionDuration = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
+            const wordsPerMinute = sessionDuration > 0 ? Math.round((totalAnswers * 60) / sessionDuration) : 0;
+            
+            trackGameEvent('player_engagement', {
+                session_duration: sessionDuration,
+                words_per_minute: wordsPerMinute,
+                total_words_answered: totalAnswers,
+                current_streak: currentStreak,
+                best_streak: bestStreak,
+                lives_remaining: playerLives,
+                levels_completed: levelsCompleted,
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackDifficultyProgression() {
+            const totalPlayed = difficultyStats.easy + difficultyStats.medium + difficultyStats.hard;
+            const easyRate = totalPlayed > 0 ? Math.round((difficultyStats.easy / totalPlayed) * 100) : 0;
+            const mediumRate = totalPlayed > 0 ? Math.round((difficultyStats.medium / totalPlayed) * 100) : 0;
+            const hardRate = totalPlayed > 0 ? Math.round((difficultyStats.hard / totalPlayed) * 100) : 0;
+            
+            trackGameEvent('difficulty_progression', {
+                easy_completion_rate: easyRate,
+                medium_completion_rate: mediumRate,
+                hard_completion_rate: hardRate,
+                total_words_played: totalPlayed,
+                preferred_difficulty: getPreferredDifficulty(),
+                current_difficulty: levelNames[currentLevel],
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function getPreferredDifficulty() {
+            const max = Math.max(difficultyStats.easy, difficultyStats.medium, difficultyStats.hard);
+            if (max === difficultyStats.easy) return 'Easy';
+            if (max === difficultyStats.medium) return 'Medium';
+            return 'Hard';
+        }
+        
+        function trackStreakAnalysis() {
+            if (streakHistory.length > 0) {
+                const avgStreak = Math.round(streakHistory.reduce((a, b) => a + b, 0) / streakHistory.length);
+                const maxStreak = Math.max(...streakHistory);
+                const recoveryRate = calculateRecoveryRate();
+                
+                trackGameEvent('streak_analysis', {
+                    max_streak_achieved: maxStreak,
+                    average_streak: avgStreak,
+                    streak_count: streakHistory.length,
+                    recovery_rate: recoveryRate,
+                    current_streak: currentStreak,
+                    best_streak: bestStreak
+                });
+            }
+        }
+        
+        function calculateRecoveryRate() {
+            if (streakHistory.length < 2) return 0;
+            let recoveries = 0;
+            for (let i = 1; i < streakHistory.length; i++) {
+                if (streakHistory[i] > streakHistory[i-1]) {
+                    recoveries++;
+                }
+            }
+            return Math.round((recoveries / (streakHistory.length - 1)) * 100);
+        }
+        
+        function trackAnswerPatterns() {
+            if (answerHistory.length > 0) {
+                const correctAnswers = answerHistory.filter(a => a.correct).length;
+                const accuracy = Math.round((correctAnswers / answerHistory.length) * 100);
+                const commonMistakes = getCommonMistakes();
+                
+                trackGameEvent('answer_pattern', {
+                    correct_answer_rate: accuracy,
+                    total_answers: answerHistory.length,
+                    common_mistakes: commonMistakes,
+                    learning_curve: calculateLearningCurve(),
+                    current_accuracy: Math.round((correctAnswers / totalAnswers) * 100)
+                });
+            }
+        }
+        
+        function getCommonMistakes() {
+            const mistakes = answerHistory.filter(a => !a.correct);
+            const mistakeCounts = {};
+            mistakes.forEach(mistake => {
+                const key = mistake.difficulty + '_' + mistake.wordContext;
+                mistakeCounts[key] = (mistakeCounts[key] || 0) + 1;
+            });
+            return Object.keys(mistakeCounts).slice(0, 3); // Top 3 mistakes
+        }
+        
+        function calculateLearningCurve() {
+            if (answerHistory.length < 10) return 'insufficient_data';
+            const recent = answerHistory.slice(-10);
+            const recentAccuracy = recent.filter(a => a.correct).length / recent.length;
+            const early = answerHistory.slice(0, 10);
+            const earlyAccuracy = early.filter(a => a.correct).length / early.length;
+            
+            if (recentAccuracy > earlyAccuracy + 0.1) return 'improving';
+            if (recentAccuracy < earlyAccuracy - 0.1) return 'declining';
+            return 'stable';
+        }
+        
+        function trackPerformanceMetrics() {
+            const loadTime = performance.timing ? 
+                performance.timing.loadEventEnd - performance.timing.navigationStart : 0;
+            
+            trackGameEvent('performance_metrics', {
+                page_load_time: loadTime,
+                memory_usage: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) : null,
+                connection_type: navigator.connection ? navigator.connection.effectiveType : 'unknown',
+                device_pixel_ratio: window.devicePixelRatio || 1,
+                viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+                screen_resolution: `${screen.width}x${screen.height}`
+            });
+        }
+        
+        function trackFeatureUsage(feature) {
+            featureUsage[feature] = (featureUsage[feature] || 0) + 1;
+            
+            trackGameEvent('feature_usage', {
+                feature_name: feature,
+                usage_count: featureUsage[feature],
+                session_id: sessionId,
+                timestamp: Date.now()
+            });
+        }
+        
+        function trackUIInteraction(elementId, elementType) {
+            trackGameEvent('ui_interaction', {
+                element_clicked: elementId,
+                element_type: elementType,
+                interaction_time: Date.now(),
+                session_id: sessionId,
+                current_streak: currentStreak,
+                current_level: levelNames[currentLevel]
+            });
+        }
+        
+        function trackGameError(errorType, errorMessage, gameState) {
+            trackGameEvent('game_error', {
+                error_type: errorType,
+                error_message: errorMessage,
+                game_state: gameState,
+                session_id: sessionId,
+                current_streak: currentStreak,
+                current_level: levelNames[currentLevel],
+                user_action: lastUserAction,
+                timestamp: Date.now(),
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackPlayerNameChange(oldName, newName) {
+            trackGameEvent('player_name_change', {
+                old_name: oldName || 'anonymous',
+                new_name: newName || 'anonymous',
+                session_id: sessionId,
+                timestamp: Date.now()
+            });
+        }
+        let timerInterval;
+        let timerEnabled = false;
+        let timeLimit = 5000; // 5 seconds
+        let currentTimeout;
+        let playerName = '';
+        let selectedDifficulty = 'easy';
+        let isKeyboardEnabled = true;
+        let gameActive = false;
+        let synth = null;
+        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
+        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let userHasInteracted = false;
+        
+        // Audio objects
+        const backgroundMusic = new Audio("sounds/bg_sound.mp3");
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 1.0;
+        
+        const resultSound = new Audio("sounds/result_sound.mp3");
+        resultSound.loop = true;
+        resultSound.volume = 0.0;
+        let selectedLeftCard = false;
+        let selectedRightCard = false;
+        
+        // v2.0.0: Progressive Difficulty System
+        let playerLives = 3;
+        let currentLevel = 0; // 0: easy, 1: medium, 2: hard
+        let levelProgress = 0;
+        let levelsCompleted = 0; // Track how many levels have been completed
+        let totalWordsCompleted = 0; // Track total words completed across all sessions
+        let currentWordPair = null; // Store current word pair for answer checking
+        let shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] }; // Store shuffled words for each difficulty
+        const levelThresholds = [15, 15, 15]; // Words needed to complete each level
+        const levelNames = ['ງ່າຍ', 'ປານກາງ', 'ຍາກ'];
+        const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
+        const levelScores = { easy: 0, medium: 0, hard: 0 };
+        
+        // Google Sheets CSV URL (same as original gameplay.html)
+        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        
+        // DOM elements
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const currentStreakEl = document.getElementById('current-streak');
+        const bestStreakEl = document.getElementById('best-streak');
+        const finalStreakEl = document.getElementById('final-streak');
+        const resultsBestStreakEl = document.getElementById('results-best-streak');
+        const evaluationResultEl = document.getElementById('evaluation-result');
+        const contextDisplay = document.getElementById('context-display');
+        const wordCardLeft = document.getElementById('word-card-left');
+        const wordCardRight = document.getElementById('word-card-right');
+        const timerBar = document.getElementById('timer-bar');
+        const restartGameBtn = document.getElementById('restart-game-btn');
+        const gamePlayerNameEl = document.getElementById('game-player-name');
+        const gameSettingsDisplay = document.getElementById('game-settings-display');
+        const difficultyDisplay = document.getElementById('difficulty-display');
+        const wordLoadingStatus = document.getElementById('word-loading-status');
+        const retryLoadingContainer = document.getElementById('retry-loading-container');
+        const retryLoadingBtn = document.getElementById('retry-loading-btn');
+        
+        // Life system elements
+        const heartsContainer = document.getElementById('hearts-container');
+        const motivationText = document.getElementById('motivation-text');
+        const totalWordsCompletedEl = document.getElementById('total-words-completed');
+
+        // Test Google Sheets connection (for debugging)
+        async function testGoogleSheetsConnection() {
+            console.log("Testing Google Sheets connection...");
+            console.log("URL:", GOOGLE_SHEETS_URL);
+            
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                console.log("Response status:", response.status);
+                console.log("Response headers:", [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log("Response text length:", text.length);
+                    console.log("Response preview:", text.substring(0, 500));
+                    return true;
+                } else {
+                    console.error("Response not OK:", response.status, response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                return false;
+            }
+        }
+
+        // Initialize game
+        async function initializeGame() {
+            loadGameSettings();
+            
+            // Set initial currentLevel based on selectedDifficulty
+            switch(selectedDifficulty) {
+                case 'easy': currentLevel = 0; break;
+                case 'medium': currentLevel = 1; break;
+                case 'hard': currentLevel = 2; break;
+                default: currentLevel = 0;
+            }
+            
+            // Update difficulty display with correct currentLevel
+            updateDifficultyDisplay();
+            
+            updateUI();
+            await loadWordsFromGoogleSheets();
+            setupEventListeners();
+            setupNavigationHandlers();
+            initializeSounds();
+            
+            // Try to auto-start music if enabled (may be blocked by browser)
+            if (musicEnabled) {
+                setTimeout(() => {
+                    toggleBackgroundMusic();
+                }, 1000); // Small delay to ensure audio is ready
+            }
+            
+            showNewWords();
+            
+            // Start enhanced tracking
+            trackSessionStart();
+            trackPerformanceMetrics();
+            
+            // Track game start
+            trackGameStart();
+        }
+
+        // Load game settings from localStorage
+        function loadGameSettings() {
+            const storedSettings = localStorage.getItem('gameSettings');
+            if (storedSettings) {
+                const settings = JSON.parse(storedSettings);
+                selectedDifficulty = settings.difficulty || 'easy';
+                timerEnabled = settings.timerEnabled || false;
+            }
+            
+            // Get settings from URL parameters first, then fallback to localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Get player name from URL parameters
+            const urlPlayerName = urlParams.get('player');
+            if (urlPlayerName) {
+                playerName = decodeURIComponent(urlPlayerName);
+                // Store in localStorage for consistency
+                localStorage.setItem('displayName', playerName);
+            } else {
+                playerName = localStorage.getItem('displayName') || 'ແຂກ';
+            }
+            
+            // Get difficulty from URL parameters
+            const urlDifficulty = urlParams.get('difficulty');
+            if (urlDifficulty) {
+                selectedDifficulty = urlDifficulty;
+            }
+            
+            // Get timer setting from URL parameters
+            const urlTimer = urlParams.get('timer');
+            if (urlTimer !== null) {
+                timerEnabled = urlTimer === 'true';
+            }
+            
+            bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
+            
+            // Update UI with settings
+            gamePlayerNameEl.textContent = playerName;
+            const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
+            const timerStatusEl = document.getElementById('timer-status');
+            if (timerStatusEl) {
+                timerStatusEl.textContent = timerText;
+            }
+            
+            // Set initial timer container visibility
+            const timerContainer = document.getElementById('timer-container');
+            if (timerContainer) {
+                timerContainer.style.display = timerEnabled ? 'block' : 'none';
+            }
+        }
+
+        // Update difficulty display with color
+        function updateDifficultyDisplay() {
+            difficultyDisplay.textContent = levelNames[currentLevel];
+            difficultyDisplay.style.color = levelColors[currentLevel];
+        }
+
+        // Load words from Google Sheets CSV
+        async function loadWordsFromGoogleSheets() {
+            try {
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.style.color = 'var(--main-color)';
+                
+                console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
+                
+                // Try multiple approaches to fetch the data
+                let response;
+                let fetchMethod = '';
+                
+                // Method 1: Try CORS proxy (allorigins.win)
+                try {
+                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_SHEETS_URL)}`;
+                    console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
+                    response = await fetch(corsProxyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv',
+                        },
+                    });
+                    fetchMethod = 'CORS proxy (allorigins)';
+                } catch (corsError1) {
+                    console.log("CORS proxy (allorigins) failed:", corsError1);
+                    
+                    // Method 2: Try another CORS proxy (cors-anywhere)
+                    try {
+                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GOOGLE_SHEETS_URL}`;
+                        console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
+                        response = await fetch(corsProxyUrl2, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'text/csv',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                        });
+                        fetchMethod = 'CORS proxy (cors-anywhere)';
+                    } catch (corsError2) {
+                        console.log("CORS proxy (cors-anywhere) failed:", corsError2);
+                        
+                        // Method 3: Try direct fetch
+                        console.log("Trying direct fetch:", GOOGLE_SHEETS_URL);
+                        response = await fetch(GOOGLE_SHEETS_URL, {
+                            method: 'GET',
+                            mode: 'cors',
+                            headers: {
+                                'Accept': 'text/csv',
+                            },
+                        });
+                        fetchMethod = 'Direct fetch';
+                    }
+                }
+                
+                console.log(`Successfully fetched using: ${fetchMethod}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+                
+                const csvText = await response.text();
+                console.log("CSV response length:", csvText.length);
+                console.log("CSV preview:", csvText.substring(0, 200));
+                
+                const lines = csvText.split('\n').filter(line => line.trim());
+                console.log("Total lines:", lines.length);
+                
+                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
+                wordPairs = lines
+                    .slice(1) // Skip header row
+                    .map((line, index) => {
+                        try {
+                            // Handle CSV parsing more robustly
+                            const columns = line.split(',').map(col => col.replace(/^"|"$/g, '').trim());
+                            if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
+                                return {
+                                    context: columns[0],    // Column A - context to display
+                                    correct: columns[1],    // Column B - correct answer
+                                    incorrect: columns[2],  // Column C - incorrect answer
+                                    difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
+                                };
+                            }
+                        } catch (parseError) {
+                            console.warn(`Error parsing line ${index + 2}:`, line, parseError);
+                        }
+                        return null;
+                    })
+                    .filter(item => item !== null); // Remove invalid entries
+                
+                console.log("Word list loaded from Google Sheets:", wordPairs.length, "entries");
+                console.log("Sample entries:", wordPairs.slice(0, 3));
+                
+                if (wordPairs.length === 0) {
+                    throw new Error("No valid entries found in the spreadsheet");
+                }
+                
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
+                wordLoadingStatus.style.color = 'var(--correct-color)';
+                
+                // Hide loading status and retry button after successful load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                    retryLoadingContainer.classList.add('hidden');
+                }, 2000);
+                
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
+                
+                // Initialize shuffled words for each difficulty
+                shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
+                shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
+                shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
+                
+            } catch (error) {
+                console.error("Error loading word list from Google Sheets:", error);
+                console.log("Error details:", error.message);
+                console.log("Error stack:", error.stack);
+                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
+                wordLoadingStatus.style.color = 'var(--warning-color)';
+                
+                // Show retry button
+                retryLoadingContainer.classList.remove('hidden');
+                
+                // Fallback to default words
+                wordPairs = getDefaultWords();
+                console.log("Using fallback words:", wordPairs.length, "entries");
+                
+                // Hide loading status after fallback load
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 3000);
+                
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
+                
+                // Initialize shuffled words for each difficulty
+                shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
+                shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
+                shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
+            }
+        }
+
+        // Get default words as fallback
+        function getDefaultWords() {
+            return [
+                { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', incorrect: 'ສະບາຍດີີ', difficulty: 1 },
+                { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບຈັຍ', difficulty: 1 },
+                { context: 'ລາວ', correct: 'ລາວ', incorrect: 'ລາຍ', difficulty: 1 },
+                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ", difficulty: 1 },
+                { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', incorrect: 'ພາສາລາຍ', difficulty: 2 },
+                { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', incorrect: 'ໂຮງຮິຽນ', difficulty: 2 },
+                { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', incorrect: 'ປະເທດລາຍ', difficulty: 2 },
+                { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', incorrect: 'ຄອມພິຍເຕີ', difficulty: 3 },
+                { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', incorrect: 'ວິທະຍາສາຍ', difficulty: 3 },
+                { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
+            ];
+        }
+
+        // Shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Show new words
+        function showNewWords() {
+            // Track time spent on previous word
+            trackWordTimeSpent();
+            
+            // Get current difficulty level (Column D: 1=Easy, 2=Medium, 3=Hard)
+            const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
+            const shuffledWords = shuffledWordsByDifficulty[difficultyLevel];
+            
+            if (shuffledWords.length === 0) {
+                console.warn(`No words found for difficulty level ${difficultyLevel}, using all words`);
+                // Fallback to all words if no words found for current difficulty
+                if (currentWordIndex >= wordPairs.length) {
+                    currentWordIndex = 0;
+                    wordPairs = shuffleArray(wordPairs);
+                }
+                currentWordPair = wordPairs[currentWordIndex];
+                currentWordIndex++;
+            } else {
+                // Use pre-shuffled words for this difficulty
+                if (currentWordIndex >= shuffledWords.length) {
+                    currentWordIndex = 0;
+                    // Re-shuffle words for next cycle
+                    shuffledWordsByDifficulty[difficultyLevel] = shuffleArray([...shuffledWords]);
+                }
+                currentWordPair = shuffledWordsByDifficulty[difficultyLevel][currentWordIndex];
+                currentWordIndex++;
+            }
+            
+            contextDisplay.textContent = currentWordPair.context;
+            
+            const options = [currentWordPair.correct, currentWordPair.incorrect];
+            const shuffled = Math.random() > 0.5 ? options : options.reverse();
+            
+            wordCardLeft.textContent = shuffled[0];
+            wordCardRight.textContent = shuffled[1];
+            
+            // Reset card states
+            wordCardLeft.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            wordCardRight.classList.remove('feedback-correct', 'feedback-incorrect', 'focused');
+            
+            // Start timing for new word
+            wordStartTime = Date.now();
+            selectedLeftCard = false;
+            selectedRightCard = false;
+            
+            gameActive = true;
+            
+            if (timerEnabled) {
+                startTimer();
+            }
+        }
+
+        // Check answer
+        function checkAnswer(selectedWord) {
+            try {
+                if (!gameActive) return;
+                
+                gameActive = false;
+                cancelAnimationFrame(currentTimeout);
+                
+                const isCorrect = selectedWord === currentWordPair.correct;
+            
+            // Track answer pattern
+            answerHistory.push({
+                correct: isCorrect,
+                difficulty: levelNames[currentLevel],
+                wordContext: currentWordPair.context.substring(0, 30),
+                timeSpent: wordStartTime ? Date.now() - wordStartTime : 0,
+                streak: currentStreak
+            });
+            
+            // Update difficulty stats
+            difficultyStats[levelNames[currentLevel].toLowerCase()]++;
+            
+            totalAnswers++;
+            
+            // Visual feedback
+            const selectedCard = selectedWord === wordCardLeft.textContent ? wordCardLeft : wordCardRight;
+            const otherCard = selectedCard === wordCardLeft ? wordCardRight : wordCardLeft;
+            
+            if (isCorrect) {
+                correctAnswers++;
+                currentStreak++;
+                levelProgress++;
+                levelScores[levelNames[currentLevel].toLowerCase()]++;
+                selectedCard.classList.add('feedback-correct');
+                playSound('correct');
+                
+                // Track correct answer
+                trackWordAnswer(true, currentLevel);
+                
+                // Check level progression
+                if (levelProgress >= levelThresholds[currentLevel]) {
+                    // Add to total words completed
+                    totalWordsCompleted += levelThresholds[currentLevel];
+                    
+                    // Track streak history
+                    streakHistory.push(currentStreak);
+                    
+                    // Track level completion
+                    const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
+                    trackLevelComplete(currentLevel, currentStreak, accuracy);
+                    
+                    // Track enhanced analytics
+                    trackDifficultyProgression();
+                    trackStreakAnalysis();
+                    trackAnswerPatterns();
+                    trackPlayerEngagement();
+                    
+                    // Life recovery bonus: restore +1 life if below max (capped at 3)
+                    if (playerLives < 3) {
+                        playerLives++;
+                        updateLifeDisplay();
+                    }
+                    
+                    // Show level transition modal
+                    showLevelTransitionModal();
+                }
+                
+                // Update UI immediately
+                updateUI();
+            } else {
+                selectedCard.classList.add('feedback-incorrect');
+                otherCard.classList.add('feedback-correct');
+                playSound('incorrect');
+                
+                // Track incorrect answer
+                trackWordAnswer(false, currentLevel);
+                
+                loseLife();
+            }
+            
+            if (playerLives > 0) {
+                setTimeout(() => {
+                    showNewWords();
+                }, 1500);
+            }
+            } catch (error) {
+                trackGameError('checkAnswer_error', error.message, 'checking_answer');
+                console.error('Error in checkAnswer:', error);
+            }
+        }
+
+        // Update level display
+        function updateLevelDisplay() {
+            // Update the progress display in the score section
+            const progressEl = document.getElementById('level-progress');
+            if (progressEl) {
+                // Show cumulative progress: 15, 30, 45
+                // Level 0: 15, Level 1: 30, Level 2: 45
+                const cumulativeThreshold = (currentLevel + 1) * 15;
+                progressEl.textContent = cumulativeThreshold;
+            }
+            
+            // Update difficulty display span
+            updateDifficultyDisplay();
+            
+            // Motivation text no longer shows score/lives
+            updateMotivationalText();
+        }
+
+        // Update life display with new motivational text
+        function updateLifeDisplay() {
+            const hearts = heartsContainer.querySelectorAll('.heart');
+            
+            hearts.forEach((heart, index) => {
+                // Add life-change animation to active hearts
+                if (index < playerLives) {
+                    heart.classList.remove('lost');
+                    heart.classList.add('active');
+                    // Add subtle animation when life changes
+                    heart.classList.add('life-change');
+                    setTimeout(() => {
+                        heart.classList.remove('life-change');
+                    }, 500);
+                } else {
+                    heart.classList.add('lost');
+                    heart.classList.remove('active');
+                }
+            });
+            
+            // Update motivational text based on lives
+            updateMotivationalText();
+        }
+
+        function updateMotivationalText() {
+            motivationText.classList.remove('warning', 'critical');
+            
+            switch(playerLives) {
+                case 3:
+                    motivationText.textContent = 'ທ່ານມີໂອກາດຕອບຜິດພຽງແຕ່ 3 ຄັ້ງ!';
+                    break;
+                case 2:
+                    motivationText.textContent = 'ເຫຼືອໂອກາດອີກ 2 ຄັ້ງ';
+                    motivationText.classList.add('warning');
+                    break;
+                case 1:
+                    motivationText.textContent = 'ໂອກາດສຸດທ້າຍແລ້ວ!!';
+                    motivationText.classList.add('critical');
+                    break;
+                case 0:
+                    motivationText.textContent = 'ເກມຈົບແລ້ວ!';
+                    motivationText.classList.add('critical');
+                    break;
+            }
+        }
+
+        function updateMotivationTextColor() {
+            // This function is now handled by updateMotivationalText
+        }
+
+        function loseLife() {
+            if (playerLives > 0) {
+                playerLives--;
+                
+                // Track life lost
+                trackLifeLost(playerLives);
+                
+                const hearts = heartsContainer.querySelectorAll('.heart');
+                const heartToBreak = hearts[playerLives];
+                
+                // Add losing animation
+                heartToBreak.classList.add('losing');
+                
+                setTimeout(() => {
+                    heartToBreak.classList.remove('losing');
+                    heartToBreak.classList.remove('active');
+                    heartToBreak.classList.add('lost');
+                    
+                    // Update motivational text
+                    updateMotivationalText();
+                    
+                    if (playerLives === 0) {
+                        gameOver();
+                    }
+                }, 400);
+            }
+        }
+
+        function gameOver() {
+            // When player runs out of lives, just call endGame
+            endGame();
+        }
+
+        // Timer functions
+        function startTimer() {
+            const timerContainer = document.getElementById('timer-container');
+            
+            if (!timerEnabled) {
+                if (timerContainer) {
+                    timerContainer.style.display = 'none';
+                }
+                return;
+            }
+            
+            if (timerContainer) {
+                timerContainer.style.display = 'block';
+            }
+            
+            cancelAnimationFrame(currentTimeout);
+            timerBar.style.transform = 'scaleX(1)';
+            
+            const startTime = Date.now();
+            
+            const updateTimer = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = 1 - (elapsed / timeLimit);
+                
+                if (progress <= 0) {
+                    timerBar.style.transform = 'scaleX(0)';
+                    if (gameActive) {
+                        gameActive = false;
+                        playSound('timeout');
+                        loseLife();
+                        
+                        if (playerLives > 0) {
+                            setTimeout(() => {
+                                showNewWords();
+                            }, 1500);
+                        }
+                    }
+                } else {
+                    timerBar.style.transform = `scaleX(${progress})`;
+                    currentTimeout = requestAnimationFrame(updateTimer);
+                }
+            };
+            
+            currentTimeout = requestAnimationFrame(updateTimer);
+        }
+
+        // Update UI
+        function updateUI() {
+            // Show cumulative progress: current level progress + previous levels
+            const cumulativeProgress = (currentLevel * 15) + levelProgress;
+            currentStreakEl.textContent = cumulativeProgress;
+            bestStreakEl.textContent = bestStreak;
+            if (totalWordsCompletedEl) {
+                totalWordsCompletedEl.textContent = totalWordsCompleted;
+            }
+            
+            // Update account panel if it exists and is visible
+            const accountPanel = document.getElementById('account-panel');
+            if (accountPanel && !accountPanel.classList.contains('hidden')) {
+                updateAccountPanel();
+            }
+            
+            if (currentStreak > bestStreak) {
+                bestStreak = currentStreak;
+                localStorage.setItem('bestStreak', bestStreak);
+            }
+        }
+
+        // End game (general purpose)
+        function endGame() {
+            gameActive = false;
+            cancelAnimationFrame(currentTimeout);
+            
+            // Calculate final percentage score for display
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
+            const accuracyRounded = accuracy.toFixed(1);
+            
+            // Track game end
+            trackGameEnd(currentStreak, accuracy, totalWordsCompleted);
+            
+            // Update stats displays
+            document.getElementById('final-streak').textContent = currentStreak;
+            document.getElementById('results-best-streak').textContent = bestStreak;
+            
+            // Get meme container and evaluation element
+            const memeContainer = document.getElementById('meme-container');
+            const evaluationEl = document.getElementById('evaluation-result');
+            
+            // Set consistent box styling for all evaluation results
+            evaluationEl.className = 'text-xl sm:text-3xl font-bold text-center text-black bg-amber-400 px-4 py-3';
+            
+            // Determine evaluation tier and select random image based on LATEST SCORE (currentStreak)
+            let evaluation = '';
+            let memeContent = '';
+            let resultFolder = '';
+            
+            // Use currentStreak (latest score) instead of accuracy for meme selection
+            if (currentStreak >= 12) {
+                // 12+ streak: Born to be Lao
+                evaluation = 'ຊາດກ່ອນເຈົ້າເກີດເປັນຄົນລາວ ຊາດນີ້ກໍເຊັ່ນກັນ';
+                resultFolder = '1';
+            } else if (currentStreak >= 9) {
+                // 9-11 streak: 75% True Lao Child
+                evaluation = 'ເຈົ້າແມ່ນລູກຊອດລາວ';
+                resultFolder = '2';
+            } else if (currentStreak >= 6) {
+                // 6-8 streak: Born in Laos but grew up abroad
+                evaluation = 'ເຈົ້າເກີດຢູ່ລາວ ແຕ່ໄປໃຫຍ່ຢູ່ຕ່າງປະເທດ';
+                resultFolder = '3';
+            } else if (currentStreak >= 3) {
+                // 3-5 streak: At least not "Jing Jai"
+                evaluation = 'ຢ່າງໜ້ອຍເຈົ້າກໍບໍ່ແມ່ນຄົນ "ຈຣິງໃຈ"';
+                resultFolder = '4';
+            } else {
+                // 0-2 streak: Foreigner whose plane crashed
+                evaluation = 'ເຈົ້າເປັນຄົນຕ່າງປະເທດ ທີ່ຕົກຍົນ';
+                resultFolder = '5';
+            }
+            
+            // Select random image from the appropriate result folder
+            const imageOptionsByFolder = {
+                '1': ['3.webp', '4.webp', '5.webp', '6.webp', '7.webp'],
+                '2': ['8.webp', '9.webp', '10.webp', '11.webp', '12.webp'],
+                '3': ['16.webp', '17.webp'],
+                '4': ['27.webp', '28.webp'],
+                '5': ['40.webp', '41.webp', '42.webp']
+            };
+            let selectedImage = '';
+            const candidates = imageOptionsByFolder[resultFolder] || [];
+            if (candidates.length > 0) {
+                selectedImage = candidates[Math.floor(Math.random() * candidates.length)];
+            } else {
+                selectedImage = '3.webp';
+            }
+            
+            // Create image-based meme content
+            memeContent = `
+                <div class="flex items-center justify-center h-full bg-neutral-800 p-2">
+                    <img src="images/results/${resultFolder}/${selectedImage}" 
+                         alt="Result Image" 
+                         class="w-full h-full object-cover rounded-lg shadow-lg">
+                </div>
+            `;
+            
+            evaluationEl.textContent = evaluation;
+            memeContainer.innerHTML = memeContent;
+            
+            // Save game stats
+            saveGameStats();
+            
+            // Switch screens
+            gameScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+            
+            // Animate results screen entrance
+            setTimeout(() => {
+                resultsScreen.classList.remove('opacity-0', 'scale-95');
+                resultsScreen.classList.add('opacity-100', 'scale-100');
+            }, 50);
+            
+            // Start result sound with fade
+            startResultSound();
+            
+            // Optional: Auto-navigate to leaderboard after 10 seconds (can be enabled/disabled)
+            // Uncomment the following lines if you want automatic navigation to leaderboard
+            // setTimeout(() => {
+            //     if (confirm('ຕ້ອງການໄປກະດານຄະແນນບໍ່?')) {
+            //         window.location.href = 'leaderboard.html';
+            //     }
+            // }, 10000);
+            
+            // Auto-end game after 30 seconds if player doesn't interact (optional)
+            // Uncomment the following lines if you want automatic game end
+            // setTimeout(() => {
+            //     if (confirm('ເກມຈະສິ້ນສຸດໃນ 10 ວິນາທີ. ຕ້ອງການຫຼິ້ນຕໍ່ບໍ?')) {
+            //         // Player wants to continue, do nothing
+            //     } else {
+            //         window.location.href = 'leaderboard.html';
+            //     }
+            // }, 30000);
+        }
+
+        // Save game stats
+        function saveGameStats() {
+            const stats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            
+            if (!stats.totalGames) stats.totalGames = 0;
+            if (!stats.totalCorrect) stats.totalCorrect = 0;
+            if (!stats.totalMistakes) stats.totalMistakes = 0;
+            if (!stats.bestStreak) stats.bestStreak = 0;
+            
+            stats.totalGames++;
+            stats.totalCorrect += correctAnswers;
+            stats.totalMistakes += (totalAnswers - correctAnswers);
+            stats.bestStreak = Math.max(stats.bestStreak, currentStreak);
+            
+            localStorage.setItem('gameStats', JSON.stringify(stats));
+        }
+
+        // Reset game
+        function resetGame() {
+            // Stop result sound and resume background music
+            stopResultSound();
+            
+            currentStreak = 0;
+            currentWordIndex = 0;
+            currentWordPair = null;
+            correctAnswers = 0;
+            totalAnswers = 0;
+            playerLives = 3;
+            currentLevel = 0;
+            levelProgress = 0;
+            levelsCompleted = 0;
+            totalWordsCompleted = 0; // Reset total words completed
+            
+            // Reset enhanced tracking variables
+            sessionId = null;
+            sessionStartTime = null;
+            wordStartTime = null;
+            lastUserAction = null;
+            difficultyStats = { easy: 0, medium: 0, hard: 0 };
+            streakHistory = [];
+            answerHistory = [];
+            performanceMetrics = {};
+            featureUsage = {
+                soundEnabled: false,
+                settingsAccessed: 0,
+                helpAccessed: 0,
+                replayUsed: 0
+            };
+            levelScores.easy = 0;
+            levelScores.medium = 0;
+            levelScores.hard = 0;
+            gameActive = false;
+            
+            // Re-shuffle all words for fresh start
+            wordPairs = shuffleArray(wordPairs);
+            
+            // Re-shuffle words for each difficulty
+            shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
+            shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
+            shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
+            
+            updateUI();
+            updateLifeDisplay();
+            updateLevelDisplay();
+            updateDifficultyDisplay();
+            
+            gameScreen.classList.add('active');
+            resultsScreen.classList.remove('active');
+            
+            // Reset results screen animation state
+            resultsScreen.classList.remove('opacity-100', 'scale-100');
+            resultsScreen.classList.add('opacity-0', 'scale-95');
+            
+            showNewWords();
+        }
+
+        // Audio fade utility
+        function fadeAudio(audioEl, targetVolume, durationMs, onComplete) {
+            const steps = 20;
+            const stepTime = durationMs / steps;
+            const volumeStep = (targetVolume - audioEl.volume) / steps;
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                audioEl.volume = Math.max(0, Math.min(1, audioEl.volume + volumeStep));
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    audioEl.volume = targetVolume;
+                    if (targetVolume === 0) audioEl.pause();
+                    if (onComplete) onComplete();
+                }
+            }, stepTime);
+            if (targetVolume > 0 && audioEl.paused) {
+                audioEl.play().catch(() => {});
+            }
+        }
+        
+        // Sound functions
+        function initializeSounds() {
+            if (typeof Tone !== 'undefined') {
+                synth = new Tone.Synth().toDestination();
+                Tone.Destination.mute = !soundEnabled;
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            try {
+                if (type === 'correct') {
+                    synth.triggerAttackRelease("C5", "8n");
+                } else if (type === 'incorrect') {
+                    synth.triggerAttackRelease("C3", "8n");
+                } else if (type === 'timeout') {
+                    synth.triggerAttackRelease("G3", "8n");
+                }
+            } catch (error) {
+                console.error('Error playing sound:', error);
+            }
+        }
+        
+        function toggleBackgroundMusic() {
+            if (musicEnabled) {
+                // Try to play music, but handle autoplay restrictions
+                const playPromise = backgroundMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        if (e.name === 'NotAllowedError') {
+                            console.log('Autoplay blocked by browser. User needs to interact with page first.');
+                        } else {
+                            console.log('Make sure bg_sound.mp3 exists in your sounds directory');
+                        }
+                    });
+                }
+            } else {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
+        }
+        
+        function enableMusicAfterInteraction() {
+            if (!userHasInteracted && musicEnabled) {
+                userHasInteracted = true;
+                console.log('User interaction detected. Enabling background music...');
+                toggleBackgroundMusic();
+            }
+        }
+        
+        function startResultSound() {
+            if (soundEnabled) {
+                // Fade out background music
+                fadeAudio(backgroundMusic, 0, 1500);
+                // Fade in result sound
+                fadeAudio(resultSound, 1.0, 1500);
+            }
+        }
+        
+        function stopResultSound() {
+            // Fade out result sound
+            fadeAudio(resultSound, 0, 1500, () => {
+                resultSound.pause();
+                resultSound.currentTime = 0;
+                // Resume background music if enabled
+                if (musicEnabled) {
+                    fadeAudio(backgroundMusic, 1.0, 1500);
+                }
+            });
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Retry loading button
+            if (retryLoadingBtn) {
+                retryLoadingBtn.addEventListener('click', async () => {
+                    retryLoadingContainer.classList.add('hidden');
+                    wordLoadingStatus.style.display = 'block';
+                    await loadWordsFromGoogleSheets();
+                });
+            }
+            
+            // Card clicks
+            if (wordCardLeft) {
+                wordCardLeft.addEventListener('click', () => {
+                    if (gameActive) {
+                        lastUserAction = 'left_card_click';
+                        trackUIInteraction('wordCardLeft', 'word_card');
+                        checkAnswer(wordCardLeft.textContent);
+                    }
+                });
+            }
+            
+            if (wordCardRight) {
+                wordCardRight.addEventListener('click', () => {
+                    if (gameActive) {
+                        lastUserAction = 'right_card_click';
+                        trackUIInteraction('wordCardRight', 'word_card');
+                        checkAnswer(wordCardRight.textContent);
+                    }
+                });
+            }
+            
+            // Keyboard controls
+            document.addEventListener('keydown', (e) => {
+                if (!gameActive || !isKeyboardEnabled) return;
+                
+                if (e.key.toLowerCase() === 'a') {
+                    e.preventDefault();
+                    if (wordCardLeft) {
+                        wordCardLeft.classList.add('focused');
+                        selectedLeftCard = true;
+                        selectedRightCard = false;
+                        if (wordCardRight) wordCardRight.classList.remove('focused');
+                        checkAnswer(wordCardLeft.textContent);
+                    }
+                } else if (e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+                    if (wordCardRight) {
+                        wordCardRight.classList.add('focused');
+                        selectedRightCard = true;
+                        selectedLeftCard = false;
+                        if (wordCardLeft) wordCardLeft.classList.remove('focused');
+                        checkAnswer(wordCardRight.textContent);
+                    }
+                }
+            });
+            
+            // Button clicks
+            if (restartGameBtn) {
+                restartGameBtn.addEventListener('click', resetGame);
+            }
+            
+            // Leaderboard button
+            const leaderboardBtn = document.getElementById('leaderboard-btn');
+            if (leaderboardBtn) {
+                leaderboardBtn.addEventListener('click', () => {
+                    window.location.href = 'leaderboard.html';
+                });
+            }
+
+            // Back to Home button
+            const backHomeBtn = document.getElementById('back-home-btn');
+            if (backHomeBtn) {
+                backHomeBtn.addEventListener('click', () => {
+                    window.location.href = '/LaoTypo/testing.html';
+                });
+            }
+            
+            // Add Word button (Facebook redirect)
+            const addWordBtn = document.getElementById('add-word-btn');
+            if (addWordBtn) {
+                addWordBtn.addEventListener('click', () => {
+                    window.location.href = 'https://www.facebook.com/profile.php?id=61578349258643';
+                });
+            }
+            
+            // Action grid buttons (only if they exist)
+            setupActionGrid();
+            
+            // Sound setting change listeners
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'soundEnabled') {
+                    soundEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (typeof Tone !== 'undefined') {
+                        Tone.Destination.mute = !soundEnabled;
+                    }
+                } else if (e.key === 'musicEnabled') {
+                    musicEnabled = JSON.parse(e.newValue ?? 'true');
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
+                }
+            });
+            
+            window.addEventListener('soundSettingChanged', (e) => {
+                soundEnabled = e.detail.soundEnabled;
+                if (typeof Tone !== 'undefined') {
+                    Tone.Destination.mute = !soundEnabled;
+                }
+            });
+            
+            window.addEventListener('musicSettingChanged', (e) => {
+                musicEnabled = e.detail.musicEnabled;
+                if (musicEnabled) {
+                    toggleBackgroundMusic();
+                } else {
+                    fadeAudio(backgroundMusic, 0, 1000, () => {
+                        backgroundMusic.pause();
+                        backgroundMusic.currentTime = 0;
+                    });
+                }
+            });
+            
+            // Music toggle event listener (if music toggle exists in gameplay.html)
+            const musicToggle = document.getElementById('music-toggle');
+            if (musicToggle) {
+                musicToggle.addEventListener('change', () => {
+                    musicEnabled = musicToggle.checked;
+                    localStorage.setItem('musicEnabled', musicEnabled.toString());
+                    
+                    // Dispatch custom event for same-page listeners
+                    window.dispatchEvent(new CustomEvent('musicSettingChanged', {
+                        detail: { musicEnabled }
+                    }));
+                    
+                    if (musicEnabled) {
+                        toggleBackgroundMusic();
+                    } else {
+                        fadeAudio(backgroundMusic, 0, 1000, () => {
+                            backgroundMusic.pause();
+                            backgroundMusic.currentTime = 0;
+                        });
+                    }
+                });
+            }
+            
+            // Add user interaction listeners to enable music after first interaction
+            document.addEventListener('click', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('keydown', enableMusicAfterInteraction, { once: true });
+            document.addEventListener('touchstart', enableMusicAfterInteraction, { once: true });
+        }
+        
+        // Action Grid Functions
+        function setupActionGrid() {
+            const downloadBtn = document.getElementById('download-btn');
+            const shareBtn = document.getElementById('share-btn');
+            const shareWithLinkBtn = document.getElementById('share-with-link-btn');
+            
+            // Return early if action buttons don't exist
+            if (!downloadBtn || !shareBtn || !shareWithLinkBtn) {
+                console.log('Action grid buttons not found - skipping setup');
+                return;
+            }
+            
+            let currentImageBlob = null;
+            
+            // Download Button
+            downloadBtn.addEventListener('click', async () => {
+                try {
+                    await document.fonts.ready;
+                    const { blob } = await generateShareImage();
+                    currentImageBlob = blob;
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `lao-game-result-${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Download failed:', error);
+                }
+            });
+            
+            // Share Button (image only)
+            shareBtn.addEventListener('click', async () => {
+                try {
+                    await document.fonts.ready;
+                    const { blob } = await generateShareImage();
+                    currentImageBlob = blob;
+                    
+                    if (navigator.share && navigator.canShare) {
+                        const file = new File([blob], `lao-game-result-${Date.now()}.png`, {
+                            type: 'image/png'
+                        });
+                        
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'LaoTypo Game Result'
+                            });
+                        } else {
+                            // Fallback: copy image to clipboard
+                            await navigator.clipboard.write([
+                                new ClipboardItem({ 'image/png': blob })
+                            ]);
+                            alert('Image copied to clipboard!');
+                        }
+                    } else {
+                        // Fallback: copy image to clipboard
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        alert('Image copied to clipboard!');
+                    }
+                } catch (error) {
+                    console.error('Share failed:', error);
+                    alert('Sharing not supported on this device');
+                }
+            });
+            
+            // Share with Link Button (image + text)
+            shareWithLinkBtn.addEventListener('click', async () => {
+                try {
+                    await document.fonts.ready;
+                    const { blob } = await generateShareImage();
+                    currentImageBlob = blob;
+                    
+                    if (navigator.share && navigator.canShare) {
+                        const file = new File([blob], `lao-game-result-${Date.now()}.png`, {
+                            type: 'image/png'
+                        });
+                        
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'LaoTypo Game Result',
+                                text: 'Let\'s play with me! 🎮 Laotypo.com'
+                            });
+                        } else {
+                            // Fallback: copy text to clipboard
+                            await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
+                            alert('Link text copied to clipboard!');
+                        }
+                    } else {
+                        // Fallback: copy text to clipboard
+                        await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
+                        alert('Link text copied to clipboard!');
+                    }
+                } catch (error) {
+                    console.error('Share with link failed:', error);
+                    alert('Sharing not supported on this device');
+                }
+            });
+        }
+        
+        async function generateShareImage(format = 'square') {
+            // Ensure fonts are loaded
+            await document.fonts.ready;
+            
+            const canvas = document.getElementById('share-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Always use square format (1080x1080)
+            canvas.width = 1080;
+            canvas.height = 1080;
+            
+            // Get evaluation text
+            const evaluation = document.getElementById('evaluation-result').textContent;
+            
+            // Create dark rounded background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#2c2e31');
+            gradient.addColorStop(1, '#1e2023');
+            ctx.fillStyle = gradient;
+            
+            // Draw rounded rectangle background
+            const cornerRadius = 40;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, canvas.width, canvas.height, cornerRadius);
+            ctx.fill();
+            
+            // 1. Header text at the top: "ຜົນການປະເມີນບອກວ່າ..."
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '40px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ຜົນການປະເມີນບອກວ່າ...', canvas.width / 2, 100);
+            
+            // 2. Meme section (image + caption as one unified block)
+            const blockWidth = 600;
+            const blockX = (canvas.width - blockWidth) / 2;
+            const blockY = 180;
+            const blockRadius = 20;
+            const borderWidth = 3;
+            
+            // Get the meme image from #meme-container
+            const memeContainer = document.getElementById('meme-container');
+            const memeImg = memeContainer.querySelector('img');
+            
+            // Calculate caption dimensions first
+            ctx.font = 'bold 28px "Noto Sans Lao Looped", sans-serif';
+            ctx.textAlign = 'center';
+            
+            const captionPadding = 24; // Increased by 20% (20 * 1.2 = 24)
+            const maxWidth = blockWidth - (captionPadding * 2);
+            const lineHeight = 38; // Increased by 20% (32 * 1.2 = 38.4, rounded to 38)
+            const words = evaluation.split(' ');
+            let lines = [];
+            let currentLine = '';
+            
+            for (let n = 0; n < words.length; n++) {
+                const testLine = currentLine + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = words[n] + ' ';
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine.trim()) {
+                lines.push(currentLine.trim());
+            }
+            
+            const captionHeight = (lines.length * lineHeight) + (captionPadding * 2);
+            const imageSize = blockWidth;
+            const captionY = blockY + imageSize; // Directly attached to image bottom
+            
+            if (memeImg && memeImg.src) {
+                try {
+                    // Load the meme image
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.src = memeImg.src;
+                    
+                    await new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        setTimeout(reject, 3000);
+                    });
+                    
+                    // Draw outer amber border for the entire block
+                    ctx.strokeStyle = '#f8af3c';
+                    ctx.lineWidth = borderWidth;
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, blockWidth, imageSize + captionHeight, blockRadius);
+                    ctx.stroke();
+                    
+                    // Draw image with object-fit: cover
+                    const imgAspectRatio = img.width / img.height;
+                    const containerAspectRatio = 1; // Square container
+                    
+                    let sourceX = 0, sourceY = 0, sourceWidth = img.width, sourceHeight = img.height;
+                    
+                    if (imgAspectRatio > containerAspectRatio) {
+                        // Image is wider than container - crop sides
+                        sourceWidth = img.height;
+                        sourceX = (img.width - sourceWidth) / 2;
+                    } else {
+                        // Image is taller than container - crop top/bottom
+                        sourceHeight = img.width;
+                        sourceY = (img.height - sourceHeight) / 2;
+                    }
+                    
+                    // Draw image with rounded corners (top only) and object-fit: cover
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, imageSize, imageSize, blockRadius);
+                    ctx.clip();
+                    ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, blockX, blockY, imageSize, imageSize);
+                    ctx.restore();
+                    
+                } catch (error) {
+                    console.log('Could not load meme image, using fallback');
+                    // Fallback: draw a placeholder
+                    ctx.fillStyle = '#2c2e31';
+                    ctx.beginPath();
+                    ctx.roundRect(blockX, blockY, imageSize, imageSize, blockRadius);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#f8af3c';
+                    ctx.font = 'bold 80px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🦎', blockX + imageSize / 2, blockY + imageSize / 2 + 30);
+                }
+            }
+            
+            // 3. Caption bar (directly attached to image, no gap)
+            const captionX = blockX;
+            const captionWidth = blockWidth;
+            
+            // Draw amber caption bar (bottom part of the unified block)
+            ctx.fillStyle = '#f8af3c';
+            ctx.beginPath();
+            ctx.roundRect(captionX, captionY, captionWidth, captionHeight, blockRadius);
+            ctx.fill();
+            
+            // Draw text centered vertically in caption bar
+            ctx.fillStyle = '#1a1a1a';
+            const textStartY = captionY + captionPadding + (lineHeight * 0.8);
+            
+            lines.forEach((line, index) => {
+                const textY = textStartY + (index * lineHeight);
+                ctx.fillText(line, captionX + captionWidth / 2, textY);
+            });
+            
+            // 4. Footer: LaoTypo logo (250px width as requested)
+            try {
+                const logoImg = new Image();
+                logoImg.src = 'images/LaoTypo-logo-04.png';
+                
+                await new Promise((resolve, reject) => {
+                    logoImg.onload = resolve;
+                    logoImg.onerror = reject;
+                    setTimeout(reject, 3000);
+                });
+                
+                // Draw logo at bottom center (280px width)
+                const logoWidth = 280;
+                const logoHeight = (logoImg.height / logoImg.width) * logoWidth;
+                const logoX = (canvas.width - logoWidth) / 2;
+                const logoY = canvas.height - logoHeight - 40;
+                
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+                
+            } catch (error) {
+                console.log('Could not load logo, using text fallback');
+                // Fallback: draw text
+                ctx.fillStyle = '#f8af3c';
+                ctx.font = 'bold 32px "Montserrat", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Laotypo', canvas.width / 2, canvas.height - 40);
+            }
+            
+            // Convert canvas to blob and data URL
+            const dataUrl = canvas.toDataURL('image/png');
+            
+            // Create blob for native sharing
+            const blob = await new Promise(resolve => {
+                canvas.toBlob(blob => {
+                    resolve(blob);
+                }, 'image/png');
+            });
+            
+            return { dataUrl, blob };
+        }
+
+        // Navigation handlers
+        function setupNavigationHandlers() {
+            // Home button navigation
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn) {
+                homeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'registration.html';
+                });
+            }
+            
+            const homeNavBtn = document.getElementById('home-nav-btn');
+            if (homeNavBtn) {
+                homeNavBtn.addEventListener('click', () => {
+                    window.location.href = 'testing.html';
+                });
+            }
+            
+            // Return home button in footer
+            const returnHomeBtn = document.getElementById('return-home-btn');
+            if (returnHomeBtn) {
+                returnHomeBtn.addEventListener('click', () => {
+                    stopResultSound();
+                    window.location.href = 'testing.html';
+                });
+            }
+            
+            // Other navigation buttons can be added here
+            const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+            if (leaderboardNavBtn) {
+                leaderboardNavBtn.addEventListener('click', () => {
+                    window.location.href = 'leaderboard.html';
+                });
+            }
+            
+            const openSettingsBtn = document.getElementById('open-settings-btn');
+            if (openSettingsBtn) {
+                openSettingsBtn.addEventListener('click', () => {
+                    // Add settings functionality
+                });
+            }
+            
+            const accountNavBtn = document.getElementById('account-nav-btn');
+            if (accountNavBtn) {
+                accountNavBtn.addEventListener('click', () => {
+                    console.log('👤 Toggling account panel');
+                    const accountPanel = document.getElementById('account-panel');
+                    const isHidden = accountPanel.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        updateAccountPanel(); // Update account panel with latest data
+                        accountPanel.classList.remove('hidden');
+                    } else {
+                        accountPanel.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // Account panel close button
+            const closeAccountBtn = document.getElementById('close-account-btn');
+            if (closeAccountBtn) {
+                closeAccountBtn.addEventListener('click', () => {
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.add('hidden');
+                });
+            }
+            
+            // Quick edit name button
+            const quickEditNameBtn = document.getElementById('quick-edit-name-btn');
+            if (quickEditNameBtn) {
+                quickEditNameBtn.addEventListener('click', () => {
+                    const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
+                    if (newName && newName.trim() !== '') {
+                        const oldName = playerName;
+                        playerName = newName.trim();
+                        localStorage.setItem('displayName', playerName);
+                        updateAccountPanel();
+                        updateUI();
+                        
+                        // Track player name change
+                        trackPlayerNameChange(oldName, playerName);
+                    }
+                });
+            }
+            
+            // View full profile button
+            const viewFullProfileBtn = document.getElementById('view-full-profile-btn');
+            if (viewFullProfileBtn) {
+                viewFullProfileBtn.addEventListener('click', () => {
+                    // Close account panel and navigate to full profile page
+                    const accountPanel = document.getElementById('account-panel');
+                    accountPanel.classList.add('hidden');
+                    window.location.href = 'player_account_info.html';
+                });
+            }
+        }
+
+        // Enhanced Account Functions
+        function updateAccountPanel() {
+            // Update account panel with current data
+            document.getElementById('account-display-name').textContent = playerName || 'ຜູ້ຫຼິ້ນ';
+            
+            // Update quick stats
+            document.getElementById('account-best-streak').textContent = bestStreak;
+            
+            // Calculate accuracy
+            const totalAnswers = correctAnswers + (currentStreak - correctAnswers);
+            const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100).toFixed(1) : '0.0';
+            document.getElementById('account-accuracy').textContent = `${accuracy}%`;
+            
+            // Calculate achievements (simplified - based on best streak)
+            let achievements = 0;
+            if (bestStreak >= 5) achievements++;
+            if (bestStreak >= 10) achievements++;
+            if (bestStreak >= 15) achievements++;
+            if (bestStreak >= 20) achievements++;
+            if (bestStreak >= 25) achievements++;
+            if (bestStreak >= 30) achievements++;
+            if (bestStreak >= 40) achievements++;
+            if (bestStreak >= 50) achievements++;
+            
+            document.getElementById('account-achievements').textContent = `${achievements}/8`;
+        }
+
+        // Level Transition Modal Functions
+        function showLevelTransitionModal() {
+            const modal = document.getElementById('level-transition-modal');
+            const levelMessage = document.getElementById('level-message');
+            const levelQuestion = document.getElementById('level-question');
+            const levelScore = document.getElementById('level-score');
+            const levelIcon = document.getElementById('level-icon');
+            const continueBtn = document.getElementById('continue-next-level');
+            const replayBtn = document.getElementById('replay-current-level');
+            
+            // Pause the game
+            gameActive = false;
+            
+            // Update modal content based on current level
+            levelScore.textContent = levelProgress;
+            
+            if (currentLevel === 0) {
+                // Completed Easy Level
+                levelIcon.textContent = '🟢';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບປານກາງບໍ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
+                `;
+            } else if (currentLevel === 1) {
+                // Completed Medium Level
+                levelIcon.textContent = '🔵';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບປານກາງແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບຍາກບໍ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
+                `;
+            } else if (currentLevel === 2) {
+                // Completed Hard Level - Game Complete!
+                levelsCompleted++;
+                levelIcon.textContent = '🏆';
+                levelMessage.textContent = 'ທ່ານຜ່ານທຸກລະດັບແລ້ວ! 🎉';
+                levelQuestion.textContent = 'ທ່ານຕ້ອງການເບິ່ງຜົນສຳເລັດ ຫຼື ຫຼິ້ນອີກຄັ້ງ?';
+                continueBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    ເບິ່ງຜົນສຳເລັດ
+                `;
+                replayBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    ຫຼິ້ນອີກຄັ້ງ
+                `;
+            }
+            
+            // Show the modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Play success sound
+            playSound('correct');
+        }
+        
+        function setupLevelTransitionHandlers() {
+            const modal = document.getElementById('level-transition-modal');
+            const continueBtn = document.getElementById('continue-next-level');
+            const replayBtn = document.getElementById('replay-current-level');
+            
+            if (continueBtn) {
+                continueBtn.addEventListener('click', () => {
+                    if (currentLevel < 2) {
+                        // Advance to next level
+                        const previousLevel = currentLevel;
+                        levelsCompleted++;
+                        currentLevel++;
+                        levelProgress = 0;
+                        currentWordIndex = 0; // Reset word index for new level
+                        
+                        // Track level advance
+                        trackLevelAdvance(previousLevel, currentLevel);
+                        
+                        // Re-shuffle words for the new difficulty level
+                        const newDifficultyLevel = currentLevel + 1;
+                        if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
+                            shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
+                        }
+                        
+                        updateLevelDisplay();
+                        updateDifficultyDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game with new level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    } else {
+                        // At hard level, game is complete - show results
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // End the game and show results
+                        setTimeout(() => {
+                            endGame();
+                        }, 500);
+                    }
+                });
+            }
+            
+            if (replayBtn) {
+                replayBtn.addEventListener('click', () => {
+                    // Track feature usage
+                    trackFeatureUsage('replayUsed');
+                    lastUserAction = 'replay_click';
+                    
+                    if (currentLevel === 2) {
+                        // At hard level, "replay" means restart the game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Reset and restart the game
+                        setTimeout(() => {
+                            resetGame();
+                        }, 500);
+                    } else {
+                        // Replay current level - reset score and lives
+                        currentStreak = 0;
+                        playerLives = 3;
+                        levelProgress = 0;
+                        currentWordIndex = 0; // Reset word index for replay
+                        
+                        // Track replay
+                        trackReplay(currentLevel);
+                        
+                        // Re-shuffle words for this difficulty level
+                        const difficultyLevel = currentLevel + 1;
+                        if (shuffledWordsByDifficulty[difficultyLevel].length > 0) {
+                            // Re-shuffle the words for this difficulty
+                            shuffledWordsByDifficulty[difficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[difficultyLevel]]);
+                        }
+                        
+                        updateLevelDisplay();
+                        updateLifeDisplay();
+                        updateUI();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game at same level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
+                    }
+                });
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                initializeGame();
+                setupLevelTransitionHandlers();
+                
+                // Initialize PWA and Analytics
+                initializePWA();
+                initializeAnalytics();
+            } catch (error) {
+                console.error('Error initializing game:', error);
+                // Show user-friendly error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'fixed top-4 left-4 right-4 bg-red-500 text-white p-4 rounded-lg z-50';
+                errorDiv.innerHTML = `
+                    <h3 class="font-bold">ເກີດຂໍ້ຜິດພາດ!</h3>
+                    <p>ກະລຸນາລອງໂຫຼດໜ້ານີ້ອີກຄັ້ງ</p>
+                    <button onclick="location.reload()" class="mt-2 bg-white text-red-500 px-4 py-2 rounded">ໂຫຼດໃໝ່</button>
+                `;
+                document.body.appendChild(errorDiv);
+            }
+        });
+    </script>
+    
+    <!-- Footer with Return Home button -->
+    <footer class="fixed bottom-0 left-0 right-0 p-3 sm:p-4 bg-[#222426] border-t-2 border-[#f8af3c] hidden">
+        <div class="max-w-7xl mx-auto text-center">
+            <button id="return-home-btn" class="btn btn-primary px-4 sm:px-6 py-1.5 sm:py-2 text-sm sm:text-base">
+                ກັບໄປໜ້າຫຼັກ
+            </button>
+        </div>
+    </footer>
+
+    <!-- Result Screen Share Functionality -->
+    <script>
+    // Result Screen Share Functionality
+    class ResultShareGenerator {
+        constructor() {
+            this.canvas = document.getElementById('share-canvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.memeContainer = document.getElementById('meme-container');
+            this.evaluationResult = document.getElementById('evaluation-result');
+            this.sharePreview = document.getElementById('share-preview');
+            this.sharePreviewContainer = document.getElementById('share-preview-container');
+            this.copyStatus = document.getElementById('copy-status');
+            
+            this.setupEventListeners();
+        }
+        
+        setupEventListeners() {
+            document.getElementById('share-with-link-btn')?.addEventListener('click', () => this.handleShareWithLink());
+            document.getElementById('share-btn')?.addEventListener('click', () => this.handleShare());
+            document.getElementById('download-btn')?.addEventListener('click', () => this.handleDownload());
+        }
+        
+        async generateResultImage() {
+            const size = 600; // Square image size
+            this.canvas.width = size;
+            this.canvas.height = size;
+            
+            // Clear canvas
+            this.ctx.clearRect(0, 0, size, size);
+            
+            // Draw outer dark rounded background
+            this.drawRoundedRect(0, 0, size, size, 20, '#2c2e31');
+            
+            const padding = 30;
+            const contentWidth = size - (padding * 2);
+            let currentY = padding;
+            
+            // Header text
+            const headerText = "ຜົນການປະເມີນບອກວ່າ...";
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.font = 'bold 24px Arial, sans-serif';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(headerText, size / 2, currentY + 30);
+            currentY += 60;
+            
+            // Get meme image
+            const memeImg = this.memeContainer.querySelector('img');
+            if (memeImg) {
+                const imageSize = 300;
+                const imageX = (size - imageSize) / 2;
+                const imageY = currentY;
+                
+                // Draw amber border
+                this.drawRoundedRect(imageX - 4, imageY - 4, imageSize + 8, imageSize + 8, 12, '#f8af3c');
+                
+                // Draw image with rounded corners
+                await this.drawImageWithRoundedCorners(memeImg, imageX, imageY, imageSize, imageSize, 8);
+                currentY += imageSize + 20;
+            }
+            
+            // Evaluation text
+            const evaluationText = this.evaluationResult.textContent || '';
+            if (evaluationText) {
+                const textBoxHeight = 60;
+                const textBoxY = currentY;
+                
+                // Draw amber background for text
+                this.drawRoundedRect(padding, textBoxY, contentWidth, textBoxHeight, 8, '#f8af3c');
+                
+                // Draw wrapped text
+                this.ctx.fillStyle = '#000000';
+                this.ctx.font = 'bold 18px Arial, sans-serif';
+                this.ctx.textAlign = 'center';
+                this.wrapText(evaluationText, size / 2, textBoxY + 35, contentWidth - 20, 20);
+                currentY += textBoxHeight + 20;
+            }
+            
+            // Footer logo
+            try {
+                const logoImg = await this.loadImage('images/LaoTypo-logo-04.png');
+                const logoSize = 40;
+                const logoX = (size - logoSize) / 2;
+                const logoY = size - padding - logoSize;
+                
+                this.ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+            } catch (error) {
+                console.warn('Could not load logo:', error);
+                // Fallback text
+                this.ctx.fillStyle = '#f8af3c';
+                this.ctx.font = 'bold 20px Arial, sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('Laotypo', size / 2, size - padding - 10);
+            }
+            
+            return this.canvas.toDataURL('image/png');
+        }
+        
+        drawRoundedRect(x, y, width, height, radius, color) {
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, width, height, radius);
+            this.ctx.fill();
+        }
+        
+        async drawImageWithRoundedCorners(img, x, y, width, height, radius) {
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.roundRect(x, y, width, height, radius);
+            this.ctx.clip();
+            
+            // Calculate image cover dimensions
+            const imgAspect = img.naturalWidth / img.naturalHeight;
+            const targetAspect = width / height;
+            
+            let drawWidth, drawHeight, drawX, drawY;
+            
+            if (imgAspect > targetAspect) {
+                // Image is wider than target
+                drawHeight = height;
+                drawWidth = height * imgAspect;
+                drawX = x - (drawWidth - width) / 2;
+                drawY = y;
+            } else {
+                // Image is taller than target
+                drawWidth = width;
+                drawHeight = width / imgAspect;
+                drawX = x;
+                drawY = y - (drawHeight - height) / 2;
+            }
+            
+            this.ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+            this.ctx.restore();
+        }
+        
+        wrapText(text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = this.ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && i > 0) {
+                    this.ctx.fillText(line, x, currentY);
+                    line = words[i] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            this.ctx.fillText(line, x, currentY);
+        }
+        
+        async loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+        
+        showCopyStatus(message) {
+            this.copyStatus.textContent = message;
+            this.copyStatus.style.display = 'block';
+            setTimeout(() => {
+                this.copyStatus.style.display = 'none';
+            }, 3000);
+        }
+        
+        async handleShareWithLink() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Convert to blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Copy to clipboard
+                if (navigator.clipboard && window.ClipboardItem) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
+                } else {
+                    throw new Error('Clipboard API not supported');
+                }
+                
+                // Show preview
+                this.sharePreview.src = dataUrl;
+                this.sharePreviewContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Share with link failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດຄັດລອກໄດ້');
+            }
+        }
+        
+        async handleShare() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Convert to blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Try Web Share API
+                if (navigator.share && navigator.canShare) {
+                    const file = new File([blob], 'laotypo-result.png', { type: 'image/png' });
+                    
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'ຜົນການປະເມີນບອກວ່າ...',
+                            text: 'ເບິ່ງຜົນການປະເມີນຂອງຂ້ອຍ!',
+                            files: [file]
+                        });
+                        return;
+                    }
+                }
+                
+                // Fallback: copy image to clipboard
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
+                
+            } catch (error) {
+                console.error('Share failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດແບ່ງປັນໄດ້');
+            }
+        }
+        
+        async handleDownload() {
+            try {
+                const dataUrl = await this.generateResultImage();
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'laotypo-result.png';
+                link.href = dataUrl;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                
+            } catch (error) {
+                console.error('Download failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດດາວໂຫຼດໄດ້');
+            }
+        }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        new ResultShareGenerator();
+    });
+    </script>
+</body>
+</html>
