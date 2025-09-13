@@ -893,7 +893,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.5.1</p>
+        <p>📦 Version 2.5.2</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -996,7 +996,8 @@
             const deviceInfo = getDeviceInfo();
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
-                level: currentLevel + 1
+                level: currentLevel + 1,
+                player_name: playerName || 'anonymous'
             });
             
             // Track device information separately
@@ -1005,7 +1006,8 @@
                 device_model: deviceInfo.deviceModel,
                 screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
                 viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
-                user_agent: deviceInfo.userAgent
+                user_agent: deviceInfo.userAgent,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1015,7 +1017,8 @@
                 level_number: level + 1,
                 final_score: score,
                 accuracy: accuracy,
-                words_completed: levelProgress
+                words_completed: levelProgress,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1024,14 +1027,16 @@
                 final_score: finalScore,
                 accuracy: accuracy,
                 total_words: totalWords,
-                levels_completed: levelsCompleted
+                levels_completed: levelsCompleted,
+                player_name: playerName || 'anonymous'
             });
         }
         
         function trackReplay(level) {
             trackGameEvent('game_replay', {
                 level_name: levelNames[level],
-                level_number: level + 1
+                level_number: level + 1,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1039,14 +1044,16 @@
             trackGameEvent('word_answer', {
                 correct: isCorrect,
                 difficulty: levelNames[difficulty],
-                current_streak: currentStreak
+                current_streak: currentStreak,
+                player_name: playerName || 'anonymous'
             });
         }
         
         function trackLifeLost(remainingLives) {
             trackGameEvent('life_lost', {
                 remaining_lives: remainingLives,
-                current_streak: currentStreak
+                current_streak: currentStreak,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1055,7 +1062,8 @@
                 from_level: levelNames[fromLevel],
                 to_level: levelNames[toLevel],
                 from_level_number: fromLevel + 1,
-                to_level_number: toLevel + 1
+                to_level_number: toLevel + 1,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1080,7 +1088,8 @@
                 utm_source: getUrlParameter('utm_source') || 'unknown',
                 utm_campaign: getUrlParameter('utm_campaign') || 'unknown',
                 page_title: document.title,
-                page_url: window.location.href
+                page_url: window.location.href,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1108,7 +1117,8 @@
                 current_streak: currentStreak,
                 best_streak: bestStreak,
                 lives_remaining: playerLives,
-                levels_completed: levelsCompleted
+                levels_completed: levelsCompleted,
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1124,7 +1134,8 @@
                 hard_completion_rate: hardRate,
                 total_words_played: totalPlayed,
                 preferred_difficulty: getPreferredDifficulty(),
-                current_difficulty: levelNames[currentLevel]
+                current_difficulty: levelNames[currentLevel],
+                player_name: playerName || 'anonymous'
             });
         }
         
@@ -1246,6 +1257,16 @@
                 current_streak: currentStreak,
                 current_level: levelNames[currentLevel],
                 user_action: lastUserAction,
+                timestamp: Date.now(),
+                player_name: playerName || 'anonymous'
+            });
+        }
+        
+        function trackPlayerNameChange(oldName, newName) {
+            trackGameEvent('player_name_change', {
+                old_name: oldName || 'anonymous',
+                new_name: newName || 'anonymous',
+                session_id: sessionId,
                 timestamp: Date.now()
             });
         }
@@ -2726,10 +2747,14 @@
                 quickEditNameBtn.addEventListener('click', () => {
                     const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
                     if (newName && newName.trim() !== '') {
+                        const oldName = playerName;
                         playerName = newName.trim();
                         localStorage.setItem('displayName', playerName);
                         updateAccountPanel();
                         updateUI();
+                        
+                        // Track player name change
+                        trackPlayerNameChange(oldName, playerName);
                     }
                 });
             }

@@ -249,7 +249,7 @@ This application uses modern web technologies with a focus on real-time performa
 - **`game_replay`**: Player replays a level
 - **`device_info`**: Device and browser information
 
-### Advanced Analytics Events (v2.5.0)
+### Advanced Analytics Events (v2.5.0 - v2.5.2)
 - **`session_start`**: Unique session tracking with referrer and UTM data
 - **`word_time_spent`**: Time spent on each word (learning curve analysis)
 - **`player_engagement`**: Session duration, words per minute, focus metrics
@@ -260,6 +260,7 @@ This application uses modern web technologies with a focus on real-time performa
 - **`feature_usage`**: UI feature interaction tracking
 - **`ui_interaction`**: Detailed click and interaction analytics
 - **`game_error`**: Error tracking with context and user actions
+- **`player_name_change`**: Tracks when players change their display names
 
 ### Mobile Device Detection
 - **Device Types**: Mobile, Tablet, Desktop
@@ -275,7 +276,7 @@ This application uses modern web technologies with a focus on real-time performa
 - **Geographic Data**: Player locations worldwide
 - **Technical Metrics**: Load times, error rates, device performance
 
-### Advanced Analytics Insights (v2.5.0)
+### Advanced Analytics Insights (v2.5.0 - v2.5.2)
 - **Learning Curve Analysis**: How quickly players improve over time
 - **Difficulty Preference**: Which difficulty levels players prefer and perform best in
 - **Streak Psychology**: When players break streaks and recovery patterns
@@ -286,10 +287,11 @@ This application uses modern web technologies with a focus on real-time performa
 - **User Journey Mapping**: Complete player flow from start to finish
 - **Retention Analysis**: Session patterns and re-engagement triggers
 - **A/B Testing Data**: Feature effectiveness and user preference data
+- **Player Identity Tracking (v2.5.2)**: Personalized analytics with player names for individual performance analysis
 
 ## 🛠️ Development Status
 
-### Current Phase (v2.5.1)
+### Current Phase (v2.5.2)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -306,9 +308,11 @@ This application uses modern web technologies with a focus on real-time performa
   - Removed testing references, now live
   - **Advanced Analytics**: Session tracking, word timing, player engagement, difficulty progression, streak analysis, answer patterns, performance metrics, feature usage, UI interactions, error tracking
   - **UI Fix**: Fixed level progression display to show per-level progress (15/15) instead of cumulative
+  - **Player Name Tracking**: All analytics events now include player names for personalized data analysis
 
 ### Version History
-- **v2.5.1** (Current): Fixed level progression display bug, improved UI clarity
+- **v2.5.2** (Current): Added player name tracking to all analytics events
+- **v2.5.1**: Fixed level progression display bug, improved UI clarity
 - **v2.5.0**: Added comprehensive analytics tracking, performance monitoring, error handling
 - **v2.4.0**: Added Google Analytics 4 tracking, mobile device detection, removed testing references
 - **v2.3.2**: Fixed endgame meme selection logic to use latest score instead of accuracy
