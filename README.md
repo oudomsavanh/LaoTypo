@@ -291,7 +291,7 @@ This application uses modern web technologies with a focus on real-time performa
 
 ## 🛠️ Development Status
 
-### Current Phase (v2.5.3)
+### Current Phase (v2.5.4)
 - Core functionality implemented
 - Security measures in place
 - Performance optimized
@@ -310,9 +310,11 @@ This application uses modern web technologies with a focus on real-time performa
   - **UI Fix**: Fixed level progression display to show per-level progress (15/15) instead of cumulative
   - **Player Name Tracking**: All analytics events now include player names for personalized data analysis
   - **Cumulative Progress Display**: Level progress now shows cumulative progress (15/30/45) across all levels
+  - **UI Consistency**: Made account panel design consistent between gameplay.html and testing.html
 
 ### Version History
-- **v2.5.3** (Current): Implemented cumulative level progress display (15/30/45)
+- **v2.5.4** (Current): Made account panel design consistent across all pages
+- **v2.5.3**: Implemented cumulative level progress display (15/30/45)
 - **v2.5.2**: Added player name tracking to all analytics events
 - **v2.5.1**: Fixed level progression display bug, improved UI clarity
 - **v2.5.0**: Added comprehensive analytics tracking, performance monitoring, error handling
