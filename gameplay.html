@@ -11,11 +11,17 @@
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
     <meta name="theme-color" content="#f8af3c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LaoTypo">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="LaoTypo">
+    <meta name="msapplication-TileColor" content="#f8af3c">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
     
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -889,12 +895,20 @@
                 <button id="quick-edit-name-btn" class="btn text-sm">✏️ ແກ້ໄຂຊື່</button>
             </div>
             
+            <!-- Analytics Dashboard Toggle -->
+            <div class="analytics-section mb-4">
+                <button id="analytics-toggle-btn" class="w-full bg-main-color hover:bg-yellow-500 text-white py-2 px-3 rounded text-sm transition-colors duration-200">
+                    📊 Live Analytics
+                </button>
+            </div>
+            
             <!-- Version Info -->
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.5.4</p>
+        <p>📦 Version 2.6.0</p>
         <p>Status: Live</p>
+        <p>🚀 PWA Ready</p>
                 </div>
             </div>
         </div>
@@ -974,6 +988,262 @@
                 viewportWidth: window.innerWidth,
                 viewportHeight: window.innerHeight
             };
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        let isInstalled = false;
+        
+        // Check if app is already installed
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            isInstalled = true;
+        }
+        
+        // Listen for beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallButton();
+        });
+        
+        // Listen for app installed event
+        window.addEventListener('appinstalled', (e) => {
+            console.log('✅ PWA installed successfully');
+            isInstalled = true;
+            hideInstallButton();
+            trackGameEvent('pwa_installed', {
+                install_method: 'prompt',
+                timestamp: Date.now()
+            });
+        });
+        
+        // Show install button
+        function showInstallButton() {
+            if (isInstalled) return;
+            
+            const installBtn = document.createElement('button');
+            installBtn.id = 'install-btn';
+            installBtn.innerHTML = '📱 Install App';
+            installBtn.className = 'fixed bottom-4 right-4 bg-main-color text-white px-4 py-2 rounded-lg shadow-lg z-50 hover:bg-yellow-500 transition-all duration-300';
+            installBtn.style.display = 'none';
+            document.body.appendChild(installBtn);
+            
+            // Show after 3 seconds
+            setTimeout(() => {
+                installBtn.style.display = 'block';
+                installBtn.addEventListener('click', installApp);
+            }, 3000);
+        }
+        
+        // Hide install button
+        function hideInstallButton() {
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.remove();
+            }
+        }
+        
+        // Install app
+        async function installApp() {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            trackGameEvent('pwa_install_prompt', {
+                outcome: outcome,
+                timestamp: Date.now()
+            });
+            
+            deferredPrompt = null;
+            hideInstallButton();
+        }
+        
+        // Enhanced Analytics Dashboard
+        function createAnalyticsDashboard() {
+            const dashboard = document.createElement('div');
+            dashboard.id = 'analytics-dashboard';
+            dashboard.className = 'fixed top-20 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm';
+            dashboard.style.display = 'none';
+            
+            dashboard.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-bold">📊 Live Analytics</h3>
+                    <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>🎮 Active Players:</span>
+                        <span id="active-players">1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>⚡ Current Streak:</span>
+                        <span id="current-streak">${currentStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🏆 Best Streak:</span>
+                        <span id="best-streak">${bestStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📊 Words Completed:</span>
+                        <span id="words-completed">${totalWordsCompleted || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>❤️ Lives Left:</span>
+                        <span id="lives-left">${playerLives || 3}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📱 Device:</span>
+                        <span id="device-type">${getDeviceInfo().deviceType}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🌐 Online:</span>
+                        <span id="connection-status">${navigator.onLine ? 'Yes' : 'No'}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(dashboard);
+            
+            // Close dashboard
+            document.getElementById('close-dashboard').addEventListener('click', () => {
+                dashboard.style.display = 'none';
+            });
+            
+            return dashboard;
+        }
+        
+        // Toggle analytics dashboard
+        function toggleAnalyticsDashboard() {
+            let dashboard = document.getElementById('analytics-dashboard');
+            if (!dashboard) {
+                dashboard = createAnalyticsDashboard();
+            }
+            
+            dashboard.style.display = dashboard.style.display === 'none' ? 'block' : 'none';
+            
+            if (dashboard.style.display === 'block') {
+                updateAnalyticsDashboard();
+            }
+        }
+        
+        // Update analytics dashboard
+        function updateAnalyticsDashboard() {
+            const dashboard = document.getElementById('analytics-dashboard');
+            if (!dashboard) return;
+            
+            document.getElementById('current-streak').textContent = currentStreak || 0;
+            document.getElementById('best-streak').textContent = bestStreak || 0;
+            document.getElementById('words-completed').textContent = totalWordsCompleted || 0;
+            document.getElementById('lives-left').textContent = playerLives || 3;
+            document.getElementById('device-type').textContent = getDeviceInfo().deviceType;
+            document.getElementById('connection-status').textContent = navigator.onLine ? 'Yes' : 'No';
+        }
+        
+        // Performance monitoring
+        function trackPerformanceMetrics() {
+            const metrics = {
+                load_time: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                dom_ready: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                first_paint: performance.getEntriesByType('paint')[0]?.startTime || 0,
+                memory_usage: performance.memory ? {
+                    used: performance.memory.usedJSHeapSize,
+                    total: performance.memory.totalJSHeapSize,
+                    limit: performance.memory.jsHeapSizeLimit
+                } : null,
+                connection: navigator.connection ? {
+                    effective_type: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : null
+            };
+            
+            trackGameEvent('performance_metrics', metrics);
+        }
+        
+        // Real-time analytics updates
+        function startRealTimeAnalytics() {
+            setInterval(() => {
+                if (document.getElementById('analytics-dashboard')?.style.display === 'block') {
+                    updateAnalyticsDashboard();
+                }
+            }, 1000);
+        }
+        
+        // Initialize PWA features
+        function initializePWA() {
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered:', registration);
+                        trackGameEvent('pwa_service_worker_registered', {
+                            scope: registration.scope,
+                            timestamp: Date.now()
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Service Worker registration failed:', error);
+                        trackGameEvent('pwa_service_worker_error', {
+                            error: error.message,
+                            timestamp: Date.now()
+                        });
+                    });
+            }
+            
+            // Track PWA installability
+            trackGameEvent('pwa_installability_check', {
+                is_installable: !!deferredPrompt,
+                is_installed: isInstalled,
+                display_mode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
+                timestamp: Date.now()
+            });
+        }
+        
+        // Initialize Analytics features
+        function initializeAnalytics() {
+            // Start real-time analytics updates
+            startRealTimeAnalytics();
+            
+            // Track performance metrics on load
+            setTimeout(() => {
+                trackPerformanceMetrics();
+            }, 2000);
+            
+            // Track page visibility changes
+            document.addEventListener('visibilitychange', () => {
+                trackGameEvent('page_visibility_change', {
+                    is_visible: !document.hidden,
+                    timestamp: Date.now()
+                });
+            });
+            
+            // Track online/offline status
+            window.addEventListener('online', () => {
+                trackGameEvent('connection_status', {
+                    status: 'online',
+                    timestamp: Date.now()
+                });
+            });
+            
+            window.addEventListener('offline', () => {
+                trackGameEvent('connection_status', {
+                    status: 'offline',
+                    timestamp: Date.now()
+                });
+            });
+            
+            // Add analytics toggle button event listener
+            document.addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'analytics-toggle-btn') {
+                    toggleAnalyticsDashboard();
+                    trackGameEvent('analytics_dashboard_toggle', {
+                        action: 'open',
+                        timestamp: Date.now()
+                    });
+                }
+            });
         }
         
         // Google Analytics 4 Event Tracking
@@ -2977,6 +3247,10 @@
             try {
                 initializeGame();
                 setupLevelTransitionHandlers();
+                
+                // Initialize PWA and Analytics
+                initializePWA();
+                initializeAnalytics();
             } catch (error) {
                 console.error('Error initializing game:', error);
                 // Show user-friendly error message
