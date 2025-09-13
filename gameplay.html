@@ -893,7 +893,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.5.2</p>
+        <p>📦 Version 2.5.3</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -1776,9 +1776,10 @@
             // Update the progress display in the score section
             const progressEl = document.getElementById('level-progress');
             if (progressEl) {
-                // Show current level threshold: 15 for each level
-                // Level 0: 15, Level 1: 15, Level 2: 15
-                progressEl.textContent = levelThresholds[currentLevel];
+                // Show cumulative progress: 15, 30, 45
+                // Level 0: 15, Level 1: 30, Level 2: 45
+                const cumulativeThreshold = (currentLevel + 1) * 15;
+                progressEl.textContent = cumulativeThreshold;
             }
             
             // Update difficulty display span
@@ -1919,7 +1920,9 @@
 
         // Update UI
         function updateUI() {
-            currentStreakEl.textContent = currentStreak;
+            // Show cumulative progress: current level progress + previous levels
+            const cumulativeProgress = (currentLevel * 15) + levelProgress;
+            currentStreakEl.textContent = cumulativeProgress;
             bestStreakEl.textContent = bestStreak;
             if (totalWordsCompletedEl) {
                 totalWordsCompletedEl.textContent = totalWordsCompleted;
