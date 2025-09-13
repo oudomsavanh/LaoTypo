@@ -28,6 +28,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
     <!-- Firebase Configuration -->
     <script type="module" src="firebase-config.js"></script>
@@ -300,6 +301,20 @@
         
         .btn-primary:hover {
             background: linear-gradient(135deg, #b8940f 0%, var(--main-color) 100%);
+        }
+        
+        /* Music Toggle Button Styling */
+        #music-toggle-btn {
+            transition: all 0.3s ease;
+        }
+        
+        #music-toggle-btn:hover {
+            transform: scale(1.05);
+            background: rgba(248, 175, 60, 0.1);
+        }
+        
+        #music-toggle-btn.opacity-50 {
+            opacity: 0.5;
         }
         
         .btn-secondary {
@@ -752,6 +767,11 @@
                 <button id="account-nav-btn" class="nav-link btn-icon" title="ບັນຊີ/ສະຖິຕິ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 </button>
+                <button id="music-toggle-btn" class="nav-link btn-icon" title="🎵 ສຽງປະກອບພື້ນຫຼັງ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                    </svg>
+                </button>
             </div>
         </div>
     </nav>
@@ -961,6 +981,13 @@
             
             <div class="space-y-6">
                 <div class="text-left space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label>🎵 ສຽງປະກອບພື້ນຫຼັງ</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="settings-music-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                     <div class="flex justify-between items-center">
                         <label>☁️ Firebase Sync</label>
                         <label class="toggle-switch">
@@ -1537,6 +1564,144 @@
         
         })(); // End of async wrapper
         
+        // --- BACKGROUND MUSIC SYSTEM ---
+        let musicEnabled = true;
+        let backgroundMusic = null;
+        let musicInterval = null;
+        
+        // Initialize background music
+        function initializeBackgroundMusic() {
+            // Load music setting from localStorage
+            const savedMusic = localStorage.getItem('musicEnabled');
+            if (savedMusic !== null) {
+                musicEnabled = savedMusic === 'true';
+            }
+            
+            updateMusicButton();
+            
+            // Start background music if enabled
+            if (musicEnabled) {
+                startBackgroundMusic();
+            }
+        }
+        
+        // Start background music
+        function startBackgroundMusic() {
+            if (!musicEnabled || backgroundMusic) return;
+            
+            try {
+                // Create a simple ambient background music using Tone.js
+                const synth = new Tone.Synth({
+                    oscillator: {
+                        type: "sine"
+                    },
+                    envelope: {
+                        attack: 0.1,
+                        decay: 0.2,
+                        sustain: 0.3,
+                        release: 0.8
+                    }
+                }).toDestination();
+                
+                // Create a gentle ambient melody
+                const melody = ["C4", "E4", "G4", "C5", "G4", "E4", "C4", "F4", "A4", "C5", "A4", "F4"];
+                let noteIndex = 0;
+                
+                const playMelody = () => {
+                    if (!musicEnabled) return;
+                    
+                    synth.triggerAttackRelease(melody[noteIndex], "2n");
+                    noteIndex = (noteIndex + 1) % melody.length;
+                };
+                
+                // Play melody every 3 seconds for ambient effect
+                musicInterval = setInterval(playMelody, 3000);
+                backgroundMusic = synth;
+                
+                console.log('🎵 Background music started');
+                
+            } catch (error) {
+                console.log('Background music not available:', error);
+            }
+        }
+        
+        // Stop background music
+        function stopBackgroundMusic() {
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+            }
+            
+            if (backgroundMusic) {
+                backgroundMusic.dispose();
+                backgroundMusic = null;
+            }
+            
+            console.log('🎵 Background music stopped');
+        }
+        
+        // Update music button appearance
+        function updateMusicButton() {
+            const musicBtn = document.getElementById('music-toggle-btn');
+            const settingsToggle = document.getElementById('settings-music-toggle');
+            
+            if (musicBtn) {
+                if (musicEnabled) {
+                    musicBtn.classList.remove('opacity-50');
+                    musicBtn.title = '🎵 ປິດສຽງປະກອບພື້ນຫຼັງ';
+                } else {
+                    musicBtn.classList.add('opacity-50');
+                    musicBtn.title = '🔇 ເປີດສຽງປະກອບພື້ນຫຼັງ';
+                }
+            }
+            
+            if (settingsToggle) {
+                settingsToggle.checked = musicEnabled;
+            }
+        }
+        
+        // Toggle background music
+        function toggleBackgroundMusic() {
+            musicEnabled = !musicEnabled;
+            localStorage.setItem('musicEnabled', musicEnabled.toString());
+            
+            if (musicEnabled) {
+                startBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+            
+            updateMusicButton();
+        }
+        
+        // Initialize music system when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeBackgroundMusic();
+            
+            // Add music toggle event listener
+            const musicToggleBtn = document.getElementById('music-toggle-btn');
+            if (musicToggleBtn) {
+                musicToggleBtn.addEventListener('click', toggleBackgroundMusic);
+            }
+            
+            // Sync settings panel music toggle
+            const settingsMusicToggle = document.getElementById('settings-music-toggle');
+            if (settingsMusicToggle) {
+                settingsMusicToggle.checked = musicEnabled;
+                settingsMusicToggle.addEventListener('change', (e) => {
+                    musicEnabled = e.target.checked;
+                    localStorage.setItem('musicEnabled', musicEnabled.toString());
+                    
+                    if (musicEnabled) {
+                        startBackgroundMusic();
+                    } else {
+                        stopBackgroundMusic();
+                    }
+                    
+                    updateMusicButton();
+                });
+            }
+        });
         
     </script>
 </body>
