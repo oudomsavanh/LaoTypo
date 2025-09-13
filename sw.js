@@ -1,18 +1,31 @@
 // Service Worker for Lao Typo Game PWA
-const CACHE_NAME = 'lao-typo-v1.0.0-beta';
-const OFFLINE_URL = '/testing.html';
+const CACHE_NAME = 'lao-typo-v2.6.0';
+const OFFLINE_URL = '/gameplay.html';
 
 // Files to cache for offline use
 const CACHE_FILES = [
     '/',
     '/testing.html',
     '/gameplay.html',
+    '/leaderboard.html',
     '/manifest.json',
     '/firebase-config.js',
+    '/icon-192x192.png',
+    '/icon-512x512.png',
+    '/favicon.ico',
+    '/screenshot-wide.png',
+    '/screenshot-narrow.png',
+    // Game assets
+    '/images/LaoTypo-logo-04.png',
+    '/images/LaoTypo-logo-06.png',
+    '/images/Gecko.png',
+    '/bg_sound.mp3',
+    '/result_sound.mp3',
     // External resources (will be cached when accessed)
-    'https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&display=swap',
+    'https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap',
     'https://cdn.tailwindcss.com',
-    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js'
+    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
+    'https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z'
 ];
 
 // Install event - cache essential files
