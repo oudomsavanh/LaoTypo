@@ -2125,7 +2125,9 @@
             
             // Check if this is a Heart Extra restoration (from motivational text)
             // Only add Heart Extra if we have exactly 3 lives and this is after motivational text
+            console.log('Checking Heart Extra:', 'playerLives:', playerLives, 'hearts.length:', hearts.length, 'heartExtraGiven:', window.heartExtraGiven);
             if (playerLives === 3 && hearts.length > 0 && window.heartExtraGiven) {
+                console.log('Adding Heart Extra...');
                 // Add Heart Extra animation to the last heart
                 const lastHeart = hearts[hearts.length - 1];
                 if (lastHeart) {
@@ -2136,6 +2138,7 @@
                     setTimeout(() => {
                         lastHeart.classList.remove('heart-extra-animation');
                     }, 2000);
+                    console.log('Heart Extra added successfully');
                 }
                 // Reset the flag
                 window.heartExtraGiven = false;
@@ -3232,6 +3235,7 @@
         
         // Motivational Text Display Function
         function showMotivationalText(callback) {
+            console.log('Showing motivational text...');
             // Create motivational text modal
             const motivationalModal = document.createElement('div');
             motivationalModal.id = 'motivational-modal';
@@ -3251,11 +3255,15 @@
             `;
             
             document.body.appendChild(motivationalModal);
+            console.log('Motivational modal added to DOM');
             
             // Close button handler
             const closeBtn = document.getElementById('close-motivational-btn');
             const closeModal = () => {
-                document.body.removeChild(motivationalModal);
+                console.log('Closing motivational modal...');
+                if (document.body.contains(motivationalModal)) {
+                    document.body.removeChild(motivationalModal);
+                }
                 callback();
             };
             
@@ -3275,8 +3283,9 @@
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
                         // Check if player has lost lives (needs motivational text and bonus heart)
-                        console.log('Current lives:', playerLives, 'Current level:', currentLevel);
+                        console.log('Continue button clicked - Current lives:', playerLives, 'Current level:', currentLevel);
                         if (playerLives < 3) {
+                            console.log('Player has lost lives, showing motivational text...');
                             // Show motivational text before advancing
                             showMotivationalText(() => {
                                 // Advance to next level
@@ -3315,6 +3324,7 @@
                                 }, 500);
                             });
                         } else {
+                            console.log('Player has full 3 hearts, no motivational text needed...');
                             // Player has full 3 hearts, no motivational text needed
                             // Advance to next level
                             const previousLevel = currentLevel;
