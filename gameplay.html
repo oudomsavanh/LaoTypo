@@ -3135,13 +3135,13 @@
                 // Completed Hard Level - Game Complete!
                 levelsCompleted++;
                 levelIcon.textContent = '🏆';
-                levelMessage.textContent = 'ທ່ານຜ່ານທຸກລະດັບແລ້ວ! 🎉';
-                levelQuestion.textContent = 'ທ່ານຕ້ອງການເບິ່ງຜົນສຳເລັດ ຫຼື ຫຼິ້ນອີກຄັ້ງ?';
+                levelMessage.textContent = 'ເຈົ້າເກັ່ງໂພດແລ້ວ!';
+                levelQuestion.innerHTML = 'ທ້າໃຫ້ເຈົ້າ ຕື່ມຄຳສັບ ! <br>ເພື່ອເຮັດໃຫ້ເກມຍາກຂຶ້ນໄປອີກ';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    ເບິ່ງຜົນສຳເລັດ
+                    ➕ ຕື່ມຄຳສັບ
                 `;
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3197,16 +3197,8 @@
                             showNewWords();
                         }, 500);
                     } else {
-                        // At hard level, game is complete - show results
-                        if (modal) {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                        }
-                        
-                        // End the game and show results
-                        setTimeout(() => {
-                            endGame();
-                        }, 500);
+                        // At hard level, redirect to add words form
+                        window.open('https://forms.gle/pAJ6pn954dpkQSkh6', '_blank');
                     }
                 });
             }
