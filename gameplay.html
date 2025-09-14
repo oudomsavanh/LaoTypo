@@ -942,7 +942,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.5</p>
+            <p>📦 Version 2.8.6</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -1760,6 +1760,9 @@
                 levelsCompleted = 0;
                 levelProgress = 0;
                 
+                // Re-initialize shuffled words for each difficulty
+                shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
+                
                 console.log('🧹 Cache cleared for new guest player');
             }
             
@@ -1965,8 +1968,16 @@
             const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
             const shuffledWords = shuffledWordsByDifficulty[difficultyLevel];
             
-            if (shuffledWords.length === 0) {
+            // Safety check: if shuffledWords is undefined or empty, use fallback
+            if (!shuffledWords || shuffledWords.length === 0) {
                 console.warn(`No words found for difficulty level ${difficultyLevel}, using all words`);
+                
+                // Ensure wordPairs is available
+                if (!wordPairs || wordPairs.length === 0) {
+                    console.error('No word pairs available, loading default words');
+                    wordPairs = getDefaultWords();
+                }
+                
                 // Fallback to all words if no words found for current difficulty
                 if (currentWordIndex >= wordPairs.length) {
                     currentWordIndex = 0;
@@ -2458,6 +2469,9 @@
                 totalWordsCompleted = 0;
                 levelsCompleted = 0;
                 levelProgress = 0;
+                
+                // Re-initialize shuffled words for each difficulty
+                shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
                 
                 console.log('🧹 Cache cleared for guest player restart');
             }
@@ -3148,6 +3162,9 @@
                         totalWordsCompleted = 0;
                         levelsCompleted = 0;
                         levelProgress = 0;
+                        
+                        // Re-initialize shuffled words for each difficulty
+                        shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
                         
                         console.log('🧹 Cache cleared for new guest player name change');
                         
