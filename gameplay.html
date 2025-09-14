@@ -942,7 +942,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.8.3</p>
+            <p>📦 Version 2.8.5</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -1744,9 +1744,23 @@
             
             // Reset best streak for guest mode to ensure clean start
             if (playerName === 'ແຂກ') {
+                // Clear all game-related cache for fresh guest start
+                localStorage.removeItem('bestStreak');
+                localStorage.removeItem('gameStats');
+                localStorage.removeItem('displayName');
+                localStorage.removeItem('bestTotalScore');
+                sessionStorage.clear();
+                
+                // Reset all game variables
                 bestStreak = 0;
-                localStorage.setItem('bestStreak', '0');
-                currentStreak = 0; // Also reset current streak for guest mode
+                currentStreak = 0;
+                totalScore = 0;
+                bestTotalScore = 0;
+                totalWordsCompleted = 0;
+                levelsCompleted = 0;
+                levelProgress = 0;
+                
+                console.log('🧹 Cache cleared for new guest player');
             }
             
             // Update UI with settings
@@ -2429,9 +2443,23 @@
             
             // Reset best streak for guest mode when restarting game
             if (playerName === 'ແຂກ') {
+                // Clear all game-related cache for fresh guest restart
+                localStorage.removeItem('bestStreak');
+                localStorage.removeItem('gameStats');
+                localStorage.removeItem('displayName');
+                localStorage.removeItem('bestTotalScore');
+                sessionStorage.clear();
+                
+                // Reset all game variables
                 bestStreak = 0;
-                localStorage.setItem('bestStreak', '0');
-                currentStreak = 0; // Also reset current streak for guest mode
+                currentStreak = 0;
+                totalScore = 0;
+                bestTotalScore = 0;
+                totalWordsCompleted = 0;
+                levelsCompleted = 0;
+                levelProgress = 0;
+                
+                console.log('🧹 Cache cleared for guest player restart');
             }
             
             // Reset enhanced tracking variables
@@ -3108,6 +3136,20 @@
                         
                         // Also reset current streak to ensure clean start
                         currentStreak = 0;
+                        
+                        // Clear additional cache for new guest player
+                        localStorage.removeItem('gameStats');
+                        localStorage.removeItem('bestTotalScore');
+                        sessionStorage.clear();
+                        
+                        // Reset all game variables
+                        totalScore = 0;
+                        bestTotalScore = 0;
+                        totalWordsCompleted = 0;
+                        levelsCompleted = 0;
+                        levelProgress = 0;
+                        
+                        console.log('🧹 Cache cleared for new guest player name change');
                         
                         updateAccountPanel();
                         updateUI();
