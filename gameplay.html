@@ -1643,6 +1643,9 @@
                 default: currentLevel = 0;
             }
             
+            // Always start with 0 progress for any level
+            levelProgress = 0;
+            
             // Update difficulty display with correct currentLevel
             updateDifficultyDisplay();
             
@@ -2054,10 +2057,8 @@
             // Update the progress display in the score section
             const progressEl = document.getElementById('level-progress');
             if (progressEl) {
-                // Show cumulative progress: 15, 30, 45
-                // Level 0: 15, Level 1: 30, Level 2: 45
-                const cumulativeThreshold = (currentLevel + 1) * 15;
-                progressEl.textContent = cumulativeThreshold;
+                // Show per-level progress: always 15 for each level
+                progressEl.textContent = 15;
             }
             
             // Update difficulty display span
@@ -2198,9 +2199,8 @@
 
         // Update UI
         function updateUI() {
-            // Show cumulative progress: current level progress + previous levels
-            const cumulativeProgress = (currentLevel * 15) + levelProgress;
-            currentStreakEl.textContent = cumulativeProgress;
+            // Show per-level progress: 0/15, 1/15, 2/15, etc.
+            currentStreakEl.textContent = levelProgress;
             bestStreakEl.textContent = bestStreak;
             if (totalWordsCompletedEl) {
                 totalWordsCompletedEl.textContent = totalWordsCompleted;
