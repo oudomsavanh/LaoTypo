@@ -840,6 +840,12 @@
                                 </svg>
                                 ຫຼິ້ນລະດັບນີ້ຕໍ່
                             </button>
+                            <button id="play-again-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 hidden">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                ຫຼິ້ນອີກຄັ້ງ
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -3133,16 +3139,28 @@
                 levelQuestion.innerHTML = 'ທ້າໃຫ້ເຈົ້າ ຕື່ມຄຳສັບ ! <br>ເພື່ອເຮັດໃຫ້ເກມຍາກຂຶ້ນໄປອີກ';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ➕ ຕື່ມຄຳສັບ
+                    ເບິ່ງຜົນສຳເລັດ
                 `;
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
-                    ຫຼິ້ນອີກຄັ້ງ
+                    ຕື່ມຄຳສັບ
                 `;
+                
+                // Show/hide buttons for hard level completion
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.remove('hidden');
+                    playAgainBtn.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        ຫຼິ້ນອີກຄັ້ງ
+                    `;
+                }
             }
             
             // Show the modal
@@ -3157,6 +3175,7 @@
             const modal = document.getElementById('level-transition-modal');
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
+            const playAgainBtn = document.getElementById('play-again-btn');
             
             if (continueBtn) {
                 continueBtn.addEventListener('click', () => {
@@ -3191,8 +3210,16 @@
                             showNewWords();
                         }, 500);
                     } else {
-                        // At hard level, redirect to add words form
-                        window.open('https://forms.gle/pAJ6pn954dpkQSkh6', '_blank');
+                        // At hard level, show results
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // End the game and show results
+                        setTimeout(() => {
+                            endGame();
+                        }, 500);
                     }
                 });
             }
@@ -3204,16 +3231,8 @@
                     lastUserAction = 'replay_click';
                     
                     if (currentLevel === 2) {
-                        // At hard level, "replay" means restart the game
-                        if (modal) {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                        }
-                        
-                        // Reset and restart the game
-                        setTimeout(() => {
-                            resetGame();
-                        }, 500);
+                        // At hard level, "replay" means redirect to add words form
+                        window.open('https://forms.gle/pAJ6pn954dpkQSkh6', '_blank');
                     } else {
                         // Replay current level - reset score and lives
                         currentStreak = 0;
@@ -3246,6 +3265,25 @@
                             showNewWords();
                         }, 500);
                     }
+                });
+            }
+            
+            if (playAgainBtn) {
+                playAgainBtn.addEventListener('click', () => {
+                    // Track feature usage
+                    trackFeatureUsage('playAgainUsed');
+                    lastUserAction = 'play_again_click';
+                    
+                    // Hide modal and restart the game
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                    
+                    // Reset and restart the game
+                    setTimeout(() => {
+                        resetGame();
+                    }, 500);
                 });
             }
         }
