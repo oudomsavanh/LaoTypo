@@ -914,7 +914,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.8.0</p>
+        <p>📦 Version 2.8.1</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -3178,6 +3178,41 @@
             playSound('correct');
         }
         
+        // Motivational Text Display Function
+        function showMotivationalText(callback) {
+            // Create motivational text modal
+            const motivationalModal = document.createElement('div');
+            motivationalModal.id = 'motivational-modal';
+            motivationalModal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75';
+            motivationalModal.innerHTML = `
+                <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border-2 border-[#f8af3c] text-center">
+                    <div class="mb-6">
+                        <p class="text-lg sm:text-xl text-gray-300 mb-2">ມັກເດ້...</p>
+                        <p class="text-lg sm:text-xl text-gray-300 mb-2">ຈັ່ງແມ່ນເຈົ້າກ້າຫານ</p>
+                        <p class="text-lg sm:text-xl text-gray-300 mb-4">ເອົາໃຈໄປເລີຍ</p>
+                        <div class="text-4xl animate-pulse">💖</div>
+                    </div>
+                    <button id="close-motivational-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300">
+                        ຕໍ່ໄປ
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(motivationalModal);
+            
+            // Close button handler
+            const closeBtn = document.getElementById('close-motivational-btn');
+            const closeModal = () => {
+                document.body.removeChild(motivationalModal);
+                callback();
+            };
+            
+            closeBtn.addEventListener('click', closeModal);
+            
+            // Auto-close after 10 seconds
+            setTimeout(closeModal, 10000);
+        }
+
         function setupLevelTransitionHandlers() {
             const modal = document.getElementById('level-transition-modal');
             const continueBtn = document.getElementById('continue-next-level');
@@ -3187,35 +3222,44 @@
             if (continueBtn) {
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
-                        // Advance to next level
-                        const previousLevel = currentLevel;
-                        levelsCompleted++;
-                        currentLevel++;
-                        levelProgress = 0;
-                        currentWordIndex = 0; // Reset word index for new level
-                        
-                        // Track level advance
-                        trackLevelAdvance(previousLevel, currentLevel);
-                        
-                        // Re-shuffle words for the new difficulty level
-                        const newDifficultyLevel = currentLevel + 1;
-                        if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
-                            shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
-                        }
-                        
-                        updateLevelDisplay();
-                        updateDifficultyDisplay();
-                        
-                        // Hide modal and continue game
-                        if (modal) {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                        }
-                        
-                        // Resume game with new level
-                        setTimeout(() => {
-                            showNewWords();
-                        }, 500);
+                        // Show motivational text before advancing
+                        showMotivationalText(() => {
+                            // Advance to next level
+                            const previousLevel = currentLevel;
+                            levelsCompleted++;
+                            currentLevel++;
+                            levelProgress = 0;
+                            currentWordIndex = 0; // Reset word index for new level
+                            
+                            // Add bonus life for being brave
+                            if (playerLives < 3) {
+                                playerLives++;
+                                updateLifeDisplay();
+                            }
+                            
+                            // Track level advance
+                            trackLevelAdvance(previousLevel, currentLevel);
+                            
+                            // Re-shuffle words for the new difficulty level
+                            const newDifficultyLevel = currentLevel + 1;
+                            if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
+                                shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
+                            }
+                            
+                            updateLevelDisplay();
+                            updateDifficultyDisplay();
+                            
+                            // Hide modal and continue game
+                            if (modal) {
+                                modal.classList.add('hidden');
+                                modal.classList.remove('flex');
+                            }
+                            
+                            // Resume game with new level
+                            setTimeout(() => {
+                                showNewWords();
+                            }, 500);
+                        });
                     } else {
                         // At hard level, show results
                         if (modal) {
