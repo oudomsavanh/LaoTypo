@@ -1704,6 +1704,13 @@
             
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
             
+            // Reset best streak for guest mode to ensure clean start
+            if (playerName === 'ແຂກ') {
+                bestStreak = 0;
+                localStorage.setItem('bestStreak', '0');
+                currentStreak = 0; // Also reset current streak for guest mode
+            }
+            
             // Update UI with settings
             gamePlayerNameEl.textContent = playerName;
             const timerText = timerEnabled ? 'ເປີດ' : 'ປິດ';
@@ -2356,6 +2363,13 @@
             levelProgress = 0;
             levelsCompleted = 0;
             totalWordsCompleted = 0; // Reset total words completed
+            
+            // Reset best streak for guest mode when restarting game
+            if (playerName === 'ແຂກ') {
+                bestStreak = 0;
+                localStorage.setItem('bestStreak', '0');
+                currentStreak = 0; // Also reset current streak for guest mode
+            }
             
             // Reset enhanced tracking variables
             sessionId = null;
@@ -3023,6 +3037,15 @@
                         const oldName = playerName;
                         playerName = newName.trim();
                         localStorage.setItem('displayName', playerName);
+                        
+                        // Reset best streak for new player in guest mode
+                        // This ensures each player starts with a clean score
+                        bestStreak = 0;
+                        localStorage.setItem('bestStreak', '0');
+                        
+                        // Also reset current streak to ensure clean start
+                        currentStreak = 0;
+                        
                         updateAccountPanel();
                         updateUI();
                         
