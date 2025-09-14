@@ -2580,20 +2580,32 @@
         document.getElementById('gecko-mascot').addEventListener('click', () => {
             // Play custom gecko sound with proper error handling
             try {
-                // Try different path formats
+                // Try different audio formats in order of preference
                 const soundPaths = [
-                    '/sounds/Gecko-Sound.mp3',
-                    './sounds/Gecko-Sound.mp3',
-                    'sounds/Gecko-Sound.mp3'
+                    '/sounds/Gecko-Sound.wav',        // WAV format (most compatible)
+                    '/sounds/Gecko-Sound-New.wav',    // New WAV file
+                    '/sounds/Gecko-Sound-Test.mp3',   // Test MP3 (should work)
+                    '/sounds/Gecko-Sound.mp3',        // Original MP3
+                    './sounds/Gecko-Sound.wav',
+                    './sounds/Gecko-Sound.mp3'
                 ];
                 
-                let geckoSound = null;
                 let soundPlayed = false;
+                let currentPathIndex = 0;
                 
-                // Try each path until one works
-                for (const path of soundPaths) {
+                // Function to try next path
+                const tryNextPath = () => {
+                    if (currentPathIndex >= soundPaths.length) {
+                        console.log('All audio paths failed, using fallback synthesized sound');
+                        playSound('uhoh');
+                        return;
+                    }
+                    
+                    const path = soundPaths[currentPathIndex];
+                    console.log(`Trying audio path: ${path}`);
+                    
                     try {
-                        geckoSound = new Audio(path);
+                        const geckoSound = new Audio(path);
                         geckoSound.volume = 0.7;
                         geckoSound.preload = 'auto';
                         
@@ -2602,23 +2614,19 @@
                             soundPlayed = true;
                         }).catch(e => {
                             console.log('Failed to play from:', path, e);
+                            currentPathIndex++;
+                            tryNextPath();
                         });
                         
-                        // If we got here without error, break
-                        break;
                     } catch (e) {
                         console.log('Error creating audio from:', path, e);
-                        continue;
+                        currentPathIndex++;
+                        tryNextPath();
                     }
-                }
+                };
                 
-                // If no sound played after a short delay, use fallback
-                setTimeout(() => {
-                    if (!soundPlayed) {
-                        console.log('Using fallback synthesized sound');
-                        playSound('uhoh');
-                    }
-                }, 100);
+                // Start trying paths
+                tryNextPath();
                 
             } catch (error) {
                 console.error('Error with gecko sound:', error);
