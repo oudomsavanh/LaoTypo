@@ -2578,9 +2578,53 @@
         
         // Gecko mascot click event
         document.getElementById('gecko-mascot').addEventListener('click', () => {
-            // Play custom gecko sound
-            const geckoSound = new Audio('/sounds/Gecko-Sound.mp3');
-            geckoSound.play().catch(e => console.log('Gecko sound play failed:', e));
+            // Play custom gecko sound with proper error handling
+            try {
+                // Try different path formats
+                const soundPaths = [
+                    '/sounds/Gecko-Sound.mp3',
+                    './sounds/Gecko-Sound.mp3',
+                    'sounds/Gecko-Sound.mp3'
+                ];
+                
+                let geckoSound = null;
+                let soundPlayed = false;
+                
+                // Try each path until one works
+                for (const path of soundPaths) {
+                    try {
+                        geckoSound = new Audio(path);
+                        geckoSound.volume = 0.7;
+                        geckoSound.preload = 'auto';
+                        
+                        geckoSound.play().then(() => {
+                            console.log('Gecko sound played successfully from:', path);
+                            soundPlayed = true;
+                        }).catch(e => {
+                            console.log('Failed to play from:', path, e);
+                        });
+                        
+                        // If we got here without error, break
+                        break;
+                    } catch (e) {
+                        console.log('Error creating audio from:', path, e);
+                        continue;
+                    }
+                }
+                
+                // If no sound played after a short delay, use fallback
+                setTimeout(() => {
+                    if (!soundPlayed) {
+                        console.log('Using fallback synthesized sound');
+                        playSound('uhoh');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error with gecko sound:', error);
+                // Fallback to synthesized sound
+                playSound('uhoh');
+            }
             
             // Optional: Add a little animation
             const gecko = document.getElementById('gecko-mascot');
