@@ -3112,25 +3112,25 @@
             
             if (currentLevel === 0) {
                 // Completed Easy Level
-                levelIcon.textContent = '🟢';
-                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!';
-                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບປານກາງບໍ?';
+                levelIcon.textContent = '🥇';
+                levelMessage.textContent = 'ປາຕິໂທ້! ຕອບໄດ້ຄົບເລີຍ';
+                levelQuestion.textContent = 'ແຕ່ຂອງແທ້ຢູ່ \'ລະດັບກາງ\' ພຸ້ນເດີ້';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
+                    ໄປຕໍ່ ລະດັບກາງ
                 `;
             } else if (currentLevel === 1) {
                 // Completed Medium Level
-                levelIcon.textContent = '🔵';
-                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບປານກາງແລ້ວ!';
-                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບຍາກບໍ?';
+                levelIcon.textContent = '🎉';
+                levelMessage.textContent = 'ສຸດຍອດ! ບໍ່ທຳມະດາຕວ໋ານິ';
+                levelQuestion.textContent = 'ຢ່າຟ້າວດີໃຈ...ມີລະດັບຍາກລໍຖ້າຢູ່';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
+                    ໄປຕໍ່ ລະດັບຍາກ
                 `;
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
