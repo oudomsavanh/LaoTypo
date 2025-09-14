@@ -348,33 +348,7 @@
             }
         }
         
-        /* Heart Extra animation */
-        .heart-extra-animation {
-            animation: heartExtra 2s ease-in-out;
-        }
-        
-        @keyframes heartExtra {
-            0% {
-                transform: scale(0.5) rotate(0deg);
-                opacity: 0;
-            }
-            25% {
-                transform: scale(1.3) rotate(10deg);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1) rotate(-5deg);
-                opacity: 1;
-            }
-            75% {
-                transform: scale(1.2) rotate(5deg);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
+        /* Heart Extra animation removed - using simple life bar system */
         
         .motivation-text {
             text-align: center;
@@ -942,7 +916,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.6</p>
+            <p>📦 Version 2.8.7</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -2148,26 +2122,7 @@
                 }
             });
             
-            // Check if this is a Heart Extra restoration (from motivational text)
-            // Only add Heart Extra if we have exactly 3 lives and this is after motivational text
-            console.log('Checking Heart Extra:', 'playerLives:', playerLives, 'hearts.length:', hearts.length, 'heartExtraGiven:', window.heartExtraGiven);
-            if (playerLives === 3 && hearts.length > 0 && window.heartExtraGiven) {
-                console.log('Adding Heart Extra...');
-                // Add Heart Extra animation to the last heart
-                const lastHeart = hearts[hearts.length - 1];
-                if (lastHeart) {
-                    lastHeart.innerHTML = '💖';
-                    lastHeart.classList.add('heart-extra');
-                    // Add special animation for Heart Extra
-                    lastHeart.classList.add('heart-extra-animation');
-                    setTimeout(() => {
-                        lastHeart.classList.remove('heart-extra-animation');
-                    }, 2000);
-                    console.log('Heart Extra added successfully');
-                }
-                // Reset the flag
-                window.heartExtraGiven = false;
-            }
+            // Heart Extra system removed - using simple life bar system
             
             // Update motivational text based on lives
             updateMotivationalText();
@@ -2217,11 +2172,7 @@
                     heartToBreak.classList.remove('active');
                     heartToBreak.classList.add('lost');
                     
-                    // If this was a Heart Extra, change it to lost heart
-                    if (heartToBreak.classList.contains('heart-extra')) {
-                        heartToBreak.innerHTML = '💔';
-                        heartToBreak.classList.remove('heart-extra');
-                    }
+                    // Simple life bar system - no Heart Extra logic
                     
                     // Update motivational text
                     updateMotivationalText();
@@ -3341,50 +3292,9 @@
             if (continueBtn) {
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
-                        // Check if player has lost lives (needs motivational text and bonus heart)
+                        // Show motivational text before advancing (no Heart Extra bonus)
                         console.log('Continue button clicked - Current lives:', playerLives, 'Current level:', currentLevel);
-                        if (playerLives < 3) {
-                            console.log('Player has lost lives, showing motivational text...');
-                            // Show motivational text before advancing
-                            showMotivationalText(() => {
-                                // Advance to next level
-                                const previousLevel = currentLevel;
-                                levelsCompleted++;
-                                currentLevel++;
-                                levelProgress = 0;
-                                currentWordIndex = 0; // Reset word index for new level
-                                
-                                // Add bonus life for being brave (restore to max 3)
-                                playerLives = 3;
-                                window.heartExtraGiven = true; // Flag for Heart Extra
-                                updateLifeDisplay();
-                                
-                                // Track level advance
-                                trackLevelAdvance(previousLevel, currentLevel);
-                                
-                                // Re-shuffle words for the new difficulty level
-                                const newDifficultyLevel = currentLevel + 1;
-                                if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
-                                    shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
-                                }
-                                
-                                updateLevelDisplay();
-                                updateDifficultyDisplay();
-                                
-                                // Hide modal and continue game
-                                if (modal) {
-                                    modal.classList.add('hidden');
-                                    modal.classList.remove('flex');
-                                }
-                                
-                                // Resume game with new level
-                                setTimeout(() => {
-                                    showNewWords();
-                                }, 500);
-                            });
-                        } else {
-                            console.log('Player has full 3 hearts, no motivational text needed...');
-                            // Player has full 3 hearts, no motivational text needed
+                        showMotivationalText(() => {
                             // Advance to next level
                             const previousLevel = currentLevel;
                             levelsCompleted++;
@@ -3403,6 +3313,8 @@
                             
                             updateLevelDisplay();
                             updateDifficultyDisplay();
+                            updateLifeDisplay();
+                            updateUI();
                             
                             // Hide modal and continue game
                             if (modal) {
@@ -3414,7 +3326,7 @@
                             setTimeout(() => {
                                 showNewWords();
                             }, 500);
-                        }
+                        });
                     } else {
                         // At hard level, show results
                         if (modal) {
