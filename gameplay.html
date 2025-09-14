@@ -908,12 +908,6 @@
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
         <p>📦 Version 2.7.4</p>
         <p>Status: Live</p>
-        <p>🚀 PWA Ready</p>
-        <p>🔧 Guest Score Fix</p>
-        <p>📊 Level Progress Fix</p>
-        <p>🏷️ Label Consistency Fix</p>
-        <p>🦎 Fixed Gecko Sound</p>
-        <p>🏆 Hard Level Enhancement</p>
                 </div>
             </div>
         </div>
@@ -2005,6 +1999,7 @@
                 trackWordAnswer(true, currentLevel);
                 
                 // Check level progression
+                console.log('Level progress check:', levelProgress, '>=', levelThresholds[currentLevel], '?', levelProgress >= levelThresholds[currentLevel]);
                 if (levelProgress >= levelThresholds[currentLevel]) {
                     // Add to total words completed
                     totalWordsCompleted += levelThresholds[currentLevel];
