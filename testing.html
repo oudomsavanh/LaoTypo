@@ -1531,12 +1531,13 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
-        <p>📦 Version 2.7.2</p>
+        <p>📦 Version 2.7.3</p>
         <p>Status: Live</p>
         <p>🚀 PWA Ready</p>
         <p>🔧 Guest Score Fix</p>
         <p>📊 Level Progress Fix</p>
         <p>🏷️ Label Consistency Fix</p>
+        <p>🦎 Custom Gecko Sound</p>
                 </div>
             </div>
         </div>
@@ -2577,7 +2578,10 @@
         
         // Gecko mascot click event
         document.getElementById('gecko-mascot').addEventListener('click', () => {
-            playSound('uhoh');
+            // Play custom gecko sound
+            const geckoSound = new Audio('/sounds/Gecko-Sound.mp3');
+            geckoSound.play().catch(e => console.log('Gecko sound play failed:', e));
+            
             // Optional: Add a little animation
             const gecko = document.getElementById('gecko-mascot');
             gecko.style.transform = 'scale(0.9) rotate(-5deg)';
