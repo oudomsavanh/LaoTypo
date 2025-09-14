@@ -2755,16 +2755,16 @@
                             await navigator.share({
                                 files: [file],
                                 title: 'LaoTypo Game Result',
-                                text: 'Let\'s play with me! 🎮 Laotypo.com'
+                                text: 'ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com'
                             });
                         } else {
                             // Fallback: copy text to clipboard
-                            await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
+                            await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
                             alert('Link text copied to clipboard!');
                         }
                     } else {
                         // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText('Let\'s play with me! 🎮 Laotypo.com');
+                        await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
                         alert('Link text copied to clipboard!');
                     }
                 } catch (error) {
@@ -3479,14 +3479,14 @@
             try {
                 const shareText = `ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ
 ພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!
-www.laotypo.com`;
+https://www.laotypo.com`;
                 
                 // Try Web Share API first
                 if (navigator.share) {
                     await navigator.share({
                         title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
                         text: shareText,
-                        url: 'www.laotypo.com'
+                        url: 'https://www.laotypo.com'
                     });
                     this.showCopyStatus('✅ ແບ່ງປັນສຳເລັດແລ້ວ!');
                 } else if (navigator.clipboard) {
