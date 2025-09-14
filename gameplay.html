@@ -348,6 +348,34 @@
             }
         }
         
+        /* Heart Extra animation */
+        .heart-extra-animation {
+            animation: heartExtra 2s ease-in-out;
+        }
+        
+        @keyframes heartExtra {
+            0% {
+                transform: scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            25% {
+                transform: scale(1.3) rotate(10deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1) rotate(-5deg);
+                opacity: 1;
+            }
+            75% {
+                transform: scale(1.2) rotate(5deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
         .motivation-text {
             text-align: center;
             color: #000000; /* Black text */
@@ -914,7 +942,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.8.1</p>
+        <p>📦 Version 2.8.2</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -2095,6 +2123,21 @@
                 }
             });
             
+            // Check if this is a Heart Extra restoration (from motivational text)
+            if (playerLives === 3 && hearts.length > 0) {
+                // Add Heart Extra animation to the last heart
+                const lastHeart = hearts[hearts.length - 1];
+                if (lastHeart) {
+                    lastHeart.innerHTML = '💖';
+                    lastHeart.classList.add('heart-extra');
+                    // Add special animation for Heart Extra
+                    lastHeart.classList.add('heart-extra-animation');
+                    setTimeout(() => {
+                        lastHeart.classList.remove('heart-extra-animation');
+                    }, 2000);
+                }
+            }
+            
             // Update motivational text based on lives
             updateMotivationalText();
         }
@@ -3222,20 +3265,52 @@
             if (continueBtn) {
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
-                        // Show motivational text before advancing
-                        showMotivationalText(() => {
+                        // Check if player has lost lives (needs motivational text and bonus heart)
+                        if (playerLives < 3) {
+                            // Show motivational text before advancing
+                            showMotivationalText(() => {
+                                // Advance to next level
+                                const previousLevel = currentLevel;
+                                levelsCompleted++;
+                                currentLevel++;
+                                levelProgress = 0;
+                                currentWordIndex = 0; // Reset word index for new level
+                                
+                                // Add bonus life for being brave (restore to max 3)
+                                playerLives = 3;
+                                updateLifeDisplay();
+                                
+                                // Track level advance
+                                trackLevelAdvance(previousLevel, currentLevel);
+                                
+                                // Re-shuffle words for the new difficulty level
+                                const newDifficultyLevel = currentLevel + 1;
+                                if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
+                                    shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
+                                }
+                                
+                                updateLevelDisplay();
+                                updateDifficultyDisplay();
+                                
+                                // Hide modal and continue game
+                                if (modal) {
+                                    modal.classList.add('hidden');
+                                    modal.classList.remove('flex');
+                                }
+                                
+                                // Resume game with new level
+                                setTimeout(() => {
+                                    showNewWords();
+                                }, 500);
+                            });
+                        } else {
+                            // Player has full 3 hearts, no motivational text needed
                             // Advance to next level
                             const previousLevel = currentLevel;
                             levelsCompleted++;
                             currentLevel++;
                             levelProgress = 0;
                             currentWordIndex = 0; // Reset word index for new level
-                            
-                            // Add bonus life for being brave
-                            if (playerLives < 3) {
-                                playerLives++;
-                                updateLifeDisplay();
-                            }
                             
                             // Track level advance
                             trackLevelAdvance(previousLevel, currentLevel);
@@ -3259,7 +3334,7 @@
                             setTimeout(() => {
                                 showNewWords();
                             }, 500);
-                        });
+                        }
                     } else {
                         // At hard level, show results
                         if (modal) {
