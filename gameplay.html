@@ -916,7 +916,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.7</p>
+            <p>📦 Version 2.8.8</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -3205,7 +3205,6 @@
                 `;
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
-                levelsCompleted++;
                 levelIcon.textContent = '🏆';
                 levelMessage.textContent = 'ເຈົ້າເກັ່ງໂພດແລ້ວ!';
                 levelQuestion.innerHTML = 'ທ້າໃຫ້ເຈົ້າ ຕື່ມຄຳສັບ ! <br>ເພື່ອເຮັດໃຫ້ເກມຍາກຂຶ້ນໄປອີກ';
@@ -3329,6 +3328,7 @@
                         });
                     } else {
                         // At hard level, show results
+                        levelsCompleted++; // Increment when hard level is actually completed
                         if (modal) {
                             modal.classList.add('hidden');
                             modal.classList.remove('flex');
