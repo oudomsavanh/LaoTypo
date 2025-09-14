@@ -2580,11 +2580,9 @@
         document.getElementById('gecko-mascot').addEventListener('click', () => {
             // Play custom gecko sound with proper error handling
             try {
-                // Try different audio formats in order of preference
+                // Try different path formats for Gecko-Sound.mp3
                 const soundPaths = [
-                    '/sounds/Gecko-Sound.wav',        // WAV format (most compatible)
                     '/sounds/Gecko-Sound.mp3',        // Original MP3
-                    './sounds/Gecko-Sound.wav',
                     './sounds/Gecko-Sound.mp3'
                 ];
                 
