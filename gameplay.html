@@ -942,7 +942,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.8.2</p>
+        <p>📦 Version 2.8.3</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -2124,7 +2124,8 @@
             });
             
             // Check if this is a Heart Extra restoration (from motivational text)
-            if (playerLives === 3 && hearts.length > 0) {
+            // Only add Heart Extra if we have exactly 3 lives and this is after motivational text
+            if (playerLives === 3 && hearts.length > 0 && window.heartExtraGiven) {
                 // Add Heart Extra animation to the last heart
                 const lastHeart = hearts[hearts.length - 1];
                 if (lastHeart) {
@@ -2136,6 +2137,8 @@
                         lastHeart.classList.remove('heart-extra-animation');
                     }, 2000);
                 }
+                // Reset the flag
+                window.heartExtraGiven = false;
             }
             
             // Update motivational text based on lives
@@ -2185,6 +2188,12 @@
                     heartToBreak.classList.remove('losing');
                     heartToBreak.classList.remove('active');
                     heartToBreak.classList.add('lost');
+                    
+                    // If this was a Heart Extra, change it to lost heart
+                    if (heartToBreak.classList.contains('heart-extra')) {
+                        heartToBreak.innerHTML = '💔';
+                        heartToBreak.classList.remove('heart-extra');
+                    }
                     
                     // Update motivational text
                     updateMotivationalText();
@@ -3266,6 +3275,7 @@
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
                         // Check if player has lost lives (needs motivational text and bonus heart)
+                        console.log('Current lives:', playerLives, 'Current level:', currentLevel);
                         if (playerLives < 3) {
                             // Show motivational text before advancing
                             showMotivationalText(() => {
@@ -3278,6 +3288,7 @@
                                 
                                 // Add bonus life for being brave (restore to max 3)
                                 playerLives = 3;
+                                window.heartExtraGiven = true; // Flag for Heart Extra
                                 updateLifeDisplay();
                                 
                                 // Track level advance
