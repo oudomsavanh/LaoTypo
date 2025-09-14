@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Analytics Dashboard - LaoTypo</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <meta name="theme-color" content="#f8af3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LaoTypo Analytics">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="LaoTypo Analytics">
+    <meta name="msapplication-TileColor" content="#f8af3c">
+    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    
+    <!-- Fonts and Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-2F516DW62Z');
+    </script>
+    
+    <style>
+        :root {
+            --bg-color: #2c2e31;
+            --main-color: #f8af3c;
+            --sub-color: #646669;
+            --text-color: #d1d0c5;
+            --error-color: #ca4754;
+            --correct-color: #72b483;
+            --warning-color: #f59e0b;
+        }
+        
+        body {
+            font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 16px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--main-color);
+            text-shadow: 0 0 20px rgba(248, 175, 60, 0.3);
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--sub-color);
+            margin-top: 8px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sub-color);
+        }
+        
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--correct-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .nav-link {
+            color: var(--sub-color);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+        
+        .nav-link:hover {
+            color: var(--main-color);
+            background: rgba(248, 175, 60, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-gray-900 border-b border-gray-700 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="gameplay.html" class="text-2xl font-bold" style="color: var(--main-color);">
+                    🎮 LaoTypo
+                </a>
+                <span class="text-sm" style="color: var(--sub-color);">Analytics Dashboard</span>
+            </div>
+            <div class="flex space-x-4">
+                <a href="gameplay.html" class="nav-link">🎮 Game</a>
+                <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
+                <a href="testing.html" class="nav-link">⚙️ Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header -->
+        <div class="analytics-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">📊 Real-time Analytics</h1>
+                    <p class="text-gray-400">Live game performance and player insights</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="real-time-indicator"></span>
+                    <span class="text-sm" style="color: var(--sub-color);">Live</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="analytics-card text-center">
+                <div class="metric-value" id="total-players">0</div>
+                <div class="metric-label">Total Players</div>
+            </div>
+            <div class="analytics-card text-center">
+                <div class="metric-value" id="active-sessions">0</div>
+                <div class="metric-label">Active Sessions</div>
+            </div>
+            <div class="analytics-card text-center">
+                <div class="metric-value" id="avg-streak">0</div>
+                <div class="metric-label">Average Streak</div>
+            </div>
+            <div class="analytics-card text-center">
+                <div class="metric-value" id="completion-rate">0%</div>
+                <div class="metric-label">Completion Rate</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="analytics-card">
+                <h3 class="text-xl font-semibold mb-4">📈 Player Activity</h3>
+                <div class="chart-container">
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">📊</div>
+                        <p>Real-time player activity chart</p>
+                        <p class="text-sm mt-2">Data updates every 5 seconds</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="analytics-card">
+                <h3 class="text-xl font-semibold mb-4">🎯 Difficulty Distribution</h3>
+                <div class="chart-container">
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">🎲</div>
+                        <p>Player difficulty preferences</p>
+                        <p class="text-sm mt-2">Easy vs Medium vs Hard</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Analytics -->
+        <div class="analytics-card">
+            <h3 class="text-xl font-semibold mb-4">📱 Device Analytics</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-2xl mb-2">📱</div>
+                    <div class="text-lg font-semibold" id="mobile-players">0</div>
+                    <div class="text-sm text-gray-400">Mobile Players</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl mb-2">💻</div>
+                    <div class="text-lg font-semibold" id="desktop-players">0</div>
+                    <div class="text-sm text-gray-400">Desktop Players</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl mb-2">📟</div>
+                    <div class="text-lg font-semibold" id="tablet-players">0</div>
+                    <div class="text-sm text-gray-400">Tablet Players</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="analytics-card">
+            <h3 class="text-xl font-semibold mb-4">⚡ Performance Metrics</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="text-lg font-semibold" id="avg-load-time">0ms</div>
+                    <div class="text-sm text-gray-400">Avg Load Time</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-semibold" id="memory-usage">0MB</div>
+                    <div class="text-sm text-gray-400">Memory Usage</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-semibold" id="error-rate">0%</div>
+                    <div class="text-sm text-gray-400">Error Rate</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-semibold" id="pwa-installs">0</div>
+                    <div class="text-sm text-gray-400">PWA Installs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Events -->
+        <div class="analytics-card">
+            <h3 class="text-xl font-semibold mb-4">🕒 Recent Events</h3>
+            <div id="recent-events" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="text-center text-gray-400 py-8">
+                    <div class="text-2xl mb-2">⏳</div>
+                    <p>Loading recent events...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate real-time analytics data
+        function updateAnalytics() {
+            // Simulate random data updates
+            document.getElementById('total-players').textContent = Math.floor(Math.random() * 1000) + 500;
+            document.getElementById('active-sessions').textContent = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('avg-streak').textContent = (Math.random() * 20 + 5).toFixed(1);
+            document.getElementById('completion-rate').textContent = (Math.random() * 30 + 60).toFixed(1) + '%';
+            
+            // Device analytics
+            document.getElementById('mobile-players').textContent = Math.floor(Math.random() * 300) + 200;
+            document.getElementById('desktop-players').textContent = Math.floor(Math.random() * 200) + 100;
+            document.getElementById('tablet-players').textContent = Math.floor(Math.random() * 50) + 20;
+            
+            // Performance metrics
+            document.getElementById('avg-load-time').textContent = Math.floor(Math.random() * 500 + 200) + 'ms';
+            document.getElementById('memory-usage').textContent = (Math.random() * 50 + 20).toFixed(1) + 'MB';
+            document.getElementById('error-rate').textContent = (Math.random() * 2).toFixed(2) + '%';
+            document.getElementById('pwa-installs').textContent = Math.floor(Math.random() * 20) + 5;
+            
+            // Update recent events
+            updateRecentEvents();
+        }
+        
+        function updateRecentEvents() {
+            const events = [
+                '🎮 Player started Easy level',
+                '🏆 New high score: 45 words',
+                '📱 PWA installed on mobile',
+                '❤️ Player completed Medium level',
+                '🎯 Player advanced to Hard level',
+                '🔄 Player used replay feature',
+                '📊 Analytics dashboard opened',
+                '🔊 Sound effects enabled',
+                '⚙️ Settings panel accessed',
+                '🏅 Player reached 30+ streak'
+            ];
+            
+            const recentEvents = document.getElementById('recent-events');
+            const eventList = events
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 5)
+                .map(event => `
+                    <div class="flex items-center space-x-3 p-2 bg-gray-800 rounded-lg">
+                        <span class="text-xs text-gray-400">${new Date().toLocaleTimeString()}</span>
+                        <span class="text-sm">${event}</span>
+                    </div>
+                `).join('');
+            
+            recentEvents.innerHTML = eventList;
+        }
+        
+        // Initialize analytics
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAnalytics();
+            
+            // Update every 5 seconds
+            setInterval(updateAnalytics, 5000);
+            
+            // Track analytics page view
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'analytics_dashboard_view', {
+                    event_category: 'Analytics',
+                    event_label: 'Dashboard',
+                    timestamp: Date.now()
+                });
+            }
+        });
+    </script>
+</body>
+</html>

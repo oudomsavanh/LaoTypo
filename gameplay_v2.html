@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?</title>
+    <title>ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ? v2</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
@@ -50,6 +50,21 @@
             --error-color: #ca4754;
             --correct-color: #72b483;
             --warning-color: #f59e0b;
+            
+            /* Modern Design Variables */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.25);
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 24px;
+            --transition-fast: 0.15s ease-out;
+            --transition-normal: 0.3s ease-out;
+            --transition-slow: 0.5s ease-out;
         }
         
         /* Global font rules - Montserrat for English, Noto Sans Lao Looped for Lao */
@@ -64,7 +79,8 @@
         }
         body {
             font-family: 'Montserrat', 'Noto Sans Lao Looped', sans-serif;
-            background-color: var(--bg-color);
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 50%, var(--bg-color) 100%);
+            background-attachment: fixed;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
@@ -75,6 +91,24 @@
             padding-bottom: 60px; /* Space for fixed footer - responsive */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Modern Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(248, 175, 60, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(114, 180, 131, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(202, 71, 84, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
         @media (min-width: 640px) {
             body {
@@ -82,9 +116,12 @@
                 padding-bottom: 80px;
             }
         }
+        /* Modern Navigation */
         nav {
-            background-color: #222426;
-            border-bottom: 2px solid var(--main-color);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
         }
         .nav-link {
             color: var(--sub-color);
@@ -181,17 +218,133 @@
             color: var(--text-color);
         }
         .word-card {
-            background-color: #3e4043;
-            border: 2px solid #4a4d50;
-            border-radius: 0.75rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .word-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(248, 175, 60, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        
+        .word-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--main-color);
+        }
+        
+        .word-card:hover::before {
+            opacity: 1;
+        }
+        
+        .word-card.selected {
+            background: linear-gradient(135deg, var(--main-color) 0%, #e6a035 100%);
+            color: var(--bg-color);
+            transform: scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .word-card.correct {
+            background: linear-gradient(135deg, var(--correct-color) 0%, #5a9b6b 100%);
+            color: white;
+            animation: correctPulse 0.6s ease-out;
+        }
+        
+        .word-card.incorrect {
+            background: linear-gradient(135deg, var(--error-color) 0%, #b83a4a 100%);
+            color: white;
+            animation: incorrectShake 0.6s ease-out;
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .word-card {
+            transition: all var(--transition-normal);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Noto Sans Lao Looped', 'Montserrat', sans-serif;
+            min-height: 80px;
+        }
+        
+        .word-card {
             padding: 1rem;
+        }
+        
+        /* Modern Button Styling */
+        .btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: all var(--transition-normal);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(248, 175, 60, 0.1), transparent);
+            transition: left var(--transition-slow);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--main-color);
+            background: rgba(248, 175, 60, 0.1);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--main-color) 0%, #e6a035 100%);
+            color: var(--bg-color);
+            border: 1px solid var(--main-color);
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #e6a035 0%, var(--main-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
         
         @media (min-width: 640px) {
@@ -199,24 +352,107 @@
                 padding: 1.5rem;
             }
         }
-        .word-card:hover {
-            border-color: var(--main-color);
-            transform: scale(1.02);
+        
+        /* Modern Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
         }
-        .word-card.focused {
-            border-color: var(--main-color);
-            box-shadow: 0 0 0 3px rgba(248, 175, 60, 0.3);
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--main-color) 0%, var(--correct-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .word-card.feedback-correct {
-            background-color: var(--correct-color);
-            border-color: var(--correct-color);
-            color: white;
+        
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        .word-card.feedback-incorrect {
-            background-color: var(--error-color);
-            border-color: var(--error-color);
-            color: white;
+        
+        /* Loading States */
+        .btn.loading {
+            position: relative;
+            color: transparent;
         }
+        
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--text-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--glass-bg) 25%, rgba(255, 255, 255, 0.1) 50%, var(--glass-bg) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Accessibility Improvements */
+        .word-card:focus {
+            outline: 2px solid var(--main-color);
+            outline-offset: 2px;
+        }
+        
+        .btn:focus {
+            outline: 2px solid var(--main-color);
+            outline-offset: 2px;
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .word-card {
+                font-size: 1.5rem;
+                padding: 1rem;
+                min-height: 100px;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .word-card {
+                font-size: 1.25rem;
+                padding: 0.75rem;
+                min-height: 80px;
+            }
+        }
+        
         .timer-bar {
             width: 100%;
             height: 100%;
@@ -347,8 +583,6 @@
                 transform: scale(1) translateY(0);
             }
         }
-        
-        /* Heart Extra animation removed - using simple life bar system */
         
         .motivation-text {
             text-align: center;
@@ -727,7 +961,7 @@
                             </div>
                             <!-- Row A: Best Score -->
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-neutral-300">ຄະແນນທີ່ດີທີ່ສຸດ</span>
+                                <span class="text-sm text-neutral-300">ຄະແນນສູງສຸດ</span>
                                 <span id="results-best-streak" class="inline-flex items-center rounded-md bg-red-500/10 text-red-400 px-2 py-0.5 text-xs font-semibold">0</span>
                             </div>
                         </div>
@@ -735,8 +969,8 @@
                         <!-- Action Icon Grid -->
                         <div class="max-w-sm mx-auto grid grid-cols-3 gap-4 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-4 text-center">
                           
-                          <!-- 1) Share Text -->
-                          <button id="share-with-link-btn" class="flex flex-col items-center gap-1 text-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded" title="ແບ່ງປັນຂໍ້ຄວາມ">
+                          <!-- 1) Share with Link -->
+                          <button id="share-with-link-btn" class="flex flex-col items-center gap-1 text-sm cursor-pointer group focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0 rounded">
                             <!-- Icon same color as text, but turns gray when button is hovered -->
                             <svg class="w-5 h-5 text-amber-400 group-hover:text-neutral-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -800,7 +1034,7 @@
                             </button>
                           </div>
 
-                          <!-- Add Word -->
+                          <!-- Add Word (Facebook Redirect) -->
                           <button id="add-word-btn" class="w-1/3 mx-auto block rounded-xl bg-amber-500 text-neutral-900 font-bold px-4 py-2.5 shadow hover:bg-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-0">
                             ຕື່ມຄຳສັບ
                           </button>
@@ -822,6 +1056,11 @@
                             ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!
                         </h2>
                         
+                        <!-- Progress Stats -->
+                        <div class="bg-gray-900/50 rounded-lg p-4 mb-6">
+                            <p class="text-gray-400 text-sm mb-2">ຄະແນນລະດັບນີ້</p>
+                            <p class="text-2xl font-bold text-white"><span id="level-score">15</span>/15</p>
+                        </div>
                         
                         <!-- Question -->
                         <p class="text-lg sm:text-xl text-gray-300 mb-6" id="level-question">
@@ -829,32 +1068,19 @@
                         </p>
                         
                         <!-- Action Buttons -->
-                        <div class="flex flex-col gap-3 justify-center">
-                            <!-- First Row: View Results Button (wider) -->
-                            <div class="flex justify-center">
-                                <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    ແມ່ນແລ້ວ, ສືບຕໍ່!
-                                </button>
-                            </div>
-                            
-                            <!-- Second Row: Add Words and Play Again Buttons -->
-                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                                <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                    </svg>
-                                    ຫຼິ້ນລະດັບນີ້ຕໍ່
-                                </button>
-                                <button id="play-again-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 hidden">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                    </svg>
-                                    ຫຼິ້ນອີກຄັ້ງ
-                                </button>
-                            </div>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                ແມ່ນແລ້ວ, ສືບຕໍ່!
+                            </button>
+                            <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                ຫຼິ້ນລະດັບນີ້ຕໍ່
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -885,7 +1111,7 @@
                 <!-- Quick Stats -->
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏆 ຄະແນນທີ່ດີທີ່ສຸດ:</span>
+                        <span class="stat-label font-medium text-sm" style="color: var(--sub-color);">🏆 ຄະແນນສູງສຸດ:</span>
                         <span class="stat-value font-semibold" id="account-best-streak" style="color: var(--text-color);">0</span>
                     </div>
                     <div class="quick-stat">
@@ -916,8 +1142,10 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.9.3</p>
+        <p>📦 Version 2.7.0</p>
         <p>Status: Live</p>
+        <p>🚀 PWA Ready</p>
+        <p>✨ Modern UI/UX</p>
                 </div>
             </div>
         </div>
@@ -1651,9 +1879,6 @@
                 default: currentLevel = 0;
             }
             
-            // Always start with 0 progress for any level
-            levelProgress = 0;
-            
             // Update difficulty display with correct currentLevel
             updateDifficultyDisplay();
             
@@ -1715,30 +1940,6 @@
             }
             
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
-            
-            // Reset best streak for guest mode to ensure clean start
-            if (playerName === 'ແຂກ') {
-                // Clear all game-related cache for fresh guest start
-                localStorage.removeItem('bestStreak');
-                localStorage.removeItem('gameStats');
-                localStorage.removeItem('displayName');
-                localStorage.removeItem('bestTotalScore');
-                sessionStorage.clear();
-                
-                // Reset all game variables
-                bestStreak = 0;
-                currentStreak = 0;
-                totalScore = 0;
-                bestTotalScore = 0;
-                totalWordsCompleted = 0;
-                levelsCompleted = 0;
-                levelProgress = 0;
-                
-                // Re-initialize shuffled words for each difficulty
-                shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
-                
-                console.log('🧹 Cache cleared for new guest player');
-            }
             
             // Update UI with settings
             gamePlayerNameEl.textContent = playerName;
@@ -1942,16 +2143,8 @@
             const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
             const shuffledWords = shuffledWordsByDifficulty[difficultyLevel];
             
-            // Safety check: if shuffledWords is undefined or empty, use fallback
-            if (!shuffledWords || shuffledWords.length === 0) {
+            if (shuffledWords.length === 0) {
                 console.warn(`No words found for difficulty level ${difficultyLevel}, using all words`);
-                
-                // Ensure wordPairs is available
-                if (!wordPairs || wordPairs.length === 0) {
-                    console.error('No word pairs available, loading default words');
-                    wordPairs = getDefaultWords();
-                }
-                
                 // Fallback to all words if no words found for current difficulty
                 if (currentWordIndex >= wordPairs.length) {
                     currentWordIndex = 0;
@@ -2034,7 +2227,6 @@
                 trackWordAnswer(true, currentLevel);
                 
                 // Check level progression
-                console.log('Level progress check:', levelProgress, '>=', levelThresholds[currentLevel], '?', levelProgress >= levelThresholds[currentLevel]);
                 if (levelProgress >= levelThresholds[currentLevel]) {
                     // Add to total words completed
                     totalWordsCompleted += levelThresholds[currentLevel];
@@ -2091,8 +2283,10 @@
             // Update the progress display in the score section
             const progressEl = document.getElementById('level-progress');
             if (progressEl) {
-                // Show per-level progress: always 15 for each level
-                progressEl.textContent = 15;
+                // Show cumulative progress: 15, 30, 45
+                // Level 0: 15, Level 1: 30, Level 2: 45
+                const cumulativeThreshold = (currentLevel + 1) * 15;
+                progressEl.textContent = cumulativeThreshold;
             }
             
             // Update difficulty display span
@@ -2121,8 +2315,6 @@
                     heart.classList.remove('active');
                 }
             });
-            
-            // Heart Extra system removed - using simple life bar system
             
             // Update motivational text based on lives
             updateMotivationalText();
@@ -2171,8 +2363,6 @@
                     heartToBreak.classList.remove('losing');
                     heartToBreak.classList.remove('active');
                     heartToBreak.classList.add('lost');
-                    
-                    // Simple life bar system - no Heart Extra logic
                     
                     // Update motivational text
                     updateMotivationalText();
@@ -2237,8 +2427,9 @@
 
         // Update UI
         function updateUI() {
-            // Show per-level progress: 0/15, 1/15, 2/15, etc.
-            currentStreakEl.textContent = levelProgress;
+            // Show cumulative progress: current level progress + previous levels
+            const cumulativeProgress = (currentLevel * 15) + levelProgress;
+            currentStreakEl.textContent = cumulativeProgress;
             bestStreakEl.textContent = bestStreak;
             if (totalWordsCompletedEl) {
                 totalWordsCompletedEl.textContent = totalWordsCompleted;
@@ -2402,30 +2593,6 @@
             levelProgress = 0;
             levelsCompleted = 0;
             totalWordsCompleted = 0; // Reset total words completed
-            
-            // Reset best streak for guest mode when restarting game
-            if (playerName === 'ແຂກ') {
-                // Clear all game-related cache for fresh guest restart
-                localStorage.removeItem('bestStreak');
-                localStorage.removeItem('gameStats');
-                localStorage.removeItem('displayName');
-                localStorage.removeItem('bestTotalScore');
-                sessionStorage.clear();
-                
-                // Reset all game variables
-                bestStreak = 0;
-                currentStreak = 0;
-                totalScore = 0;
-                bestTotalScore = 0;
-                totalWordsCompleted = 0;
-                levelsCompleted = 0;
-                levelProgress = 0;
-                
-                // Re-initialize shuffled words for each difficulty
-                shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
-                
-                console.log('🧹 Cache cleared for guest player restart');
-            }
             
             // Reset enhanced tracking variables
             sessionId = null;
@@ -2637,15 +2804,15 @@
             const backHomeBtn = document.getElementById('back-home-btn');
             if (backHomeBtn) {
                 backHomeBtn.addEventListener('click', () => {
-                    window.location.href = '/LaoTypo/testing.html';
+                    window.location.href = '/LaoTypo/testing_v2.html';
                 });
             }
             
-            // Add Word button 
+            // Add Word button (Facebook redirect)
             const addWordBtn = document.getElementById('add-word-btn');
             if (addWordBtn) {
                 addWordBtn.addEventListener('click', () => {
-                    window.location.href = 'https://forms.gle/pAJ6pn954dpkQSkh6';
+                    window.location.href = 'https://www.facebook.com/profile.php?id=61578349258643';
                 });
             }
             
@@ -2791,27 +2958,37 @@
                 }
             });
             
-            // Share with Link Button (text only - no image generation)
+            // Share with Link Button (image + text)
             shareWithLinkBtn.addEventListener('click', async () => {
                 try {
-                    const shareText = 'ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!';
+                    await document.fonts.ready;
+                    const { blob } = await generateShareImage();
+                    currentImageBlob = blob;
                     
-                    if (navigator.share) {
-                        await navigator.share({
-                            title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
-                            text: shareText,
-                            url: 'https://www.laotypo.com'
+                    if (navigator.share && navigator.canShare) {
+                        const file = new File([blob], `lao-game-result-${Date.now()}.png`, {
+                            type: 'image/png'
                         });
-                    } else if (navigator.clipboard) {
-                        // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText(shareText + '\nhttps://www.laotypo.com');
-                        alert('✅ ຄັດລອກຂໍ້ຄວາມສຳເລັດແລ້ວ!');
+                        
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: 'LaoTypo Game Result',
+                                text: 'ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com'
+                            });
+                        } else {
+                            // Fallback: copy text to clipboard
+                            await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
+                            alert('Link text copied to clipboard!');
+                        }
                     } else {
-                        throw new Error('Share and clipboard APIs not supported');
+                        // Fallback: copy text to clipboard
+                        await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
+                        alert('Link text copied to clipboard!');
                     }
                 } catch (error) {
                     console.error('Share with link failed:', error);
-                    alert('❌ ບໍ່ສາມາດແບ່ງປັນໄດ້');
+                    alert('Sharing not supported on this device');
                 }
             });
         }
@@ -3021,7 +3198,7 @@
             const homeNavBtn = document.getElementById('home-nav-btn');
             if (homeNavBtn) {
                 homeNavBtn.addEventListener('click', () => {
-                    window.location.href = 'testing.html';
+                    window.location.href = 'testing_v2.html';
                 });
             }
             
@@ -3030,7 +3207,7 @@
             if (returnHomeBtn) {
                 returnHomeBtn.addEventListener('click', () => {
                     stopResultSound();
-                    window.location.href = 'testing.html';
+                    window.location.href = 'testing_v2.html';
                 });
             }
             
@@ -3083,32 +3260,6 @@
                         const oldName = playerName;
                         playerName = newName.trim();
                         localStorage.setItem('displayName', playerName);
-                        
-                        // Reset best streak for new player in guest mode
-                        // This ensures each player starts with a clean score
-                        bestStreak = 0;
-                        localStorage.setItem('bestStreak', '0');
-                        
-                        // Also reset current streak to ensure clean start
-                        currentStreak = 0;
-                        
-                        // Clear additional cache for new guest player
-                        localStorage.removeItem('gameStats');
-                        localStorage.removeItem('bestTotalScore');
-                        sessionStorage.clear();
-                        
-                        // Reset all game variables
-                        totalScore = 0;
-                        bestTotalScore = 0;
-                        totalWordsCompleted = 0;
-                        levelsCompleted = 0;
-                        levelProgress = 0;
-                        
-                        // Re-initialize shuffled words for each difficulty
-                        shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] };
-                        
-                        console.log('🧹 Cache cleared for new guest player name change');
-                        
                         updateAccountPanel();
                         updateUI();
                         
@@ -3162,6 +3313,7 @@
             const modal = document.getElementById('level-transition-modal');
             const levelMessage = document.getElementById('level-message');
             const levelQuestion = document.getElementById('level-question');
+            const levelScore = document.getElementById('level-score');
             const levelIcon = document.getElementById('level-icon');
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
@@ -3170,34 +3322,36 @@
             gameActive = false;
             
             // Update modal content based on current level
+            levelScore.textContent = levelProgress;
             
             if (currentLevel === 0) {
                 // Completed Easy Level
-                levelIcon.textContent = '🥇';
-                levelMessage.textContent = 'ປາຕິໂທ້! ຕອບໄດ້ຄົບເລີຍ';
-                levelQuestion.textContent = 'ແຕ່ຂອງແທ້ຢູ່ \'ລະດັບກາງ\' ພຸ້ນເດີ້';
+                levelIcon.textContent = '🟢';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບງ່າຍແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບປານກາງບໍ?';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ໄປຕໍ່ ລະດັບກາງ
+                    ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
                 `;
             } else if (currentLevel === 1) {
                 // Completed Medium Level
-                levelIcon.textContent = '🎉';
-                levelMessage.textContent = 'ສຸດຍອດ! ບໍ່ທຳມະດາຕວ໋ານິ';
-                levelQuestion.textContent = 'ຢ່າຟ້າວດີໃຈ...ມີລະດັບຍາກລໍຖ້າຢູ່';
+                levelIcon.textContent = '🔵';
+                levelMessage.textContent = 'ທ່ານຜ່ານລະດັບປານກາງແລ້ວ!';
+                levelQuestion.textContent = 'ສືບຕໍ່ໄປລະດັບຍາກບໍ?';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    ໄປຕໍ່ ລະດັບຍາກ
+                    ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
                 `;
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
+                levelsCompleted++;
                 levelIcon.textContent = '🏆';
-                levelMessage.textContent = 'ເຈົ້າເກັ່ງໂພດແລ້ວ!';
-                levelQuestion.innerHTML = 'ທ້າໃຫ້ເຈົ້າ ຕື່ມຄຳສັບ ! <br>ເພື່ອເຮັດໃຫ້ເກມຍາກຂຶ້ນໄປອີກ';
+                levelMessage.textContent = 'ທ່ານຜ່ານທຸກລະດັບແລ້ວ! 🎉';
+                levelQuestion.textContent = 'ທ່ານຕ້ອງການເບິ່ງຜົນສຳເລັດ ຫຼື ຫຼິ້ນອີກຄັ້ງ?';
                 continueBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -3206,22 +3360,10 @@
                 `;
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    ຕື່ມຄຳສັບ
+                    ຫຼິ້ນອີກຄັ້ງ
                 `;
-                
-                // Show/hide buttons for hard level completion
-                const playAgainBtn = document.getElementById('play-again-btn');
-                if (playAgainBtn) {
-                    playAgainBtn.classList.remove('hidden');
-                    playAgainBtn.innerHTML = `
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        ຫຼິ້ນອີກຄັ້ງ
-                    `;
-                }
             }
             
             // Show the modal
@@ -3232,93 +3374,45 @@
             playSound('correct');
         }
         
-        // Motivational Text Display Function
-        function showMotivationalText(callback) {
-            console.log('Showing motivational text...');
-            // Create motivational text modal
-            const motivationalModal = document.createElement('div');
-            motivationalModal.id = 'motivational-modal';
-            motivationalModal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75';
-            motivationalModal.innerHTML = `
-                <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full shadow-2xl border-2 border-[#f8af3c] text-center">
-                    <div class="mb-6">
-                        <p class="text-lg sm:text-xl text-gray-300 mb-2">ມັກເດ້...</p>
-                        <p class="text-lg sm:text-xl text-gray-300 mb-2">ຈັ່ງແມ່ນເຈົ້າກ້າຫານ</p>
-                        <p class="text-lg sm:text-xl text-gray-300 mb-4">ເອົາໃຈໄປເລີຍ</p>
-                        <div class="text-4xl animate-pulse">💖</div>
-                    </div>
-                    <button id="close-motivational-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300">
-                        ຕໍ່ໄປ
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(motivationalModal);
-            console.log('Motivational modal added to DOM');
-            
-            // Close button handler
-            const closeBtn = document.getElementById('close-motivational-btn');
-            const closeModal = () => {
-                console.log('Closing motivational modal...');
-                if (document.body.contains(motivationalModal)) {
-                    document.body.removeChild(motivationalModal);
-                }
-                callback();
-            };
-            
-            closeBtn.addEventListener('click', closeModal);
-            
-            // Auto-close after 10 seconds
-            setTimeout(closeModal, 10000);
-        }
-
         function setupLevelTransitionHandlers() {
             const modal = document.getElementById('level-transition-modal');
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
-            const playAgainBtn = document.getElementById('play-again-btn');
             
             if (continueBtn) {
                 continueBtn.addEventListener('click', () => {
                     if (currentLevel < 2) {
-                        // Show motivational text before advancing (no Heart Extra bonus)
-                        console.log('Continue button clicked - Current lives:', playerLives, 'Current level:', currentLevel);
-                        showMotivationalText(() => {
-                            // Advance to next level
-                            const previousLevel = currentLevel;
-                            levelsCompleted++;
-                            currentLevel++;
-                            levelProgress = 0;
-                            currentWordIndex = 0; // Reset word index for new level
-                            
-                            // Track level advance
-                            trackLevelAdvance(previousLevel, currentLevel);
-                            
-                            // Re-shuffle words for the new difficulty level
-                            const newDifficultyLevel = currentLevel + 1;
-                            if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
-                                shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
-                            }
-                            
-                            updateLevelDisplay();
-                            updateDifficultyDisplay();
-                            updateLifeDisplay();
-                            updateUI();
-                            
-                            // Hide modal and continue game
-                            if (modal) {
-                                modal.classList.add('hidden');
-                                modal.classList.remove('flex');
-                            }
-                            
-                            // Resume game with new level
-                            setTimeout(() => {
-                                showNewWords();
-                            }, 500);
-                        });
+                        // Advance to next level
+                        const previousLevel = currentLevel;
+                        levelsCompleted++;
+                        currentLevel++;
+                        levelProgress = 0;
+                        currentWordIndex = 0; // Reset word index for new level
+                        
+                        // Track level advance
+                        trackLevelAdvance(previousLevel, currentLevel);
+                        
+                        // Re-shuffle words for the new difficulty level
+                        const newDifficultyLevel = currentLevel + 1;
+                        if (shuffledWordsByDifficulty[newDifficultyLevel].length > 0) {
+                            shuffledWordsByDifficulty[newDifficultyLevel] = shuffleArray([...shuffledWordsByDifficulty[newDifficultyLevel]]);
+                        }
+                        
+                        updateLevelDisplay();
+                        updateDifficultyDisplay();
+                        
+                        // Hide modal and continue game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Resume game with new level
+                        setTimeout(() => {
+                            showNewWords();
+                        }, 500);
                     } else {
-                        // At hard level, show results
-                        levelsCompleted++; // Increment when hard level is actually completed
+                        // At hard level, game is complete - show results
                         if (modal) {
                             modal.classList.add('hidden');
                             modal.classList.remove('flex');
@@ -3339,8 +3433,16 @@
                     lastUserAction = 'replay_click';
                     
                     if (currentLevel === 2) {
-                        // At hard level, "replay" means redirect to add words form
-                        window.open('https://forms.gle/pAJ6pn954dpkQSkh6', '_blank');
+                        // At hard level, "replay" means restart the game
+                        if (modal) {
+                            modal.classList.add('hidden');
+                            modal.classList.remove('flex');
+                        }
+                        
+                        // Reset and restart the game
+                        setTimeout(() => {
+                            resetGame();
+                        }, 500);
                     } else {
                         // Replay current level - reset score and lives
                         currentStreak = 0;
@@ -3373,25 +3475,6 @@
                             showNewWords();
                         }, 500);
                     }
-                });
-            }
-            
-            if (playAgainBtn) {
-                playAgainBtn.addEventListener('click', () => {
-                    // Track feature usage
-                    trackFeatureUsage('playAgainUsed');
-                    lastUserAction = 'play_again_click';
-                    
-                    // Hide modal and restart the game
-                    if (modal) {
-                        modal.classList.add('hidden');
-                        modal.classList.remove('flex');
-                    }
-                    
-                    // Reset and restart the game
-                    setTimeout(() => {
-                        resetGame();
-                    }, 500);
                 });
             }
         }
@@ -3604,28 +3687,29 @@
         
         async handleShareWithLink() {
             try {
-                const shareText = `ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ
-ພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!`;
+                const dataUrl = await this.generateResultImage();
                 
-                // Try Web Share API first
-                if (navigator.share) {
-                    await navigator.share({
-                        title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
-                        text: shareText,
-                        url: 'https://www.laotypo.com'
-                    });
-                    this.showCopyStatus('✅ ແບ່ງປັນສຳເລັດແລ້ວ!');
-                } else if (navigator.clipboard) {
-                    // Fallback to clipboard
-                    await navigator.clipboard.writeText(shareText + '\nhttps://www.laotypo.com');
-                    this.showCopyStatus('✅ ຄັດລອກຂໍ້ຄວາມສຳເລັດແລ້ວ!');
+                // Convert to blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                
+                // Copy to clipboard
+                if (navigator.clipboard && window.ClipboardItem) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
                 } else {
-                    throw new Error('Share and clipboard APIs not supported');
+                    throw new Error('Clipboard API not supported');
                 }
+                
+                // Show preview
+                this.sharePreview.src = dataUrl;
+                this.sharePreviewContainer.style.display = 'block';
                 
             } catch (error) {
                 console.error('Share with link failed:', error);
-                this.showCopyStatus('❌ ບໍ່ສາມາດແບ່ງປັນໄດ້');
+                this.showCopyStatus('❌ ບໍ່ສາມາດຄັດລອກໄດ້');
             }
         }
         
