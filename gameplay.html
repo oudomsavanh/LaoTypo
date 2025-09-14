@@ -3094,7 +3094,6 @@
             const modal = document.getElementById('level-transition-modal');
             const levelMessage = document.getElementById('level-message');
             const levelQuestion = document.getElementById('level-question');
-            const levelScore = document.getElementById('level-score');
             const levelIcon = document.getElementById('level-icon');
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
@@ -3103,7 +3102,6 @@
             gameActive = false;
             
             // Update modal content based on current level
-            levelScore.textContent = levelProgress;
             
             if (currentLevel === 0) {
                 // Completed Easy Level
