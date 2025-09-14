@@ -916,7 +916,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.8</p>
+            <p>📦 Version 2.8.9</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -2791,37 +2791,27 @@
                 }
             });
             
-            // Share with Link Button (image + text)
+            // Share with Link Button (text only - no image generation)
             shareWithLinkBtn.addEventListener('click', async () => {
                 try {
-                    await document.fonts.ready;
-                    const { blob } = await generateShareImage();
-                    currentImageBlob = blob;
+                    const shareText = 'ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com';
                     
-                    if (navigator.share && navigator.canShare) {
-                        const file = new File([blob], `lao-game-result-${Date.now()}.png`, {
-                            type: 'image/png'
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
+                            text: shareText,
+                            url: 'https://www.laotypo.com'
                         });
-                        
-                        if (navigator.canShare({ files: [file] })) {
-                            await navigator.share({
-                                files: [file],
-                                title: 'LaoTypo Game Result',
-                                text: 'ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com'
-                            });
-                        } else {
-                            // Fallback: copy text to clipboard
-                            await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
-                            alert('Link text copied to clipboard!');
-                        }
-                    } else {
+                    } else if (navigator.clipboard) {
                         // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText('ທ້າໃຫ້ເຈົ້າລອງຫຼິ້ນ\nພິສູດຄວາມເປັນລາວໃນສາຍເລືອດ!\nhttps://www.laotypo.com');
-                        alert('Link text copied to clipboard!');
+                        await navigator.clipboard.writeText(shareText);
+                        alert('✅ ຄັດລອກຂໍ້ຄວາມສຳເລັດແລ້ວ!');
+                    } else {
+                        throw new Error('Share and clipboard APIs not supported');
                     }
                 } catch (error) {
                     console.error('Share with link failed:', error);
-                    alert('Sharing not supported on this device');
+                    alert('❌ ບໍ່ສາມາດແບ່ງປັນໄດ້');
                 }
             });
         }
