@@ -1531,13 +1531,13 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--md-sys-color-on-surface-variant);">
-        <p>📦 Version 2.7.3</p>
+        <p>📦 Version 2.7.3.1</p>
         <p>Status: Live</p>
         <p>🚀 PWA Ready</p>
         <p>🔧 Guest Score Fix</p>
         <p>📊 Level Progress Fix</p>
         <p>🏷️ Label Consistency Fix</p>
-        <p>🦎 Custom Gecko Sound</p>
+        <p>🦎 Fixed Gecko Sound</p>
                 </div>
             </div>
         </div>
@@ -2583,8 +2583,6 @@
                 // Try different audio formats in order of preference
                 const soundPaths = [
                     '/sounds/Gecko-Sound.wav',        // WAV format (most compatible)
-                    '/sounds/Gecko-Sound-New.wav',    // New WAV file
-                    '/sounds/Gecko-Sound-Test.mp3',   // Test MP3 (should work)
                     '/sounds/Gecko-Sound.mp3',        // Original MP3
                     './sounds/Gecko-Sound.wav',
                     './sounds/Gecko-Sound.mp3'
