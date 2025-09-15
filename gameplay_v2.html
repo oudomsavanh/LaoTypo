@@ -33,6 +33,7 @@
     
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
@@ -1819,8 +1820,7 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content data source
-        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        // Game content loaded from Firestore
         
         // DOM elements
         const gameScreen = document.getElementById('game-screen');
@@ -1848,7 +1848,7 @@
         const totalWordsCompletedEl = document.getElementById('total-words-completed');
 
         // Test game data connection (for debugging)
-        async function testGameDataConnection() {
+        async function testFirestoreConnection() {
             console.log("Testing game data connection...");
             console.log("URL:", GAME_DATA_URL);
             

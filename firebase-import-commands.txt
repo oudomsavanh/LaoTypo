@@ -1,0 +1,23 @@
+
+# Firebase CLI Commands to Import Data
+
+## 1. Install Firebase CLI (if not already installed)
+npm install -g firebase-tools
+
+## 2. Login to Firebase
+firebase login
+
+## 3. Initialize Firebase project (if not already done)
+firebase init firestore
+
+## 4. Import the data
+firebase firestore:import firebase-import.json
+
+## 5. Verify the import
+firebase firestore:get gameWords --limit 5
+
+## Alternative: Manual import via Firebase Console
+1. Go to Firebase Console → Firestore Database
+2. Click "Start collection"
+3. Collection ID: "gameWords"
+4. Import the firebase-individual-docs.json file
