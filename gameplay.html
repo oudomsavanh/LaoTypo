@@ -635,7 +635,7 @@
             <div id="game-screen" class="screen active">
                 <!-- Word Loading Status -->
                 <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
-                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+                    Loading game content...
                 </div>
                 
                 <!-- Retry Button (hidden by default) -->
@@ -694,7 +694,7 @@
                     <div id="timer-bar" class="timer-bar"></div>
                 </div>
                 
-                <!-- Context display area for showing word from Google Sheets Column A -->
+                <!-- Context display area for showing word content -->
                 <div class="mb-4 sm:mb-6 text-center">
                     <h3 class="text-lg sm:text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນວ່າງ:</h3>
                     <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-3 sm:py-4 px-4 sm:px-6 min-h-[80px] sm:min-h-[100px] flex items-center justify-center text-base sm:text-2xl"></div>
@@ -1604,8 +1604,8 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Google Sheets CSV URL (same as original gameplay.html)
-        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        // Game content data source
+        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
         
         // DOM elements
         const gameScreen = document.getElementById('game-screen');
@@ -1632,13 +1632,13 @@
         const motivationText = document.getElementById('motivation-text');
         const totalWordsCompletedEl = document.getElementById('total-words-completed');
 
-        // Test Google Sheets connection (for debugging)
-        async function testGoogleSheetsConnection() {
-            console.log("Testing Google Sheets connection...");
-            console.log("URL:", GOOGLE_SHEETS_URL);
+        // Test game data connection (for debugging)
+        async function testGameDataConnection() {
+            console.log("Testing game data connection...");
+            console.log("URL:", GAME_DATA_URL);
             
             try {
-                const response = await fetch(GOOGLE_SHEETS_URL);
+                const response = await fetch(GAME_DATA_URL);
                 console.log("Response status:", response.status);
                 console.log("Response headers:", [...response.headers.entries()]);
                 
@@ -1676,7 +1676,7 @@
             updateDifficultyDisplay();
             
             updateUI();
-            await loadWordsFromGoogleSheets();
+            await loadGameContent();
             setupEventListeners();
             setupNavigationHandlers();
             initializeSounds();
@@ -1779,13 +1779,13 @@
             difficultyDisplay.style.color = levelColors[currentLevel];
         }
 
-        // Load words from Google Sheets CSV
-        async function loadWordsFromGoogleSheets() {
+        // Load game content data
+        async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.textContent = 'Loading game content...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
                 
-                console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
+                console.log("Attempting to fetch from:", GAME_DATA_URL);
                 
                 // Try multiple approaches to fetch the data
                 let response;
@@ -1793,7 +1793,7 @@
                 
                 // Method 1: Try CORS proxy (allorigins.win)
                 try {
-                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_SHEETS_URL)}`;
+                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GAME_DATA_URL)}`;
                     console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
                     response = await fetch(corsProxyUrl, {
                         method: 'GET',
@@ -1807,7 +1807,7 @@
                     
                     // Method 2: Try another CORS proxy (cors-anywhere)
                     try {
-                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GOOGLE_SHEETS_URL}`;
+                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GAME_DATA_URL}`;
                         console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
                         response = await fetch(corsProxyUrl2, {
                             method: 'GET',
@@ -1821,8 +1821,8 @@
                         console.log("CORS proxy (cors-anywhere) failed:", corsError2);
                         
                         // Method 3: Try direct fetch
-                        console.log("Trying direct fetch:", GOOGLE_SHEETS_URL);
-                        response = await fetch(GOOGLE_SHEETS_URL, {
+                        console.log("Trying direct fetch:", GAME_DATA_URL);
+                        response = await fetch(GAME_DATA_URL, {
                             method: 'GET',
                             mode: 'cors',
                             headers: {
@@ -1846,7 +1846,7 @@
                 const lines = csvText.split('\n').filter(line => line.trim());
                 console.log("Total lines:", lines.length);
                 
-                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
+                // Parse game data: A=context, B=correct, C=wrong, D=difficulty (optional)
                 wordPairs = lines
                     .slice(1) // Skip header row
                     .map((line, index) => {
@@ -1868,7 +1868,7 @@
                     })
                     .filter(item => item !== null); // Remove invalid entries
                 
-                console.log("Word list loaded from Google Sheets:", wordPairs.length, "entries");
+                console.log("Game content loaded:", wordPairs.length, "entries");
                 console.log("Sample entries:", wordPairs.slice(0, 3));
                 
                 if (wordPairs.length === 0) {
@@ -1893,10 +1893,10 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
                 
             } catch (error) {
-                console.error("Error loading word list from Google Sheets:", error);
+                console.error("Error loading game content:", error);
                 console.log("Error details:", error.message);
                 console.log("Error stack:", error.stack);
-                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                console.log("Fetch URL:", GAME_DATA_URL);
                 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
@@ -2613,7 +2613,7 @@
                 retryLoadingBtn.addEventListener('click', async () => {
                     retryLoadingContainer.classList.add('hidden');
                     wordLoadingStatus.style.display = 'block';
-                    await loadWordsFromGoogleSheets();
+                    await loadGameContent();
                 });
             }
             
