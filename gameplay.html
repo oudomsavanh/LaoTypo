@@ -3183,6 +3183,12 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບກາງ
                 `;
+                // Reset button classes to original flexible width
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2';
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.add('hidden');
+                }
             } else if (currentLevel === 1) {
                 // Completed Medium Level
                 levelIcon.textContent = '🎉';
@@ -3194,6 +3200,12 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບຍາກ
                 `;
+                // Reset button classes to original flexible width
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2';
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.add('hidden');
+                }
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
                 levelIcon.textContent = '🏆';
@@ -3211,6 +3223,7 @@
                     </svg>
                     ຕື່ມຄຳສັບ
                 `;
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[180px]';
                 
                 // Show/hide buttons for hard level completion
                 const playAgainBtn = document.getElementById('play-again-btn');
@@ -3222,6 +3235,7 @@
                         </svg>
                         ຫຼິ້ນອີກຄັ້ງ
                     `;
+                    playAgainBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[180px]';
                 }
             }
             
