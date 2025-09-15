@@ -525,6 +525,39 @@ class SecurityUtils {
       element.innerHTML = safeHTML;
     }
   }
+  
+  // Safe JSON parsing with fallback
+  static safeJSONParse(jsonString, fallback = null) {
+    try {
+      if (typeof jsonString !== 'string') return fallback;
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.warn('JSON parse error:', error);
+      return fallback;
+    }
+  }
+  
+  // Safe localStorage getter
+  static safeGetLocalStorage(key, fallback = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? this.safeJSONParse(value, fallback) : fallback;
+    } catch (error) {
+      console.warn('localStorage get error:', error);
+      return fallback;
+    }
+  }
+  
+  // Safe sessionStorage getter
+  static safeGetSessionStorage(key, fallback = null) {
+    try {
+      const value = sessionStorage.getItem(key);
+      return value ? this.safeJSONParse(value, fallback) : fallback;
+    } catch (error) {
+      console.warn('sessionStorage get error:', error);
+      return fallback;
+    }
+  }
 }
 
 // 🚀 EXPORT ALL MANAGERS AND UTILITIES

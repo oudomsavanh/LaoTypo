@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <title>Host Dashboard - Session Manager</title>
     
     <!-- Tailwind CSS -->
@@ -384,7 +385,7 @@
                     return;
                 }
                 
-                sessionsContainer.innerHTML = activeSessions.map(session => `
+                SecurityUtils.safeSetHTML(sessionsContainer, activeSessions.map(session => `
                     <div class="session-card" data-session-id="${session.id}">
                         <div class="flex justify-between items-start mb-4">
                             <div>
@@ -423,7 +424,7 @@
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `).join(''));
             }
             
             // View Session Details
@@ -431,7 +432,7 @@
                 const session = activeSessions.find(s => s.id === sessionId);
                 if (!session) return;
                 
-                modalContent.innerHTML = `
+                SecurityUtils.safeSetHTML(modalContent, `
                     <div class="space-y-3">
                         <div>
                             <p class="text-sm text-gray-600">Session Code:</p>
@@ -470,7 +471,7 @@
                             <p class="text-sm">${formatDate(session.createdAt)}</p>
                         </div>
                     </div>
-                `;
+                `);
                 
                 // Update modal buttons based on session status
                 if (session.status === 'waiting' && session.players && session.players.length >= 2) {

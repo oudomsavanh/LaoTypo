@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1304,7 +1305,7 @@
             dashboard.className = 'fixed top-20 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm';
             dashboard.style.display = 'none';
             
-            dashboard.innerHTML = `
+            SecurityUtils.safeSetHTML(dashboard, `
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold">📊 Live Analytics</h3>
                     <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
@@ -1339,7 +1340,7 @@
                         <span id="connection-status">${navigator.onLine ? 'Yes' : 'No'}</span>
                     </div>
                 </div>
-            `;
+            `);
             
             document.body.appendChild(dashboard);
             
@@ -1500,11 +1501,15 @@
         }
         
         function trackGameStart() {
+            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            if (!localStorage.getItem('anonymousId')) {
+                localStorage.setItem('anonymousId', anonymousId);
+            }
             const deviceInfo = getDeviceInfo();
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
                 level: currentLevel + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
             
             // Track device information separately
@@ -1514,7 +1519,7 @@
                 screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
                 viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
                 user_agent: deviceInfo.userAgent,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1525,7 +1530,7 @@
                 final_score: score,
                 accuracy: accuracy,
                 words_completed: levelProgress,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1535,7 +1540,7 @@
                 accuracy: accuracy,
                 total_words: totalWords,
                 levels_completed: levelsCompleted,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1543,7 +1548,7 @@
             trackGameEvent('game_replay', {
                 level_name: levelNames[level],
                 level_number: level + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1552,7 +1557,7 @@
                 correct: isCorrect,
                 difficulty: levelNames[difficulty],
                 current_streak: currentStreak,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1560,7 +1565,7 @@
             trackGameEvent('life_lost', {
                 remaining_lives: remainingLives,
                 current_streak: currentStreak,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1570,7 +1575,7 @@
                 to_level: levelNames[toLevel],
                 from_level_number: fromLevel + 1,
                 to_level_number: toLevel + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1596,7 +1601,7 @@
                 utm_campaign: getUrlParameter('utm_campaign') || 'unknown',
                 page_title: document.title,
                 page_url: window.location.href,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1625,7 +1630,7 @@
                 best_streak: bestStreak,
                 lives_remaining: playerLives,
                 levels_completed: levelsCompleted,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1642,7 +1647,7 @@
                 total_words_played: totalPlayed,
                 preferred_difficulty: getPreferredDifficulty(),
                 current_difficulty: levelNames[currentLevel],
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1765,7 +1770,7 @@
                 current_level: levelNames[currentLevel],
                 user_action: lastUserAction,
                 timestamp: Date.now(),
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1786,8 +1791,8 @@
         let isKeyboardEnabled = true;
         let gameActive = false;
         let synth = null;
-        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
-        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled' ?? 'true');
+        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled' ?? 'true');
         let userHasInteracted = false;
         
         // Audio objects
@@ -2565,7 +2570,7 @@
 
         // Save game stats
         function saveGameStats() {
-            const stats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            const stats = SecurityUtils.safeGetLocalStorage('gameStats' || '{}');
             
             if (!stats.totalGames) stats.totalGames = 0;
             if (!stats.totalCorrect) stats.totalCorrect = 0;
@@ -3258,9 +3263,10 @@
             if (quickEditNameBtn) {
                 quickEditNameBtn.addEventListener('click', () => {
                     const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
-                    if (newName && newName.trim() !== '') {
+                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
+                    if (sanitizednewName && sanitizednewName.trim() !== '') {
                         const oldName = playerName;
-                        playerName = newName.trim();
+                        playerName = sanitizednewName.trim();
                         localStorage.setItem('displayName', playerName);
                         updateAccountPanel();
                         updateUI();

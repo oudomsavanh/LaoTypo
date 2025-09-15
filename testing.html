@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <!-- Cache Busting Headers v2.9.3 - Version aligned with gameplay; prior GA4 setup retained -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1603,8 +1604,8 @@
 
         // --- AUDIO SYSTEM v2.2.0 ---
         // Initialize sound settings from localStorage
-        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
-        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled' ?? 'true');
+        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled' ?? 'true');
         let userHasInteracted = false;
         
         // Audio objects
@@ -1997,7 +1998,7 @@
         function updateLeaderboard(score) {
             try {
                 const finalDisplayName = displayName || 'Anonymous';
-                let leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                let leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard' || '[]');
                 
                 // Check if user already exists in leaderboard
                 const existingIndex = leaderboard.findIndex(entry => entry.userId === userId);
@@ -2124,7 +2125,7 @@
                 
                 // Fallback to localStorage
                 if (leaderboard.length === 0) {
-                    leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                    leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard' || '[]');
                 }
                 
                 if (leaderboard.length === 0) {
@@ -2636,8 +2637,9 @@
         // Account panel controls
         document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
             const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
             if (newName && newName.trim()) {
-                displayName = newName.trim();
+                displayName = sanitizednewName.trim();
                 localStorage.setItem('displayName', displayName);
                 updateUI();
                 updateAccountPanel();
