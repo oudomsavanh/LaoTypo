@@ -921,7 +921,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.9.2</p>
+            <p>📦 Version 2.9.3</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -3263,14 +3263,18 @@
                     </svg>
                     ເບິ່ງຜົນສຳເລັດ
                 `;
-                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                     ຕື່ມຄຳສັບ
                 `;
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
+                const secondRowActions = document.getElementById('second-row-actions');
+                if (secondRowActions) {
+                    secondRowActions.className = 'flex flex-col gap-3 justify-center';
+                }
                 
                 // Show/hide buttons for hard level completion
                 const playAgainBtn = document.getElementById('play-again-btn');
@@ -3282,7 +3286,7 @@
                         </svg>
                         ຫຼິ້ນອີກຄັ້ງ
                     `;
-                    playAgainBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                    playAgainBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
                 }
             }
             
