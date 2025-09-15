@@ -38,7 +38,7 @@
 ### Step 3: Update Your Game Files
 Replace `GA_MEASUREMENT_ID` in both files:
 
-**In gameplay.html (line 31):**
+**In play.html (line 31):**
 ```html
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>

@@ -2324,7 +2324,7 @@
                 music: musicEnabled.toString()
             });
             
-            const gameURL = `gameplay.html?${params.toString()}`;
+            const gameURL = `play.html?${params.toString()}`;
             console.log('🔗 Navigating to:', gameURL);
             
             window.location.href = gameURL;
@@ -2707,7 +2707,7 @@
             loadUserData();
             updateUI();
             
-            // Word loading now handled in gameplay.html
+            // Word loading now handled in play.html
             startGameBtn.disabled = false;
             startGameBtn.textContent = 'ເລີ່ມເກມ';
         };
