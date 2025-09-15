@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.9.1 - Motivational modal guarded; no double-advance; plus prior fixes -->
+    <!-- Cache Busting Headers v2.9.2 - Layout alignments; version sync with testing; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -921,7 +921,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.9.1</p>
+            <p>📦 Version 2.9.2</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -3227,9 +3227,9 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບກາງ
                 `;
-                // Set non-hard button widths: Continue min-w, Replay fixed w
-                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px]';
+                // Set non-hard button widths: Continue min-w, Replay fixed w; both centered
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px] mx-auto';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px] mx-auto';
                 const playAgainBtn = document.getElementById('play-again-btn');
                 if (playAgainBtn) {
                     playAgainBtn.classList.add('hidden');
@@ -3245,9 +3245,9 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບຍາກ
                 `;
-                // Set non-hard button widths: Continue min-w, Replay fixed w
-                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px]';
+                // Set non-hard button widths: Continue min-w, Replay fixed w; both centered
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px] mx-auto';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px] mx-auto';
                 const playAgainBtn = document.getElementById('play-again-btn');
                 if (playAgainBtn) {
                     playAgainBtn.classList.add('hidden');
