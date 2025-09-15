@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.5 - Fixed timer stopping, uniform button layout, header design, and sound management -->
+    <!-- Cache Busting Headers v2.8.6 - Button layout: 2-row on non-hard, 3x180px on hard; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -835,7 +835,7 @@
                         
                         <!-- Action Buttons -->
                         <div class="flex flex-col gap-3 justify-center">
-                            <!-- First Row: View Results Button (wider) -->
+                            <!-- First Row: Continue Button (wider) -->
                             <div class="flex justify-center">
                                 <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -845,18 +845,14 @@
                                 </button>
                             </div>
                             
-                            <!-- Second Row: Add Words Button -->
-                            <div class="flex justify-center">
+                            <!-- Second Row: Actions (Replay + Play Again) -->
+                            <div id="second-row-actions" class="flex flex-col sm:flex-row gap-3 justify-center">
                                 <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
                                     ຫຼິ້ນລະດັບນີ້ຕໍ່
                                 </button>
-                            </div>
-                            
-                            <!-- Third Row: Play Again Button -->
-                            <div class="flex justify-center">
                                 <button id="play-again-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 hidden">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -925,7 +921,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.5</p>
+            <p>📦 Version 2.8.6</p>
         <p>Status: Live</p>
                 </div>
             </div>
