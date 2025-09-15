@@ -4,7 +4,7 @@
 
 ### Step 1: Go to Firebase Console
 1. Open: https://console.firebase.google.com/
-2. Select your project: **laotypo-a8e80**
+2. Select your project: **laotypo-phase1**
 3. Click **"Firestore Database"** in the left menu
 
 ### Step 2: Create Collection

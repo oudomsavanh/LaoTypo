@@ -17,7 +17,8 @@ const CONFIG = {
     // Your Google Sheets CSV URL
     GOOGLE_SHEETS_URL: 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0',
     
-    // Firebase collection name
+    // Firebase project and collection
+    FIREBASE_PROJECT_ID: 'laotypo-phase1',
     FIRESTORE_COLLECTION: 'gameWords',
     
     // CSV column mapping

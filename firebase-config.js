@@ -1,17 +1,18 @@
 // 🔥 Firebase Configuration for LaoTypo Game
 // ✅ CONFIGURED WITH REAL FIREBASE PROJECT
 const firebaseConfig = {
-  apiKey: "AIzaSyC-PtK5NdCnQi8JOJ8MvRwvGht-teE2vp8",
-  authDomain: "laotypo-a8e80.firebaseapp.com",
-  projectId: "laotypo-a8e80",
-  storageBucket: "laotypo-a8e80.firebasestorage.app",
-  messagingSenderId: "597772456731",
-  appId: "1:597772456731:web:7a476dee850b85227539be",
-  measurementId: "G-YRJCWZQTCZ"
+  apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
+  authDomain: "laotypo-phase1.firebaseapp.com",
+  projectId: "laotypo-phase1",
+  storageBucket: "laotypo-phase1.firebasestorage.app",
+  messagingSenderId: "359413130623",
+  appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
+  measurementId: "G-7CH5217ZYG"
 };
 
 // Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
 import { 
   getFirestore, 
   collection, 
@@ -26,26 +27,27 @@ import {
   limit, 
   where,
   serverTimestamp 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 import { 
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
   signOut, 
   onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const analytics = getAnalytics(app);
 
 console.log('🔥 Firebase initialized successfully');
 
 // 🗄️ DATABASE COLLECTIONS
 const COLLECTIONS = {
   PLAYERS: 'players',
-  WORDS: 'words', 
+  WORDS: 'gameWords',  // Updated to match our export
   LEADERBOARDS: 'leaderboards',
   GAME_RESULTS: 'gameResults'
 };
@@ -569,6 +571,7 @@ window.FirebaseAuthManager = FirebaseAuthManager;
 window.SecurityUtils = SecurityUtils;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
+window.firebaseAnalytics = analytics;
 
 console.log('🔥 Firebase modules loaded and ready!');
 console.log('🛡️ Security utilities loaded');

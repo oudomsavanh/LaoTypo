@@ -11,12 +11,12 @@
 
 // Firebase configuration - UPDATE THESE VALUES
 const FIREBASE_CONFIG = {
-  projectId: 'laotypo-a8e80',
+  projectId: 'laotypo-phase1',
   // You'll need to get this from Firebase Console → Project Settings → Service Accounts
   serviceAccountKey: {
     // Copy the entire service account JSON here
     "type": "service_account",
-    "project_id": "laotypo-a8e80",
+    "project_id": "laotypo-phase1",
     "private_key_id": "YOUR_PRIVATE_KEY_ID",
     "private_key": "YOUR_PRIVATE_KEY",
     "client_email": "YOUR_CLIENT_EMAIL",
