@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.4.0 - Added Google Analytics 4 tracking -->
+    <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -1142,7 +1142,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.7.0</p>
+        <p>📦 Version 2.9.0</p>
         <p>Status: Live</p>
         <p>🚀 PWA Ready</p>
         <p>✨ Modern UI/UX</p>
@@ -2183,6 +2183,8 @@
             gameActive = true;
             
             if (timerEnabled) {
+                const timerContainer = document.getElementById('timer-container');
+                if (timerContainer) timerContainer.style.display = 'block';
                 startTimer();
             }
         }
@@ -3318,9 +3320,14 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            // Pause the game
+            // Pause the game and stop timer
             gameActive = false;
+            cancelAnimationFrame(currentTimeout);
             
+            // Hide timer bar during modal
+            const timerContainer = document.getElementById('timer-container');
+            if (timerContainer) timerContainer.style.display = 'none';
+
             // Update modal content based on current level
             levelScore.textContent = levelProgress;
             
@@ -3335,6 +3342,9 @@
                     </svg>
                     ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
                 `;
+                // Non-hard: set fixed min width for Continue and Replay (190px)
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
             } else if (currentLevel === 1) {
                 // Completed Medium Level
                 levelIcon.textContent = '🔵';
@@ -3346,6 +3356,9 @@
                     </svg>
                     ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
                 `;
+                // Non-hard: set fixed min width for Continue and Replay (190px)
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
                 levelsCompleted++;
@@ -3358,12 +3371,20 @@
                     </svg>
                     ເບິ່ງຜົນສຳເລັດ
                 `;
+                // Hard: set all three to min-w-[200px]
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
                     ຫຼິ້ນອີກຄັ້ງ
                 `;
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.remove('hidden');
+                    playAgainBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                }
             }
             
             // Show the modal

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.4.0 - Added Google Analytics 4 tracking -->
+    <!-- Cache Busting Headers v2.9.2 - Layout alignments; version sync with testing; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -106,15 +106,20 @@
             background-color: transparent;
             color: var(--sub-color);
             padding: 0.5rem;
-            border-radius: 9999px; /* circle */
-            transition: all 0.3s ease-in-out;
-            transform-origin: center;
+            border-radius: 1.25rem;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: none;
+            cursor: pointer;
+            min-width: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-icon:hover {
             color: var(--text-color);
             background-color: #3e4043;
-            transform: scale(1.1) rotate(3deg);
-            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon:active {
             transform: scale(0.95);
@@ -591,7 +596,7 @@
 </head>
 <body>
     <!-- Navigation from testing.html -->
-    <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
                 <img src="images/LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
@@ -830,7 +835,7 @@
                         
                         <!-- Action Buttons -->
                         <div class="flex flex-col gap-3 justify-center">
-                            <!-- First Row: View Results Button (wider) -->
+                            <!-- First Row: Continue Button (wider) -->
                             <div class="flex justify-center">
                                 <button id="continue-next-level" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -840,8 +845,8 @@
                                 </button>
                             </div>
                             
-                            <!-- Second Row: Add Words and Play Again Buttons -->
-                            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <!-- Second Row: Actions (Replay + Play Again) -->
+                            <div id="second-row-actions" class="flex flex-col sm:flex-row gap-3 justify-center">
                                 <button id="replay-current-level" class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1556,6 +1561,7 @@
         let playerName = '';
         let selectedDifficulty = 'easy';
         let isKeyboardEnabled = true;
+        let isLevelModalOpen = false; // Freeze gameplay during level completion modal
         let gameActive = false;
         let synth = null;
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
@@ -1989,7 +1995,16 @@
             
             gameActive = true;
             
+            // Resume background music if it was paused during level transition
+            if (musicEnabled && backgroundMusic.paused && !resultSound.loop) {
+                backgroundMusic.play().catch(() => {});
+                console.log('Background music resumed in showNewWords()');
+            }
+            
             if (timerEnabled) {
+                // Show timer again when resuming
+                const timerContainer = document.getElementById('timer-container');
+                if (timerContainer) timerContainer.style.display = 'block';
                 startTimer();
             }
         }
@@ -2026,6 +2041,7 @@
                 correctAnswers++;
                 currentStreak++;
                 levelProgress++;
+                console.log('[PROGRESS] levelProgress incremented:', levelProgress, 'currentLevel:', currentLevel, 'threshold:', levelThresholds[currentLevel]);
                 levelScores[levelNames[currentLevel].toLowerCase()]++;
                 selectedCard.classList.add('feedback-correct');
                 playSound('correct');
@@ -2040,6 +2056,7 @@
                     totalWordsCompleted += levelThresholds[currentLevel];
                     
                     // Track streak history
+                    console.log('[LEVEL] Threshold met at level', currentLevel, 'levelProgress:', levelProgress, 'threshold:', levelThresholds[currentLevel]);
                     streakHistory.push(currentStreak);
                     
                     // Track level completion
@@ -2059,6 +2076,7 @@
                     }
                     
                     // Show level transition modal
+                    console.log('[MODAL] Opening level transition modal. currentLevel:', currentLevel, 'levelProgress:', levelProgress);
                     showLevelTransitionModal();
                 }
                 
@@ -2155,6 +2173,7 @@
         }
 
         function loseLife() {
+            if (isLevelModalOpen) return; // Prevent life loss during level modal
             if (playerLives > 0) {
                 playerLives--;
                 
@@ -2205,6 +2224,7 @@
             }
             
             cancelAnimationFrame(currentTimeout);
+            console.log('Timer starting, previous currentTimeout:', currentTimeout);
             timerBar.style.transform = 'scaleX(1)';
             
             const startTime = Date.now();
@@ -2215,6 +2235,10 @@
                 
                 if (progress <= 0) {
                     timerBar.style.transform = 'scaleX(0)';
+                    // If a level modal is open, do nothing
+                    if (isLevelModalOpen) {
+                        return;
+                    }
                     if (gameActive) {
                         gameActive = false;
                         playSound('timeout');
@@ -2233,6 +2257,7 @@
             };
             
             currentTimeout = requestAnimationFrame(updateTimer);
+            console.log('Timer animation frame set, currentTimeout:', currentTimeout);
         }
 
         // Update UI
@@ -2260,6 +2285,12 @@
         function endGame() {
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
+            
+            // Stop all sounds when game ends
+            stopResultSound();
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+            console.log('All sounds stopped in endGame()');
             
             // Calculate final percentage score for display
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
@@ -3159,6 +3190,7 @@
 
         // Level Transition Modal Functions
         function showLevelTransitionModal() {
+            console.log('[MODAL] showLevelTransitionModal called. currentLevel:', currentLevel, 'levelProgress:', levelProgress);
             const modal = document.getElementById('level-transition-modal');
             const levelMessage = document.getElementById('level-message');
             const levelQuestion = document.getElementById('level-question');
@@ -3166,8 +3198,21 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            // Pause the game
+            // Pause the game and stop timer
+            isLevelModalOpen = true;
             gameActive = false;
+            cancelAnimationFrame(currentTimeout);
+            console.log('Timer stopped in showLevelTransitionModal, currentTimeout:', currentTimeout);
+            
+            // Pause background music during level transition
+            if (!backgroundMusic.paused) {
+                backgroundMusic.pause();
+                console.log('Background music paused during level transition');
+            }
+
+            // Hide timer bar during modal
+            const timerContainer = document.getElementById('timer-container');
+            if (timerContainer) timerContainer.style.display = 'none';
             
             // Update modal content based on current level
             
@@ -3182,6 +3227,13 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບກາງ
                 `;
+                // Set non-hard button widths: Continue min-w, Replay fixed w; both centered
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px] mx-auto';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px] mx-auto';
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.add('hidden');
+                }
             } else if (currentLevel === 1) {
                 // Completed Medium Level
                 levelIcon.textContent = '🎉';
@@ -3193,6 +3245,13 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບຍາກ
                 `;
+                // Set non-hard button widths: Continue min-w, Replay fixed w; both centered
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px] mx-auto';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px] mx-auto';
+                const playAgainBtn = document.getElementById('play-again-btn');
+                if (playAgainBtn) {
+                    playAgainBtn.classList.add('hidden');
+                }
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
                 levelIcon.textContent = '🏆';
@@ -3204,12 +3263,18 @@
                     </svg>
                     ເບິ່ງຜົນສຳເລັດ
                 `;
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
                 replayBtn.innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                     ຕື່ມຄຳສັບ
                 `;
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
+                const secondRowActions = document.getElementById('second-row-actions');
+                if (secondRowActions) {
+                    secondRowActions.className = 'flex flex-col gap-3 justify-center';
+                }
                 
                 // Show/hide buttons for hard level completion
                 const playAgainBtn = document.getElementById('play-again-btn');
@@ -3221,6 +3286,7 @@
                         </svg>
                         ຫຼິ້ນອີກຄັ້ງ
                     `;
+                    playAgainBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[200px] mx-auto';
                 }
             }
             
@@ -3258,18 +3324,32 @@
             
             // Close button handler
             const closeBtn = document.getElementById('close-motivational-btn');
-            const closeModal = () => {
-                console.log('Closing motivational modal...');
+            const modalLevel = currentLevel; // snapshot level when opened
+            let autoClosed = false;
+            let autoCloseTimeoutId;
+            const closeModal = (advance = true) => {
+                console.log('Closing motivational modal... advance:', advance, 'modalLevel:', modalLevel, 'currentLevel:', currentLevel);
                 if (document.body.contains(motivationalModal)) {
                     document.body.removeChild(motivationalModal);
                 }
-                callback();
+                if (autoCloseTimeoutId) {
+                    clearTimeout(autoCloseTimeoutId);
+                    autoCloseTimeoutId = null;
+                }
+                // Only advance if still on the same level we opened on
+                if (advance && currentLevel === modalLevel) {
+                    callback();
+                }
             };
             
-            closeBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', () => closeModal(true));
             
             // Auto-close after 10 seconds
-            setTimeout(closeModal, 10000);
+            autoCloseTimeoutId = setTimeout(() => {
+                autoClosed = true;
+                // Auto-close should not chain-advance if the player already progressed
+                closeModal(true);
+            }, 10000);
         }
 
         function setupLevelTransitionHandlers() {
@@ -3288,6 +3368,7 @@
                             const previousLevel = currentLevel;
                             levelsCompleted++;
                             currentLevel++;
+                            console.log('[LEVEL] Continue clicked. Advancing', previousLevel, '->', currentLevel);
                             levelProgress = 0;
                             currentWordIndex = 0; // Reset word index for new level
                             
@@ -3313,6 +3394,7 @@
                             
                             // Resume game with new level
                             setTimeout(() => {
+                                isLevelModalOpen = false;
                                 showNewWords();
                             }, 500);
                         });
@@ -3347,6 +3429,7 @@
                         playerLives = 3;
                         levelProgress = 0;
                         currentWordIndex = 0; // Reset word index for replay
+                        console.log('[REPLAY] Reset current level', currentLevel, 'progress=0, lives reset');
                         
                         // Track replay
                         trackReplay(currentLevel);
@@ -3370,6 +3453,7 @@
                         
                         // Resume game at same level
                         setTimeout(() => {
+                            isLevelModalOpen = false;
                             showNewWords();
                         }, 500);
                     }
