@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.4 - Fixed timer stopping, uniform button layout, header design, and timer debugging -->
+    <!-- Cache Busting Headers v2.8.5 - Fixed timer stopping, uniform button layout, header design, and sound management -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -925,7 +925,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.4</p>
+            <p>📦 Version 2.8.5</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -1998,6 +1998,12 @@
             
             gameActive = true;
             
+            // Resume background music if it was paused during level transition
+            if (musicEnabled && backgroundMusic.paused && !resultSound.loop) {
+                backgroundMusic.play().catch(() => {});
+                console.log('Background music resumed in showNewWords()');
+            }
+            
             if (timerEnabled) {
                 startTimer();
             }
@@ -2271,6 +2277,12 @@
         function endGame() {
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
+            
+            // Stop all sounds when game ends
+            stopResultSound();
+            backgroundMusic.pause();
+            backgroundMusic.currentTime = 0;
+            console.log('All sounds stopped in endGame()');
             
             // Calculate final percentage score for display
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
@@ -3181,6 +3193,12 @@
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
             console.log('Timer stopped in showLevelTransitionModal, currentTimeout:', currentTimeout);
+            
+            // Pause background music during level transition
+            if (!backgroundMusic.paused) {
+                backgroundMusic.pause();
+                console.log('Background music paused during level transition');
+            }
             
             // Update modal content based on current level
             
