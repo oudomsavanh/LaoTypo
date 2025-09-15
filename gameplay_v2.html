@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.9 - Unified button widths: non-hard 2x200px, hard 3x200px; plus prior fixes -->
+    <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -1142,7 +1142,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.8.9</p>
+        <p>📦 Version 2.9.0</p>
         <p>Status: Live</p>
         <p>🚀 PWA Ready</p>
         <p>✨ Modern UI/UX</p>
@@ -2183,6 +2183,8 @@
             gameActive = true;
             
             if (timerEnabled) {
+                const timerContainer = document.getElementById('timer-container');
+                if (timerContainer) timerContainer.style.display = 'block';
                 startTimer();
             }
         }
@@ -3322,6 +3324,10 @@
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
             
+            // Hide timer bar during modal
+            const timerContainer = document.getElementById('timer-container');
+            if (timerContainer) timerContainer.style.display = 'none';
+
             // Update modal content based on current level
             levelScore.textContent = levelProgress;
             
@@ -3336,9 +3342,9 @@
                     </svg>
                     ແມ່ນແລ້ວ, ໄປລະດັບປານກາງ!
                 `;
-                // Non-hard: set fixed min width for Continue and Replay
-                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                // Non-hard: set fixed min width for Continue and Replay (190px)
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
             } else if (currentLevel === 1) {
                 // Completed Medium Level
                 levelIcon.textContent = '🔵';
@@ -3350,9 +3356,9 @@
                     </svg>
                     ແມ່ນແລ້ວ, ໄປລະດັບຍາກ!
                 `;
-                // Non-hard: set fixed min width for Continue and Replay
-                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[200px]';
+                // Non-hard: set fixed min width for Continue and Replay (190px)
+                continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
             } else if (currentLevel === 2) {
                 // Completed Hard Level - Game Complete!
                 levelsCompleted++;
