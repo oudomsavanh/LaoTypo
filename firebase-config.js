@@ -476,9 +476,73 @@ window.FirebaseAuthManager = FirebaseAuthManager;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
 
+// 🛡️ SECURITY UTILITIES
+class SecurityUtils {
+  
+  // Sanitize user input
+  static sanitizeInput(input, maxLength = 100) {
+    if (typeof input !== 'string') return '';
+    
+    // Remove HTML tags and limit length
+    const sanitized = input
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/[<>\"'&]/g, '') // Remove dangerous characters
+      .trim()
+      .substring(0, maxLength);
+    
+    return sanitized;
+  }
+  
+  // Validate display name
+  static validateDisplayName(name) {
+    const sanitized = this.sanitizeInput(name, 50);
+    return sanitized.length >= 2 && sanitized.length <= 50;
+  }
+  
+  // Validate session name
+  static validateSessionName(name) {
+    const sanitized = this.sanitizeInput(name, 100);
+    return sanitized.length >= 3 && sanitized.length <= 100;
+  }
+  
+  // Validate session code
+  static validateSessionCode(code) {
+    return /^[A-Z0-9]{6}$/.test(code);
+  }
+  
+  // Safe DOM insertion
+  static safeSetTextContent(element, text) {
+    if (element && typeof text === 'string') {
+      element.textContent = this.sanitizeInput(text);
+    }
+  }
+  
+  // Safe innerHTML (avoid this, use textContent instead)
+  static safeSetHTML(element, html) {
+    if (element && typeof html === 'string') {
+      // Only allow safe HTML patterns
+      const safeHTML = html.replace(/<script[^>]*>.*?<\/script>/gi, '');
+      element.innerHTML = safeHTML;
+    }
+  }
+}
+
+// 🚀 EXPORT ALL MANAGERS AND UTILITIES
+window.FirebasePlayerManager = FirebasePlayerManager;
+window.FirebaseWordManager = FirebaseWordManager; 
+window.FirebaseLeaderboardManager = FirebaseLeaderboardManager;
+window.FirebaseSyncManager = FirebaseSyncManager;
+window.FirebaseAuthManager = FirebaseAuthManager;
+window.SecurityUtils = SecurityUtils;
+window.firebaseDb = db;
+window.firebaseAuth = auth;
+
 console.log('🔥 Firebase modules loaded and ready!');
+console.log('🛡️ Security utilities loaded');
 console.log('🔑 Available Firebase functions:');
 console.log('  - FirebaseAuthManager.loginWithGmail()');
 console.log('  - FirebaseAuthManager.getUserProfile(uid)');
 console.log('  - FirebasePlayerManager.savePlayerData()');
 console.log('  - FirebaseSyncManager.syncToCloud()');
+console.log('  - SecurityUtils.sanitizeInput()');
+console.log('  - SecurityUtils.validateDisplayName()');

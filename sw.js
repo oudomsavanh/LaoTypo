@@ -2,12 +2,19 @@
 const CACHE_NAME = 'lao-typo-v2.6.0';
 const OFFLINE_URL = '/gameplay.html';
 
-// Files to cache for offline use
+// Files to cache for offline use (same-origin only for security)
 const CACHE_FILES = [
     '/',
     '/testing.html',
     '/gameplay.html',
+    '/gameplay_v2.html',
+    '/testing_v2.html',
     '/leaderboard.html',
+    '/registration.html',
+    '/host-dashboard.html',
+    '/join.html',
+    '/player_account_info.html',
+    '/analytics.html',
     '/manifest.json',
     '/firebase-config.js',
     '/icon-192x192.png',
@@ -19,13 +26,28 @@ const CACHE_FILES = [
     '/images/LaoTypo-logo-04.png',
     '/images/LaoTypo-logo-06.png',
     '/images/Gecko.png',
+    '/images/results/1/3.webp',
+    '/images/results/1/4.webp',
+    '/images/results/1/5.webp',
+    '/images/results/1/6.webp',
+    '/images/results/1/7.webp',
+    '/images/results/2/8.webp',
+    '/images/results/2/9.webp',
+    '/images/results/2/10.webp',
+    '/images/results/2/11.webp',
+    '/images/results/2/12.webp',
+    '/images/results/3/16.webp',
+    '/images/results/3/17.webp',
+    '/images/results/4/27.webp',
+    '/images/results/4/28.webp',
+    '/images/results/5/40.webp',
+    '/images/results/5/41.webp',
+    '/images/results/5/42.webp',
     '/bg_sound.mp3',
     '/result_sound.mp3',
-    // External resources (will be cached when accessed)
-    'https://fonts.googleapis.com/css2?family=Noto+Sans+Lao+Looped:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap',
-    'https://cdn.tailwindcss.com',
-    'https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js',
-    'https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z'
+    '/sounds/bg_sound.mp3',
+    '/sounds/Gecko-Sound.mp3',
+    '/sounds/result_sound.mp3'
 ];
 
 // Install event - cache essential files
