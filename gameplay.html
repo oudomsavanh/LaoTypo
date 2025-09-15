@@ -3166,8 +3166,9 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            // Pause the game
+            // Pause the game and stop timer
             gameActive = false;
+            cancelAnimationFrame(currentTimeout);
             
             // Update modal content based on current level
             
