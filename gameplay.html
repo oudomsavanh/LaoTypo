@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.3 - Fixed timer stopping, uniform button layout, and header design -->
+    <!-- Cache Busting Headers v2.8.4 - Fixed timer stopping, uniform button layout, header design, and timer debugging -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -925,7 +925,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.3</p>
+            <p>📦 Version 2.8.4</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -2214,6 +2214,7 @@
             }
             
             cancelAnimationFrame(currentTimeout);
+            console.log('Timer starting, previous currentTimeout:', currentTimeout);
             timerBar.style.transform = 'scaleX(1)';
             
             const startTime = Date.now();
@@ -2242,6 +2243,7 @@
             };
             
             currentTimeout = requestAnimationFrame(updateTimer);
+            console.log('Timer animation frame set, currentTimeout:', currentTimeout);
         }
 
         // Update UI
@@ -3178,6 +3180,7 @@
             // Pause the game and stop timer
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
+            console.log('Timer stopped in showLevelTransitionModal, currentTimeout:', currentTimeout);
             
             // Update modal content based on current level
             
