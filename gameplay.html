@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.2 - Fixed timer stopping and uniform button layout -->
+    <!-- Cache Busting Headers v2.8.3 - Fixed timer stopping, uniform button layout, and header design -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -106,15 +106,20 @@
             background-color: transparent;
             color: var(--sub-color);
             padding: 0.5rem;
-            border-radius: 9999px; /* circle */
-            transition: all 0.3s ease-in-out;
-            transform-origin: center;
+            border-radius: 1.25rem;
+            transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            border: none;
+            cursor: pointer;
+            min-width: 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-icon:hover {
             color: var(--text-color);
             background-color: #3e4043;
-            transform: scale(1.1) rotate(3deg);
-            box-shadow: 0 4px 12px rgba(248, 175, 60, 0.2);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
         }
         .btn-icon:active {
             transform: scale(0.95);
@@ -591,7 +596,7 @@
 </head>
 <body>
     <!-- Navigation from testing.html -->
-    <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
+    <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
                 <img src="images/LaoTypo-logo-04.png" alt="LaoTypo!" class="h-8 md:h-10 w-auto object-contain">
@@ -920,7 +925,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.2</p>
+            <p>📦 Version 2.8.3</p>
         <p>Status: Live</p>
                 </div>
             </div>
