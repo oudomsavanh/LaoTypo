@@ -2041,6 +2041,7 @@
                 correctAnswers++;
                 currentStreak++;
                 levelProgress++;
+                console.log('[PROGRESS] levelProgress incremented:', levelProgress, 'currentLevel:', currentLevel, 'threshold:', levelThresholds[currentLevel]);
                 levelScores[levelNames[currentLevel].toLowerCase()]++;
                 selectedCard.classList.add('feedback-correct');
                 playSound('correct');
@@ -2055,6 +2056,7 @@
                     totalWordsCompleted += levelThresholds[currentLevel];
                     
                     // Track streak history
+                    console.log('[LEVEL] Threshold met at level', currentLevel, 'levelProgress:', levelProgress, 'threshold:', levelThresholds[currentLevel]);
                     streakHistory.push(currentStreak);
                     
                     // Track level completion
@@ -2074,6 +2076,7 @@
                     }
                     
                     // Show level transition modal
+                    console.log('[MODAL] Opening level transition modal. currentLevel:', currentLevel, 'levelProgress:', levelProgress);
                     showLevelTransitionModal();
                 }
                 
@@ -3187,6 +3190,7 @@
 
         // Level Transition Modal Functions
         function showLevelTransitionModal() {
+            console.log('[MODAL] showLevelTransitionModal called. currentLevel:', currentLevel, 'levelProgress:', levelProgress);
             const modal = document.getElementById('level-transition-modal');
             const levelMessage = document.getElementById('level-message');
             const levelQuestion = document.getElementById('level-question');
@@ -3346,6 +3350,7 @@
                             const previousLevel = currentLevel;
                             levelsCompleted++;
                             currentLevel++;
+                            console.log('[LEVEL] Continue clicked. Advancing', previousLevel, '->', currentLevel);
                             levelProgress = 0;
                             currentWordIndex = 0; // Reset word index for new level
                             
@@ -3406,6 +3411,7 @@
                         playerLives = 3;
                         levelProgress = 0;
                         currentWordIndex = 0; // Reset word index for replay
+                        console.log('[REPLAY] Reset current level', currentLevel, 'progress=0, lives reset');
                         
                         // Track replay
                         trackReplay(currentLevel);
