@@ -191,7 +191,7 @@
             background-clip: text;
         }
         
-        /* Panel styles (copied from testing.html) */
+        /* Panel styles (copied from game.html) */
         .account-panel, .settings-panel, .leaderboard-panel {
             position: fixed;
             top: 15%;
@@ -253,7 +253,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation (from testing.html) -->
+    <!-- Navigation (from game.html) -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -313,7 +313,7 @@
 
         <!-- Action Button -->
         <div class="mt-12 text-center">
-            <a href="testing.html" class="btn btn-primary text-lg px-8 py-3">
+            <a href="game.html" class="btn btn-primary text-lg px-8 py-3">
                 🎮 ເລີ່ມເກມ
             </a>
         </div>
@@ -376,11 +376,11 @@
         // Navigation functionality
         document.getElementById('home-btn').addEventListener('click', (e) => {
             e.preventDefault();
-            window.location.href = 'testing.html';
+            window.location.href = 'game.html';
         });
 
         document.getElementById('home-nav-btn').addEventListener('click', () => {
-            window.location.href = 'testing.html';
+            window.location.href = 'game.html';
         });
 
         // Panel controls

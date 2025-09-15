@@ -5,7 +5,7 @@ const OFFLINE_URL = '/gameplay.html';
 // Files to cache for offline use (same-origin only for security)
 const CACHE_FILES = [
     '/',
-    '/testing.html',
+    '/game.html',
     '/gameplay.html',
     '/gameplay_v2.html',
     '/testing_v2.html',
@@ -210,7 +210,7 @@ self.addEventListener('notificationclick', (event) => {
     
     if (event.action === 'explore') {
         event.waitUntil(
-            clients.openWindow('/testing.html')
+            clients.openWindow('/game.html')
         );
     }
 });
