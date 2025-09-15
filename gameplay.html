@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer paused on modal; no heart loss during modal; resume on continue/replay -->
+    <!-- Cache Busting Headers v2.9.1 - Motivational modal guarded; no double-advance; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -921,7 +921,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.9.0</p>
+            <p>📦 Version 2.9.1</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -3320,18 +3320,32 @@
             
             // Close button handler
             const closeBtn = document.getElementById('close-motivational-btn');
-            const closeModal = () => {
-                console.log('Closing motivational modal...');
+            const modalLevel = currentLevel; // snapshot level when opened
+            let autoClosed = false;
+            let autoCloseTimeoutId;
+            const closeModal = (advance = true) => {
+                console.log('Closing motivational modal... advance:', advance, 'modalLevel:', modalLevel, 'currentLevel:', currentLevel);
                 if (document.body.contains(motivationalModal)) {
                     document.body.removeChild(motivationalModal);
                 }
-                callback();
+                if (autoCloseTimeoutId) {
+                    clearTimeout(autoCloseTimeoutId);
+                    autoCloseTimeoutId = null;
+                }
+                // Only advance if still on the same level we opened on
+                if (advance && currentLevel === modalLevel) {
+                    callback();
+                }
             };
             
-            closeBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', () => closeModal(true));
             
             // Auto-close after 10 seconds
-            setTimeout(closeModal, 10000);
+            autoCloseTimeoutId = setTimeout(() => {
+                autoClosed = true;
+                // Auto-close should not chain-advance if the player already progressed
+                closeModal(true);
+            }, 10000);
         }
 
         function setupLevelTransitionHandlers() {
