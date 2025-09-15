@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.8.9 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
+    <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer paused on modal; no heart loss during modal; resume on continue/replay -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -921,7 +921,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-            <p>📦 Version 2.8.9</p>
+            <p>📦 Version 2.9.0</p>
         <p>Status: Live</p>
                 </div>
             </div>
@@ -1561,6 +1561,7 @@
         let playerName = '';
         let selectedDifficulty = 'easy';
         let isKeyboardEnabled = true;
+        let isLevelModalOpen = false; // Freeze gameplay during level completion modal
         let gameActive = false;
         let synth = null;
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
@@ -2169,6 +2170,7 @@
         }
 
         function loseLife() {
+            if (isLevelModalOpen) return; // Prevent life loss during level modal
             if (playerLives > 0) {
                 playerLives--;
                 
@@ -2230,7 +2232,10 @@
                 
                 if (progress <= 0) {
                     timerBar.style.transform = 'scaleX(0)';
-                    // If a level modal is open (gameActive=false), don't penalize
+                    // If a level modal is open, do nothing
+                    if (isLevelModalOpen) {
+                        return;
+                    }
                     if (gameActive) {
                         gameActive = false;
                         playSound('timeout');
@@ -3190,6 +3195,7 @@
             const replayBtn = document.getElementById('replay-current-level');
             
             // Pause the game and stop timer
+            isLevelModalOpen = true;
             gameActive = false;
             cancelAnimationFrame(currentTimeout);
             console.log('Timer stopped in showLevelTransitionModal, currentTimeout:', currentTimeout);
@@ -3217,9 +3223,9 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບກາງ
                 `;
-                // Set non-hard button widths to min-w-[190px]
+                // Set non-hard button widths: Continue min-w, Replay fixed w
                 continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px]';
                 const playAgainBtn = document.getElementById('play-again-btn');
                 if (playAgainBtn) {
                     playAgainBtn.classList.add('hidden');
@@ -3235,9 +3241,9 @@
                     </svg>
                     ໄປຕໍ່ ລະດັບຍາກ
                 `;
-                // Set non-hard button widths to min-w-[190px]
+                // Set non-hard button widths: Continue min-w, Replay fixed w
                 continueBtn.className = 'bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
-                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 min-w-[190px]';
+                replayBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-bold transition duration-300 flex items-center justify-center gap-2 w-[190px]';
                 const playAgainBtn = document.getElementById('play-again-btn');
                 if (playAgainBtn) {
                     playAgainBtn.classList.add('hidden');
@@ -3365,6 +3371,7 @@
                             
                             // Resume game with new level
                             setTimeout(() => {
+                                isLevelModalOpen = false;
                                 showNewWords();
                             }, 500);
                         });
@@ -3422,6 +3429,7 @@
                         
                         // Resume game at same level
                         setTimeout(() => {
+                            isLevelModalOpen = false;
                             showNewWords();
                         }, 500);
                     }
