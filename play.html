@@ -2015,7 +2015,7 @@
             gameActive = true;
             
             // Resume background music if it was paused during level transition
-            if (musicEnabled && backgroundMusic.paused && !resultSound.loop) {
+            if (musicEnabled && backgroundMusic.paused) {
                 backgroundMusic.play().catch(() => {});
                 console.log('Background music resumed in showNewWords()');
             }
