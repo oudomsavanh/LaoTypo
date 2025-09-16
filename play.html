@@ -1606,7 +1606,11 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content loaded from Firestore
+        // Game content data source (Google Sheets CSV)
+        // Replace with your own Google Sheet CSV export URL if needed
+        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+
+        // Game content loaded from Google Sheets
         
         // DOM elements
         const gameScreen = document.getElementById('game-screen');
