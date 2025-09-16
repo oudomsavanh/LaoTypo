@@ -34,6 +34,7 @@
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
     <script src="firestore-game-data.js"></script>
+    <script src="server-validation.js"></script>
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
@@ -1661,6 +1662,9 @@
         async function initializeGame() {
             loadGameSettings();
             
+            // Initialize server validation
+            await ServerValidation.initialize();
+            
             // Set initial currentLevel based on selectedDifficulty
             switch(selectedDifficulty) {
                 case 'easy': currentLevel = 0; break;
@@ -1689,6 +1693,9 @@
             }
             
             showNewWords();
+            
+            // Start server validation tracking
+            ServerValidation.startGame(wordPairs);
             
             // Start enhanced tracking
             trackSessionStart();
@@ -2031,6 +2038,14 @@
                 
                 const isCorrect = selectedWord === currentWordPair.correct;
             
+            // Record answer for server validation
+            ServerValidation.recordAnswer(
+                currentWordIndex - 1, // word index
+                selectedWord, // user answer
+                isCorrect, // is correct
+                wordStartTime ? Date.now() - wordStartTime : 0 // time spent
+            );
+            
             // Track answer pattern
             answerHistory.push({
                 correct: isCorrect,
@@ -2293,6 +2308,34 @@
             }
         }
 
+        // Submit game for server validation
+        async function submitGameForValidation() {
+            try {
+                const gameData = {
+                    finalScore: totalScore,
+                    accuracy: totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0,
+                    totalWords: totalAnswers,
+                    correctAnswers: correctAnswers,
+                    wrongAnswers: totalAnswers - correctAnswers,
+                    streak: bestStreak,
+                    levelsCompleted: levelsCompleted,
+                    difficulty: levelNames[currentLevel],
+                    playerName: playerName || 'Anonymous'
+                };
+
+                const result = await ServerValidation.submitGame(gameData);
+                
+                if (result.success) {
+                    console.log('✅ Game validated and saved to server');
+                    console.log('🏆 Server-validated score:', result.validatedScore);
+                } else {
+                    console.warn('⚠️ Server validation failed, using local score');
+                }
+            } catch (error) {
+                console.error('❌ Error submitting game for validation:', error);
+            }
+        }
+
         // End game (general purpose)
         function endGame() {
             gameActive = false;
@@ -2303,6 +2346,9 @@
             backgroundMusic.pause();
             backgroundMusic.currentTime = 0;
             console.log('All sounds stopped in endGame()');
+            
+            // Submit game for server validation
+            submitGameForValidation();
             
             // Calculate final percentage score for display
             const accuracy = totalAnswers > 0 ? ((correctAnswers / totalAnswers) * 100) : 0;
