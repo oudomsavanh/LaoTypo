@@ -1604,8 +1604,8 @@
 
         // --- AUDIO SYSTEM v2.2.0 ---
         // Initialize sound settings from localStorage
-        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled' ?? 'true');
-        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled' ?? 'true');
+        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled', true);
+        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled', true);
         let userHasInteracted = false;
         
         // Audio objects
@@ -2319,9 +2319,9 @@
             const params = new URLSearchParams({
                 player: encodeURIComponent(displayName),
                 difficulty: settings.difficulty,
-                timer: settings.timer.toString(),
-                sound: soundEnabled.toString(),
-                music: musicEnabled.toString()
+                timer: String(settings.timer),
+                sound: String(!!soundEnabled),
+                music: String(!!musicEnabled)
             });
             
             const gameURL = `play.html?${params.toString()}`;
