@@ -51,10 +51,14 @@
     "rewrites": [
       {
         "source": "/game",
+        "destination": "/game.html"
+      },
+      {
+        "source": "/play",
         "destination": "/play.html"
       },
       {
-        "source": "/game/**",
+        "source": "/play/**",
         "destination": "/play.html"
       },
       {
