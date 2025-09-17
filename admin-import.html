@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Import – gameWords</title>
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; background:#0b0b0c; color:#e7e7ea; margin:0; padding:24px; }
+        .card { max-width: 860px; margin: 0 auto; background:#161617; border:1px solid #2a2a2c; border-radius:16px; padding:24px; }
+        h1 { margin:0 0 12px 0; font-size:22px; }
+        .muted { color:#a7a7ad; font-size:14px; }
+        .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+        button { background:#2c6bed; color:#fff; border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600; }
+        button[disabled] { opacity:.5; cursor:not-allowed; }
+        input[type=file] { background:#0f0f10; border:1px solid #2a2a2c; padding:10px; border-radius:10px; color:#e7e7ea; }
+        .ok { color:#6ee7a2; }
+        .warn { color:#f7b955; }
+        .err { color:#ff7a7a; }
+        .log { white-space:pre-wrap; background:#0f0f10; border:1px solid #2a2a2c; padding:12px; border-radius:10px; max-height: 320px; overflow:auto; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size:12px; }
+        .badge { display:inline-block; padding:2px 8px; border:1px solid #2a2a2c; border-radius:999px; font-size:12px; }
+        .divider { height:1px; background:#2a2a2c; margin:16px 0; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Admin Import – gameWords</h1>
+    <p class="muted">Sign in with your admin Google account, select the JSON file (e.g. <code>firebase-manual-import.json</code>), then import. No billing or service account keys required.</p>
+
+    <div class="row">
+        <button id="signin">Sign in with Google</button>
+        <span id="user" class="badge">Not signed in</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+        <input id="file" type="file" accept="application/json" />
+        <button id="import" disabled>Import to gameWords</button>
+        <span id="status" class="muted"></span>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="log" id="log"></div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
+
+// Use existing config (phase1)
+const firebaseConfig = {
+  apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
+  authDomain: "laotypo-phase1.firebaseapp.com",
+  projectId: "laotypo-phase1",
+  storageBucket: "laotypo-phase1.firebasestorage.app",
+  messagingSenderId: "359413130623",
+  appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
+  measurementId: "G-7CH5217ZYG"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const ADMIN_EMAIL = 'crews@laotypo.com'; // adjust if needed
+
+const els = {
+  signin: document.getElementById('signin'),
+  user: document.getElementById('user'),
+  file: document.getElementById('file'),
+  importBtn: document.getElementById('import'),
+  status: document.getElementById('status'),
+  log: document.getElementById('log')
+};
+
+function log(msg, cls) {
+  const el = document.createElement('div');
+  if (cls) el.className = cls;
+  el.textContent = msg;
+  els.log.appendChild(el);
+  els.log.scrollTop = els.log.scrollHeight;
+}
+
+// Auth
+els.signin.addEventListener('click', async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    const res = await signInWithPopup(auth, provider);
+    log(`Signed in: ${res.user.email}`, 'ok');
+  } catch (e) {
+    log(`Sign-in failed: ${e.message}`, 'err');
+  }
+});
+
+let canWrite = false;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    els.user.textContent = user.email || user.uid;
+    canWrite = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    els.importBtn.disabled = !canWrite;
+    els.user.className = 'badge ' + (canWrite ? 'ok' : 'warn');
+    if (!canWrite) {
+      log('Signed in, but not authorized to import. Use the admin email.', 'warn');
+    }
+  } else {
+    els.user.textContent = 'Not signed in';
+    els.user.className = 'badge';
+    els.importBtn.disabled = true;
+  }
+});
+
+// Import handler
+els.importBtn.addEventListener('click', async () => {
+  if (!canWrite) return;
+  const file = els.file.files && els.file.files[0];
+  if (!file) { log('Please choose a JSON file first.', 'warn'); return; }
+
+  try {
+    els.importBtn.disabled = true;
+    els.status.textContent = 'Importing...';
+    els.log.textContent = '';
+
+    const text = await file.text();
+    /** @type {Record<string, any>} */
+    const json = JSON.parse(text);
+    const entries = Object.entries(json);
+    if (entries.length === 0) { throw new Error('Empty JSON'); }
+
+    const BATCH_LIMIT = 400;
+    let batch = writeBatch(db);
+    let ops = 0, written = 0;
+    const now = new Date();
+
+    for (const [docId, doc] of entries) {
+      const difficultyNum = typeof doc.difficulty === 'number' ? doc.difficulty : parseInt(String(doc.difficulty ?? '1'), 10);
+      const normalized = {
+        context: String(doc.context || '').trim(),
+        correct: String(doc.correct || '').trim(),
+        incorrect: String((doc.incorrect ?? doc.wrong ?? '')).trim(),
+        difficulty: Number.isFinite(difficultyNum) && [1,2,3].includes(difficultyNum) ? difficultyNum : 1,
+        order: typeof doc.order === 'number' ? doc.order : null,
+        createdAt: now,
+        updatedAt: now
+      };
+      if (!normalized.context || !normalized.correct || !normalized.incorrect) {
+        log(`Skip ${docId}: missing required fields`, 'warn');
+        continue;
+      }
+      batch.set(doc(db, 'gameWords', docId), normalized, { merge: true });
+      ops++; written++;
+      if (ops >= BATCH_LIMIT) {
+        await batch.commit();
+        log(`Committed ${written} so far...`, 'ok');
+        batch = writeBatch(db);
+        ops = 0;
+      }
+    }
+    if (ops > 0) await batch.commit();
+    log(`Import complete: ${written} documents.`, 'ok');
+    els.status.textContent = 'Done';
+  } catch (e) {
+    log(`Import failed: ${e.message}`, 'err');
+    els.status.textContent = 'Failed';
+  } finally {
+    els.importBtn.disabled = !canWrite;
+  }
+});
+</script>
+</body>
+</html>
+
