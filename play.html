@@ -1606,10 +1606,9 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content data source (Private Google Sheets)
-        // Replace with your own Google Sheet ID and API key
-        const GOOGLE_SHEET_ID = 'YOUR_PRIVATE_SHEET_ID_HERE';
-        const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
+        // Game content data source (Secure Proxy Server)
+        // Replace with your secure proxy server URL
+        const SECURE_PROXY_URL = 'https://your-secure-proxy.com/api/words';
 
         // Game content loaded from Google Sheets
         
@@ -1794,42 +1793,40 @@
         // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ secure server...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Check if configuration is set
-                if (GOOGLE_SHEET_ID === 'YOUR_PRIVATE_SHEET_ID_HERE' || GOOGLE_API_KEY === 'YOUR_GOOGLE_API_KEY_HERE') {
-                    throw new Error('Please configure your Google Sheet ID and API key in the game code');
+                // Check if proxy URL is configured
+                if (SECURE_PROXY_URL === 'https://your-secure-proxy.com/api/words') {
+                    throw new Error('Please configure your secure proxy server URL');
                 }
 
-                // Load words from private Google Sheets using API
-                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1!A:D?key=${GOOGLE_API_KEY}`);
+                // Load words from secure proxy server (API key is hidden)
+                const response = await fetch(SECURE_PROXY_URL);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                const rows = data.values || [];
                 
-                if (rows.length < 2) {
-                    throw new Error('No data found in Google Sheets');
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load from secure server');
                 }
 
                 // Convert to wordPairs structure expected by the game
-                wordPairs = rows.slice(1).map((row, index) => ({
-                    context: row[0] || '',
-                    correct: row[1] || '',
-                    incorrect: row[2] || '',
-                    difficulty: parseInt(row[3]) || 1,
-                    order: index + 1
+                wordPairs = data.words.map(w => ({
+                    context: w.context,
+                    correct: w.correct,
+                    incorrect: w.incorrect || '',
+                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No valid words found in Google Sheets');
+                    throw new Error('No valid words found');
                 }
 
-                console.log('Loaded words from private Google Sheets:', wordPairs.length);
+                console.log('Loaded words from secure server:', wordPairs.length);
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
@@ -1848,7 +1845,7 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from Google Sheets:', error);
+                console.error('Error loading game content from secure server:', error);
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
@@ -1856,9 +1853,9 @@
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
 
-                // No fallback - game requires Google Sheets data
+                // No fallback - game requires secure server data
                 wordPairs = [];
-                console.log('No words loaded - Google Sheets connection required');
+                console.log('No words loaded - secure server connection required');
             }
         }
 
