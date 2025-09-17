@@ -50,6 +50,14 @@
     ],
     "rewrites": [
       {
+        "source": "/game",
+        "destination": "/play.html"
+      },
+      {
+        "source": "/game/**",
+        "destination": "/play.html"
+      },
+      {
         "source": "**",
         "destination": "/game.html"
       }
