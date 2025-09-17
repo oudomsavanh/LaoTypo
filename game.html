@@ -2324,7 +2324,7 @@
                 music: String(!!musicEnabled)
             });
             
-            const gameURL = `play.html?${params.toString()}`;
+            const gameURL = `/play?${params.toString()}`;
             console.log('🔗 Navigating to:', gameURL);
             
             window.location.href = gameURL;
