@@ -1819,6 +1819,10 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
+        // Game content data source (Google Sheets CSV)
+        // Replace with your own Google Sheet CSV export URL if needed
+        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        
         // Game content loaded from Firestore
         
         // DOM elements
@@ -2113,18 +2117,50 @@
         // Get default words as fallback
         function getDefaultWords() {
             return [
+                // Easy words (difficulty: 1)
                 { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', incorrect: 'ສະບາຍດີີ', difficulty: 1 },
                 { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບຈັຍ', difficulty: 1 },
                 { context: 'ລາວ', correct: 'ລາວ', incorrect: 'ລາຍ', difficulty: 1 },
-                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌", difficulty: 1 },
-                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ", difficulty: 1 },
-                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ", difficulty: 1 },
+                { context: 'ສວຍງາມ', correct: 'ສວຍງາມ', incorrect: 'ສວຍງາມມ', difficulty: 1 },
+                { context: 'ດີ', correct: 'ດີ', incorrect: 'ດີີ', difficulty: 1 },
+                { context: 'ບໍ່ດີ', correct: 'ບໍ່ດີ', incorrect: 'ບໍດີ', difficulty: 1 },
+                { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບຈັຍ', difficulty: 1 },
+                { context: 'ຂໍອະໄພ', correct: 'ຂໍອະໄພ', incorrect: 'ຂໍອະໄພພ', difficulty: 1 },
+                { context: 'ຍິນດີ', correct: 'ຍິນດີ', incorrect: 'ຍິນດີີ', difficulty: 1 },
+                { context: 'ຄອບຄົວ', correct: 'ຄອບຄົວ', incorrect: 'ຄອບຄົວວ', difficulty: 1 },
+                { context: 'ເຮືອນ', correct: 'ເຮືອນ', incorrect: 'ເຮືອນນ', difficulty: 1 },
+                { context: 'ອາຫານ', correct: 'ອາຫານ', incorrect: 'ອາຫານນ', difficulty: 1 },
+                { context: 'ນ້ຳ', correct: 'ນ້ຳ', incorrect: 'ນຳ', difficulty: 1 },
+                { context: 'ອາກາດ', correct: 'ອາກາດ', incorrect: 'ອາກາດດ', difficulty: 1 },
+                { context: 'ດອກໄມ້', correct: 'ດອກໄມ້', incorrect: 'ດອກໄມ້້', difficulty: 1 },
+                
+                // Medium words (difficulty: 2)
+                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌", difficulty: 2 },
+                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ", difficulty: 2 },
+                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ", difficulty: 2 },
                 { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', incorrect: 'ພາສາລາຍ', difficulty: 2 },
                 { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', incorrect: 'ໂຮງຮິຽນ', difficulty: 2 },
                 { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', incorrect: 'ປະເທດລາຍ', difficulty: 2 },
+                { context: 'ວັດທະນະທຳ', correct: 'ວັດທະນະທຳ', incorrect: 'ວັດທະນະທຳຳ', difficulty: 2 },
+                { context: 'ປະຫວັດສາດ', correct: 'ປະຫວັດສາດ', incorrect: 'ປະຫວັດສາດດ', difficulty: 2 },
+                { context: 'ການສຶກສາ', correct: 'ການສຶກສາ', incorrect: 'ການສຶກສາະ', difficulty: 2 },
+                { context: 'ການແພດ', correct: 'ການແພດ', incorrect: 'ການແພດດ', difficulty: 2 },
+                { context: 'ການທ່ອງທ່ຽວ', correct: 'ການທ່ອງທ່ຽວ', incorrect: 'ການທ່ອງທ່ຽວວ', difficulty: 2 },
+                { context: 'ການຄ້າ', correct: 'ການຄ້າ', incorrect: 'ການຄ້າະ', difficulty: 2 },
+                { context: 'ການກະສິກຳ', correct: 'ການກະສິກຳ', incorrect: 'ການກະສິກຳຳ', difficulty: 2 },
+                { context: 'ການອຸດສາຫະກຳ', correct: 'ການອຸດສາຫະກຳ', incorrect: 'ການອຸດສາຫະກຳຳ', difficulty: 2 },
+                
+                // Hard words (difficulty: 3)
                 { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', incorrect: 'ຄອມພິຍເຕີ', difficulty: 3 },
                 { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', incorrect: 'ວິທະຍາສາຍ', difficulty: 3 },
-                { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
+                { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 },
+                { context: 'ການພັດທະນາ', correct: 'ການພັດທະນາ', incorrect: 'ການພັດທະນາະ', difficulty: 3 },
+                { context: 'ການວິໄຈ', correct: 'ການວິໄຈ', incorrect: 'ການວິໄຈຈ', difficulty: 3 },
+                { context: 'ການປະດິດສ້າງ', correct: 'ການປະດິດສ້າງ', incorrect: 'ການປະດິດສ້າງງ', difficulty: 3 },
+                { context: 'ການປະຕິບັດ', correct: 'ການປະຕິບັດ', incorrect: 'ການປະຕິບັດດ', difficulty: 3 },
+                { context: 'ການປະສົບຜົນສຳເລັດ', correct: 'ການປະສົບຜົນສຳເລັດ', incorrect: 'ການປະສົບຜົນສຳເລັດດ', difficulty: 3 },
+                { context: 'ການປະສົມປະສານ', correct: 'ການປະສົມປະສານ', incorrect: 'ການປະສົມປະສານນ', difficulty: 3 },
+                { context: 'ການປະຕິບັດຕາມ', correct: 'ການປະຕິບັດຕາມ', incorrect: 'ການປະຕິບັດຕາມມ', difficulty: 3 }
             ];
         }
 
