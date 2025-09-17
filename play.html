@@ -1606,9 +1606,9 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content data source (Google Sheets CSV)
-        // Replace with your own Google Sheet CSV export URL if needed
-        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        // Game content data source (Google Sheets via Apps Script)
+        // Replace with your own Google Apps Script web app URL
+        const GOOGLE_SHEETS_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
 
         // Game content loaded from Google Sheets
         
@@ -1793,25 +1793,35 @@
         // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'Loading game content...';
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Load up to 500 words from Firestore
-                const words = await GameDataManager.loadWords(500);
+                // Load words from Google Sheets via Apps Script
+                const response = await fetch(GOOGLE_SHEETS_API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load from Google Sheets');
+                }
 
-                // Normalize to wordPairs structure expected by the game
-                wordPairs = words.map(w => ({
+                // Convert to wordPairs structure expected by the game
+                wordPairs = data.words.map(w => ({
                     context: w.context,
                     correct: w.correct,
-                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    incorrect: w.incorrect || '',
                     difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No words found in Firestore');
+                    throw new Error('No words found in Google Sheets');
                 }
 
-                console.log('Loaded words from Firestore:', wordPairs.length);
+                console.log('Loaded words from Google Sheets:', wordPairs.length);
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
@@ -1830,7 +1840,7 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from Firestore:', error);
+                console.error('Error loading game content from Google Sheets:', error);
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
@@ -1838,19 +1848,9 @@
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
 
-                // No fallback - game requires Firebase data
+                // No fallback - game requires Google Sheets data
                 wordPairs = [];
-                console.log('No words loaded - Firebase connection required');
-
-                // Don't hide loading status - keep showing error
-                // setTimeout(() => {
-                //     wordLoadingStatus.style.display = 'none';
-                // }, 3000);
-
-                // Don't initialize empty word arrays
-                // shuffledWordsByDifficulty[1] = [];
-                // shuffledWordsByDifficulty[2] = [];
-                // shuffledWordsByDifficulty[3] = [];
+                console.log('No words loaded - Google Sheets connection required');
             }
         }
 
