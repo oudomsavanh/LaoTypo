@@ -1606,9 +1606,10 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content data source (Google Sheets via Apps Script)
-        // Replace with your own Google Apps Script web app URL
-        const GOOGLE_SHEETS_API_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        // Game content data source (Private Google Sheets)
+        // Replace with your own Google Sheet ID and API key
+        const GOOGLE_SHEET_ID = 'YOUR_PRIVATE_SHEET_ID_HERE';
+        const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
 
         // Game content loaded from Google Sheets
         
@@ -1796,32 +1797,39 @@
                 wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Load words from Google Sheets via Apps Script
-                const response = await fetch(GOOGLE_SHEETS_API_URL);
+                // Check if configuration is set
+                if (GOOGLE_SHEET_ID === 'YOUR_PRIVATE_SHEET_ID_HERE' || GOOGLE_API_KEY === 'YOUR_GOOGLE_API_KEY_HERE') {
+                    throw new Error('Please configure your Google Sheet ID and API key in the game code');
+                }
+
+                // Load words from private Google Sheets using API
+                const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1!A:D?key=${GOOGLE_API_KEY}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
+                const rows = data.values || [];
                 
-                if (!data.success) {
-                    throw new Error(data.error || 'Failed to load from Google Sheets');
+                if (rows.length < 2) {
+                    throw new Error('No data found in Google Sheets');
                 }
 
                 // Convert to wordPairs structure expected by the game
-                wordPairs = data.words.map(w => ({
-                    context: w.context,
-                    correct: w.correct,
-                    incorrect: w.incorrect || '',
-                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
+                wordPairs = rows.slice(1).map((row, index) => ({
+                    context: row[0] || '',
+                    correct: row[1] || '',
+                    incorrect: row[2] || '',
+                    difficulty: parseInt(row[3]) || 1,
+                    order: index + 1
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No words found in Google Sheets');
+                    throw new Error('No valid words found in Google Sheets');
                 }
 
-                console.log('Loaded words from Google Sheets:', wordPairs.length);
+                console.log('Loaded words from private Google Sheets:', wordPairs.length);
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';

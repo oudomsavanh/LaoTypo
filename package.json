@@ -1,0 +1,21 @@
+{
+  "name": "laotypo-private-sheets-proxy",
+  "version": "1.0.0",
+  "description": "Private Google Sheets proxy for LaoTypo game",
+  "main": "private-sheets-proxy.js",
+  "scripts": {
+    "start": "node private-sheets-proxy.js",
+    "dev": "nodemon private-sheets-proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["google-sheets", "private", "proxy", "laotypo"],
+  "author": "LaoTypo Team",
+  "license": "MIT"
+}
