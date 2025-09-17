@@ -54,6 +54,10 @@
         "destination": "/game.html"
       },
       {
+        "source": "/admin-import",
+        "destination": "/admin-import.html"
+      },
+      {
         "source": "/play",
         "destination": "/play.html"
       },
