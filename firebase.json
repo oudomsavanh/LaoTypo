@@ -1,0 +1,81 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "README.md",
+      "GA4_SETUP_GUIDE.md"
+    ],
+        "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "no-referrer"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=()"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+                "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com https://docs.google.com https://docs.gstatic.com https://api.allorigins.win https://cors-anywhere.herokuapp.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/game",
+        "destination": "/game.html"
+      },
+      {
+        "source": "/admin-import",
+        "destination": "/admin-import.html"
+      },
+      {
+        "source": "/play",
+        "destination": "/play.html"
+      },
+      {
+        "source": "/play/**",
+        "destination": "/play.html"
+      },
+      {
+        "source": "**",
+        "destination": "/game.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  }
+}

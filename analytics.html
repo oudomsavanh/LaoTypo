@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <title>📊 Analytics Dashboard - LaoTypo</title>
     
     <!-- PWA Meta Tags -->
@@ -121,15 +122,15 @@
     <nav class="bg-gray-900 border-b border-gray-700 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <a href="gameplay.html" class="text-2xl font-bold" style="color: var(--main-color);">
+                <a href="/play" class="text-2xl font-bold" style="color: var(--main-color);">
                     🎮 LaoTypo
                 </a>
                 <span class="text-sm" style="color: var(--sub-color);">Analytics Dashboard</span>
             </div>
             <div class="flex space-x-4">
-                <a href="gameplay.html" class="nav-link">🎮 Game</a>
+                <a href="/play" class="nav-link">🎮 Game</a>
                 <a href="leaderboard.html" class="nav-link">🏆 Leaderboard</a>
-                <a href="testing.html" class="nav-link">⚙️ Settings</a>
+                <a href="/game" class="nav-link">⚙️ Settings</a>
             </div>
         </div>
     </nav>

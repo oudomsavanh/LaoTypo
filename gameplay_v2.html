@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.9.0 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <!-- Cache Busting Headers v1.9.2 - Non-hard buttons 190px; timer pause on modal; no heart loss on modal; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -32,6 +33,7 @@
     
     <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
@@ -824,7 +826,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation from testing.html -->
+    <!-- Navigation from game.html -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -863,7 +865,7 @@
             <div id="game-screen" class="screen active">
                 <!-- Word Loading Status -->
                 <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
-                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
+                    Loading game content...
                 </div>
                 
                 <!-- Retry Button (hidden by default) -->
@@ -922,7 +924,7 @@
                     <div id="timer-bar" class="timer-bar"></div>
                 </div>
                 
-                <!-- Context display area for showing word from Google Sheets Column A -->
+                <!-- Context display area for showing word from game data Column A -->
                 <div class="mb-4 sm:mb-6 text-center">
                     <h3 class="text-lg sm:text-xl text-sub-color mb-2">ເລຶອກຄຳສັບທີ່ຖືກຕ້ອງໃສ່ບ່ອນວ່າງ:</h3>
                     <div id="context-display" class="context-display-custom text-text-color bg-[#3e4043] rounded-lg py-3 sm:py-4 px-4 sm:px-6 min-h-[80px] sm:min-h-[100px] flex items-center justify-center text-base sm:text-2xl"></div>
@@ -1144,7 +1146,6 @@
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
         <p>📦 Version 2.9.0</p>
         <p>Status: Live</p>
-        <p>🚀 PWA Ready</p>
         <p>✨ Modern UI/UX</p>
                 </div>
             </div>
@@ -1304,7 +1305,7 @@
             dashboard.className = 'fixed top-20 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm';
             dashboard.style.display = 'none';
             
-            dashboard.innerHTML = `
+            SecurityUtils.safeSetHTML(dashboard, `
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold">📊 Live Analytics</h3>
                     <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
@@ -1339,7 +1340,7 @@
                         <span id="connection-status">${navigator.onLine ? 'Yes' : 'No'}</span>
                     </div>
                 </div>
-            `;
+            `);
             
             document.body.appendChild(dashboard);
             
@@ -1500,11 +1501,15 @@
         }
         
         function trackGameStart() {
+            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            if (!localStorage.getItem('anonymousId')) {
+                localStorage.setItem('anonymousId', anonymousId);
+            }
             const deviceInfo = getDeviceInfo();
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
                 level: currentLevel + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
             
             // Track device information separately
@@ -1514,7 +1519,7 @@
                 screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
                 viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
                 user_agent: deviceInfo.userAgent,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1525,7 +1530,7 @@
                 final_score: score,
                 accuracy: accuracy,
                 words_completed: levelProgress,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1535,7 +1540,7 @@
                 accuracy: accuracy,
                 total_words: totalWords,
                 levels_completed: levelsCompleted,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1543,7 +1548,7 @@
             trackGameEvent('game_replay', {
                 level_name: levelNames[level],
                 level_number: level + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1552,7 +1557,7 @@
                 correct: isCorrect,
                 difficulty: levelNames[difficulty],
                 current_streak: currentStreak,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1560,7 +1565,7 @@
             trackGameEvent('life_lost', {
                 remaining_lives: remainingLives,
                 current_streak: currentStreak,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1570,7 +1575,7 @@
                 to_level: levelNames[toLevel],
                 from_level_number: fromLevel + 1,
                 to_level_number: toLevel + 1,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1596,7 +1601,7 @@
                 utm_campaign: getUrlParameter('utm_campaign') || 'unknown',
                 page_title: document.title,
                 page_url: window.location.href,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1625,7 +1630,7 @@
                 best_streak: bestStreak,
                 lives_remaining: playerLives,
                 levels_completed: levelsCompleted,
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1642,7 +1647,7 @@
                 total_words_played: totalPlayed,
                 preferred_difficulty: getPreferredDifficulty(),
                 current_difficulty: levelNames[currentLevel],
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1765,7 +1770,7 @@
                 current_level: levelNames[currentLevel],
                 user_action: lastUserAction,
                 timestamp: Date.now(),
-                player_name: playerName || 'anonymous'
+                user_id: localStorage.getItem('anonymousId') || 'user_' + Date.now()
             });
         }
         
@@ -1786,8 +1791,8 @@
         let isKeyboardEnabled = true;
         let gameActive = false;
         let synth = null;
-        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
-        let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
+        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled' ?? 'true');
+        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled' ?? 'true');
         let userHasInteracted = false;
         
         // Audio objects
@@ -1814,8 +1819,7 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Google Sheets CSV URL (same as original gameplay.html)
-        const GOOGLE_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        // Game content loaded from Firestore
         
         // DOM elements
         const gameScreen = document.getElementById('game-screen');
@@ -1842,13 +1846,13 @@
         const motivationText = document.getElementById('motivation-text');
         const totalWordsCompletedEl = document.getElementById('total-words-completed');
 
-        // Test Google Sheets connection (for debugging)
-        async function testGoogleSheetsConnection() {
-            console.log("Testing Google Sheets connection...");
-            console.log("URL:", GOOGLE_SHEETS_URL);
+        // Test game data connection (for debugging)
+        async function testFirestoreConnection() {
+            console.log("Testing game data connection...");
+            console.log("URL:", GAME_DATA_URL);
             
             try {
-                const response = await fetch(GOOGLE_SHEETS_URL);
+                const response = await fetch(GAME_DATA_URL);
                 console.log("Response status:", response.status);
                 console.log("Response headers:", [...response.headers.entries()]);
                 
@@ -1883,7 +1887,7 @@
             updateDifficultyDisplay();
             
             updateUI();
-            await loadWordsFromGoogleSheets();
+            await loadGameContent();
             setupEventListeners();
             setupNavigationHandlers();
             initializeSounds();
@@ -1962,13 +1966,13 @@
             difficultyDisplay.style.color = levelColors[currentLevel];
         }
 
-        // Load words from Google Sheets CSV
-        async function loadWordsFromGoogleSheets() {
+        // Load words from game data CSV
+        async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ game data...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
                 
-                console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
+                console.log("Attempting to fetch from:", GAME_DATA_URL);
                 
                 // Try multiple approaches to fetch the data
                 let response;
@@ -1976,7 +1980,7 @@
                 
                 // Method 1: Try CORS proxy (allorigins.win)
                 try {
-                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GOOGLE_SHEETS_URL)}`;
+                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GAME_DATA_URL)}`;
                     console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
                     response = await fetch(corsProxyUrl, {
                         method: 'GET',
@@ -1990,7 +1994,7 @@
                     
                     // Method 2: Try another CORS proxy (cors-anywhere)
                     try {
-                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GOOGLE_SHEETS_URL}`;
+                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GAME_DATA_URL}`;
                         console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
                         response = await fetch(corsProxyUrl2, {
                             method: 'GET',
@@ -2004,8 +2008,8 @@
                         console.log("CORS proxy (cors-anywhere) failed:", corsError2);
                         
                         // Method 3: Try direct fetch
-                        console.log("Trying direct fetch:", GOOGLE_SHEETS_URL);
-                        response = await fetch(GOOGLE_SHEETS_URL, {
+                        console.log("Trying direct fetch:", GAME_DATA_URL);
+                        response = await fetch(GAME_DATA_URL, {
                             method: 'GET',
                             mode: 'cors',
                             headers: {
@@ -2029,12 +2033,12 @@
                 const lines = csvText.split('\n').filter(line => line.trim());
                 console.log("Total lines:", lines.length);
                 
-                // Parse CSV data: A=context, B=correct, C=wrong, D=difficulty (optional)
+                // Parse game data: A=context, B=correct, C=wrong, D=difficulty (optional)
                 wordPairs = lines
                     .slice(1) // Skip header row
                     .map((line, index) => {
                         try {
-                            // Handle CSV parsing more robustly
+                            // Handle data parsing more robustly
                             const columns = line.split(',').map(col => col.replace(/^"|"$/g, '').trim());
                             if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
                                 return {
@@ -2051,7 +2055,7 @@
                     })
                     .filter(item => item !== null); // Remove invalid entries
                 
-                console.log("Word list loaded from Google Sheets:", wordPairs.length, "entries");
+                console.log("Word list loaded from game data:", wordPairs.length, "entries");
                 console.log("Sample entries:", wordPairs.slice(0, 3));
                 
                 if (wordPairs.length === 0) {
@@ -2076,10 +2080,10 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
                 
             } catch (error) {
-                console.error("Error loading word list from Google Sheets:", error);
+                console.error("Error loading word list from game data:", error);
                 console.log("Error details:", error.message);
                 console.log("Error stack:", error.stack);
-                console.log("Fetch URL:", GOOGLE_SHEETS_URL);
+                console.log("Fetch URL:", GAME_DATA_URL);
                 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
@@ -2565,7 +2569,7 @@
 
         // Save game stats
         function saveGameStats() {
-            const stats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            const stats = SecurityUtils.safeGetLocalStorage('gameStats' || '{}');
             
             if (!stats.totalGames) stats.totalGames = 0;
             if (!stats.totalCorrect) stats.totalCorrect = 0;
@@ -2739,7 +2743,7 @@
                 retryLoadingBtn.addEventListener('click', async () => {
                     retryLoadingContainer.classList.add('hidden');
                     wordLoadingStatus.style.display = 'block';
-                    await loadWordsFromGoogleSheets();
+                    await loadGameContent();
                 });
             }
             
@@ -2860,7 +2864,7 @@
                 }
             });
             
-            // Music toggle event listener (if music toggle exists in gameplay.html)
+            // Music toggle event listener (if music toggle exists in play.html)
             const musicToggle = document.getElementById('music-toggle');
             if (musicToggle) {
                 musicToggle.addEventListener('change', () => {
@@ -3258,9 +3262,10 @@
             if (quickEditNameBtn) {
                 quickEditNameBtn.addEventListener('click', () => {
                     const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
-                    if (newName && newName.trim() !== '') {
+                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
+                    if (sanitizednewName && sanitizednewName.trim() !== '') {
                         const oldName = playerName;
-                        playerName = newName.trim();
+                        playerName = sanitizednewName.trim();
                         localStorage.setItem('displayName', playerName);
                         updateAccountPanel();
                         updateUI();

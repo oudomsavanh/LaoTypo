@@ -2,7 +2,7 @@
   "name": "Lao Typo Game - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?",
   "short_name": "LaoTypo",
   "description": "Test your Lao language spelling skills with this fun typing game",
-  "start_url": "/gameplay.html",
+  "start_url": "/play.html",
   "display": "standalone",
   "background_color": "#2c2e31",
   "theme_color": "#f8af3c",

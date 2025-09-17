@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <title>Join Session - Session Manager</title>
     
     <!-- Tailwind CSS -->
@@ -364,7 +365,7 @@
                 
                 // Update players list
                 if (currentSession.players && currentSession.players.length > 0) {
-                    playersList.innerHTML = currentSession.players.map(player => `
+                    SecurityUtils.safeSetHTML(playersList, currentSession.players.map(player => `
                         <div class="player-card flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <span class="w-2 h-2 rounded-full ${player.isReady ? 'bg-green-500' : 'bg-gray-400'}"></span>
@@ -373,7 +374,7 @@
                             </div>
                             ${player.isReady ? '<span class="text-green-600 text-sm">Ready</span>' : ''}
                         </div>
-                    `).join('');
+                    `).join(''));
                 } else {
                     playersList.innerHTML = '<p class="text-gray-500 text-center">No players yet</p>';
                 }
@@ -465,7 +466,7 @@
                 showToast('Game is starting!', 'success');
                 // Redirect to game page (to be implemented)
                 setTimeout(() => {
-                    window.location.href = `/game.html?session=${currentSession.code}`;
+                    window.location.href = `/game?session=${currentSession.code}`;
                 }, 2000);
             }
             

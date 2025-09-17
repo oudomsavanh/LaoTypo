@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.1.0 - Enhanced with authentication and scoring -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <!-- Cache Busting Headers v1.9.2 - Enhanced with authentication and scoring -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -323,7 +324,7 @@
             animation: fadeInUp 0.6s ease-out;
         }
         
-        /* Panel styles from testing.html */
+        /* Panel styles from game.html */
         .leaderboard-panel, .settings-panel, .account-panel {
             position: fixed;
             top: 15%;
@@ -355,7 +356,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation from testing.html -->
+    <!-- Navigation from game.html -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -539,7 +540,7 @@
         </div>
     </div>
 
-    <!-- Panels (from testing.html) -->
+    <!-- Panels (from game.html) -->
     <!-- Leaderboard Panel -->
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
         <div class="panel-content">
@@ -586,7 +587,7 @@
     <script>
         // Global variables
         let displayName = localStorage.getItem('displayName') || '';
-        let stats = JSON.parse(localStorage.getItem('gameStats')) || {
+        let stats = SecurityUtils.safeGetLocalStorage('gameStats') || {
             bestStreak: 0,
             totalGames: 0,
             totalCorrect: 0,
@@ -721,7 +722,7 @@
             });
             
             document.getElementById('home-nav-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
+                window.location.href = 'game.html';
             });
             
             // Panel toggles
@@ -766,8 +767,9 @@
         // Event handlers
         document.getElementById('edit-profile-btn').addEventListener('click', () => {
             const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
+                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
             if (newName && newName.trim()) {
-                displayName = newName.trim();
+                displayName = sanitizednewName.trim();
                 localStorage.setItem('displayName', displayName);
                 updateFullProfile();
             }

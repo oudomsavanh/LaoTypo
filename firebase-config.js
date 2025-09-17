@@ -1,17 +1,18 @@
 // 🔥 Firebase Configuration for LaoTypo Game
 // ✅ CONFIGURED WITH REAL FIREBASE PROJECT
 const firebaseConfig = {
-  apiKey: "AIzaSyC-PtK5NdCnQi8JOJ8MvRwvGht-teE2vp8",
-  authDomain: "laotypo-a8e80.firebaseapp.com",
-  projectId: "laotypo-a8e80",
-  storageBucket: "laotypo-a8e80.firebasestorage.app",
-  messagingSenderId: "597772456731",
-  appId: "1:597772456731:web:7a476dee850b85227539be",
-  measurementId: "G-YRJCWZQTCZ"
+  apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
+  authDomain: "laotypo-phase1.firebaseapp.com",
+  projectId: "laotypo-phase1",
+  storageBucket: "laotypo-phase1.firebasestorage.app",
+  messagingSenderId: "359413130623",
+  appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
+  measurementId: "G-7CH5217ZYG"
 };
 
 // Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
 import { 
   getFirestore, 
   collection, 
@@ -26,26 +27,27 @@ import {
   limit, 
   where,
   serverTimestamp 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 import { 
   getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
   signOut, 
   onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const analytics = getAnalytics(app);
 
 console.log('🔥 Firebase initialized successfully');
 
 // 🗄️ DATABASE COLLECTIONS
 const COLLECTIONS = {
   PLAYERS: 'players',
-  WORDS: 'words', 
+  WORDS: 'gameWords',  // Updated to match our export
   LEADERBOARDS: 'leaderboards',
   GAME_RESULTS: 'gameResults'
 };
@@ -476,9 +478,107 @@ window.FirebaseAuthManager = FirebaseAuthManager;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
 
+// 🛡️ SECURITY UTILITIES
+class SecurityUtils {
+  
+  // Sanitize user input
+  static sanitizeInput(input, maxLength = 100) {
+    if (typeof input !== 'string') return '';
+    
+    // Remove HTML tags and limit length
+    const sanitized = input
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/[<>\"'&]/g, '') // Remove dangerous characters
+      .trim()
+      .substring(0, maxLength);
+    
+    return sanitized;
+  }
+  
+  // Validate display name
+  static validateDisplayName(name) {
+    const sanitized = this.sanitizeInput(name, 50);
+    return sanitized.length >= 2 && sanitized.length <= 50;
+  }
+  
+  // Validate session name
+  static validateSessionName(name) {
+    const sanitized = this.sanitizeInput(name, 100);
+    return sanitized.length >= 3 && sanitized.length <= 100;
+  }
+  
+  // Validate session code
+  static validateSessionCode(code) {
+    return /^[A-Z0-9]{6}$/.test(code);
+  }
+  
+  // Safe DOM insertion
+  static safeSetTextContent(element, text) {
+    if (element && typeof text === 'string') {
+      element.textContent = this.sanitizeInput(text);
+    }
+  }
+  
+  // Safe innerHTML (avoid this, use textContent instead)
+  static safeSetHTML(element, html) {
+    if (element && typeof html === 'string') {
+      // Only allow safe HTML patterns
+      const safeHTML = html.replace(/<script[^>]*>.*?<\/script>/gi, '');
+      element.innerHTML = safeHTML;
+    }
+  }
+  
+  // Safe JSON parsing with fallback
+  static safeJSONParse(jsonString, fallback = null) {
+    try {
+      if (typeof jsonString !== 'string') return fallback;
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.warn('JSON parse error:', error);
+      return fallback;
+    }
+  }
+  
+  // Safe localStorage getter
+  static safeGetLocalStorage(key, fallback = null) {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? this.safeJSONParse(value, fallback) : fallback;
+    } catch (error) {
+      console.warn('localStorage get error:', error);
+      return fallback;
+    }
+  }
+  
+  // Safe sessionStorage getter
+  static safeGetSessionStorage(key, fallback = null) {
+    try {
+      const value = sessionStorage.getItem(key);
+      return value ? this.safeJSONParse(value, fallback) : fallback;
+    } catch (error) {
+      console.warn('sessionStorage get error:', error);
+      return fallback;
+    }
+  }
+}
+
+// 🚀 EXPORT ALL MANAGERS AND UTILITIES
+window.FirebasePlayerManager = FirebasePlayerManager;
+window.FirebaseWordManager = FirebaseWordManager; 
+window.FirebaseLeaderboardManager = FirebaseLeaderboardManager;
+window.FirebaseSyncManager = FirebaseSyncManager;
+window.FirebaseAuthManager = FirebaseAuthManager;
+window.SecurityUtils = SecurityUtils;
+window.firebaseDb = db;
+window.firebaseAuth = auth;
+window.firebaseAnalytics = analytics;
+
 console.log('🔥 Firebase modules loaded and ready!');
+console.log('🛡️ Security utilities loaded');
 console.log('🔑 Available Firebase functions:');
 console.log('  - FirebaseAuthManager.loginWithGmail()');
 console.log('  - FirebaseAuthManager.getUserProfile(uid)');
 console.log('  - FirebasePlayerManager.savePlayerData()');
 console.log('  - FirebaseSyncManager.syncToCloud()');
+console.log('  - SecurityUtils.sanitizeInput()');
+console.log('  - SecurityUtils.validateDisplayName()');

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.0.2 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <!-- Cache Busting Headers v1.9.2 -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -909,13 +910,8 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details">
-                    <p>📦 Version 2.9.3</p>
+                    <p>📦 Version 1.9.2</p>
                     <p>Status: Live</p>
-                    <p>🚀 PWA Ready</p>
-                    <p>🔧 Guest Score Fix</p>
-                    <p>📊 Level Progress Fix</p>
-                    <p>🏷️ Label Consistency Fix</p>
-                    <p>🦎 Fixed Gecko Sound</p>
                 </div>
             </div>
         </div>
@@ -1023,8 +1019,8 @@
             if (testGuestBtn) {
                 testGuestBtn.addEventListener('click', function() {
                     console.log('🧪 Guest button clicked (basic script handler)!');
-                    alert('Guest button clicked! Redirecting to testing.html...');
-                    window.location.href = 'testing.html';
+                    alert('Guest button clicked! Redirecting to game...');
+                    window.location.href = '/game';
                 });
             }
         });
@@ -1252,7 +1248,7 @@
                 console.log('Guest button clicked!');
                 isGuest = true;
                 
-                // Option 1: Direct redirect to testing.html without profile setup
+                // Option 1: Direct redirect to game without profile setup
                 // Uncomment the lines below if you want immediate redirect
                 
                 sessionStorage.setItem('userType', 'guest');
@@ -1265,7 +1261,7 @@
                 }));
                 showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ! ກຳລັງໄປໜ້າທົດສອບ...');
                 setTimeout(() => {
-                    window.location.href = 'testing.html';
+                    window.location.href = '/game';
                 }, 1000);
                 return;
                 
@@ -1351,7 +1347,7 @@
 
         function redirectToHomepage() {
             console.log('🏠 Redirecting to homepage...');
-            window.location.href = 'testing.html';
+            window.location.href = '/game';
         }
         
         // --- PANEL FUNCTIONS ---
