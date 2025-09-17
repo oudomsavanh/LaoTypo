@@ -1790,143 +1790,65 @@
             difficultyDisplay.style.color = levelColors[currentLevel];
         }
 
-        // Load game content data
+        // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
                 wordLoadingStatus.textContent = 'Loading game content...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
-                
-                console.log("Attempting to fetch from:", GAME_DATA_URL);
-                
-                // Try multiple approaches to fetch the data
-                let response;
-                let fetchMethod = '';
-                
-                // Method 1: Try CORS proxy (allorigins.win)
-                try {
-                    const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(GAME_DATA_URL)}`;
-                    console.log("Trying CORS proxy (allorigins):", corsProxyUrl);
-                    response = await fetch(corsProxyUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'text/csv',
-                        },
-                    });
-                    fetchMethod = 'CORS proxy (allorigins)';
-                } catch (corsError1) {
-                    console.log("CORS proxy (allorigins) failed:", corsError1);
-                    
-                    // Method 2: Try another CORS proxy (cors-anywhere)
-                    try {
-                        const corsProxyUrl2 = `https://cors-anywhere.herokuapp.com/${GAME_DATA_URL}`;
-                        console.log("Trying CORS proxy (cors-anywhere):", corsProxyUrl2);
-                        response = await fetch(corsProxyUrl2, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'text/csv',
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                        });
-                        fetchMethod = 'CORS proxy (cors-anywhere)';
-                    } catch (corsError2) {
-                        console.log("CORS proxy (cors-anywhere) failed:", corsError2);
-                        
-                        // Method 3: Try direct fetch
-                        console.log("Trying direct fetch:", GAME_DATA_URL);
-                        response = await fetch(GAME_DATA_URL, {
-                            method: 'GET',
-                            mode: 'cors',
-                            headers: {
-                                'Accept': 'text/csv',
-                            },
-                        });
-                        fetchMethod = 'Direct fetch';
-                    }
-                }
-                
-                console.log(`Successfully fetched using: ${fetchMethod}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-                }
-                
-                const csvText = await response.text();
-                console.log("CSV response length:", csvText.length);
-                console.log("CSV preview:", csvText.substring(0, 200));
-                
-                const lines = csvText.split('\n').filter(line => line.trim());
-                console.log("Total lines:", lines.length);
-                
-                // Parse game data: A=context, B=correct, C=wrong, D=difficulty (optional)
-                wordPairs = lines
-                    .slice(1) // Skip header row
-                    .map((line, index) => {
-                        try {
-                            // Handle CSV parsing more robustly
-                            const columns = line.split(',').map(col => col.replace(/^"|"$/g, '').trim());
-                            if (columns.length >= 3 && columns[0] && columns[1] && columns[2]) {
-                                return {
-                                    context: columns[0],    // Column A - context to display
-                                    correct: columns[1],    // Column B - correct answer
-                                    incorrect: columns[2],  // Column C - incorrect answer
-                                    difficulty: columns[3] ? parseInt(columns[3]) : 1  // Column D - difficulty (optional)
-                                };
-                            }
-                        } catch (parseError) {
-                            console.warn(`Error parsing line ${index + 2}:`, line, parseError);
-                        }
-                        return null;
-                    })
-                    .filter(item => item !== null); // Remove invalid entries
-                
-                console.log("Game content loaded:", wordPairs.length, "entries");
-                console.log("Sample entries:", wordPairs.slice(0, 3));
-                
+
+                // Load up to 500 words from Firestore
+                const words = await GameDataManager.loadWords(500);
+
+                // Normalize to wordPairs structure expected by the game
+                wordPairs = words.map(w => ({
+                    context: w.context,
+                    correct: w.correct,
+                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
+                })).filter(w => w.context && w.correct && w.incorrect);
+
                 if (wordPairs.length === 0) {
-                    throw new Error("No valid entries found in the spreadsheet");
+                    throw new Error('No words found in Firestore');
                 }
-                
+
+                console.log('Loaded words from Firestore:', wordPairs.length);
+
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
-                
-                // Hide loading status and retry button after successful load
+
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
                     retryLoadingContainer.classList.add('hidden');
-                }, 2000);
-                
+                }, 1500);
+
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
-                
+
                 // Initialize shuffled words for each difficulty
                 shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
                 shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
-                
+
             } catch (error) {
-                console.error("Error loading game content:", error);
-                console.log("Error details:", error.message);
-                console.log("Error stack:", error.stack);
-                console.log("Fetch URL:", GAME_DATA_URL);
-                
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
+                console.error('Error loading game content from Firestore:', error);
+
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
-                
+
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
-                
+
                 // Fallback to default words
                 wordPairs = getDefaultWords();
-                console.log("Using fallback words:", wordPairs.length, "entries");
-                
-                // Hide loading status after fallback load
+                console.log('Using fallback words:', wordPairs.length, 'entries');
+
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
                 }, 3000);
-                
+
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
-                
+
                 // Initialize shuffled words for each difficulty
                 shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
                 shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
