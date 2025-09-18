@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <p>This page will test the Firebase connection and data retrieval.</p>
+    
+    <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+    <button onclick="testGameWordsCollection()">Test GameWords Collection</button>
+    <button onclick="testGameDataManager()">Test GameDataManager</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <div id="results"></div>
+
+    <!-- Load Firebase scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testFirebaseConnection() {
+            addResult('Starting Firebase connection test...', 'info');
+            
+            try {
+                // Test 1: Check if Firebase is initialized
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not initialized');
+                }
+                addResult('✅ Firebase database instance found', 'success');
+
+                // Test 2: Check if Firebase functions are available
+                if (!window.collection || !window.query || !window.getDocs) {
+                    throw new Error('Firebase functions not available');
+                }
+                addResult('✅ Firebase functions are available', 'success');
+
+                // Test 3: Test basic Firestore connection
+                const testCollection = collection(window.firebaseDb, 'test');
+                const testQuery = query(testCollection, limit(1));
+                await getDocs(testQuery);
+                addResult('✅ Basic Firestore connection successful', 'success');
+
+                addResult('🎉 Firebase connection test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ Firebase connection test FAILED: ${error.message}`, 'error');
+                console.error('Firebase connection error:', error);
+                return false;
+            }
+        }
+
+        async function testGameWordsCollection() {
+            addResult('Starting GameWords collection test...', 'info');
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase not initialized');
+                }
+
+                // Test the gameWords collection
+                const wordsCollection = collection(window.firebaseDb, 'gameWords');
+                const wordsQuery = query(wordsCollection, limit(5));
+                const snapshot = await getDocs(wordsQuery);
+
+                addResult(`📊 Found ${snapshot.size} documents in gameWords collection`, 'info');
+
+                if (snapshot.empty) {
+                    addResult('⚠️ gameWords collection is empty', 'error');
+                    return false;
+                }
+
+                // Show sample data
+                snapshot.forEach((doc, index) => {
+                    const data = doc.data();
+                    addResult(`📝 Document ${index + 1}: ${JSON.stringify(data, null, 2)}`, 'info');
+                });
+
+                addResult('✅ GameWords collection test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ GameWords collection test FAILED: ${error.message}`, 'error');
+                console.error('GameWords collection error:', error);
+                return false;
+            }
+        }
+
+        async function testGameDataManager() {
+            addResult('Starting GameDataManager test...', 'info');
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                addResult('✅ GameDataManager found', 'success');
+
+                // Test loading words
+                addResult('📚 Loading words using GameDataManager...', 'info');
+                const words = await window.GameDataManager.loadWords(10);
+                
+                addResult(`📊 Loaded ${words.length} words`, 'info');
+
+                if (words.length === 0) {
+                    addResult('⚠️ No words loaded from GameDataManager', 'error');
+                    return false;
+                }
+
+                // Show sample words
+                words.slice(0, 3).forEach((word, index) => {
+                    addResult(`📝 Word ${index + 1}: context="${word.context}", correct="${word.correct}", incorrect="${word.incorrect || word.wrong}"`, 'info');
+                });
+
+                addResult('✅ GameDataManager test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ GameDataManager test FAILED: ${error.message}`, 'error');
+                console.error('GameDataManager error:', error);
+                return false;
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', async () => {
+            addResult('🚀 Page loaded, starting automatic tests...', 'info');
+            
+            const firebaseTest = await testFirebaseConnection();
+            if (firebaseTest) {
+                await testGameWordsCollection();
+                await testGameDataManager();
+            }
+            
+            addResult('🏁 All tests completed!', 'info');
+        });
+    </script>
+</body>
+</html>
