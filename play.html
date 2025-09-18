@@ -1297,12 +1297,12 @@
         }
         
         function trackGameStart() {
-            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            const anonIdA = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
             if (!localStorage.getItem('anonymousId')) {
                 localStorage.setItem('anonymousId', anonymousId);
             }
             const deviceInfo = getDeviceInfo();
-            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            const anonIdB = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
             if (!localStorage.getItem('anonymousId')) {
                 localStorage.setItem('anonymousId', anonymousId);
             }
@@ -1325,7 +1325,7 @@
         }
         
         function trackLevelComplete(level, score, accuracy) {
-            const anonymousId = localStorage.getItem('anonymousId') || 'user_' + Date.now();
+            const anonIdC = localStorage.getItem('anonymousId') || 'user_' + Date.now();
             trackGameEvent('level_complete', {
                 level_name: levelNames[level],
                 level_number: level + 1,
@@ -1337,7 +1337,7 @@
         }
         
         function trackGameEnd(finalScore, accuracy, totalWords) {
-            const anonymousId = localStorage.getItem('anonymousId') || 'user_' + Date.now();
+            const anonIdD = localStorage.getItem('anonymousId') || 'user_' + Date.now();
             trackGameEvent('game_end', {
                 final_score: finalScore,
                 accuracy: accuracy,
@@ -3009,7 +3009,7 @@
             const dataUrl = canvas.toDataURL('image/png');
             
             // Create blob for native sharing
-            const blob = await new Promise(resolve => {
+            const exportBlob = await new Promise(resolve => {
                 canvas.toBlob(blob => {
                     resolve(blob);
                 }, 'image/png');
@@ -3701,7 +3701,7 @@
                 
                 // Convert to blob
                 // Removed non-Firebase data fetch
-                const blob = await response.blob();
+                const assetBlob1 = await response.blob();
                 
                 // Try Web Share API
                 if (navigator.share && navigator.canShare) {
@@ -3719,7 +3719,7 @@
                 
                 // Fallback: copy image to clipboard
                 // Removed non-Firebase data fetch
-                const blob = await response.blob();
+                const assetBlob2 = await response.blob();
                 await navigator.clipboard.write([
                     new ClipboardItem({ 'image/png': blob })
                 ]);
