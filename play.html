@@ -1813,6 +1813,7 @@
             try {
                 // Hide inline loading UI; use console only
                 if (wordLoadingStatus) wordLoadingStatus.style.display = 'none';
+                console.log('Loading words from Firestore...');
 
                 // Ensure Firebase SDK v8 is available (used by firestore-game-data.js)
                 if (typeof firebase === 'undefined' || !firebase.firestore) {
@@ -1831,10 +1832,10 @@
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No valid words found in Firestore');
+                    throw new Error('No valid words found in Firestore (after normalization/filter)');
                 }
 
-                console.log('Loaded words completed');
+                console.log(`Load successful: ${wordPairs.length} words`);
                 if (retryLoadingContainer) retryLoadingContainer.classList.add('hidden');
 
                 // Shuffle words
@@ -1846,7 +1847,11 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from Firestore:', error);
+                console.error('Load failed: Firestore words not available', {
+                    name: error && error.name,
+                    code: error && error.code,
+                    message: error && error.message
+                });
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
