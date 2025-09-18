@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com https://docs.google.com https://docs.gstatic.com https://api.allorigins.win https://cors-anywhere.herokuapp.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <!-- Cache Busting Headers v1.9.2 - Layout alignments; version sync with testing; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1644,7 +1644,7 @@
             console.log("URL:", GAME_DATA_URL);
             
             try {
-                const response = await fetch(GAME_DATA_URL);
+                // Removed non-Firebase data fetch
                 console.log("Response status:", response.status);
                 console.log("Response headers:", [...response.headers.entries()]);
                 
@@ -3678,7 +3678,7 @@
                 const dataUrl = await this.generateResultImage();
                 
                 // Convert to blob
-                const response = await fetch(dataUrl);
+                // Removed non-Firebase data fetch
                 const blob = await response.blob();
                 
                 // Try Web Share API
@@ -3696,7 +3696,7 @@
                 }
                 
                 // Fallback: copy image to clipboard
-                const response = await fetch(dataUrl);
+                // Removed non-Firebase data fetch
                 const blob = await response.blob();
                 await navigator.clipboard.write([
                     new ClipboardItem({ 'image/png': blob })
