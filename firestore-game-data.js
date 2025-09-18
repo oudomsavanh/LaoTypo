@@ -44,21 +44,47 @@ class FirestoreGameDataManager {
         try {
             console.log('🔥 Loading game words from Firestore...');
             
-            let query = firebase.firestore()
-                .collection('gameWords')
-                .orderBy('order', 'asc')
-                .limit(limit);
+            let baseCollection = firebase.firestore().collection('gameWords');
+            let query = baseCollection.orderBy('order', 'asc').limit(limit);
 
             // Add difficulty filter if specified
             if (difficulty) {
                 query = query.where('difficulty', '==', difficulty);
             }
 
-            const snapshot = await query.get();
-            
+            let snapshot = await query.get();
+
+            console.log(`📥 Firestore query returned ${snapshot.size} documents`);
+            if (snapshot.size > 0) {
+                try {
+                    const firstDoc = snapshot.docs[0];
+                    const firstData = firstDoc.data();
+                    console.log('🧪 Sample doc:', {
+                        id: firstDoc.id,
+                        hasContext: typeof firstData.context === 'string' && firstData.context.length > 0,
+                        hasCorrect: typeof firstData.correct === 'string' && firstData.correct.length > 0,
+                        hasIncorrect: typeof (firstData.incorrect ?? firstData.wrong) === 'string' && (firstData.incorrect ?? firstData.wrong).length > 0,
+                        difficulty: firstData.difficulty,
+                        order: firstData.order
+                    });
+                } catch (e) {
+                    console.warn('⚠️ Could not log sample doc:', e);
+                }
+            }
+
             if (snapshot.empty) {
-                console.warn('⚠️ No words found in Firestore');
-                return [];
+                console.warn('⚠️ No words found with orderBy("order"). Retrying without orderBy...');
+                // Retry without orderBy in case many docs are missing the field
+                let alt = baseCollection;
+                if (difficulty) {
+                    alt = alt.where('difficulty', '==', difficulty);
+                }
+                snapshot = await alt.limit(limit).get();
+                console.log(`📥 Retry (no orderBy) returned ${snapshot.size} documents`);
+                if (snapshot.empty) {
+                    console.warn('⚠️ Still no words found in Firestore');
+                    return [];
+                }
             }
 
             this.words = snapshot.docs.map(doc => ({

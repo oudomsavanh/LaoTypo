@@ -1877,6 +1877,17 @@
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
+                    // Diagnostics for why zero words
+                    const total = (words || []).length;
+                    const missingContext = (words || []).filter(w => !w.context).length;
+                    const missingCorrect = (words || []).filter(w => !w.correct).length;
+                    const missingIncorrect = (words || []).filter(w => !(w.incorrect || w.wrong)).length;
+                    const byDifficulty = (words || []).reduce((acc, w) => {
+                        const d = typeof w.difficulty === 'number' ? w.difficulty : parseInt(String(w.difficulty || '0'), 10);
+                        acc[d] = (acc[d] || 0) + 1;
+                        return acc;
+                    }, {});
+                    console.warn('Normalization diagnostic', { total, missingContext, missingCorrect, missingIncorrect, byDifficulty, sample: (words || [])[0] });
                     throw new Error('No valid words found in Firestore (after normalization/filter)');
                 }
 
