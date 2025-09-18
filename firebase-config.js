@@ -482,7 +482,16 @@ window.firebaseAuth = auth;
 // Expose selected helpers so other pages can avoid re-importing from CDN
 window.firebaseProviders = { GoogleAuthProvider };
 window.firebaseAuthFns = { signInWithPopup, onAuthStateChanged, signOut };
-window.firebaseFsFns = { doc, writeBatch };
+window.firebaseFsFns = { 
+  collection,
+  doc,
+  query,
+  orderBy,
+  where,
+  limit,
+  getDocs,
+  writeBatch
+};
 
 // 🛡️ SECURITY UTILITIES
 class SecurityUtils {

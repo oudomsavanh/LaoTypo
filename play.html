@@ -31,25 +31,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
-    <!-- Firebase Configuration -->
-    <!-- Firebase v8 SDK for FirestoreGameDataManager (uses global firebase namespace) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script>
-      // Initialize Firebase (v8)
-      if (!window.firebase || !firebase.apps.length) {
-        firebase.initializeApp({
-          apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
-          authDomain: "laotypo-phase1.firebaseapp.com",
-          projectId: "laotypo-phase1",
-          storageBucket: "laotypo-phase1.firebasestorage.app",
-          messagingSenderId: "359413130623",
-          appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
-          measurementId: "G-7CH5217ZYG"
-        });
-      }
-    </script>
+    <!-- Firebase v12 modular setup: central config and initialization -->
+    <script type="module" src="/firebase-config.js"></script>
     <script>
       // Minimal SecurityUtils used by play.html
       (function(){

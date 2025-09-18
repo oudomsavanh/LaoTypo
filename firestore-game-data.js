@@ -42,17 +42,20 @@ class FirestoreGameDataManager {
      */
     async _loadFromFirestore(limit, difficulty) {
         try {
-            console.log('🔥 Loading game words from Firestore...');
-            
-            let baseCollection = firebase.firestore().collection('gameWords');
-            let query = baseCollection.orderBy('order', 'asc').limit(limit);
+            console.log('🔥 Loading game words from Firestore (v12 modular)...');
+
+            const db = window.firebaseDb;
+            const { collection, query, orderBy, where, limit: limitFn, getDocs } = window.firebaseFsFns;
+
+            let baseCollection = collection(db, 'gameWords');
+            let q = query(baseCollection, orderBy('order', 'asc'), limitFn(limit));
 
             // Add difficulty filter if specified
             if (difficulty) {
-                query = query.where('difficulty', '==', difficulty);
+                q = query(baseCollection, where('difficulty', '==', difficulty), orderBy('order', 'asc'), limitFn(limit));
             }
 
-            let snapshot = await query.get();
+            let snapshot = await getDocs(q);
 
             console.log(`📥 Firestore query returned ${snapshot.size} documents`);
             if (snapshot.size > 0) {
@@ -75,11 +78,10 @@ class FirestoreGameDataManager {
             if (snapshot.empty) {
                 console.warn('⚠️ No words found with orderBy("order"). Retrying without orderBy...');
                 // Retry without orderBy in case many docs are missing the field
-                let alt = baseCollection;
-                if (difficulty) {
-                    alt = alt.where('difficulty', '==', difficulty);
-                }
-                snapshot = await alt.limit(limit).get();
+                let altQuery = difficulty
+                    ? query(baseCollection, where('difficulty', '==', difficulty), limitFn(limit))
+                    : query(baseCollection, limitFn(limit));
+                snapshot = await getDocs(altQuery);
                 console.log(`📥 Retry (no orderBy) returned ${snapshot.size} documents`);
                 if (snapshot.empty) {
                     console.warn('⚠️ Still no words found in Firestore');
