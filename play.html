@@ -1287,10 +1287,6 @@
                 localStorage.setItem('anonymousId', anonymousId);
             }
             const deviceInfo = getDeviceInfo();
-            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) {
-                localStorage.setItem('anonymousId', anonymousId);
-            }
             
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
