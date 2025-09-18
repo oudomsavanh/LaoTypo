@@ -262,18 +262,40 @@
             }
         }
 
+        // Wait for all Firebase components to be ready
+        async function waitForFirebaseReady() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            while (attempts < maxAttempts) {
+                if (window.firebaseConfig && window.firebaseDb && window.GameDataManager && window.collection) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            return false;
+        }
+
         // Auto-run tests when page loads
         window.addEventListener('load', async () => {
-            addResult('📄 Page loaded, starting automatic tests...', 'info');
+            addResult('📄 Page loaded, waiting for Firebase to be ready...', 'info');
             
-            const firebaseTest = await testFirebaseConnection();
-            if (firebaseTest) {
-                await testGameWordsCollection();
-                await testGameDataManager();
-                await testWordLoadingProcess();
+            const firebaseReady = await waitForFirebaseReady();
+            if (firebaseReady) {
+                addResult('✅ Firebase is ready, starting tests...', 'success');
+                
+                const firebaseTest = await testFirebaseConnection();
+                if (firebaseTest) {
+                    await testGameWordsCollection();
+                    await testGameDataManager();
+                    await testWordLoadingProcess();
+                }
+                
+                addResult('🏁 All tests completed!', 'success');
+            } else {
+                addResult('❌ Firebase initialization timeout!', 'error');
             }
-            
-            addResult('🏁 All tests completed!', 'info');
         });
     </script>
 </body>

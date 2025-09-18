@@ -285,8 +285,19 @@ class FirestoreGameDataManager {
 
 // Create global instance
 console.log('📚 Creating GameDataManager instance...');
-window.GameDataManager = new FirestoreGameDataManager();
-console.log('✅ GameDataManager created and exported to window');
+
+// Wait for Firebase to be ready before creating GameDataManager
+function createGameDataManager() {
+    if (window.firebaseConfig && window.firebaseDb && window.collection) {
+        window.GameDataManager = new FirestoreGameDataManager();
+        console.log('✅ GameDataManager created and exported to window');
+    } else {
+        console.log('⏳ Waiting for Firebase to be ready...');
+        setTimeout(createGameDataManager, 100);
+    }
+}
+
+createGameDataManager();
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

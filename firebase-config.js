@@ -10,6 +10,10 @@ const firebaseConfig = {
   measurementId: "G-7CH5217ZYG"
 };
 
+// Export Firebase config immediately to global scope
+window.firebaseConfig = firebaseConfig;
+console.log('🔥 Firebase config exported to global scope');
+
 // Firebase modules will be loaded dynamically
 let app, db, auth, analytics;
 let initializeApp, getAnalytics, getFirestore, getAuth;

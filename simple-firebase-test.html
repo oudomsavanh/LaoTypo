@@ -30,63 +30,68 @@
             console.log(`[${type.toUpperCase()}] ${message}`);
         }
 
-        // Test immediately after scripts load
-        addResult('Scripts loaded, testing Firebase availability...', 'info');
-
-        // Test 1: Check if firebaseConfig is available
-        if (typeof window.firebaseConfig !== 'undefined') {
-            addResult('✅ firebaseConfig found', 'success');
-            addResult(`Project ID: ${window.firebaseConfig.projectId}`, 'info');
-        } else {
-            addResult('❌ firebaseConfig not found', 'error');
-        }
-
-        // Test 2: Check if firebaseDb is available
-        if (typeof window.firebaseDb !== 'undefined') {
-            addResult('✅ firebaseDb found', 'success');
-        } else {
-            addResult('❌ firebaseDb not found', 'error');
-        }
-
-        // Test 3: Check if GameDataManager is available
-        if (typeof window.GameDataManager !== 'undefined') {
-            addResult('✅ GameDataManager found', 'success');
-        } else {
-            addResult('❌ GameDataManager not found', 'error');
-        }
-
-        // Test 4: Check Firebase functions
-        const requiredFunctions = ['collection', 'query', 'getDocs', 'orderBy', 'limit', 'where'];
-        const missingFunctions = requiredFunctions.filter(func => typeof window[func] === 'undefined');
-        
-        if (missingFunctions.length === 0) {
-            addResult('✅ All Firebase functions available', 'success');
-        } else {
-            addResult(`❌ Missing Firebase functions: ${missingFunctions.join(', ')}`, 'error');
-        }
-
-        // Test 5: Wait a bit and test again (in case of async loading)
-        setTimeout(() => {
-            addResult('--- Testing after 2 seconds ---', 'info');
+        // Wait for Firebase to be ready
+        async function waitForFirebaseReady() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
             
+            while (attempts < maxAttempts) {
+                if (window.firebaseConfig && window.firebaseDb && window.GameDataManager && window.collection) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            return false;
+        }
+
+        // Test Firebase availability
+        async function testFirebaseAvailability() {
+            addResult('Scripts loaded, waiting for Firebase to be ready...', 'info');
+            
+            const firebaseReady = await waitForFirebaseReady();
+            if (!firebaseReady) {
+                addResult('❌ Firebase initialization timeout!', 'error');
+                return;
+            }
+
+            addResult('✅ Firebase is ready, testing components...', 'success');
+
+            // Test 1: Check if firebaseConfig is available
             if (typeof window.firebaseConfig !== 'undefined') {
-                addResult('✅ firebaseConfig found (after delay)', 'success');
+                addResult('✅ firebaseConfig found', 'success');
+                addResult(`Project ID: ${window.firebaseConfig.projectId}`, 'info');
             } else {
-                addResult('❌ firebaseConfig still not found (after delay)', 'error');
+                addResult('❌ firebaseConfig not found', 'error');
             }
 
+            // Test 2: Check if firebaseDb is available
             if (typeof window.firebaseDb !== 'undefined') {
-                addResult('✅ firebaseDb found (after delay)', 'success');
+                addResult('✅ firebaseDb found', 'success');
             } else {
-                addResult('❌ firebaseDb still not found (after delay)', 'error');
+                addResult('❌ firebaseDb not found', 'error');
             }
 
+            // Test 3: Check if GameDataManager is available
             if (typeof window.GameDataManager !== 'undefined') {
-                addResult('✅ GameDataManager found (after delay)', 'success');
+                addResult('✅ GameDataManager found', 'success');
             } else {
-                addResult('❌ GameDataManager still not found (after delay)', 'error');
+                addResult('❌ GameDataManager not found', 'error');
             }
-        }, 2000);
+
+            // Test 4: Check Firebase functions
+            const requiredFunctions = ['collection', 'query', 'getDocs', 'orderBy', 'limit', 'where'];
+            const missingFunctions = requiredFunctions.filter(func => typeof window[func] === 'undefined');
+            
+            if (missingFunctions.length === 0) {
+                addResult('✅ All Firebase functions available', 'success');
+            } else {
+                addResult(`❌ Missing Firebase functions: ${missingFunctions.join(', ')}`, 'error');
+            }
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', testFirebaseAvailability);
     </script>
 </body>
 </html>
