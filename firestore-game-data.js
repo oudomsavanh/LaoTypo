@@ -5,6 +5,9 @@
  * Provides better security, performance, and real-time updates
  */
 
+// Import Firebase functions (these are available globally from firebase-config.js)
+const { collection, query, orderBy, limit, where, getDocs } = window;
+
 class FirestoreGameDataManager {
     constructor() {
         this.words = [];
@@ -44,15 +47,37 @@ class FirestoreGameDataManager {
         try {
             console.log('🔥 Loading game words from Firestore...');
             
-            let baseCollection = firebase.firestore().collection('gameWords');
-            let query = baseCollection.orderBy('order', 'asc').limit(limit);
-
-            // Add difficulty filter if specified
+            // Use the global firebaseDb instance from firebase-config.js
+            if (!window.firebaseDb) {
+                throw new Error('Firebase not initialized. Make sure firebase-config.js is loaded first.');
+            }
+            
+            // Check if Firebase functions are available
+            if (!window.collection || !window.query || !window.getDocs) {
+                throw new Error('Firebase functions not available. Make sure firebase-config.js exports are working.');
+            }
+            
+            console.log('✅ Firebase instance and functions are available');
+            
+            let baseCollection = collection(window.firebaseDb, 'gameWords');
+            let wordsQuery;
+            
             if (difficulty) {
-                query = query.where('difficulty', '==', difficulty);
+                wordsQuery = query(
+                    baseCollection,
+                    where('difficulty', '==', difficulty),
+                    orderBy('order', 'asc'),
+                    limit(limit)
+                );
+            } else {
+                wordsQuery = query(
+                    baseCollection,
+                    orderBy('order', 'asc'),
+                    limit(limit)
+                );
             }
 
-            let snapshot = await query.get();
+            let snapshot = await getDocs(wordsQuery);
 
             console.log(`📥 Firestore query returned ${snapshot.size} documents`);
             if (snapshot.size > 0) {
@@ -75,11 +100,20 @@ class FirestoreGameDataManager {
             if (snapshot.empty) {
                 console.warn('⚠️ No words found with orderBy("order"). Retrying without orderBy...');
                 // Retry without orderBy in case many docs are missing the field
-                let alt = baseCollection;
+                let altQuery;
                 if (difficulty) {
-                    alt = alt.where('difficulty', '==', difficulty);
+                    altQuery = query(
+                        baseCollection,
+                        where('difficulty', '==', difficulty),
+                        limit(limit)
+                    );
+                } else {
+                    altQuery = query(
+                        baseCollection,
+                        limit(limit)
+                    );
                 }
-                snapshot = await alt.limit(limit).get();
+                snapshot = await getDocs(altQuery);
                 console.log(`📥 Retry (no orderBy) returned ${snapshot.size} documents`);
                 if (snapshot.empty) {
                     console.warn('⚠️ Still no words found in Firestore');

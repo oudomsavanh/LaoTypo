@@ -593,6 +593,19 @@ window.firebaseDb = db;
 window.firebaseAuth = auth;
 window.firebaseAnalytics = analytics;
 
+// Export Firestore functions for use in other scripts
+window.collection = collection;
+window.query = query;
+window.orderBy = orderBy;
+window.limit = limit;
+window.where = where;
+window.getDocs = getDocs;
+window.getDoc = getDoc;
+window.setDoc = setDoc;
+window.addDoc = addDoc;
+window.updateDoc = updateDoc;
+window.serverTimestamp = serverTimestamp;
+
 console.log('🔥 Firebase modules loaded and ready!');
 console.log('🛡️ Security utilities loaded');
 console.log('🔑 Available Firebase functions:');
