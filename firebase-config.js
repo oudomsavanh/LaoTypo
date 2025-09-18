@@ -10,44 +10,71 @@ const firebaseConfig = {
   measurementId: "G-7CH5217ZYG"
 };
 
-// Import Firebase modules
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  query, 
-  orderBy, 
-  limit, 
-  where,
-  serverTimestamp 
-} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
-import { 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  signOut, 
-  onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
+// Firebase modules will be loaded dynamically
+let app, db, auth, analytics;
+let initializeApp, getAnalytics, getFirestore, getAuth;
+let collection, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, query, orderBy, limit, where, serverTimestamp;
+let GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged;
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const analytics = getAnalytics(app);
-
-console.log('🔥 Firebase initialized successfully');
+// Initialize Firebase modules dynamically
+async function initializeFirebaseModules() {
+  try {
+    // Import Firebase modules dynamically
+    const { initializeApp: initApp } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js');
+    const { getAnalytics: getAnalyticsFunc } = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js');
+    const firestoreModule = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js');
+    const authModule = await import('https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js');
+    
+    // Assign imported functions
+    initializeApp = initApp;
+    getAnalytics = getAnalyticsFunc;
+    getFirestore = firestoreModule.getFirestore;
+    collection = firestoreModule.collection;
+    doc = firestoreModule.doc;
+    setDoc = firestoreModule.setDoc;
+    getDoc = firestoreModule.getDoc;
+    getDocs = firestoreModule.getDocs;
+    addDoc = firestoreModule.addDoc;
+    updateDoc = firestoreModule.updateDoc;
+    query = firestoreModule.query;
+    orderBy = firestoreModule.orderBy;
+    limit = firestoreModule.limit;
+    where = firestoreModule.where;
+    serverTimestamp = firestoreModule.serverTimestamp;
+    
+    getAuth = authModule.getAuth;
+    GoogleAuthProvider = authModule.GoogleAuthProvider;
+    signInWithPopup = authModule.signInWithPopup;
+    signOut = authModule.signOut;
+    onAuthStateChanged = authModule.onAuthStateChanged;
+    
+    // Initialize Firebase
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    analytics = getAnalytics(app);
+    
+    console.log('🔥 Firebase modules loaded and initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to load Firebase modules:', error);
+    return false;
+  }
+}
 
 // Unified initializer for pages that expect initializeFirebase()
-export async function initializeFirebase() {
+async function initializeFirebase() {
   try {
     console.log('🧩 initializeFirebase(): starting');
+    
+    // Initialize Firebase modules if not already done
+    if (!app || !db || !auth) {
+      const success = await initializeFirebaseModules();
+      if (!success) {
+        throw new Error('Failed to initialize Firebase modules');
+      }
+    }
+    
     // Basic sanity checks
     const checks = {
       hasConfig: !!firebaseConfig && !!firebaseConfig.projectId,
@@ -582,36 +609,46 @@ class SecurityUtils {
   }
 }
 
-// 🚀 EXPORT ALL MANAGERS AND UTILITIES
-window.FirebasePlayerManager = FirebasePlayerManager;
-window.FirebaseWordManager = FirebaseWordManager; 
-window.FirebaseLeaderboardManager = FirebaseLeaderboardManager;
-window.FirebaseSyncManager = FirebaseSyncManager;
-window.FirebaseAuthManager = FirebaseAuthManager;
-window.SecurityUtils = SecurityUtils;
-window.firebaseDb = db;
-window.firebaseAuth = auth;
-window.firebaseAnalytics = analytics;
+// Initialize Firebase modules when script loads
+(async function() {
+  try {
+    await initializeFirebaseModules();
+    
+    // 🚀 EXPORT ALL MANAGERS AND UTILITIES
+    window.FirebasePlayerManager = FirebasePlayerManager;
+    window.FirebaseWordManager = FirebaseWordManager; 
+    window.FirebaseLeaderboardManager = FirebaseLeaderboardManager;
+    window.FirebaseSyncManager = FirebaseSyncManager;
+    window.FirebaseAuthManager = FirebaseAuthManager;
+    window.SecurityUtils = SecurityUtils;
+    window.firebaseDb = db;
+    window.firebaseAuth = auth;
+    window.firebaseAnalytics = analytics;
+    window.initializeFirebase = initializeFirebase;
 
-// Export Firestore functions for use in other scripts
-window.collection = collection;
-window.query = query;
-window.orderBy = orderBy;
-window.limit = limit;
-window.where = where;
-window.getDocs = getDocs;
-window.getDoc = getDoc;
-window.setDoc = setDoc;
-window.addDoc = addDoc;
-window.updateDoc = updateDoc;
-window.serverTimestamp = serverTimestamp;
+    // Export Firestore functions for use in other scripts
+    window.collection = collection;
+    window.query = query;
+    window.orderBy = orderBy;
+    window.limit = limit;
+    window.where = where;
+    window.getDocs = getDocs;
+    window.getDoc = getDoc;
+    window.setDoc = setDoc;
+    window.addDoc = addDoc;
+    window.updateDoc = updateDoc;
+    window.serverTimestamp = serverTimestamp;
 
-console.log('🔥 Firebase modules loaded and ready!');
-console.log('🛡️ Security utilities loaded');
-console.log('🔑 Available Firebase functions:');
-console.log('  - FirebaseAuthManager.loginWithGmail()');
-console.log('  - FirebaseAuthManager.getUserProfile(uid)');
-console.log('  - FirebasePlayerManager.savePlayerData()');
-console.log('  - FirebaseSyncManager.syncToCloud()');
-console.log('  - SecurityUtils.sanitizeInput()');
-console.log('  - SecurityUtils.validateDisplayName()');
+    console.log('🔥 Firebase modules loaded and ready!');
+    console.log('🛡️ Security utilities loaded');
+    console.log('🔑 Available Firebase functions:');
+    console.log('  - FirebaseAuthManager.loginWithGmail()');
+    console.log('  - FirebaseAuthManager.getUserProfile(uid)');
+    console.log('  - FirebasePlayerManager.savePlayerData()');
+    console.log('  - FirebaseSyncManager.syncToCloud()');
+    console.log('  - SecurityUtils.sanitizeInput()');
+    console.log('  - SecurityUtils.validateDisplayName()');
+  } catch (error) {
+    console.error('❌ Failed to initialize Firebase:', error);
+  }
+})();

@@ -3509,11 +3509,31 @@
         }
 
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 DOMContentLoaded event fired - starting initialization');
             try {
+                // Wait for Firebase to be initialized
+                console.log('🔥 Waiting for Firebase initialization...');
+                let firebaseReady = false;
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max wait
+                
+                while (!firebaseReady && attempts < maxAttempts) {
+                    if (window.firebaseDb && window.collection && window.getDocs) {
+                        firebaseReady = true;
+                        console.log('✅ Firebase is ready!');
+                    } else {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        attempts++;
+                    }
+                }
+                
+                if (!firebaseReady) {
+                    throw new Error('Firebase initialization timeout');
+                }
+                
                 console.log('🎮 Calling initializeGame()...');
-                initializeGame();
+                await initializeGame();
                 console.log('✅ initializeGame() completed successfully');
                 
                 console.log('🔧 Setting up level transition handlers...');
