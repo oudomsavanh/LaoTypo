@@ -194,7 +194,7 @@
                     index: index + 1,
                     hasContext: !!word.context,
                     hasCorrect: !!word.correct,
-                    hasIncorrect: !!(word.incorrect || word.wrong),
+                    hasIncorrect: !!word.incorrect,
                     difficulty: word.difficulty,
                     context: word.context ? word.context.substring(0, 20) + '...' : 'N/A'
                 }));
@@ -227,7 +227,7 @@
                 const wordPairs = words.map(w => ({
                     context: w.context,
                     correct: w.correct,
-                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    incorrect: w.incorrect,
                     difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 

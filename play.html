@@ -1916,7 +1916,7 @@
                 wordPairs = words.map(w => ({
                     context: w.context,
                     correct: w.correct,
-                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    incorrect: w.incorrect,
                     difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 

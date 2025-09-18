@@ -134,7 +134,7 @@
 
                 // Show sample words
                 words.slice(0, 3).forEach((word, index) => {
-                    addResult(`📝 Word ${index + 1}: context="${word.context}", correct="${word.correct}", incorrect="${word.incorrect || word.wrong}"`, 'info');
+                    addResult(`📝 Word ${index + 1}: context="${word.context}", correct="${word.correct}", incorrect="${word.incorrect}"`, 'info');
                 });
 
                 addResult('✅ GameDataManager test PASSED!', 'success');

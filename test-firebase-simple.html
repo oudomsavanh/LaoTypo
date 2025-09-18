@@ -157,7 +157,7 @@
                     // Show first few words
                     const sampleWords = words.slice(0, 3);
                     sampleWords.forEach(word => {
-                        addResult(`📝 Sample: "${word.lao}" = "${word.english}" (${word.difficulty})`, 'info');
+                        addResult(`📝 Sample: context="${word.context}" | correct="${word.correct}" | incorrect="${word.incorrect}" (difficulty ${word.difficulty})`, 'info');
                     });
                 } else {
                     throw new Error('No words loaded');

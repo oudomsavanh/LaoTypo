@@ -42,24 +42,32 @@ class FirestoreGameDataManager {
 
                 if (!snapshot.empty) {
                     const words = snapshot.docs.map(doc => {
-                        const data = doc.data();
+                        const data = doc.data() || {};
+
+                        const rawDifficulty = data.difficulty;
+                        const numericDifficulty = typeof rawDifficulty === 'number'
+                            ? rawDifficulty
+                            : parseInt(rawDifficulty, 10);
+
                         return {
-                            id: doc.id,
-                            lao: data.lao || '',
-                            english: data.english || '',
-                            difficulty: data.difficulty || 'easy',
-                            category: data.category || 'general'
+                            context: data.context || '',
+                            correct: data.correct || '',
+                            incorrect: data.wrong ?? data.incorrect ?? '',
+                            difficulty: Number.isFinite(numericDifficulty) ? numericDifficulty : 1
                         };
-                    });
+                    }).filter(word => word.context && word.correct && word.incorrect);
 
-                    // Cache the results
-                    this.cache.set(cacheKey, {
-                        data: words,
-                        timestamp: Date.now()
-                    });
+                    if (words.length > 0) {
+                        // Cache the results
+                        this.cache.set(cacheKey, {
+                            data: words,
+                            timestamp: Date.now()
+                        });
 
-                    console.log('✅ Loaded', words.length, 'words from Firestore');
-                    return words;
+                        console.log('✅ Loaded', words.length, 'words from Firestore');
+                        return words;
+                    }
+                    console.warn('⚠️ No valid words found in Firestore response, falling back to defaults');
                 }
             }
 
@@ -77,56 +85,53 @@ class FirestoreGameDataManager {
     // Get fallback words when Firestore is not available
     getFallbackWords(limit = 100) {
         const fallbackWords = [
-            { id: '1', lao: 'ສະບາຍດີ', english: 'Hello', difficulty: 'easy', category: 'greeting' },
-            { id: '2', lao: 'ຂອບໃຈ', english: 'Thank you', difficulty: 'easy', category: 'greeting' },
-            { id: '3', lao: 'ລາກ່ອນ', english: 'Goodbye', difficulty: 'easy', category: 'greeting' },
-            { id: '4', lao: 'ຂໍໂທດ', english: 'Sorry', difficulty: 'easy', category: 'greeting' },
-            { id: '5', lao: 'ຊື່', english: 'Name', difficulty: 'easy', category: 'basic' },
-            { id: '6', lao: 'ອາຍຸ', english: 'Age', difficulty: 'easy', category: 'basic' },
-            { id: '7', lao: 'ບ້ານ', english: 'House', difficulty: 'easy', category: 'basic' },
-            { id: '8', lao: 'ຄອບຄົວ', english: 'Family', difficulty: 'easy', category: 'basic' },
-            { id: '9', lao: 'ເດັກ', english: 'Child', difficulty: 'easy', category: 'basic' },
-            { id: '10', lao: 'ຜູ້ໃຫຍ່', english: 'Adult', difficulty: 'easy', category: 'basic' },
-            { id: '11', lao: 'ອາຫານ', english: 'Food', difficulty: 'medium', category: 'food' },
-            { id: '12', lao: 'ນ້ຳ', english: 'Water', difficulty: 'easy', category: 'food' },
-            { id: '13', lao: 'ເຂົ້າ', english: 'Rice', difficulty: 'easy', category: 'food' },
-            { id: '14', lao: 'ຜັກ', english: 'Vegetable', difficulty: 'medium', category: 'food' },
-            { id: '15', lao: 'ໝາກໄມ້', english: 'Fruit', difficulty: 'medium', category: 'food' },
-            { id: '16', lao: 'ສັດ', english: 'Animal', difficulty: 'easy', category: 'nature' },
-            { id: '17', lao: 'ຕົ້ນໄມ້', english: 'Tree', difficulty: 'easy', category: 'nature' },
-            { id: '18', lao: 'ດອກໄມ້', english: 'Flower', difficulty: 'medium', category: 'nature' },
-            { id: '19', lao: 'ທ້ອງຟ້າ', english: 'Sky', difficulty: 'easy', category: 'nature' },
-            { id: '20', lao: 'ດິນ', english: 'Earth', difficulty: 'easy', category: 'nature' },
-            { id: '21', lao: 'ຮຽນ', english: 'Study', difficulty: 'easy', category: 'education' },
-            { id: '22', lao: 'ປຶ້ມ', english: 'Book', difficulty: 'easy', category: 'education' },
-            { id: '23', lao: 'ຄູ', english: 'Teacher', difficulty: 'easy', category: 'education' },
-            { id: '24', lao: 'ນັກຮຽນ', english: 'Student', difficulty: 'easy', category: 'education' },
-            { id: '25', lao: 'ໂຮງຮຽນ', english: 'School', difficulty: 'medium', category: 'education' },
-            { id: '26', lao: 'ວຽກ', english: 'Work', difficulty: 'easy', category: 'work' },
-            { id: '27', lao: 'ອອບຟິດ', english: 'Office', difficulty: 'medium', category: 'work' },
-            { id: '28', lao: 'ລົດ', english: 'Car', difficulty: 'easy', category: 'transport' },
-            { id: '29', lao: 'ລົດຈັກ', english: 'Motorcycle', difficulty: 'medium', category: 'transport' },
-            { id: '30', lao: 'ລົດເມ', english: 'Bus', difficulty: 'easy', category: 'transport' },
-            { id: '31', lao: 'ສີ', english: 'Color', difficulty: 'easy', category: 'basic' },
-            { id: '32', lao: 'ແດງ', english: 'Red', difficulty: 'easy', category: 'color' },
-            { id: '33', lao: 'ຂຽວ', english: 'Green', difficulty: 'easy', category: 'color' },
-            { id: '34', lao: 'ຟ້າ', english: 'Blue', difficulty: 'easy', category: 'color' },
-            { id: '35', lao: 'ເຫຼືອງ', english: 'Yellow', difficulty: 'easy', category: 'color' },
-            { id: '36', lao: 'ດຳ', english: 'Black', difficulty: 'easy', category: 'color' },
-            { id: '37', lao: 'ຂາວ', english: 'White', difficulty: 'easy', category: 'color' },
-            { id: '38', lao: 'ເວລາ', english: 'Time', difficulty: 'medium', category: 'basic' },
-            { id: '39', lao: 'ວັນ', english: 'Day', difficulty: 'easy', category: 'time' },
-            { id: '40', lao: 'ຄືນ', english: 'Night', difficulty: 'easy', category: 'time' },
-            { id: '41', lao: 'ເຊົ້າ', english: 'Morning', difficulty: 'easy', category: 'time' },
-            { id: '42', lao: 'ບ່າຍ', english: 'Afternoon', difficulty: 'medium', category: 'time' },
-            { id: '43', lao: 'ແສງ', english: 'Light', difficulty: 'medium', category: 'basic' },
-            { id: '44', lao: 'ມືດ', english: 'Dark', difficulty: 'easy', category: 'basic' },
-            { id: '45', lao: 'ຮ້ອນ', english: 'Hot', difficulty: 'easy', category: 'weather' },
-            { id: '46', lao: 'ເຢັນ', english: 'Cold', difficulty: 'easy', category: 'weather' },
-            { id: '47', lao: 'ຝົນ', english: 'Rain', difficulty: 'easy', category: 'weather' },
-            { id: '48', lao: 'ແດດ', english: 'Sun', difficulty: 'easy', category: 'weather' },
-            { id: '49', lao: 'ລົມ', english: 'Wind', difficulty: 'easy', category: 'weather' },
-            { id: '50', lao: 'ຟ້າຜ່າ', english: 'Lightning', difficulty: 'hard', category: 'weather' }
+            { context: 'ຄຳທັກທາຍ', correct: 'ສະບາຍດີ', incorrect: 'ສະບາຍດິ', difficulty: 1 },
+            { context: 'ຄຳຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບໃ່', difficulty: 1 },
+            { context: 'ຄຳລາ', correct: 'ລາກ່ອນ', incorrect: 'ລາກ່ນ', difficulty: 1 },
+            { context: 'ຄຳຂໍໂທດ', correct: 'ຂໍໂທດ', incorrect: 'ຂໍໂຖດ', difficulty: 1 },
+            { context: 'ການແນະນຳຕົນ', correct: 'ຊື່', incorrect: 'ຊຶ່', difficulty: 1 },
+            { context: 'ການແນະນຳຕົນ', correct: 'ອາຍຸ', incorrect: 'ອາຍູ', difficulty: 1 },
+            { context: 'ສະມາຊິກຄອບຄົວ', correct: 'ຄອບຄົວ', incorrect: 'ຄອບຄົົວ', difficulty: 1 },
+            { context: 'ສະຖານທີ່ຢູ່', correct: 'ບ້ານ', incorrect: 'ບ້ານນ', difficulty: 1 },
+            { context: 'ອາຫານພື້ນຖານ', correct: 'ອາຫານ', incorrect: 'ອາຫານນ', difficulty: 1 },
+            { context: 'ເຄື່ອງດື່ມຈຳເປັນ', correct: 'ນ້ຳ', incorrect: 'ນ້ຳຳ', difficulty: 1 },
+            { context: 'ອາຫານພື້ນຖານ', correct: 'ເຂົ້າ', incorrect: 'ເຂົ້້າ', difficulty: 1 },
+            { context: 'ອາຫານເພີ່ມສຸຂະພາບ', correct: 'ຜັກ', incorrect: 'ຜັັກ', difficulty: 2 },
+            { context: 'ອາຫານເພີ່ມຄວາມຫວານ', correct: 'ໝາກໄມ້', incorrect: 'ໝາກໄໝ້', difficulty: 2 },
+            { context: 'ການເດີນທາງ', correct: 'ລົດ', incorrect: 'ລົົດ', difficulty: 1 },
+            { context: 'ພາຫະນະສ່ວນບຸກຄົນ', correct: 'ລົດຈັກ', incorrect: 'ລົດຈັັກ', difficulty: 2 },
+            { context: 'ສະຖານສຶກສາ', correct: 'ໂຮງຮຽນ', incorrect: 'ໂຮງຮຽນນ', difficulty: 2 },
+            { context: 'ການເຮັດວຽກ', correct: 'ວຽກ', incorrect: 'ວຽັກ', difficulty: 1 },
+            { context: 'ອາຊີບຄູ', correct: 'ຄູ', incorrect: 'ຄົູ', difficulty: 1 },
+            { context: 'ຜູ້ຮຽນ', correct: 'ນັກຮຽນ', incorrect: 'ນັກຮຽນນ', difficulty: 1 },
+            { context: 'ເວລາເຊົ້າ', correct: 'ເຊົ້າ', incorrect: 'ເຊົ້າ້', difficulty: 1 },
+            { context: 'ເວລາກາງຄືນ', correct: 'ຄືນ', incorrect: 'ຄືນນ', difficulty: 1 },
+            { context: 'ອາກາດຝົນ', correct: 'ຝົນ', incorrect: 'ຝົນນ', difficulty: 1 },
+            { context: 'ອາກາດຮ້ອນ', correct: 'ຮ້ອນ', incorrect: 'ຮ້ອນນ', difficulty: 1 },
+            { context: 'ອາກາດເຢັນ', correct: 'ເຢັນ', incorrect: 'ເຢັນນ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ແດງ', incorrect: 'ແດງງ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ຂຽວ', incorrect: 'ຂຽວວ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ຟ້າ', incorrect: 'ຟ້າາ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ເຫຼືອງ', incorrect: 'ເຫຼືອງງ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ດຳ', incorrect: 'ດຳຳ', difficulty: 1 },
+            { context: 'ສີພື້ນຖານ', correct: 'ຂາວ', incorrect: 'ຂາວວ', difficulty: 1 },
+            { context: 'ຂໍ້ມູນປະເທດ', correct: 'ປະເທດລາວ', incorrect: 'ປະເທດລາວວ', difficulty: 2 },
+            { context: 'ພາສາທ້ອງຖິ່ນ', correct: 'ພາສາລາວ', incorrect: 'ພາສາລາວວ', difficulty: 2 },
+            { context: 'ຄວາມຮູ້ດ້ານເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 },
+            { context: 'ຄວາມຮູ້ດ້ານວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', incorrect: 'ວິທະຍາສາດດ', difficulty: 3 },
+            { context: 'ທຳມະຊາດ', correct: 'ສັດ', incorrect: 'ສັັດ', difficulty: 1 },
+            { context: 'ທ້ອງຟ້າ', correct: 'ທ້ອງຟ້າ', incorrect: 'ທ້ອງຟ້າາ', difficulty: 1 },
+            { context: 'ພື້ນດິນ', correct: 'ດິນ', incorrect: 'ດິນນ', difficulty: 1 },
+            { context: 'ດອກໄມ້', correct: 'ດອກໄມ້', incorrect: 'ດອກໄໝ້', difficulty: 2 },
+            { context: 'ຕົ້ນໄມ້', correct: 'ຕົ້ນໄມ້', incorrect: 'ຕົ້ນໄໝ້', difficulty: 1 },
+            { context: 'ການຮຽນຮູ້', correct: 'ຮຽນ', incorrect: 'ຮຽນນ', difficulty: 1 },
+            { context: 'ປຶ້ມຮຽນ', correct: 'ປຶ້ມ', incorrect: 'ປຶ້ມມ', difficulty: 1 },
+            { context: 'ເວລາກາງວັນ', correct: 'ວັນ', incorrect: 'ວັນນ', difficulty: 1 },
+            { context: 'ແສງສະຫວ່າງ', correct: 'ແສງ', incorrect: 'ແສງງ', difficulty: 2 },
+            { context: 'ຄວາມມືດ', correct: 'ມືດ', incorrect: 'ມືດດ', difficulty: 1 },
+            { context: 'ກະແສລົມ', correct: 'ລົມ', incorrect: 'ລົມມ', difficulty: 1 },
+            { context: 'ແສງແດດ', correct: 'ແດດ', incorrect: 'ແດດດ', difficulty: 1 },
+            { context: 'ປາຍຟ້າ', correct: 'ຟ້າຜ່າ', incorrect: 'ຟ້າຜ່າາ', difficulty: 3 }
         ];
 
         // Return limited number of words
