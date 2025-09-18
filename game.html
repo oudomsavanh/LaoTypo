@@ -1239,8 +1239,8 @@
 <body>
     <!-- 🔥 Firebase Integration (Player Data Only) -->
     <script src="firebase-config.js"></script>
-    <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> 
-    <script type="module" src="test-firebase-player-sync.js"></script>
+    <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration -->
+    <script src="firestore-game-data.js"></script>
     
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
@@ -1546,7 +1546,7 @@
         async function waitForFirebase() {
             let attempts = 0;
             const maxAttempts = 50; // 5 seconds max wait
-            
+
             while (attempts < maxAttempts) {
                 if (window.SecurityUtils && window.firebaseDb) {
                     console.log('✅ Firebase and SecurityUtils are ready!');
@@ -1555,15 +1555,151 @@
                 await new Promise(resolve => setTimeout(resolve, 100));
                 attempts++;
             }
-            
+
             console.warn('⚠️ Firebase initialization timeout, continuing without Firebase');
             return false;
         }
-        
+
+        const offlineWordList = [
+            { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', wrong: 'ສະບາຍດີີ', difficulty: 1 },
+            { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', wrong: 'ຂອບຈັຍ', difficulty: 1 },
+            { context: 'ລາວ', correct: 'ລາວ', wrong: 'ລາຍ', difficulty: 1 },
+            { context: 'ຍິນດີ', correct: 'ຍິນດີ', wrong: 'ຍິນດີີ', difficulty: 1 },
+            { context: 'ຄອບຄົວ', correct: 'ຄອບຄົວ', wrong: 'ຄອບຄົວວ', difficulty: 1 },
+            { context: 'ຄົນທີ່ຂັບລົດ', correct: 'ຄົນຂັບ', wrong: 'ຄົນຂັບຣ໌', difficulty: 2 },
+            { context: 'ຜູ້ທີ່ມັກເວົ້າ', correct: 'ຄົນຂີ້ຄຸຍ', wrong: 'ຄົນຂີຄຸ້ຍ', difficulty: 2 },
+            { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', wrong: 'ປະເທດລາຍ', difficulty: 2 },
+            { context: 'ການທ່ອງທ່ຽວ', correct: 'ການທ່ອງທ່ຽວ', wrong: 'ການທ່ອງທ່ຽວວ', difficulty: 2 },
+            { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', wrong: 'ຄອມພິຍເຕີ', difficulty: 3 },
+            { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', wrong: 'ເຕັກໂນໂລຊິ', difficulty: 3 },
+            { context: 'ການປະສົບຜົນສຳເລັດ', correct: 'ການປະສົບຜົນສຳເລັດ', wrong: 'ການປະສົບຜົນສຳເລັດດ', difficulty: 3 }
+        ];
+
+        let wordList = offlineWordList.map(entry => ({ ...entry }));
+        let wordListReady = false;
+        let wordListLoadingPromise = null;
+
+        function normalizeDifficultyValue(value) {
+            if (typeof value === 'number' && !Number.isNaN(value)) {
+                if (value < 1) return 1;
+                if (value > 3) return 3;
+                return Math.round(value);
+            }
+
+            if (typeof value === 'string') {
+                const trimmed = value.trim().toLowerCase();
+                if (trimmed === 'easy') return 1;
+                if (trimmed === 'medium') return 2;
+                if (trimmed === 'hard') return 3;
+                const parsed = parseInt(trimmed, 10);
+                if (!Number.isNaN(parsed)) {
+                    if (parsed < 1) return 1;
+                    if (parsed > 3) return 3;
+                    return parsed;
+                }
+            }
+
+            return 1;
+        }
+
+        function difficultyNumberToName(value) {
+            switch (value) {
+                case 3:
+                    return 'hard';
+                case 2:
+                    return 'medium';
+                default:
+                    return 'easy';
+            }
+        }
+
+        function normalizeWordEntry(rawWord) {
+            if (!rawWord) return null;
+
+            const difficulty = normalizeDifficultyValue(rawWord.difficulty);
+            let context = rawWord.context || rawWord.prompt || rawWord.lao || rawWord.question || '';
+            let correct = rawWord.correct || rawWord.answer || rawWord.lao || '';
+            let wrong = rawWord.wrong || rawWord.incorrect || rawWord.typo || rawWord.fake || '';
+
+            if (!context && correct) {
+                context = correct;
+            }
+
+            if (!correct) {
+                return null;
+            }
+
+            if (!wrong && correct) {
+                wrong = generateTypo(correct, difficultyNumberToName(difficulty));
+            }
+
+            if (!wrong) {
+                return null;
+            }
+
+            return {
+                context: String(context).trim(),
+                correct: String(correct).trim(),
+                wrong: String(wrong).trim(),
+                difficulty
+            };
+        }
+
+        async function waitForGameDataManager(timeoutMs = 5000) {
+            const pollInterval = 100;
+            const maxAttempts = Math.ceil(timeoutMs / pollInterval);
+
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                if (window.GameDataManager && typeof window.GameDataManager.loadWords === 'function') {
+                    return window.GameDataManager;
+                }
+                await new Promise(resolve => setTimeout(resolve, pollInterval));
+            }
+
+            throw new Error('GameDataManager not ready');
+        }
+
+        async function loadWordList(limit = 500) {
+            try {
+                const manager = await waitForGameDataManager();
+                const rawWords = await manager.loadWords(limit);
+                const normalizedWords = (rawWords || []).map(normalizeWordEntry).filter(Boolean);
+
+                if (normalizedWords.length > 0) {
+                    wordList = normalizedWords;
+                    wordListReady = true;
+                    console.log(`✅ Word list loaded from GameDataManager: ${wordList.length} entries`);
+                    return wordList;
+                }
+
+                throw new Error('No valid words returned from GameDataManager');
+            } catch (error) {
+                console.warn('⚠️ Falling back to offline word list:', error);
+                wordList = offlineWordList.map(entry => ({ ...entry }));
+                wordListReady = true;
+                return wordList;
+            } finally {
+                wordListLoadingPromise = null;
+            }
+        }
+
+        async function ensureWordListLoaded(limit = 500) {
+            if (wordListReady && wordList.length > 0) {
+                return wordList;
+            }
+
+            if (!wordListLoadingPromise) {
+                wordListLoadingPromise = loadWordList(limit);
+            }
+
+            return wordListLoadingPromise;
+        }
+
         // Initialize the game when everything is ready
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 DOMContentLoaded - waiting for Firebase...');
             await waitForFirebase();
+            await ensureWordListLoaded();
             initializeGame();
         });
         
@@ -1615,6 +1751,8 @@
             } else {
                 console.warn('⚠️ initializeFirebase function not available');
             }
+
+            await ensureWordListLoaded();
         });
 
         // --- DOM ELEMENTS ---
@@ -2739,14 +2877,16 @@
         window.onload = async () => {
             // Initialize sound system first (always needed)
             initializeSoundSystem();
-            
+
             // Try to auto-start music if enabled (may be blocked by browser)
             if (musicEnabled) {
                 setTimeout(() => {
                     toggleBackgroundMusic();
                 }, 1000); // Small delay to ensure audio is ready
             }
-            
+
+            await ensureWordListLoaded();
+
             // Check authentication
             if (!checkUserAuthentication()) {
                 return; // Will redirect to registration
