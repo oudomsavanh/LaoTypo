@@ -1086,7 +1086,9 @@
             dashboard.className = 'fixed top-20 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg z-40 max-w-sm';
             dashboard.style.display = 'none';
             
-            SecurityUtils.safeSetHTML(dashboard, `
+            // Use SecurityUtils if available, otherwise use innerHTML directly
+            if (window.SecurityUtils) {
+                SecurityUtils.safeSetHTML(dashboard, `
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-bold">📊 Live Analytics</h3>
                     <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
@@ -1122,6 +1124,45 @@
                     </div>
                 </div>
             `);
+            } else {
+                // Fallback if SecurityUtils is not available
+                dashboard.innerHTML = `
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-lg font-bold">📊 Live Analytics</h3>
+                    <button id="close-dashboard" class="text-gray-400 hover:text-white">✕</button>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>🎮 Active Players:</span>
+                        <span id="active-players">1</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>⚡ Current Streak:</span>
+                        <span id="current-streak">${currentStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🏆 Best Streak:</span>
+                        <span id="best-streak">${bestStreak || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📊 Words Completed:</span>
+                        <span id="words-completed">${totalWordsCompleted || 0}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>❤️ Lives Left:</span>
+                        <span id="lives-left">${playerLives || 3}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>📱 Device:</span>
+                        <span id="device-type">${getDeviceInfo().deviceType}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>🌐 Online:</span>
+                        <span id="connection-status">${navigator.onLine ? 'Yes' : 'No'}</span>
+                    </div>
+                </div>
+            `;
+            }
             
             document.body.appendChild(dashboard);
             
@@ -1753,6 +1794,22 @@
 
         // Load game settings from localStorage
         function loadGameSettings() {
+            // Initialize audio settings using SecurityUtils if available
+            if (window.SecurityUtils) {
+                soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled', true);
+                musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled', true);
+                console.log('✅ Audio settings loaded from localStorage using SecurityUtils');
+            } else {
+                // Fallback to localStorage directly
+                try {
+                    soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+                    musicEnabled = localStorage.getItem('musicEnabled') !== 'false';
+                    console.log('✅ Audio settings loaded from localStorage (fallback)');
+                } catch (e) {
+                    console.warn('⚠️ localStorage not available, using default audio settings');
+                }
+            }
+            
             const storedSettings = localStorage.getItem('gameSettings');
             if (storedSettings) {
                 const settings = JSON.parse(storedSettings);
@@ -2404,7 +2461,12 @@
             `;
             
             evaluationEl.textContent = evaluation;
-            SecurityUtils.safeSetHTML(memeContainer, memeContent);
+            // Use SecurityUtils if available, otherwise use innerHTML directly
+            if (window.SecurityUtils) {
+                SecurityUtils.safeSetHTML(memeContainer, memeContent);
+            } else {
+                memeContainer.innerHTML = memeContent;
+            }
             
             // Save game stats
             saveGameStats();
@@ -2443,7 +2505,19 @@
 
         // Save game stats
         function saveGameStats() {
-            const stats = SecurityUtils.safeGetLocalStorage('gameStats', {});
+            let stats = {};
+            if (window.SecurityUtils) {
+                stats = SecurityUtils.safeGetLocalStorage('gameStats', {});
+            } else {
+                // Fallback to localStorage directly
+                try {
+                    const stored = localStorage.getItem('gameStats');
+                    stats = stored ? JSON.parse(stored) : {};
+                } catch (e) {
+                    console.warn('⚠️ localStorage not available, using empty stats');
+                    stats = {};
+                }
+            }
             
             if (!stats.totalGames) stats.totalGames = 0;
             if (!stats.totalCorrect) stats.totalCorrect = 0;
@@ -3150,11 +3224,16 @@
             if (quickEditNameBtn) {
                 quickEditNameBtn.addEventListener('click', () => {
                     const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
-                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
-                    const sanitizedName = SecurityUtils.sanitizeInput(newName, 50);
-                    if (sanitizedsanitizedName && sanitizedsanitizedName.trim() !== '') {
+                    let sanitizedName = '';
+                    if (window.SecurityUtils) {
+                        sanitizedName = SecurityUtils.sanitizeInput(newName, 50);
+                    } else {
+                        // Fallback sanitization
+                        sanitizedName = newName ? newName.toString().substring(0, 50).replace(/[<>]/g, '') : '';
+                    }
+                    if (sanitizedName && sanitizedName.trim() !== '') {
                         const oldName = playerName;
-                        playerName = sanitizedsanitizedName.trim();
+                        playerName = sanitizedName.trim();
                         localStorage.setItem('displayName', playerName);
                         
                         // Reset best streak for new player in guest mode
