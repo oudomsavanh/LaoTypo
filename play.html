@@ -1794,8 +1794,8 @@
         // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Firestore...';
-                wordLoadingStatus.style.color = 'var(--main-color)';
+                // Hide inline loading UI; use console only
+                if (wordLoadingStatus) wordLoadingStatus.style.display = 'none';
 
                 // Ensure Firebase SDK v8 is available (used by firestore-game-data.js)
                 if (typeof firebase === 'undefined' || !firebase.firestore) {
@@ -1817,15 +1817,8 @@
                     throw new Error('No valid words found in Firestore');
                 }
 
-                console.log('Loaded words from Firestore:', wordPairs.length);
-
-                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
-                wordLoadingStatus.style.color = 'var(--correct-color)';
-
-                setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
-                    retryLoadingContainer.classList.add('hidden');
-                }, 1500);
+                console.log('Loaded words completed');
+                if (retryLoadingContainer) retryLoadingContainer.classList.add('hidden');
 
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
