@@ -160,14 +160,14 @@ els.importBtn.addEventListener('click', async () => {
     let ops = 0, written = 0;
     const now = new Date();
 
-    for (const [docId, doc] of entries) {
-      const difficultyNum = typeof doc.difficulty === 'number' ? doc.difficulty : parseInt(String(doc.difficulty ?? '1'), 10);
+    for (const [docId, docData] of entries) {
+      const difficultyNum = typeof docData.difficulty === 'number' ? docData.difficulty : parseInt(String(docData.difficulty ?? '1'), 10);
       const normalized = {
-        context: String(doc.context || '').trim(),
-        correct: String(doc.correct || '').trim(),
-        incorrect: String((doc.incorrect ?? doc.wrong ?? '')).trim(),
+        context: String(docData.context || '').trim(),
+        correct: String(docData.correct || '').trim(),
+        incorrect: String((docData.incorrect ?? docData.wrong ?? '')).trim(),
         difficulty: Number.isFinite(difficultyNum) && [1,2,3].includes(difficultyNum) ? difficultyNum : 1,
-        order: typeof doc.order === 'number' ? doc.order : null,
+        order: typeof docData.order === 'number' ? docData.order : null,
         createdAt: now,
         updatedAt: now
       };
