@@ -2316,13 +2316,9 @@
             console.log('🚀 Starting game with settings:', settings);
             console.log('👤 Player name:', displayName);
             
-            // Convert difficulty to numeric format for play.html
-            const diffNum = settings.difficulty === 'easy' ? 1 :
-                           settings.difficulty === 'medium' ? 2 : 3;
-            
             const params = new URLSearchParams({
                 player: encodeURIComponent(displayName),
-                difficulty: String(diffNum),
+                difficulty: settings.difficulty,
                 timer: String(settings.timer),
                 sound: String(!!soundEnabled),
                 music: String(!!musicEnabled)
