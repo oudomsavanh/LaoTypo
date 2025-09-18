@@ -1603,13 +1603,17 @@
         }
 
         // --- FIREBASE INITIALIZATION ---
-        let firebaseSync = null;
+        let firebaseEnabled = false;
         
         window.addEventListener('load', async () => {
-            const firebaseInitialized = await initializeFirebase();
-            if (firebaseInitialized) {
-                firebaseSync = new FirebaseSync();
-                console.log('🔥 Firebase sync ready');
+            if (window.initializeFirebase) {
+                const firebaseInitialized = await window.initializeFirebase();
+                if (firebaseInitialized) {
+                    firebaseEnabled = true;
+                    console.log('🔥 Firebase sync ready');
+                }
+            } else {
+                console.warn('⚠️ initializeFirebase function not available');
             }
         });
 
@@ -2754,7 +2758,27 @@
             motivationText = document.querySelector('.motivation-text');
             
             // Initialize Firebase sync
-            await initializeFirebaseSync();
+            try {
+                if (window.FirebaseSyncManager) {
+                    const isConnected = await window.FirebaseSyncManager.checkConnection();
+                    if (isConnected) {
+                        firebaseEnabled = true;
+                        console.log('✅ Firebase sync enabled');
+                        
+                        // Try to sync existing local data to cloud
+                        await syncLocalDataToFirebase();
+                        
+                        // Try to load cloud data
+                        await syncCloudDataToLocal();
+                    } else {
+                        console.warn('⚠️ Firebase connection failed');
+                    }
+                } else {
+                    console.warn('⚠️ FirebaseSyncManager not available');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+            }
             
             loadUserData();
             updateUI();
@@ -3026,46 +3050,7 @@
         }
         
         // 🔥 FIREBASE INTEGRATION FUNCTIONS
-        let firebaseEnabled = false;
-        
-        // Initialize Firebase connection
-        async function initializeFirebaseSync() {
-            try {
-                // Check if Firebase managers are available
-                console.log('🔍 Firebase debug:', {
-                    hasFirebaseConfig: typeof window.firebaseConfig !== 'undefined',
-                    hasDb: typeof window.firebaseDb !== 'undefined',
-                    hasAuth: typeof window.firebaseAuth !== 'undefined',
-                    hasManagers: typeof FirebaseSyncManager !== 'undefined',
-                });
-
-                if (typeof FirebaseSyncManager !== 'undefined') {
-                    let isConnected = false;
-                    try {
-                        isConnected = await FirebaseSyncManager.checkConnection();
-                    } catch (e) {
-                        console.error('🔌 checkConnection threw:', { name: e?.name, code: e?.code, message: e?.message });
-                    }
-                    if (isConnected) {
-                        firebaseEnabled = true;
-                        console.log('🔥 Firebase sync enabled');
-                        
-                        // Try to sync existing local data to cloud
-                        await syncLocalDataToFirebase();
-                        
-                        // Try to load cloud data
-                        await syncCloudDataToLocal();
-                    } else {
-                        console.warn('🔌 Firebase connection failed, using local mode');
-                    }
-                } else {
-                    console.warn('🔥 Firebase not loaded, using local mode');
-                }
-            } catch (error) {
-                console.error('❌ Firebase initialization error:', error);
-                firebaseEnabled = false;
-            }
-        }
+        // firebaseEnabled is already declared above
         
         // Sync local data to Firebase
         async function syncLocalDataToFirebase() {
