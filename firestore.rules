@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function hasAdminClaim() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isCustomProvider() {
+      return isSignedIn() &&
+        request.auth.token.firebase != null &&
+        request.auth.token.firebase.sign_in_provider == 'custom';
+    }
+
+    function isServiceAccount() {
+      return isSignedIn() &&
+        request.auth.uid != null &&
+        request.auth.uid.matches('^serviceAccount:.*$');
+    }
+
+    function isTrustedService() {
+      return isCustomProvider() || isServiceAccount();
+    }
+
+    function isKnownPlayer() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/players/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/users/$(request.auth.uid))
+      );
+    }
+
+    function hasPlayerIds(data) {
+      return data.keys().hasAny(['playerIds']) && data.playerIds != null;
+    }
+
+    function sessionHasPlayer(uid) {
+      return hasPlayerIds(resource.data) && resource.data.playerIds.hasAny([uid]);
+    }
+
+    function playerIdsUnchanged() {
+      return (!hasPlayerIds(resource.data) && !hasPlayerIds(request.resource.data)) ||
+        (hasPlayerIds(resource.data) && hasPlayerIds(request.resource.data) &&
+          resource.data.playerIds.hasOnly(request.resource.data.playerIds) &&
+          request.resource.data.playerIds.hasOnly(resource.data.playerIds));
+    }
+
+    match /players/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /sessions/{code} {
+      allow create: if isSignedIn() &&
+        request.resource.data.hostId == request.auth.uid;
+
+      allow read: if isSignedIn() && (
+        (resource.data.hostId == request.auth.uid) ||
+        sessionHasPlayer(request.auth.uid) ||
+        isKnownPlayer()
+      );
+
+      allow update: if isSignedIn() && (
+        resource.data.hostId == request.auth.uid ||
+        (
+          sessionHasPlayer(request.auth.uid) &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['players', 'updatedAt']) &&
+          playerIdsUnchanged()
+        )
+      );
+
+      allow delete: if isSignedIn() && resource.data.hostId == request.auth.uid;
+    }
+
+    match /gameWords/{id} {
+      allow get, list: if isKnownPlayer();
+      allow create, update, delete: if hasAdminClaim() || isTrustedService();
+    }
+
+    match /leaderboard/{id} {
+      allow get, list: if isKnownPlayer();
+      allow create, update, delete: if isTrustedService();
+    }
+
+    match /gameResults/{id} {
+      allow get, list: if isKnownPlayer();
+      allow create, update, delete: if isTrustedService();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -16,7 +16,7 @@ serviceAccountKey.json
 .firebaserc
 firebase-debug.log
 firestore-debug.log
-firestore.rules
+!firestore.rules
 firestore.indexes.json
 database.rules.json
 storage.rules
