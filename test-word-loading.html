@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Word Loading</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Word Loading Test</h1>
+        <p>This page will test the complete word loading process from Firebase to the game.</p>
+        
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+            <button onclick="testGameWordsCollection()">Test GameWords Collection</button>
+            <button onclick="testGameDataManager()">Test GameDataManager</button>
+            <button onclick="testWordLoadingProcess()">Test Complete Word Loading</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <!-- Load Firebase scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+
+    <script>
+        let testResults = [];
+
+        function addResult(message, type = 'info', details = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const result = { timestamp, message, type, details };
+            testResults.push(result);
+            
+            const resultsDiv = document.getElementById('results');
+            const section = document.createElement('div');
+            section.className = `test-section ${type}`;
+            
+            let html = `<strong>[${timestamp}]</strong> ${message}`;
+            if (details) {
+                html += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            section.innerHTML = html;
+            resultsDiv.appendChild(section);
+            
+            console.log(`[${type.toUpperCase()}] ${message}`, details || '');
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testResults = [];
+        }
+
+        async function testFirebaseConnection() {
+            addResult('🔍 Testing Firebase connection...', 'info');
+            
+            try {
+                // Test 1: Check Firebase config
+                if (typeof window.firebaseConfig === 'undefined') {
+                    throw new Error('Firebase config not found');
+                }
+                addResult('✅ Firebase config found', 'success', {
+                    projectId: window.firebaseConfig.projectId,
+                    authDomain: window.firebaseConfig.authDomain
+                });
+
+                // Test 2: Check Firebase app
+                if (typeof window.firebaseDb === 'undefined') {
+                    throw new Error('Firebase database instance not found');
+                }
+                addResult('✅ Firebase database instance found', 'success');
+
+                // Test 3: Check Firebase functions
+                const requiredFunctions = ['collection', 'query', 'getDocs', 'orderBy', 'limit', 'where'];
+                const missingFunctions = requiredFunctions.filter(func => typeof window[func] === 'undefined');
+                
+                if (missingFunctions.length > 0) {
+                    throw new Error(`Missing Firebase functions: ${missingFunctions.join(', ')}`);
+                }
+                addResult('✅ All required Firebase functions available', 'success');
+
+                return true;
+
+            } catch (error) {
+                addResult(`❌ Firebase connection test failed: ${error.message}`, 'error', {
+                    error: error.message,
+                    stack: error.stack
+                });
+                return false;
+            }
+        }
+
+        async function testGameWordsCollection() {
+            addResult('📚 Testing GameWords collection...', 'info');
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase not initialized');
+                }
+
+                // Test 1: Query gameWords collection
+                addResult('🔍 Querying gameWords collection...', 'info');
+                const wordsCollection = window.collection(window.firebaseDb, 'gameWords');
+                
+                // Try with orderBy first
+                let wordsQuery = window.query(wordsCollection, window.orderBy('order', 'asc'), window.limit(5));
+                let snapshot = await window.getDocs(wordsQuery);
+                
+                if (snapshot.empty) {
+                    addResult('⚠️ No documents found with orderBy, trying without...', 'warning');
+                    wordsQuery = window.query(wordsCollection, window.limit(5));
+                    snapshot = await window.getDocs(wordsQuery);
+                }
+
+                addResult(`📊 Found ${snapshot.size} documents in gameWords collection`, 'info');
+
+                if (snapshot.empty) {
+                    addResult('❌ gameWords collection is empty or does not exist', 'error');
+                    return false;
+                }
+
+                // Test 2: Analyze document structure
+                const documents = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    documents.push({
+                        id: doc.id,
+                        hasContext: !!data.context,
+                        hasCorrect: !!data.correct,
+                        hasIncorrect: !!(data.incorrect || data.wrong),
+                        difficulty: data.difficulty,
+                        order: data.order
+                    });
+                });
+
+                addResult('📝 Document structure analysis:', 'info', documents);
+
+                // Test 3: Show sample data
+                const sampleDoc = snapshot.docs[0];
+                const sampleData = sampleDoc.data();
+                addResult('📄 Sample document data:', 'info', {
+                    id: sampleDoc.id,
+                    data: sampleData
+                });
+
+                addResult('✅ GameWords collection test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ GameWords collection test failed: ${error.message}`, 'error', {
+                    error: error.message,
+                    stack: error.stack
+                });
+                return false;
+            }
+        }
+
+        async function testGameDataManager() {
+            addResult('🎮 Testing GameDataManager...', 'info');
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                addResult('✅ GameDataManager found', 'success');
+
+                // Test 1: Load words
+                addResult('📚 Loading words using GameDataManager...', 'info');
+                const words = await window.GameDataManager.loadWords(10);
+                
+                addResult(`📊 Loaded ${words.length} words`, 'info');
+
+                if (words.length === 0) {
+                    addResult('❌ No words loaded from GameDataManager', 'error');
+                    return false;
+                }
+
+                // Test 2: Analyze word structure
+                const wordAnalysis = words.map((word, index) => ({
+                    index: index + 1,
+                    hasContext: !!word.context,
+                    hasCorrect: !!word.correct,
+                    hasIncorrect: !!(word.incorrect || word.wrong),
+                    difficulty: word.difficulty,
+                    context: word.context ? word.context.substring(0, 20) + '...' : 'N/A'
+                }));
+
+                addResult('📝 Word structure analysis:', 'info', wordAnalysis.slice(0, 5));
+
+                addResult('✅ GameDataManager test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ GameDataManager test failed: ${error.message}`, 'error', {
+                    error: error.message,
+                    stack: error.stack
+                });
+                return false;
+            }
+        }
+
+        async function testWordLoadingProcess() {
+            addResult('🎯 Testing complete word loading process...', 'info');
+            
+            try {
+                // Simulate the exact process from play.html
+                addResult('📚 Loading words using GameDataManager...', 'info');
+                const words = await window.GameDataManager.loadWords(500);
+                
+                addResult(`📥 Raw words from GameDataManager: ${words.length} words`, 'info');
+
+                // Normalize to wordPairs structure expected by the game
+                const wordPairs = words.map(w => ({
+                    context: w.context,
+                    correct: w.correct,
+                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
+                })).filter(w => w.context && w.correct && w.incorrect);
+
+                addResult(`📊 Normalized wordPairs: ${wordPairs.length} words`, 'info');
+
+                if (wordPairs.length === 0) {
+                    addResult('❌ No valid wordPairs after normalization', 'error');
+                    return false;
+                }
+
+                // Test difficulty distribution
+                const difficultyStats = {
+                    easy: wordPairs.filter(w => w.difficulty === 1).length,
+                    medium: wordPairs.filter(w => w.difficulty === 2).length,
+                    hard: wordPairs.filter(w => w.difficulty === 3).length
+                };
+
+                addResult('📊 Difficulty distribution:', 'info', difficultyStats);
+
+                // Show sample wordPairs
+                addResult('📝 Sample wordPairs:', 'info', wordPairs.slice(0, 3));
+
+                addResult('✅ Complete word loading process test PASSED!', 'success');
+                return true;
+
+            } catch (error) {
+                addResult(`❌ Word loading process test failed: ${error.message}`, 'error', {
+                    error: error.message,
+                    stack: error.stack
+                });
+                return false;
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', async () => {
+            addResult('📄 Page loaded, starting automatic tests...', 'info');
+            
+            const firebaseTest = await testFirebaseConnection();
+            if (firebaseTest) {
+                await testGameWordsCollection();
+                await testGameDataManager();
+                await testWordLoadingProcess();
+            }
+            
+            addResult('🏁 All tests completed!', 'info');
+        });
+    </script>
+</body>
+</html>

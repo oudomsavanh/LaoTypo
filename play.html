@@ -1838,8 +1838,22 @@
                 wordLoadingStatus.textContent = 'Loading game content...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
+                // Check if GameDataManager is available
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+
+                console.log('📚 GameDataManager is available, loading words...');
+                console.log('🔍 GameDataManager debug:', {
+                    hasLoadWords: typeof window.GameDataManager.loadWords === 'function',
+                    hasFirebaseDb: !!window.firebaseDb,
+                    hasCollection: !!window.collection,
+                    hasGetDocs: !!window.getDocs
+                });
+                
                 // Load up to 500 words from Firestore
-                const words = await GameDataManager.loadWords(500);
+                const words = await window.GameDataManager.loadWords(500);
+                console.log('📥 Raw words from GameDataManager:', words.length, 'words');
 
                 // Normalize to wordPairs structure expected by the game
                 wordPairs = words.map(w => ({
@@ -3519,9 +3533,9 @@
                 const maxAttempts = 50; // 5 seconds max wait
                 
                 while (!firebaseReady && attempts < maxAttempts) {
-                    if (window.firebaseDb && window.collection && window.getDocs) {
+                    if (window.firebaseDb && window.collection && window.getDocs && window.GameDataManager) {
                         firebaseReady = true;
-                        console.log('✅ Firebase is ready!');
+                        console.log('✅ Firebase and GameDataManager are ready!');
                     } else {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         attempts++;
