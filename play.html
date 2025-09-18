@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com https://docs.google.com https://docs.gstatic.com https://api.allorigins.win https://cors-anywhere.herokuapp.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <!-- Cache Busting Headers v1.9.2 - Layout alignments; version sync with testing; plus prior fixes -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -32,53 +32,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
     <!-- Firebase Configuration -->
-    <!-- Firebase v8 SDK for FirestoreGameDataManager (uses global firebase namespace) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script>
-      // Initialize Firebase (v8)
-      if (!window.firebase || !firebase.apps.length) {
-        firebase.initializeApp({
-          apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
-          authDomain: "laotypo-phase1.firebaseapp.com",
-          projectId: "laotypo-phase1",
-          storageBucket: "laotypo-phase1.firebasestorage.app",
-          messagingSenderId: "359413130623",
-          appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
-          measurementId: "G-7CH5217ZYG"
-        });
-      }
-    </script>
-    <script>
-      // Minimal SecurityUtils used by play.html
-      (function(){
-        if (!window.SecurityUtils) {
-          window.SecurityUtils = {
-            sanitizeInput: function(input, maxLength) {
-              if (typeof input !== 'string') return '';
-              var sanitized = input.replace(/<[^>]*>/g, '').replace(/[<>"'&]/g, '').trim();
-              if (typeof maxLength === 'number') return sanitized.substring(0, maxLength);
-              return sanitized;
-            },
-            safeSetHTML: function(element, html) {
-              if (element && typeof html === 'string') {
-                var safe = html.replace(/<script[^>]*>.*?<\/script>/gis, '');
-                element.innerHTML = safe;
-              }
-            },
-            safeGetLocalStorage: function(key, fallback) {
-              try {
-                var value = localStorage.getItem(key);
-                return value ? JSON.parse(value) : (fallback === undefined ? null : fallback);
-              } catch (e) {
-                return (fallback === undefined ? null : fallback);
-              }
-            }
-          };
-        }
-      })();
-    </script>
+    <script src="firebase-config.js"></script>
     <script src="firestore-game-data.js"></script>
     <script src="server-validation.js"></script>
     
@@ -1325,26 +1279,21 @@
             }
         }
         
-        function getAnonymousId() {
-            let id = localStorage.getItem('anonymousId');
-            if (!id) {
-                id = 'user_' + Date.now();
-                localStorage.setItem('anonymousId', id);
-            }
-            return id;
-        }
-
         function trackGameStart() {
-            const anonIdA = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) { localStorage.setItem('anonymousId', anonIdA); }
+            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            if (!localStorage.getItem('anonymousId')) {
+                localStorage.setItem('anonymousId', anonymousId);
+            }
             const deviceInfo = getDeviceInfo();
-            const anonIdB = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) { localStorage.setItem('anonymousId', anonIdB); }
+            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
+            if (!localStorage.getItem('anonymousId')) {
+                localStorage.setItem('anonymousId', anonymousId);
+            }
             
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
                 level: currentLevel + 1,
-                user_id: getAnonymousId()
+                user_id: anonymousId
             });
             
             // Track device information separately
@@ -1354,30 +1303,30 @@
                 screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
                 viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
                 user_agent: deviceInfo.userAgent,
-                user_id: getAnonymousId()
+                user_id: anonymousId
             });
         }
         
         function trackLevelComplete(level, score, accuracy) {
-            const anonIdC = localStorage.getItem('anonymousId') || 'user_' + Date.now();
+            const anonymousId = localStorage.getItem('anonymousId') || 'user_' + Date.now();
             trackGameEvent('level_complete', {
                 level_name: levelNames[level],
                 level_number: level + 1,
                 final_score: score,
                 accuracy: accuracy,
                 words_completed: levelProgress,
-                user_id: getAnonymousId()
+                user_id: anonymousId
             });
         }
         
         function trackGameEnd(finalScore, accuracy, totalWords) {
-            const anonIdD = localStorage.getItem('anonymousId') || 'user_' + Date.now();
+            const anonymousId = localStorage.getItem('anonymousId') || 'user_' + Date.now();
             trackGameEvent('game_end', {
                 final_score: finalScore,
                 accuracy: accuracy,
                 total_words: totalWords,
                 levels_completed: levelsCompleted,
-                user_id: getAnonymousId()
+                user_id: anonymousId
             });
         }
         
@@ -1650,7 +1599,6 @@
         let levelProgress = 0;
         let levelsCompleted = 0; // Track how many levels have been completed
         let totalWordsCompleted = 0; // Track total words completed across all sessions
-        let totalScore = 0; // Track total score across the session
         let currentWordPair = null; // Store current word pair for answer checking
         let shuffledWordsByDifficulty = { 1: [], 2: [], 3: [] }; // Store shuffled words for each difficulty
         const levelThresholds = [15, 15, 15]; // Words needed to complete each level
@@ -1658,10 +1606,9 @@
         const levelColors = ['#4ade80', '#fbbf24', '#ef4444'];
         const levelScores = { easy: 0, medium: 0, hard: 0 };
         
-        // Game content data source (Secure Proxy Server)
-        // Replace with your secure proxy server URL
-        // Firestore-only mode: remove proxy usage
-        // const SECURE_PROXY_URL = 'https://your-secure-proxy.com/api/words';
+        // Game content data source (Google Sheets CSV)
+        // Replace with your own Google Sheet CSV export URL if needed
+        const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
 
         // Game content loaded from Google Sheets
         
@@ -1696,7 +1643,7 @@
             console.log("URL:", GAME_DATA_URL);
             
             try {
-                // Removed non-Firebase data fetch
+                const response = await fetch(GAME_DATA_URL);
                 console.log("Response status:", response.status);
                 console.log("Response headers:", [...response.headers.entries()]);
                 
@@ -1719,12 +1666,8 @@
         async function initializeGame() {
             loadGameSettings();
             
-            // Initialize server validation (optional, disabled on free tier)
-            if (window.ServerValidation && typeof ServerValidation.initialize === 'function') {
-                await ServerValidation.initialize();
-            } else {
-                console.log('ServerValidation disabled (no Cloud Functions).');
-            }
+            // Initialize server validation
+            await ServerValidation.initialize();
             
             // Set initial currentLevel based on selectedDifficulty
             switch(selectedDifficulty) {
@@ -1755,10 +1698,8 @@
             
             showNewWords();
             
-            // Start server validation tracking (optional)
-            if (window.ServerValidation && typeof ServerValidation.startGame === 'function') {
-                ServerValidation.startGame(wordPairs);
-            }
+            // Start server validation tracking
+            ServerValidation.startGame(wordPairs);
             
             // Start enhanced tracking
             trackSessionStart();
@@ -1793,11 +1734,7 @@
             // Get difficulty from URL parameters
             const urlDifficulty = urlParams.get('difficulty');
             if (urlDifficulty) {
-                // Normalize numeric difficulty to labels: 1->easy, 2->medium, 3->hard
-                if (urlDifficulty === '1') selectedDifficulty = 'easy';
-                else if (urlDifficulty === '2') selectedDifficulty = 'medium';
-                else if (urlDifficulty === '3') selectedDifficulty = 'hard';
-                else selectedDifficulty = urlDifficulty; // accept 'easy'|'medium'|'hard'
+                selectedDifficulty = urlDifficulty;
             }
             
             // Get timer setting from URL parameters
@@ -1856,43 +1793,33 @@
         // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
-                // Hide inline loading UI; use console only
-                if (wordLoadingStatus) wordLoadingStatus.style.display = 'none';
-                console.log('Loading words from Firestore...');
+                wordLoadingStatus.textContent = 'Loading game content...';
+                wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Ensure Firebase SDK v8 is available (used by firestore-game-data.js)
-                if (typeof firebase === 'undefined' || !firebase.firestore) {
-                    throw new Error('Firebase SDK not loaded. Ensure firebase v8 scripts are included.');
-                }
+                // Load up to 500 words from Firestore
+                const words = await GameDataManager.loadWords(500);
 
-                // Load via FirestoreGameDataManager (collection: gameWords)
-                const words = await window.GameDataManager.loadWords(1000);
-
-                // Normalize to game structure
-                wordPairs = (words || []).map(w => ({
+                // Normalize to wordPairs structure expected by the game
+                wordPairs = words.map(w => ({
                     context: w.context,
                     correct: w.correct,
-                    incorrect: w.incorrect || w.wrong || '',
-                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(String(w.difficulty || '1'), 10)
+                    incorrect: (w.incorrect ?? w.wrong ?? ''),
+                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    // Diagnostics for why zero words
-                    const total = (words || []).length;
-                    const missingContext = (words || []).filter(w => !w.context).length;
-                    const missingCorrect = (words || []).filter(w => !w.correct).length;
-                    const missingIncorrect = (words || []).filter(w => !(w.incorrect || w.wrong)).length;
-                    const byDifficulty = (words || []).reduce((acc, w) => {
-                        const d = typeof w.difficulty === 'number' ? w.difficulty : parseInt(String(w.difficulty || '0'), 10);
-                        acc[d] = (acc[d] || 0) + 1;
-                        return acc;
-                    }, {});
-                    console.warn('Normalization diagnostic', { total, missingContext, missingCorrect, missingIncorrect, byDifficulty, sample: (words || [])[0] });
-                    throw new Error('No valid words found in Firestore (after normalization/filter)');
+                    throw new Error('No words found in Firestore');
                 }
 
-                console.log(`Load successful: ${wordPairs.length} words`);
-                if (retryLoadingContainer) retryLoadingContainer.classList.add('hidden');
+                console.log('Loaded words from Firestore:', wordPairs.length);
+
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
+                wordLoadingStatus.style.color = 'var(--correct-color)';
+
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                    retryLoadingContainer.classList.add('hidden');
+                }, 1500);
 
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
@@ -1903,27 +1830,48 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Load failed: Firestore words not available', {
-                    name: error && error.name,
-                    code: error && error.code,
-                    message: error && error.message
-                });
+                console.error('Error loading game content from Firestore:', error);
 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
-                wordLoadingStatus.style.color = 'var(--error-color)';
+                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
+                wordLoadingStatus.style.color = 'var(--warning-color)';
 
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
 
-                wordPairs = [];
-                console.log('No words loaded - Firestore connection required');
+                // Fallback to default words
+                wordPairs = getDefaultWords();
+                console.log('Using fallback words:', wordPairs.length, 'entries');
+
+                setTimeout(() => {
+                    wordLoadingStatus.style.display = 'none';
+                }, 3000);
+
+                // Shuffle words
+                wordPairs = shuffleArray(wordPairs);
+
+                // Initialize shuffled words for each difficulty
+                shuffledWordsByDifficulty[1] = shuffleArray(wordPairs.filter(word => word.difficulty === 1));
+                shuffledWordsByDifficulty[2] = shuffleArray(wordPairs.filter(word => word.difficulty === 2));
+                shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
             }
         }
 
         // Get default words as fallback
         function getDefaultWords() {
-            // No fallback words - game must load from Firebase
-            return [];
+            return [
+                { context: 'ສະບາຍດີ', correct: 'ສະບາຍດີ', incorrect: 'ສະບາຍດີີ', difficulty: 1 },
+                { context: 'ຂອບໃຈ', correct: 'ຂອບໃຈ', incorrect: 'ຂອບຈັຍ', difficulty: 1 },
+                { context: 'ລາວ', correct: 'ລາວ', incorrect: 'ລາຍ', difficulty: 1 },
+                { context: "ຄົນທີ່ຂັບລົດ", correct: "ຄົນຂັບ", incorrect: "ຄົນຂັບຣ໌", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກເວົ້າ", correct: "ຄົນຂີ້ຄຸຍ", incorrect: "ຄົນຂີຄຸ້ຍ", difficulty: 1 },
+                { context: "ຜູ້ທີ່ມັກຫຼອກລວງ", correct: "ຄົນຂີ້ຕົວະ", incorrect: "ຄົນຂີຕົ້ວະ", difficulty: 1 },
+                { context: 'ພາສາລາວ', correct: 'ພາສາລາວ', incorrect: 'ພາສາລາຍ', difficulty: 2 },
+                { context: 'ໂຮງຮຽນ', correct: 'ໂຮງຮຽນ', incorrect: 'ໂຮງຮິຽນ', difficulty: 2 },
+                { context: 'ປະເທດລາວ', correct: 'ປະເທດລາວ', incorrect: 'ປະເທດລາຍ', difficulty: 2 },
+                { context: 'ຄອມພິວເຕີ', correct: 'ຄອມພິວເຕີ', incorrect: 'ຄອມພິຍເຕີ', difficulty: 3 },
+                { context: 'ວິທະຍາສາດ', correct: 'ວິທະຍາສາດ', incorrect: 'ວິທະຍາສາຍ', difficulty: 3 },
+                { context: 'ເຕັກໂນໂລຊີ', correct: 'ເຕັກໂນໂລຊີ', incorrect: 'ເຕັກໂນໂລຊິ', difficulty: 3 }
+            ];
         }
 
         // Shuffle array
@@ -2016,15 +1964,13 @@
                 
                 const isCorrect = selectedWord === currentWordPair.correct;
             
-            // Record answer for server validation (optional)
-            if (window.ServerValidation && typeof ServerValidation.recordAnswer === 'function') {
-                ServerValidation.recordAnswer(
-                    currentWordIndex - 1,
-                    selectedWord,
-                    isCorrect,
-                    wordStartTime ? Date.now() - wordStartTime : 0
-                );
-            }
+            // Record answer for server validation
+            ServerValidation.recordAnswer(
+                currentWordIndex - 1, // word index
+                selectedWord, // user answer
+                isCorrect, // is correct
+                wordStartTime ? Date.now() - wordStartTime : 0 // time spent
+            );
             
             // Track answer pattern
             answerHistory.push({
@@ -2303,14 +2249,7 @@
                     playerName: playerName || 'Anonymous'
                 };
 
-                let result = { success: false, fallback: true };
-                if (window.ServerValidation && typeof ServerValidation.submitGame === 'function') {
-                    try {
-                        result = await ServerValidation.submitGame(gameData);
-                    } catch (e) {
-                        console.warn('ServerValidation submit skipped:', e?.message || e);
-                    }
-                }
+                const result = await ServerValidation.submitGame(gameData);
                 
                 if (result.success) {
                     console.log('✅ Game validated and saved to server');
@@ -3074,7 +3013,7 @@
             const dataUrl = canvas.toDataURL('image/png');
             
             // Create blob for native sharing
-            const exportBlob = await new Promise(resolve => {
+            const blob = await new Promise(resolve => {
                 canvas.toBlob(blob => {
                     resolve(blob);
                 }, 'image/png');
@@ -3245,12 +3184,6 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
-            // Ensure modal becomes visible
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-
             // Pause the game and stop timer
             isLevelModalOpen = true;
             gameActive = false;
@@ -3771,8 +3704,8 @@
                 const dataUrl = await this.generateResultImage();
                 
                 // Convert to blob
-                // Removed non-Firebase data fetch
-                const assetBlob1 = await response.blob();
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
                 
                 // Try Web Share API
                 if (navigator.share && navigator.canShare) {
@@ -3789,8 +3722,8 @@
                 }
                 
                 // Fallback: copy image to clipboard
-                // Removed non-Firebase data fetch
-                const assetBlob2 = await response.blob();
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
                 await navigator.clipboard.write([
                     new ClipboardItem({ 'image/png': blob })
                 ]);
