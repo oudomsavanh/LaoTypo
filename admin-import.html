@@ -54,12 +54,12 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js';
+import { getFirestore, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 
 // Use centralized config from firebase-config.js to avoid duplicating keys in multiple files
 const app = initializeApp(window.firebaseConfig || firebaseConfig);
 const auth = getAuth(app);
-const functions = getFunctions(app);
+const db = getFirestore(app);
 
 const ADMIN_EMAIL = 'crews@laotypo.com'; // adjust if needed
 
@@ -148,7 +148,7 @@ els.file.addEventListener('change', () => {
   updateImportState();
 });
 
-// Import handler
+// Import handler (client-side Firestore batch; secured by Firestore rules)
 els.importBtn.addEventListener('click', async () => {
   if (!isSignedIn) {
     log('Please sign in with an authorized admin account before importing.', 'warn');
@@ -169,11 +169,38 @@ els.importBtn.addEventListener('click', async () => {
     const entries = Object.entries(json);
     if (entries.length === 0) { throw new Error('Empty JSON'); }
 
-    const callImport = httpsCallable(functions, 'importGameWords');
-    const response = await callImport({ documents: json });
-    const result = response?.data || {};
+    const BATCH_LIMIT = 400;
+    let batch = writeBatch(db);
+    let ops = 0, written = 0, skipped = 0;
 
-    log(`Import complete: ${result.written || 0} documents written, ${result.skipped || 0} skipped out of ${result.total || entries.length}.`, 'ok');
+    for (const [docIdRaw, docData] of entries) {
+      const docId = String(docIdRaw || '').trim();
+      if (!docId || !docData || typeof docData !== 'object') { skipped++; continue; }
+
+      const difficultyNum = typeof docData.difficulty === 'number' ? docData.difficulty : parseInt(String(docData.difficulty ?? '1'), 10);
+      const normalized = {
+        context: String(docData.context || '').trim(),
+        correct: String(docData.correct || '').trim(),
+        incorrect: String((docData.incorrect ?? docData.wrong ?? '')).trim(),
+        difficulty: Number.isFinite(difficultyNum) && [1,2,3].includes(difficultyNum) ? difficultyNum : 1,
+        order: typeof docData.order === 'number' ? docData.order : null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      if (!normalized.context || !normalized.correct || !normalized.incorrect) { skipped++; continue; }
+
+      batch.set(doc(db, 'gameWords', docId), normalized, { merge: true });
+      ops++; written++;
+      if (ops >= BATCH_LIMIT) {
+        await batch.commit();
+        log(`Committed ${written} so far...`, 'ok');
+        batch = writeBatch(db);
+        ops = 0;
+      }
+    }
+
+    if (ops > 0) await batch.commit();
+    log(`Import complete: ${written} written, ${skipped} skipped, total ${entries.length}.`, 'ok');
     els.status.textContent = 'Done';
   } catch (e) {
     log(`Import failed: ${e.message}`, 'err');
