@@ -107,6 +107,16 @@ els.signin.addEventListener('click', async () => {
       log('SOLUTION: Add your domain to Firebase Auth authorized domains:', 'warn');
       log('1. Go to Firebase Console → Authentication → Settings', 'warn');
       log('2. Add "game.laotypo.com" to authorized domains', 'warn');
+    } else if (e.code === 'auth/operation-not-allowed') {
+      log('SOLUTION: Enable Google Sign-In in Firebase Authentication:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Sign-in method', 'warn');
+      log('2. Click on "Google" provider', 'warn');
+      log('3. Toggle "Enable" to ON', 'warn');
+      log('4. Enter your support email and click "Save"', 'warn');
+    } else if (e.code === 'auth/unauthorized-domain') {
+      log('SOLUTION: Add your domain to authorized domains:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Settings', 'warn');
+      log('2. Add "game.laotypo.com" to authorized domains', 'warn');
     }
   }
 });
