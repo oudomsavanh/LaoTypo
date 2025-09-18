@@ -10,6 +10,8 @@ const firebaseConfig = {
   measurementId: "G-7CH5217ZYG"
 };
 
+// Make config available globally for other modules/pages
+window.firebaseConfig = firebaseConfig;
 // Import Firebase modules
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
@@ -477,6 +479,10 @@ window.FirebaseSyncManager = FirebaseSyncManager;
 window.FirebaseAuthManager = FirebaseAuthManager;
 window.firebaseDb = db;
 window.firebaseAuth = auth;
+// Expose selected helpers so other pages can avoid re-importing from CDN
+window.firebaseProviders = { GoogleAuthProvider };
+window.firebaseAuthFns = { signInWithPopup, onAuthStateChanged, signOut };
+window.firebaseFsFns = { doc, writeBatch };
 
 // 🛡️ SECURITY UTILITIES
 class SecurityUtils {

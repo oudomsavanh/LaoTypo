@@ -52,14 +52,12 @@
 <!-- Firebase SDKs -->
 <script type="module" src="firebase-config.js"></script>
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
-import { getFirestore, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
-
-// Use centralized config from firebase-config.js to avoid duplicating keys in multiple files
-const app = initializeApp(window.firebaseConfig || firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// firebase-config.js already initializes Firebase and exposes globals on window
+const auth = window.firebaseAuth;
+const db = window.firebaseDb;
+const { GoogleAuthProvider } = window.firebaseProviders;
+const { signInWithPopup, onAuthStateChanged } = window.firebaseAuthFns;
+const { doc, writeBatch } = window.firebaseFsFns;
 
 const ADMIN_EMAIL = 'crews@laotypo.com'; // adjust if needed
 
