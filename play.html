@@ -50,6 +50,35 @@
         });
       }
     </script>
+    <script>
+      // Minimal SecurityUtils used by play.html
+      (function(){
+        if (!window.SecurityUtils) {
+          window.SecurityUtils = {
+            sanitizeInput: function(input, maxLength) {
+              if (typeof input !== 'string') return '';
+              var sanitized = input.replace(/<[^>]*>/g, '').replace(/[<>"'&]/g, '').trim();
+              if (typeof maxLength === 'number') return sanitized.substring(0, maxLength);
+              return sanitized;
+            },
+            safeSetHTML: function(element, html) {
+              if (element && typeof html === 'string') {
+                var safe = html.replace(/<script[^>]*>.*?<\/script>/gis, '');
+                element.innerHTML = safe;
+              }
+            },
+            safeGetLocalStorage: function(key, fallback) {
+              try {
+                var value = localStorage.getItem(key);
+                return value ? JSON.parse(value) : (fallback === undefined ? null : fallback);
+              } catch (e) {
+                return (fallback === undefined ? null : fallback);
+              }
+            }
+          };
+        }
+      })();
+    </script>
     <script src="firestore-game-data.js"></script>
     <script src="server-validation.js"></script>
     
