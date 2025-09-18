@@ -1238,7 +1238,7 @@
 </head>
 <body>
     <!-- 🔥 Firebase Integration (Player Data Only) -->
-    <script type="module" src="firebase-config.js"></script>
+    <script src="firebase-config.js"></script>
     <!-- <script type="module" src="migrate-words-to-firebase.js"></script> <!-- DISABLED: Word migration --> 
     <script type="module" src="test-firebase-player-sync.js"></script>
     
@@ -1539,8 +1539,45 @@
         </div>
     </div>
 
-    <script type="module">
+    <script>
         // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
+        
+        // Wait for Firebase and SecurityUtils to be ready
+        async function waitForFirebase() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            while (attempts < maxAttempts) {
+                if (window.SecurityUtils && window.firebaseDb) {
+                    console.log('✅ Firebase and SecurityUtils are ready!');
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            console.warn('⚠️ Firebase initialization timeout, continuing without Firebase');
+            return false;
+        }
+        
+        // Initialize the game when everything is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 DOMContentLoaded - waiting for Firebase...');
+            await waitForFirebase();
+            initializeGame();
+        });
+        
+        function initializeGame() {
+            console.log('🎮 Initializing game...');
+            
+            // Initialize settings from localStorage using SecurityUtils
+            if (window.SecurityUtils) {
+                soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled', true);
+                musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled', true);
+                console.log('✅ Audio settings loaded from localStorage');
+            } else {
+                console.warn('⚠️ SecurityUtils not available, using default settings');
+            }
         
         // --- PWA SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
@@ -1603,9 +1640,9 @@
         const gamePlayerName = document.getElementById('game-player-name');
 
         // --- AUDIO SYSTEM v2.2.0 ---
-        // Initialize sound settings from localStorage
-        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled', true);
-        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled', true);
+        // Initialize sound settings from localStorage (will be set in initializeGame)
+        let soundEnabled = true;
+        let musicEnabled = true;
         let userHasInteracted = false;
         
         // Audio objects
@@ -1998,7 +2035,12 @@
         function updateLeaderboard(score) {
             try {
                 const finalDisplayName = displayName || 'Anonymous';
-                let leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard' || '[]');
+                let leaderboard;
+                if (window.SecurityUtils) {
+                    leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard', '[]');
+                } else {
+                    leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                }
                 
                 // Check if user already exists in leaderboard
                 const existingIndex = leaderboard.findIndex(entry => entry.userId === userId);
@@ -2125,7 +2167,11 @@
                 
                 // Fallback to localStorage
                 if (leaderboard.length === 0) {
-                    leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard' || '[]');
+                    if (window.SecurityUtils) {
+                        leaderboard = SecurityUtils.safeGetLocalStorage('laoTypoGame_leaderboard', '[]');
+                    } else {
+                        leaderboard = JSON.parse(localStorage.getItem('laoTypoGame_leaderboard') || '[]');
+                    }
                 }
                 
                 if (leaderboard.length === 0) {
@@ -2637,7 +2683,13 @@
         // Account panel controls
         document.getElementById('quick-edit-name-btn').addEventListener('click', () => {
             const newName = prompt('ໃສ່ຊື່ໃໝ່:', displayName || '');
-                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
+            let sanitizednewName;
+            if (window.SecurityUtils) {
+                sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
+            } else {
+                // Fallback sanitization
+                sanitizednewName = newName ? newName.replace(/[<>\"'&]/g, '').trim().substring(0, 50) : '';
+            }
             if (newName && newName.trim()) {
                 displayName = sanitizednewName.trim();
                 localStorage.setItem('displayName', displayName);
