@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        .info { color: blue; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Connection Test</h1>
+    
+    <div class="test-section">
+        <h2>Firebase Status</h2>
+        <div id="firebase-status">Checking...</div>
+        <button onclick="checkFirebaseStatus()">Check Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Connection Test</h2>
+        <div id="connection-status">Not tested yet</div>
+        <button onclick="testConnection()">Test Connection</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Word Loading Test</h2>
+        <div id="word-status">Not tested yet</div>
+        <button onclick="testWordLoading()">Load Words</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Logs</h2>
+        <div id="console-logs"></div>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+    
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 50 logs
+            if (logCount > 50) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        function checkFirebaseStatus() {
+            const status = document.getElementById('firebase-status');
+            const checks = [
+                { name: 'firebaseConfig', value: window.firebaseConfig },
+                { name: 'firebase', value: window.firebase },
+                { name: 'firebaseDb', value: window.firebaseDb },
+                { name: 'firebaseAuth', value: window.firebaseAuth },
+                { name: 'collection', value: window.collection },
+                { name: 'getDocs', value: window.getDocs },
+                { name: 'SecurityUtils', value: window.SecurityUtils },
+                { name: 'GameDataManager', value: window.GameDataManager }
+            ];
+
+            let html = '<h3>Firebase Objects Status:</h3>';
+            let allGood = true;
+
+            checks.forEach(check => {
+                const available = !!check.value;
+                const statusClass = available ? 'success' : 'error';
+                const statusText = available ? '✅ Available' : '❌ Not Available';
+                html += `<div class="${statusClass}">${check.name}: ${statusText}</div>`;
+                if (!available) allGood = false;
+            });
+
+            status.innerHTML = html;
+            
+            if (allGood) {
+                addLog('✅ All Firebase objects are available!', 'success');
+            } else {
+                addLog('❌ Some Firebase objects are missing', 'error');
+            }
+        }
+
+        async function testConnection() {
+            const status = document.getElementById('connection-status');
+            status.innerHTML = 'Testing connection...';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('🔗 Testing Firebase connection...', 'info');
+                
+                // Test basic connection
+                const testCollection = window.firebaseDb.collection('test');
+                await testCollection.limit(1).get();
+                
+                status.innerHTML = '<div class="success">✅ Firebase connection successful!</div>';
+                addLog('✅ Firebase connection test passed', 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Firebase connection failed</div>';
+                addLog(`❌ Connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWordLoading() {
+            const status = document.getElementById('word-status');
+            status.innerHTML = 'Loading words...';
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                
+                addLog('📚 Testing word loading...', 'info');
+                
+                const words = await window.GameDataManager.loadWords(5);
+                
+                if (words && words.length > 0) {
+                    status.innerHTML = `<div class="success">✅ Loaded ${words.length} words successfully!</div>`;
+                    addLog(`✅ Successfully loaded ${words.length} words`, 'success');
+                    
+                    // Show sample words
+                    words.slice(0, 3).forEach(word => {
+                        addLog(`📝 Sample: "${word.lao}" = "${word.english}"`, 'info');
+                    });
+                } else {
+                    throw new Error('No words loaded');
+                }
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Word loading failed</div>';
+                addLog(`❌ Word loading error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Page loaded, starting tests...', 'info');
+            
+            // Wait for Firebase to initialize
+            setTimeout(() => {
+                checkFirebaseStatus();
+                testConnection();
+                testWordLoading();
+            }, 3000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>

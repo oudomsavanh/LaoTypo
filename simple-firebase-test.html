@@ -1,97 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Firebase Test</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .info { background-color: #d1ecf1; color: #0c5460; }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; background: #f8f9fa; }
     </style>
 </head>
 <body>
-    <h1>Simple Firebase Test</h1>
-    <div id="results"></div>
-
-    <!-- Load Firebase scripts -->
+    <h1>🔥 Simple Firebase Test</h1>
+    <div id="output"></div>
+    <button onclick="testFirebase()">Test Firebase</button>
+    <button onclick="testWords()">Test Words</button>
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js"></script>
+    
+    <!-- Firebase Configuration -->
     <script src="firebase-config.js"></script>
     <script src="firestore-game-data.js"></script>
-
+    
     <script>
-        function addResult(message, type = 'info') {
-            const results = document.getElementById('results');
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
             const div = document.createElement('div');
             div.className = `result ${type}`;
-            div.textContent = message;
-            results.appendChild(div);
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            output.appendChild(div);
             console.log(`[${type.toUpperCase()}] ${message}`);
         }
-
-        // Wait for Firebase to be ready
-        async function waitForFirebaseReady() {
-            let attempts = 0;
-            const maxAttempts = 50; // 5 seconds max wait
+        
+        function testFirebase() {
+            log('Testing Firebase availability...', 'info');
             
-            while (attempts < maxAttempts) {
-                if (window.firebaseConfig && window.firebaseDb && window.GameDataManager && window.collection) {
-                    return true;
+            const checks = [
+                { name: 'firebase', value: typeof firebase !== 'undefined' },
+                { name: 'firebaseConfig', value: !!window.firebaseConfig },
+                { name: 'firebaseDb', value: !!window.firebaseDb },
+                { name: 'collection', value: !!window.collection },
+                { name: 'getDocs', value: !!window.getDocs },
+                { name: 'SecurityUtils', value: !!window.SecurityUtils },
+                { name: 'GameDataManager', value: !!window.GameDataManager }
+            ];
+            
+            let allGood = true;
+            checks.forEach(check => {
+                const status = check.value ? '✅' : '❌';
+                const type = check.value ? 'success' : 'error';
+                log(`${status} ${check.name}: ${check.value ? 'Available' : 'Not Available'}`, type);
+                if (!check.value) allGood = false;
+            });
+            
+            if (allGood) {
+                log('🎉 All Firebase components are working!', 'success');
+            } else {
+                log('⚠️ Some Firebase components are missing', 'error');
+            }
+        }
+        
+        async function testWords() {
+            log('Testing word loading...', 'info');
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
                 }
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-            return false;
-        }
-
-        // Test Firebase availability
-        async function testFirebaseAvailability() {
-            addResult('Scripts loaded, waiting for Firebase to be ready...', 'info');
-            
-            const firebaseReady = await waitForFirebaseReady();
-            if (!firebaseReady) {
-                addResult('❌ Firebase initialization timeout!', 'error');
-                return;
-            }
-
-            addResult('✅ Firebase is ready, testing components...', 'success');
-
-            // Test 1: Check if firebaseConfig is available
-            if (typeof window.firebaseConfig !== 'undefined') {
-                addResult('✅ firebaseConfig found', 'success');
-                addResult(`Project ID: ${window.firebaseConfig.projectId}`, 'info');
-            } else {
-                addResult('❌ firebaseConfig not found', 'error');
-            }
-
-            // Test 2: Check if firebaseDb is available
-            if (typeof window.firebaseDb !== 'undefined') {
-                addResult('✅ firebaseDb found', 'success');
-            } else {
-                addResult('❌ firebaseDb not found', 'error');
-            }
-
-            // Test 3: Check if GameDataManager is available
-            if (typeof window.GameDataManager !== 'undefined') {
-                addResult('✅ GameDataManager found', 'success');
-            } else {
-                addResult('❌ GameDataManager not found', 'error');
-            }
-
-            // Test 4: Check Firebase functions
-            const requiredFunctions = ['collection', 'query', 'getDocs', 'orderBy', 'limit', 'where'];
-            const missingFunctions = requiredFunctions.filter(func => typeof window[func] === 'undefined');
-            
-            if (missingFunctions.length === 0) {
-                addResult('✅ All Firebase functions available', 'success');
-            } else {
-                addResult(`❌ Missing Firebase functions: ${missingFunctions.join(', ')}`, 'error');
+                
+                const words = await window.GameDataManager.loadWords(5);
+                log(`✅ Successfully loaded ${words.length} words`, 'success');
+                
+                words.slice(0, 3).forEach(word => {
+                    log(`📝 "${word.lao}" = "${word.english}"`, 'info');
+                });
+                
+            } catch (error) {
+                log(`❌ Word loading failed: ${error.message}`, 'error');
             }
         }
-
-        // Run tests when page loads
-        window.addEventListener('load', testFirebaseAvailability);
+        
+        // Auto-test when page loads
+        window.addEventListener('load', () => {
+            log('📄 Page loaded, waiting for Firebase...', 'info');
+            setTimeout(() => {
+                testFirebase();
+                testWords();
+            }, 2000);
+        });
     </script>
 </body>
 </html>

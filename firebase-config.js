@@ -1,5 +1,6 @@
 // 🔥 Firebase Configuration for LaoTypo Game
 // ✅ CONFIGURED WITH REAL FIREBASE PROJECT
+
 const firebaseConfig = {
   apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
   authDomain: "laotypo-phase1.firebaseapp.com",
@@ -14,71 +15,36 @@ const firebaseConfig = {
 window.firebaseConfig = firebaseConfig;
 console.log('🔥 Firebase config exported to global scope');
 
-// Initialize Firebase immediately using CDN
+// Initialize Firebase immediately
 (function() {
-  let firebaseInitialized = false;
+  console.log('🔥 Starting Firebase initialization...');
   
-  // Set a timeout to ensure Firebase initializes within 10 seconds
-  const timeout = setTimeout(() => {
-    if (!firebaseInitialized) {
-      console.warn('⚠️ Firebase initialization timeout, using fallback mode');
+  // Check if Firebase is already loaded
+  if (typeof firebase !== 'undefined') {
+    console.log('✅ Firebase already loaded, initializing...');
+    initializeFirebase();
+    return;
+  }
+  
+  // Wait for Firebase to load from CDN
+  let attempts = 0;
+  const maxAttempts = 50; // 5 seconds max wait
+  
+  const checkFirebase = () => {
+    attempts++;
+    if (typeof firebase !== 'undefined') {
+      console.log('✅ Firebase loaded from CDN, initializing...');
+      initializeFirebase();
+    } else if (attempts < maxAttempts) {
+      console.log(`⏳ Waiting for Firebase... (${attempts}/${maxAttempts})`);
+      setTimeout(checkFirebase, 100);
+    } else {
+      console.warn('⚠️ Firebase CDN timeout, using fallback');
       initializeFallback();
     }
-  }, 10000);
+  };
   
-  // Load Firebase from CDN synchronously
-  const firebaseScript = document.createElement('script');
-  firebaseScript.src = 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
-  firebaseScript.onload = function() {
-    console.log('✅ Firebase app script loaded');
-    // Load additional Firebase modules
-    const firestoreScript = document.createElement('script');
-    firestoreScript.src = 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
-    firestoreScript.onload = function() {
-      console.log('✅ Firebase Firestore script loaded');
-      const authScript = document.createElement('script');
-      authScript.src = 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
-      authScript.onload = function() {
-        console.log('✅ Firebase Auth script loaded');
-        const analyticsScript = document.createElement('script');
-        analyticsScript.src = 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
-        analyticsScript.onload = function() {
-          console.log('✅ Firebase Analytics script loaded');
-          firebaseInitialized = true;
-          clearTimeout(timeout);
-          initializeFirebase();
-        };
-        analyticsScript.onerror = function() {
-          console.warn('⚠️ Firebase Analytics script failed to load, continuing without it');
-          firebaseInitialized = true;
-          clearTimeout(timeout);
-          initializeFirebase();
-        };
-        document.head.appendChild(analyticsScript);
-      };
-      authScript.onerror = function() {
-        console.warn('⚠️ Firebase Auth script failed to load, continuing without it');
-        firebaseInitialized = true;
-        clearTimeout(timeout);
-        initializeFirebase();
-      };
-      document.head.appendChild(authScript);
-    };
-    firestoreScript.onerror = function() {
-      console.error('❌ Firebase Firestore script failed to load');
-      firebaseInitialized = true;
-      clearTimeout(timeout);
-      initializeFallback();
-    };
-    document.head.appendChild(firestoreScript);
-  };
-  firebaseScript.onerror = function() {
-    console.error('❌ Firebase app script failed to load');
-    firebaseInitialized = true;
-    clearTimeout(timeout);
-    initializeFallback();
-  };
-  document.head.appendChild(firebaseScript);
+  checkFirebase();
 })();
 
 // Initialize Firebase
@@ -86,9 +52,8 @@ function initializeFirebase() {
   try {
     console.log('🔥 Initializing Firebase...');
     
-    // Check if firebase is available
     if (typeof firebase === 'undefined') {
-      throw new Error('Firebase not loaded from CDN');
+      throw new Error('Firebase not loaded');
     }
     
     // Initialize Firebase app
