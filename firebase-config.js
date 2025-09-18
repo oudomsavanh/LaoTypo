@@ -625,6 +625,7 @@ class SecurityUtils {
     window.firebaseAuth = auth;
     window.firebaseAnalytics = analytics;
     window.initializeFirebase = initializeFirebase;
+    window.firebaseConfig = firebaseConfig; // Export the config object
 
     // Export Firestore functions for use in other scripts
     window.collection = collection;
@@ -648,6 +649,13 @@ class SecurityUtils {
     console.log('  - FirebaseSyncManager.syncToCloud()');
     console.log('  - SecurityUtils.sanitizeInput()');
     console.log('  - SecurityUtils.validateDisplayName()');
+    console.log('📊 Firebase exports:', {
+      firebaseConfig: !!window.firebaseConfig,
+      firebaseDb: !!window.firebaseDb,
+      GameDataManager: !!window.GameDataManager,
+      collection: !!window.collection,
+      getDocs: !!window.getDocs
+    });
   } catch (error) {
     console.error('❌ Failed to initialize Firebase:', error);
   }

@@ -284,7 +284,9 @@ class FirestoreGameDataManager {
 }
 
 // Create global instance
+console.log('📚 Creating GameDataManager instance...');
 window.GameDataManager = new FirestoreGameDataManager();
+console.log('✅ GameDataManager created and exported to window');
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
