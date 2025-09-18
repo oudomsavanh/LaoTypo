@@ -54,12 +54,12 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-functions.js';
 
 // Use centralized config from firebase-config.js to avoid duplicating keys in multiple files
 const app = initializeApp(window.firebaseConfig || firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const functions = getFunctions(app);
 
 const ADMIN_EMAIL = 'crews@laotypo.com'; // adjust if needed
 
@@ -117,27 +117,45 @@ els.signin.addEventListener('click', async () => {
   }
 });
 
-let canWrite = false;
+let isSignedIn = false;
+let selectedFile = null;
+
+function updateImportState() {
+  const hasFile = !!selectedFile;
+  els.importBtn.disabled = !(isSignedIn && hasFile);
+}
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     els.user.textContent = user.email || user.uid;
-    canWrite = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    els.importBtn.disabled = !canWrite;
-    els.user.className = 'badge ' + (canWrite ? 'ok' : 'warn');
-    if (!canWrite) {
-      log('Signed in, but not authorized to import. Use the admin email.', 'warn');
+    const isExpectedAdmin = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    els.user.className = 'badge ' + (isExpectedAdmin ? 'ok' : 'warn');
+    if (!isExpectedAdmin) {
+      log('Signed in, but this account may not have admin permissions. Import will fail unless the account has an admin claim.', 'warn');
     }
+    isSignedIn = true;
+    updateImportState();
   } else {
     els.user.textContent = 'Not signed in';
     els.user.className = 'badge';
-    els.importBtn.disabled = true;
+    isSignedIn = false;
+    updateImportState();
   }
+});
+
+els.file.addEventListener('change', () => {
+  selectedFile = els.file.files && els.file.files[0] ? els.file.files[0] : null;
+  updateImportState();
 });
 
 // Import handler
 els.importBtn.addEventListener('click', async () => {
-  if (!canWrite) return;
-  const file = els.file.files && els.file.files[0];
+  if (!isSignedIn) {
+    log('Please sign in with an authorized admin account before importing.', 'warn');
+    return;
+  }
+
+  const file = selectedFile;
   if (!file) { log('Please choose a JSON file first.', 'warn'); return; }
 
   try {
@@ -151,43 +169,20 @@ els.importBtn.addEventListener('click', async () => {
     const entries = Object.entries(json);
     if (entries.length === 0) { throw new Error('Empty JSON'); }
 
-    const BATCH_LIMIT = 400;
-    let batch = writeBatch(db);
-    let ops = 0, written = 0;
-    const now = new Date();
+    const callImport = httpsCallable(functions, 'importGameWords');
+    const response = await callImport({ documents: json });
+    const result = response?.data || {};
 
-    for (const [docId, docData] of entries) {
-      const difficultyNum = typeof docData.difficulty === 'number' ? docData.difficulty : parseInt(String(docData.difficulty ?? '1'), 10);
-      const normalized = {
-        context: String(docData.context || '').trim(),
-        correct: String(docData.correct || '').trim(),
-        incorrect: String((docData.incorrect ?? docData.wrong ?? '')).trim(),
-        difficulty: Number.isFinite(difficultyNum) && [1,2,3].includes(difficultyNum) ? difficultyNum : 1,
-        order: typeof docData.order === 'number' ? docData.order : null,
-        createdAt: now,
-        updatedAt: now
-      };
-      if (!normalized.context || !normalized.correct || !normalized.incorrect) {
-        log(`Skip ${docId}: missing required fields`, 'warn');
-        continue;
-      }
-      batch.set(doc(db, 'gameWords', docId), normalized, { merge: true });
-      ops++; written++;
-      if (ops >= BATCH_LIMIT) {
-        await batch.commit();
-        log(`Committed ${written} so far...`, 'ok');
-        batch = writeBatch(db);
-        ops = 0;
-      }
-    }
-    if (ops > 0) await batch.commit();
-    log(`Import complete: ${written} documents.`, 'ok');
+    log(`Import complete: ${result.written || 0} documents written, ${result.skipped || 0} skipped out of ${result.total || entries.length}.`, 'ok');
     els.status.textContent = 'Done';
   } catch (e) {
     log(`Import failed: ${e.message}`, 'err');
+    if (e.code) {
+      log(`Error code: ${e.code}`, 'err');
+    }
     els.status.textContent = 'Failed';
   } finally {
-    els.importBtn.disabled = !canWrite;
+    updateImportState();
   }
 });
 </script>

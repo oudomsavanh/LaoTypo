@@ -10,6 +10,111 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 const db = admin.firestore();
+const ADMIN_EMAILS = ['crews@laotypo.com'];
+
+/**
+ * Import a batch of game words provided by an authenticated admin user.
+ * Validates the caller via a custom claim or approved email and performs
+ * all writes server-side to avoid exposing elevated privileges to clients.
+ */
+exports.importGameWords = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required.');
+    }
+
+    const token = context.auth.token || {};
+    const email = (token.email || '').toLowerCase();
+    const hasAdminClaim = token.admin === true || token.isAdmin === true;
+    const allowedEmails = new Set(ADMIN_EMAILS.map(e => e.toLowerCase()));
+
+    if (!hasAdminClaim && !allowedEmails.has(email)) {
+        throw new functions.https.HttpsError('permission-denied', 'Admin privileges required.');
+    }
+
+    try {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+            throw new functions.https.HttpsError('invalid-argument', 'Expected an object payload.');
+        }
+
+        const documents = data.documents;
+        if (!documents || typeof documents !== 'object' || Array.isArray(documents)) {
+            throw new functions.https.HttpsError('invalid-argument', 'Missing documents to import.');
+        }
+
+        const entries = Object.entries(documents);
+        if (entries.length === 0) {
+            throw new functions.https.HttpsError('invalid-argument', 'No documents provided.');
+        }
+
+        const collectionRef = db.collection('gameWords');
+        const BATCH_LIMIT = 400;
+        const now = admin.firestore.FieldValue.serverTimestamp();
+
+        let batch = db.batch();
+        let opCount = 0;
+        let written = 0;
+        let skipped = 0;
+
+        for (const [docIdRaw, docData] of entries) {
+            const docId = String(docIdRaw || '').trim();
+            if (!docId) {
+                skipped++;
+                continue;
+            }
+
+            if (!docData || typeof docData !== 'object') {
+                skipped++;
+                continue;
+            }
+
+            const difficultyValue = typeof docData.difficulty === 'number'
+                ? docData.difficulty
+                : parseInt(String(docData.difficulty ?? '1'), 10);
+
+            const normalized = {
+                context: String(docData.context || '').trim(),
+                correct: String(docData.correct || '').trim(),
+                incorrect: String((docData.incorrect ?? docData.wrong ?? '')).trim(),
+                difficulty: Number.isFinite(difficultyValue) && [1, 2, 3].includes(difficultyValue) ? difficultyValue : 1,
+                order: typeof docData.order === 'number' ? docData.order : null,
+                createdAt: now,
+                updatedAt: now,
+            };
+
+            if (!normalized.context || !normalized.correct || !normalized.incorrect) {
+                skipped++;
+                continue;
+            }
+
+            batch.set(collectionRef.doc(docId), normalized, { merge: true });
+            written++;
+            opCount++;
+
+            if (opCount >= BATCH_LIMIT) {
+                await batch.commit();
+                batch = db.batch();
+                opCount = 0;
+            }
+        }
+
+        if (opCount > 0) {
+            await batch.commit();
+        }
+
+        return {
+            success: true,
+            written,
+            skipped,
+            total: entries.length,
+        };
+    } catch (error) {
+        console.error('Error importing game words:', error);
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+        throw new functions.https.HttpsError('internal', 'Failed to import game words.');
+    }
+});
 
 /**
  * Validate and calculate game score server-side
