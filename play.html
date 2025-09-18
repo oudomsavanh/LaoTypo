@@ -1713,8 +1713,12 @@
         async function initializeGame() {
             loadGameSettings();
             
-            // Initialize server validation
-            await ServerValidation.initialize();
+            // Initialize server validation (optional, disabled on free tier)
+            if (window.ServerValidation && typeof ServerValidation.initialize === 'function') {
+                await ServerValidation.initialize();
+            } else {
+                console.log('ServerValidation disabled (no Cloud Functions).');
+            }
             
             // Set initial currentLevel based on selectedDifficulty
             switch(selectedDifficulty) {
@@ -1745,8 +1749,10 @@
             
             showNewWords();
             
-            // Start server validation tracking
-            ServerValidation.startGame(wordPairs);
+            // Start server validation tracking (optional)
+            if (window.ServerValidation && typeof ServerValidation.startGame === 'function') {
+                ServerValidation.startGame(wordPairs);
+            }
             
             // Start enhanced tracking
             trackSessionStart();
@@ -1989,13 +1995,15 @@
                 
                 const isCorrect = selectedWord === currentWordPair.correct;
             
-            // Record answer for server validation
-            ServerValidation.recordAnswer(
-                currentWordIndex - 1, // word index
-                selectedWord, // user answer
-                isCorrect, // is correct
-                wordStartTime ? Date.now() - wordStartTime : 0 // time spent
-            );
+            // Record answer for server validation (optional)
+            if (window.ServerValidation && typeof ServerValidation.recordAnswer === 'function') {
+                ServerValidation.recordAnswer(
+                    currentWordIndex - 1,
+                    selectedWord,
+                    isCorrect,
+                    wordStartTime ? Date.now() - wordStartTime : 0
+                );
+            }
             
             // Track answer pattern
             answerHistory.push({
@@ -2274,7 +2282,14 @@
                     playerName: playerName || 'Anonymous'
                 };
 
-                const result = await ServerValidation.submitGame(gameData);
+                let result = { success: false, fallback: true };
+                if (window.ServerValidation && typeof ServerValidation.submitGame === 'function') {
+                    try {
+                        result = await ServerValidation.submitGame(gameData);
+                    } catch (e) {
+                        console.warn('ServerValidation submit skipped:', e?.message || e);
+                    }
+                }
                 
                 if (result.success) {
                     console.log('✅ Game validated and saved to server');
