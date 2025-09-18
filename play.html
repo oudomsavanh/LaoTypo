@@ -1608,7 +1608,8 @@
         
         // Game content data source (Secure Proxy Server)
         // Replace with your secure proxy server URL
-        const SECURE_PROXY_URL = 'https://your-secure-proxy.com/api/words';
+        // Firestore-only mode: remove proxy usage
+        // const SECURE_PROXY_URL = 'https://your-secure-proxy.com/api/words';
 
         // Game content loaded from Google Sheets
         
@@ -1793,40 +1794,30 @@
         // Load game content data from Firestore (secure)
         async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ secure server...';
+                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Firestore...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Check if proxy URL is configured
-                if (SECURE_PROXY_URL === 'https://your-secure-proxy.com/api/words') {
-                    throw new Error('Please configure your secure proxy server URL');
+                // Ensure Firebase SDK v8 is available (used by firestore-game-data.js)
+                if (typeof firebase === 'undefined' || !firebase.firestore) {
+                    throw new Error('Firebase SDK not loaded. Ensure firebase v8 scripts are included.');
                 }
 
-                // Load words from secure proxy server (API key is hidden)
-                const response = await fetch(SECURE_PROXY_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (!data.success) {
-                    throw new Error(data.error || 'Failed to load from secure server');
-                }
+                // Load via FirestoreGameDataManager (collection: gameWords)
+                const words = await window.GameDataManager.loadWords(1000);
 
-                // Convert to wordPairs structure expected by the game
-                wordPairs = data.words.map(w => ({
+                // Normalize to game structure
+                wordPairs = (words || []).map(w => ({
                     context: w.context,
                     correct: w.correct,
-                    incorrect: w.incorrect || '',
-                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
+                    incorrect: w.incorrect || w.wrong || '',
+                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(String(w.difficulty || '1'), 10)
                 })).filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No valid words found');
+                    throw new Error('No valid words found in Firestore');
                 }
 
-                console.log('Loaded words from secure server:', wordPairs.length);
+                console.log('Loaded words from Firestore:', wordPairs.length);
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
@@ -1845,7 +1836,7 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from secure server:', error);
+                console.error('Error loading game content from Firestore:', error);
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດ';
                 wordLoadingStatus.style.color = 'var(--error-color)';
@@ -1853,9 +1844,8 @@
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
 
-                // No fallback - game requires secure server data
                 wordPairs = [];
-                console.log('No words loaded - secure server connection required');
+                console.log('No words loaded - Firestore connection required');
             }
         }
 
