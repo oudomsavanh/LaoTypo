@@ -44,6 +44,26 @@ const analytics = getAnalytics(app);
 
 console.log('🔥 Firebase initialized successfully');
 
+// Unified initializer for pages that expect initializeFirebase()
+export async function initializeFirebase() {
+  try {
+    console.log('🧩 initializeFirebase(): starting');
+    // Basic sanity checks
+    const checks = {
+      hasConfig: !!firebaseConfig && !!firebaseConfig.projectId,
+      appInitialized: !!app,
+      dbReady: !!db,
+      authReady: !!auth,
+      analyticsReady: !!analytics
+    };
+    console.log('🧩 initializeFirebase(): checks', checks);
+    return checks.hasConfig && checks.appInitialized && checks.dbReady && checks.authReady;
+  } catch (e) {
+    console.error('🧩 initializeFirebase(): failed', e);
+    return false;
+  }
+}
+
 // 🗄️ DATABASE COLLECTIONS
 const COLLECTIONS = {
   PLAYERS: 'players',
