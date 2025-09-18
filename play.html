@@ -3224,6 +3224,12 @@
             const continueBtn = document.getElementById('continue-next-level');
             const replayBtn = document.getElementById('replay-current-level');
             
+            // Ensure modal becomes visible
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
             // Pause the game and stop timer
             isLevelModalOpen = true;
             gameActive = false;
