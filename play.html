@@ -1576,8 +1576,8 @@
         let isLevelModalOpen = false; // Freeze gameplay during level completion modal
         let gameActive = false;
         let synth = null;
-        let soundEnabled = SecurityUtils.safeGetLocalStorage('soundEnabled', true);
-        let musicEnabled = SecurityUtils.safeGetLocalStorage('musicEnabled', true);
+        let soundEnabled = true;
+        let musicEnabled = true;
         let userHasInteracted = false;
         
         // Audio objects
