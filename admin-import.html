@@ -50,23 +50,14 @@
 </div>
 
 <!-- Firebase SDKs -->
+<script src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 
-// Firebase configuration for laotypo-phase1 project
-const firebaseConfig = {
-  apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
-  authDomain: "laotypo-phase1.firebaseapp.com", // This should work with custom domains
-  projectId: "laotypo-phase1",
-  storageBucket: "laotypo-phase1.firebasestorage.app",
-  messagingSenderId: "359413130623",
-  appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
-  measurementId: "G-7CH5217ZYG"
-};
-
-const app = initializeApp(firebaseConfig);
+// Use centralized config from firebase-config.js to avoid duplicating keys in multiple files
+const app = initializeApp(window.firebaseConfig || firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
