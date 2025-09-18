@@ -50,10 +50,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebas
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 
-// Use existing config (phase1)
+// Firebase configuration for laotypo-phase1 project
 const firebaseConfig = {
   apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
-  authDomain: "laotypo-phase1.firebaseapp.com",
+  authDomain: "laotypo-phase1.firebaseapp.com", // This should work with custom domains
   projectId: "laotypo-phase1",
   storageBucket: "laotypo-phase1.firebasestorage.app",
   messagingSenderId: "359413130623",
@@ -87,12 +87,27 @@ function log(msg, cls) {
 // Auth
 els.signin.addEventListener('click', async () => {
   try {
+    log('Initializing Firebase Auth...', 'ok');
+    log(`Current domain: ${window.location.hostname}`, 'ok');
+    log(`Firebase authDomain: ${firebaseConfig.authDomain}`, 'ok');
+    
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
+    log('Starting Google sign-in popup...', 'ok');
+    
     const res = await signInWithPopup(auth, provider);
     log(`Signed in: ${res.user.email}`, 'ok');
   } catch (e) {
     log(`Sign-in failed: ${e.message}`, 'err');
+    log(`Error code: ${e.code}`, 'err');
+    log(`Error details: ${JSON.stringify(e)}`, 'err');
+    
+    // Provide specific help for common errors
+    if (e.code === 'auth/configuration-not-found') {
+      log('SOLUTION: Add your domain to Firebase Auth authorized domains:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Settings', 'warn');
+      log('2. Add "game.laotypo.com" to authorized domains', 'warn');
+    }
   }
 });
 
