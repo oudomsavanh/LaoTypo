@@ -32,7 +32,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
     <!-- Firebase Configuration -->
-    <script src="firebase-config.js"></script>
+    <!-- Removed non-module include to avoid ES module syntax errors -->
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2F516DW62Z"></script>
@@ -2980,8 +2980,20 @@
         async function initializeFirebaseSync() {
             try {
                 // Check if Firebase managers are available
+                console.log('🔍 Firebase debug:', {
+                    hasFirebaseConfig: typeof window.firebaseConfig !== 'undefined',
+                    hasDb: typeof window.firebaseDb !== 'undefined',
+                    hasAuth: typeof window.firebaseAuth !== 'undefined',
+                    hasManagers: typeof FirebaseSyncManager !== 'undefined',
+                });
+
                 if (typeof FirebaseSyncManager !== 'undefined') {
-                    const isConnected = await FirebaseSyncManager.checkConnection();
+                    let isConnected = false;
+                    try {
+                        isConnected = await FirebaseSyncManager.checkConnection();
+                    } catch (e) {
+                        console.error('🔌 checkConnection threw:', { name: e?.name, code: e?.code, message: e?.message });
+                    }
                     if (isConnected) {
                         firebaseEnabled = true;
                         console.log('🔥 Firebase sync enabled');

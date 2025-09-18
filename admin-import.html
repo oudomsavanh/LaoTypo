@@ -25,6 +25,11 @@
 <div class="card">
     <h1>Admin Import – gameWords</h1>
     <p class="muted">Sign in with your admin Google account, select the JSON file (e.g. <code>firebase-manual-import.json</code>), then import. No billing or service account keys required.</p>
+    <div style="background: #2a2a2c; padding: 8px; border-radius: 6px; margin: 8px 0; font-family: monospace; font-size: 12px;">
+      <span style="color: #6ee7a2;">✅ VERSION 2.1 - FIXED</span> | 
+      <span style="color: #a7a7ad;">docData variable fix</span> | 
+      <span style="color: #f7b955;">Import should work now</span>
+    </div>
 
     <div class="row">
         <button id="signin">Sign in with Google</button>
@@ -45,23 +50,14 @@
 </div>
 
 <!-- Firebase SDKs -->
+<script type="module" src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
+import { getFirestore, doc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
 
-// Use existing config (phase1)
-const firebaseConfig = {
-  apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
-  authDomain: "laotypo-phase1.firebaseapp.com",
-  projectId: "laotypo-phase1",
-  storageBucket: "laotypo-phase1.firebasestorage.app",
-  messagingSenderId: "359413130623",
-  appId: "1:359413130623:web:96dd1c437d4a3971ec264a",
-  measurementId: "G-7CH5217ZYG"
-};
-
-const app = initializeApp(firebaseConfig);
+// Use centralized config from firebase-config.js to avoid duplicating keys in multiple files
+const app = initializeApp(window.firebaseConfig || firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -87,36 +83,79 @@ function log(msg, cls) {
 // Auth
 els.signin.addEventListener('click', async () => {
   try {
+    log('Initializing Firebase Auth...', 'ok');
+    log(`Current domain: ${window.location.hostname}`, 'ok');
+    log(`Firebase authDomain: ${firebaseConfig.authDomain}`, 'ok');
+    
     const provider = new GoogleAuthProvider();
     provider.addScope('email');
+    log('Starting Google sign-in popup...', 'ok');
+    
     const res = await signInWithPopup(auth, provider);
     log(`Signed in: ${res.user.email}`, 'ok');
   } catch (e) {
     log(`Sign-in failed: ${e.message}`, 'err');
+    log(`Error code: ${e.code}`, 'err');
+    log(`Error details: ${JSON.stringify(e)}`, 'err');
+    
+    // Provide specific help for common errors
+    if (e.code === 'auth/configuration-not-found') {
+      log('SOLUTION: Add your domain to Firebase Auth authorized domains:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Settings', 'warn');
+      log('2. Add "game.laotypo.com" to authorized domains', 'warn');
+    } else if (e.code === 'auth/operation-not-allowed') {
+      log('SOLUTION: Enable Google Sign-In in Firebase Authentication:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Sign-in method', 'warn');
+      log('2. Click on "Google" provider', 'warn');
+      log('3. Toggle "Enable" to ON', 'warn');
+      log('4. Enter your support email and click "Save"', 'warn');
+    } else if (e.code === 'auth/unauthorized-domain') {
+      log('SOLUTION: Add your domain to authorized domains:', 'warn');
+      log('1. Go to Firebase Console → Authentication → Settings', 'warn');
+      log('2. Add "game.laotypo.com" to authorized domains', 'warn');
+    }
   }
 });
 
-let canWrite = false;
+let isSignedIn = false;
+let selectedFile = null;
+
+function updateImportState() {
+  const hasFile = !!selectedFile;
+  els.importBtn.disabled = !(isSignedIn && hasFile);
+}
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     els.user.textContent = user.email || user.uid;
-    canWrite = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
-    els.importBtn.disabled = !canWrite;
-    els.user.className = 'badge ' + (canWrite ? 'ok' : 'warn');
-    if (!canWrite) {
-      log('Signed in, but not authorized to import. Use the admin email.', 'warn');
+    const isExpectedAdmin = (user.email || '').toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    els.user.className = 'badge ' + (isExpectedAdmin ? 'ok' : 'warn');
+    if (!isExpectedAdmin) {
+      log('Signed in, but this account may not have admin permissions. Import will fail unless the account has an admin claim.', 'warn');
     }
+    isSignedIn = true;
+    updateImportState();
   } else {
     els.user.textContent = 'Not signed in';
     els.user.className = 'badge';
-    els.importBtn.disabled = true;
+    isSignedIn = false;
+    updateImportState();
   }
 });
 
-// Import handler
+els.file.addEventListener('change', () => {
+  selectedFile = els.file.files && els.file.files[0] ? els.file.files[0] : null;
+  updateImportState();
+});
+
+// Import handler (client-side Firestore batch; secured by Firestore rules)
 els.importBtn.addEventListener('click', async () => {
-  if (!canWrite) return;
-  const file = els.file.files && els.file.files[0];
+  if (!isSignedIn) {
+    log('Please sign in with an authorized admin account before importing.', 'warn');
+    return;
+  }
+
+  const file = selectedFile;
   if (!file) { log('Please choose a JSON file first.', 'warn'); return; }
 
   try {
@@ -132,24 +171,24 @@ els.importBtn.addEventListener('click', async () => {
 
     const BATCH_LIMIT = 400;
     let batch = writeBatch(db);
-    let ops = 0, written = 0;
-    const now = new Date();
+    let ops = 0, written = 0, skipped = 0;
 
-    for (const [docId, doc] of entries) {
-      const difficultyNum = typeof doc.difficulty === 'number' ? doc.difficulty : parseInt(String(doc.difficulty ?? '1'), 10);
+    for (const [docIdRaw, docData] of entries) {
+      const docId = String(docIdRaw || '').trim();
+      if (!docId || !docData || typeof docData !== 'object') { skipped++; continue; }
+
+      const difficultyNum = typeof docData.difficulty === 'number' ? docData.difficulty : parseInt(String(docData.difficulty ?? '1'), 10);
       const normalized = {
-        context: String(doc.context || '').trim(),
-        correct: String(doc.correct || '').trim(),
-        incorrect: String((doc.incorrect ?? doc.wrong ?? '')).trim(),
+        context: String(docData.context || '').trim(),
+        correct: String(docData.correct || '').trim(),
+        incorrect: String((docData.incorrect ?? docData.wrong ?? '')).trim(),
         difficulty: Number.isFinite(difficultyNum) && [1,2,3].includes(difficultyNum) ? difficultyNum : 1,
-        order: typeof doc.order === 'number' ? doc.order : null,
-        createdAt: now,
-        updatedAt: now
+        order: typeof docData.order === 'number' ? docData.order : null,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
-      if (!normalized.context || !normalized.correct || !normalized.incorrect) {
-        log(`Skip ${docId}: missing required fields`, 'warn');
-        continue;
-      }
+      if (!normalized.context || !normalized.correct || !normalized.incorrect) { skipped++; continue; }
+
       batch.set(doc(db, 'gameWords', docId), normalized, { merge: true });
       ops++; written++;
       if (ops >= BATCH_LIMIT) {
@@ -159,14 +198,18 @@ els.importBtn.addEventListener('click', async () => {
         ops = 0;
       }
     }
+
     if (ops > 0) await batch.commit();
-    log(`Import complete: ${written} documents.`, 'ok');
+    log(`Import complete: ${written} written, ${skipped} skipped, total ${entries.length}.`, 'ok');
     els.status.textContent = 'Done';
   } catch (e) {
     log(`Import failed: ${e.message}`, 'err');
+    if (e.code) {
+      log(`Error code: ${e.code}`, 'err');
+    }
     els.status.textContent = 'Failed';
   } finally {
-    els.importBtn.disabled = !canWrite;
+    updateImportState();
   }
 });
 </script>

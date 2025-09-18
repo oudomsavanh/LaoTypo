@@ -1,0 +1,21 @@
+{
+  "name": "laotypo-secure-proxy",
+  "version": "1.0.0",
+  "description": "Secure proxy server for LaoTypo game",
+  "main": "quick-secure-setup.js",
+  "scripts": {
+    "start": "node quick-secure-setup.js",
+    "dev": "nodemon quick-secure-setup.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["google-sheets", "secure", "proxy", "laotypo"],
+  "author": "LaoTypo Team",
+  "license": "MIT"
+}
