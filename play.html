@@ -1325,21 +1325,26 @@
             }
         }
         
+        function getAnonymousId() {
+            let id = localStorage.getItem('anonymousId');
+            if (!id) {
+                id = 'user_' + Date.now();
+                localStorage.setItem('anonymousId', id);
+            }
+            return id;
+        }
+
         function trackGameStart() {
             const anonIdA = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) {
-                localStorage.setItem('anonymousId', anonymousId);
-            }
+            if (!localStorage.getItem('anonymousId')) { localStorage.setItem('anonymousId', anonIdA); }
             const deviceInfo = getDeviceInfo();
             const anonIdB = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) {
-                localStorage.setItem('anonymousId', anonymousId);
-            }
+            if (!localStorage.getItem('anonymousId')) { localStorage.setItem('anonymousId', anonIdB); }
             
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
                 level: currentLevel + 1,
-                user_id: anonymousId
+                user_id: getAnonymousId()
             });
             
             // Track device information separately
@@ -1349,7 +1354,7 @@
                 screen_resolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`,
                 viewport_size: `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`,
                 user_agent: deviceInfo.userAgent,
-                user_id: anonymousId
+                user_id: getAnonymousId()
             });
         }
         
@@ -1361,7 +1366,7 @@
                 final_score: score,
                 accuracy: accuracy,
                 words_completed: levelProgress,
-                user_id: anonymousId
+                user_id: getAnonymousId()
             });
         }
         
@@ -1372,7 +1377,7 @@
                 accuracy: accuracy,
                 total_words: totalWords,
                 levels_completed: levelsCompleted,
-                user_id: anonymousId
+                user_id: getAnonymousId()
             });
         }
         
