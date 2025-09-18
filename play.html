@@ -1793,7 +1793,11 @@
             // Get difficulty from URL parameters
             const urlDifficulty = urlParams.get('difficulty');
             if (urlDifficulty) {
-                selectedDifficulty = urlDifficulty;
+                // Normalize numeric difficulty to labels: 1->easy, 2->medium, 3->hard
+                if (urlDifficulty === '1') selectedDifficulty = 'easy';
+                else if (urlDifficulty === '2') selectedDifficulty = 'medium';
+                else if (urlDifficulty === '3') selectedDifficulty = 'hard';
+                else selectedDifficulty = urlDifficulty; // accept 'easy'|'medium'|'hard'
             }
             
             // Get timer setting from URL parameters
