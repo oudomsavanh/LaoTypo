@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Firebase Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+        .info { color: blue; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .result.success { border-left-color: #28a745; }
+        .result.error { border-left-color: #dc3545; }
+        .result.warning { border-left-color: #ffc107; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Comprehensive Firebase Test</h1>
+    
+    <div class="test-section">
+        <h2>Firebase Configuration Status</h2>
+        <div id="config-status">Checking...</div>
+        <button onclick="checkFirebaseConfig()">Check Config</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Firebase Objects Availability</h2>
+        <div id="objects-status">Not tested yet</div>
+        <button onclick="checkFirebaseObjects()">Check Objects</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>GameDataManager Test</h2>
+        <div id="gamedata-status">Not tested yet</div>
+        <button onclick="testGameDataManager()">Test GameDataManager</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Word Loading Test</h2>
+        <div id="word-loading-status">Not tested yet</div>
+        <button onclick="testWordLoading()">Load Words</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Logs</h2>
+        <div id="console-logs"></div>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+    
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 50 logs
+            if (logCount > 50) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        function checkFirebaseConfig() {
+            const status = document.getElementById('config-status');
+            const config = window.firebaseConfig;
+            
+            if (config) {
+                status.innerHTML = '<div class="success">✅ Firebase config is available</div>';
+                status.innerHTML += `<pre>${JSON.stringify(config, null, 2)}</pre>`;
+                addLog('✅ Firebase config is available', 'success');
+            } else {
+                status.innerHTML = '<div class="error">❌ Firebase config is not available</div>';
+                addLog('❌ Firebase config is not available', 'error');
+            }
+        }
+
+        function checkFirebaseObjects() {
+            const status = document.getElementById('objects-status');
+            const objects = {
+                'firebaseConfig': window.firebaseConfig,
+                'firebase': window.firebase,
+                'firebaseDb': window.firebaseDb,
+                'firebaseAuth': window.firebaseAuth,
+                'firebaseAnalytics': window.firebaseAnalytics,
+                'collection': window.collection,
+                'getDocs': window.getDocs,
+                'SecurityUtils': window.SecurityUtils,
+                'GameDataManager': window.GameDataManager
+            };
+
+            let html = '<h3>Firebase Objects Status:</h3>';
+            let availableCount = 0;
+            let totalCount = Object.keys(objects).length;
+
+            for (const [name, obj] of Object.entries(objects)) {
+                const available = !!obj;
+                const statusClass = available ? 'success' : 'error';
+                const statusText = available ? '✅ Available' : '❌ Not Available';
+                html += `<div class="${statusClass}">${name}: ${statusText}</div>`;
+                if (available) availableCount++;
+            }
+
+            html += `<div class="info"><strong>Summary: ${availableCount}/${totalCount} objects available</strong></div>`;
+            status.innerHTML = html;
+            
+            if (availableCount === totalCount) {
+                addLog('✅ All Firebase objects are available!', 'success');
+            } else {
+                addLog(`⚠️ Only ${availableCount}/${totalCount} Firebase objects are available`, 'warning');
+            }
+        }
+
+        async function testGameDataManager() {
+            const status = document.getElementById('gamedata-status');
+            status.innerHTML = 'Testing GameDataManager...';
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                
+                addLog('📚 GameDataManager is available', 'success');
+                
+                // Test cache status
+                const cacheStatus = window.GameDataManager.getCacheStatus();
+                addLog(`📊 Cache status: ${cacheStatus.size} entries`, 'info');
+                
+                status.innerHTML = '<div class="success">✅ GameDataManager is working!</div>';
+                addLog('✅ GameDataManager test passed', 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ GameDataManager test failed</div>';
+                addLog(`❌ GameDataManager error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWordLoading() {
+            const status = document.getElementById('word-loading-status');
+            status.innerHTML = 'Loading words...';
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                
+                addLog('📚 Starting word loading test...', 'info');
+                
+                const words = await window.GameDataManager.loadWords(10);
+                
+                if (words && words.length > 0) {
+                    status.innerHTML = `<div class="success">✅ Loaded ${words.length} words successfully!</div>`;
+                    addLog(`✅ Successfully loaded ${words.length} words`, 'success');
+                    
+                    // Show first few words
+                    const sampleWords = words.slice(0, 3);
+                    sampleWords.forEach(word => {
+                        addLog(`📝 Sample: "${word.lao}" = "${word.english}" (${word.difficulty})`, 'info');
+                    });
+                } else {
+                    throw new Error('No words loaded');
+                }
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Word loading failed</div>';
+                addLog(`❌ Word loading error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Page loaded, starting comprehensive tests...', 'info');
+            
+            // Run initial checks
+            checkFirebaseConfig();
+            checkFirebaseObjects();
+            
+            // Wait a bit for Firebase to initialize, then run more tests
+            setTimeout(() => {
+                checkFirebaseObjects();
+                testGameDataManager();
+                testWordLoading();
+            }, 3000);
+            
+            // Run periodic checks
+            setInterval(() => {
+                checkFirebaseObjects();
+            }, 5000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>

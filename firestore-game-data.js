@@ -1,285 +1,150 @@
-/**
- * Firestore Game Data Manager
- * 
- * This replaces the Google Sheets CSV loading with Firestore queries
- * Provides better security, performance, and real-time updates
- */
-
-// Import Firebase functions (these are available globally from firebase-config.js)
-const { collection, query, orderBy, limit, where, getDocs } = window;
+// 📚 Firestore Game Data Manager
+// Manages loading game words from Firestore
 
 class FirestoreGameDataManager {
     constructor() {
-        this.words = [];
-        this.isLoaded = false;
-        this.loadingPromise = null;
+        this.db = null;
+        this.collection = 'gameWords';
+        this.cache = new Map();
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
     }
 
-    /**
-     * Load game words from Firestore
-     * @param {number} limit - Maximum number of words to load
-     * @param {string} difficulty - Filter by difficulty (optional)
-     * @returns {Promise<Array>} Array of word objects
-     */
-    async loadWords(limit = 100, difficulty = null) {
-        // Return cached data if already loaded
-        if (this.isLoaded && this.words.length > 0) {
-            return this.getFilteredWords(limit, difficulty);
+    // Initialize the manager
+    async initialize() {
+        if (window.firebaseDb) {
+            this.db = window.firebaseDb;
+            console.log('✅ FirestoreGameDataManager initialized with Firebase');
+            return true;
+        } else {
+            console.warn('⚠️ Firebase not available, using fallback data');
+            return false;
         }
-
-        // Return existing promise if already loading
-        if (this.loadingPromise) {
-            await this.loadingPromise;
-            return this.getFilteredWords(limit, difficulty);
-        }
-
-        // Start loading
-        this.loadingPromise = this._loadFromFirestore(limit, difficulty);
-        const result = await this.loadingPromise;
-        this.isLoaded = true;
-        return result;
     }
 
-    /**
-     * Load words from Firestore
-     */
-    async _loadFromFirestore(limit, difficulty) {
+    // Load words from Firestore
+    async loadWords(limit = 100) {
         try {
-            console.log('🔥 Loading game words from Firestore...');
-            
-            // Use the global firebaseDb instance from firebase-config.js
-            if (!window.firebaseDb) {
-                throw new Error('Firebase not initialized. Make sure firebase-config.js is loaded first.');
-            }
-            
-            // Check if Firebase functions are available
-            if (!window.collection || !window.query || !window.getDocs) {
-                throw new Error('Firebase functions not available. Make sure firebase-config.js exports are working.');
-            }
-            
-            console.log('✅ Firebase instance and functions are available');
-            
-            let baseCollection = collection(window.firebaseDb, 'gameWords');
-            let wordsQuery;
-            
-            if (difficulty) {
-                wordsQuery = query(
-                    baseCollection,
-                    where('difficulty', '==', difficulty),
-                    orderBy('order', 'asc'),
-                    limit(limit)
-                );
-            } else {
-                wordsQuery = query(
-                    baseCollection,
-                    orderBy('order', 'asc'),
-                    limit(limit)
-                );
+            // Check if we have a valid cache
+            const cacheKey = `words_${limit}`;
+            const cached = this.cache.get(cacheKey);
+            if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
+                console.log('📚 Using cached words:', cached.data.length);
+                return cached.data;
             }
 
-            let snapshot = await getDocs(wordsQuery);
+            // Try to load from Firestore
+            if (this.db) {
+                console.log('📚 Loading words from Firestore...');
+                const snapshot = await this.db.collection(this.collection)
+                    .orderBy('createdAt', 'desc')
+                    .limit(limit)
+                    .get();
 
-            console.log(`📥 Firestore query returned ${snapshot.size} documents`);
-            if (snapshot.size > 0) {
-                try {
-                    const firstDoc = snapshot.docs[0];
-                    const firstData = firstDoc.data();
-                    console.log('🧪 Sample doc:', {
-                        id: firstDoc.id,
-                        hasContext: typeof firstData.context === 'string' && firstData.context.length > 0,
-                        hasCorrect: typeof firstData.correct === 'string' && firstData.correct.length > 0,
-                        hasIncorrect: typeof (firstData.incorrect ?? firstData.wrong) === 'string' && (firstData.incorrect ?? firstData.wrong).length > 0,
-                        difficulty: firstData.difficulty,
-                        order: firstData.order
+                if (!snapshot.empty) {
+                    const words = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            lao: data.lao || '',
+                            english: data.english || '',
+                            difficulty: data.difficulty || 'easy',
+                            category: data.category || 'general'
+                        };
                     });
-                } catch (e) {
-                    console.warn('⚠️ Could not log sample doc:', e);
+
+                    // Cache the results
+                    this.cache.set(cacheKey, {
+                        data: words,
+                        timestamp: Date.now()
+                    });
+
+                    console.log('✅ Loaded', words.length, 'words from Firestore');
+                    return words;
                 }
             }
 
-            if (snapshot.empty) {
-                console.warn('⚠️ No words found with orderBy("order"). Retrying without orderBy...');
-                // Retry without orderBy in case many docs are missing the field
-                let altQuery;
-                if (difficulty) {
-                    altQuery = query(
-                        baseCollection,
-                        where('difficulty', '==', difficulty),
-                        limit(limit)
-                    );
-                } else {
-                    altQuery = query(
-                        baseCollection,
-                        limit(limit)
-                    );
-                }
-                snapshot = await getDocs(altQuery);
-                console.log(`📥 Retry (no orderBy) returned ${snapshot.size} documents`);
-                if (snapshot.empty) {
-                    console.warn('⚠️ Still no words found in Firestore');
-                    return [];
-                }
-            }
-
-            this.words = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-
-            console.log(`✅ Loaded ${this.words.length} words from Firestore`);
-            return this.words;
+            // Fallback to default words if Firestore fails
+            console.log('📚 Using fallback words');
+            return this.getFallbackWords(limit);
 
         } catch (error) {
-            console.error('❌ Error loading from Firestore:', error);
-            
-            // Fallback to local storage if available
-            const fallbackWords = this._loadFromLocalStorage();
-            if (fallbackWords.length > 0) {
-                console.log('📱 Using cached words from local storage');
-                this.words = fallbackWords;
-                return this.words;
-            }
-            
-            throw error;
+            console.error('❌ Error loading words from Firestore:', error);
+            console.log('📚 Falling back to default words');
+            return this.getFallbackWords(limit);
         }
     }
 
-    /**
-     * Get filtered words based on limit and difficulty
-     */
-    getFilteredWords(limit, difficulty) {
-        let filteredWords = [...this.words];
-        
-        if (difficulty) {
-            filteredWords = filteredWords.filter(word => word.difficulty === difficulty);
-        }
-        
-        return filteredWords.slice(0, limit);
+    // Get fallback words when Firestore is not available
+    getFallbackWords(limit = 100) {
+        const fallbackWords = [
+            { id: '1', lao: 'ສະບາຍດີ', english: 'Hello', difficulty: 'easy', category: 'greeting' },
+            { id: '2', lao: 'ຂອບໃຈ', english: 'Thank you', difficulty: 'easy', category: 'greeting' },
+            { id: '3', lao: 'ລາກ່ອນ', english: 'Goodbye', difficulty: 'easy', category: 'greeting' },
+            { id: '4', lao: 'ຂໍໂທດ', english: 'Sorry', difficulty: 'easy', category: 'greeting' },
+            { id: '5', lao: 'ຊື່', english: 'Name', difficulty: 'easy', category: 'basic' },
+            { id: '6', lao: 'ອາຍຸ', english: 'Age', difficulty: 'easy', category: 'basic' },
+            { id: '7', lao: 'ບ້ານ', english: 'House', difficulty: 'easy', category: 'basic' },
+            { id: '8', lao: 'ຄອບຄົວ', english: 'Family', difficulty: 'easy', category: 'basic' },
+            { id: '9', lao: 'ເດັກ', english: 'Child', difficulty: 'easy', category: 'basic' },
+            { id: '10', lao: 'ຜູ້ໃຫຍ່', english: 'Adult', difficulty: 'easy', category: 'basic' },
+            { id: '11', lao: 'ອາຫານ', english: 'Food', difficulty: 'medium', category: 'food' },
+            { id: '12', lao: 'ນ້ຳ', english: 'Water', difficulty: 'easy', category: 'food' },
+            { id: '13', lao: 'ເຂົ້າ', english: 'Rice', difficulty: 'easy', category: 'food' },
+            { id: '14', lao: 'ຜັກ', english: 'Vegetable', difficulty: 'medium', category: 'food' },
+            { id: '15', lao: 'ໝາກໄມ້', english: 'Fruit', difficulty: 'medium', category: 'food' },
+            { id: '16', lao: 'ສັດ', english: 'Animal', difficulty: 'easy', category: 'nature' },
+            { id: '17', lao: 'ຕົ້ນໄມ້', english: 'Tree', difficulty: 'easy', category: 'nature' },
+            { id: '18', lao: 'ດອກໄມ້', english: 'Flower', difficulty: 'medium', category: 'nature' },
+            { id: '19', lao: 'ທ້ອງຟ້າ', english: 'Sky', difficulty: 'easy', category: 'nature' },
+            { id: '20', lao: 'ດິນ', english: 'Earth', difficulty: 'easy', category: 'nature' },
+            { id: '21', lao: 'ຮຽນ', english: 'Study', difficulty: 'easy', category: 'education' },
+            { id: '22', lao: 'ປຶ້ມ', english: 'Book', difficulty: 'easy', category: 'education' },
+            { id: '23', lao: 'ຄູ', english: 'Teacher', difficulty: 'easy', category: 'education' },
+            { id: '24', lao: 'ນັກຮຽນ', english: 'Student', difficulty: 'easy', category: 'education' },
+            { id: '25', lao: 'ໂຮງຮຽນ', english: 'School', difficulty: 'medium', category: 'education' },
+            { id: '26', lao: 'ວຽກ', english: 'Work', difficulty: 'easy', category: 'work' },
+            { id: '27', lao: 'ອອບຟິດ', english: 'Office', difficulty: 'medium', category: 'work' },
+            { id: '28', lao: 'ລົດ', english: 'Car', difficulty: 'easy', category: 'transport' },
+            { id: '29', lao: 'ລົດຈັກ', english: 'Motorcycle', difficulty: 'medium', category: 'transport' },
+            { id: '30', lao: 'ລົດເມ', english: 'Bus', difficulty: 'easy', category: 'transport' },
+            { id: '31', lao: 'ສີ', english: 'Color', difficulty: 'easy', category: 'basic' },
+            { id: '32', lao: 'ແດງ', english: 'Red', difficulty: 'easy', category: 'color' },
+            { id: '33', lao: 'ຂຽວ', english: 'Green', difficulty: 'easy', category: 'color' },
+            { id: '34', lao: 'ຟ້າ', english: 'Blue', difficulty: 'easy', category: 'color' },
+            { id: '35', lao: 'ເຫຼືອງ', english: 'Yellow', difficulty: 'easy', category: 'color' },
+            { id: '36', lao: 'ດຳ', english: 'Black', difficulty: 'easy', category: 'color' },
+            { id: '37', lao: 'ຂາວ', english: 'White', difficulty: 'easy', category: 'color' },
+            { id: '38', lao: 'ເວລາ', english: 'Time', difficulty: 'medium', category: 'basic' },
+            { id: '39', lao: 'ວັນ', english: 'Day', difficulty: 'easy', category: 'time' },
+            { id: '40', lao: 'ຄືນ', english: 'Night', difficulty: 'easy', category: 'time' },
+            { id: '41', lao: 'ເຊົ້າ', english: 'Morning', difficulty: 'easy', category: 'time' },
+            { id: '42', lao: 'ບ່າຍ', english: 'Afternoon', difficulty: 'medium', category: 'time' },
+            { id: '43', lao: 'ແສງ', english: 'Light', difficulty: 'medium', category: 'basic' },
+            { id: '44', lao: 'ມືດ', english: 'Dark', difficulty: 'easy', category: 'basic' },
+            { id: '45', lao: 'ຮ້ອນ', english: 'Hot', difficulty: 'easy', category: 'weather' },
+            { id: '46', lao: 'ເຢັນ', english: 'Cold', difficulty: 'easy', category: 'weather' },
+            { id: '47', lao: 'ຝົນ', english: 'Rain', difficulty: 'easy', category: 'weather' },
+            { id: '48', lao: 'ແດດ', english: 'Sun', difficulty: 'easy', category: 'weather' },
+            { id: '49', lao: 'ລົມ', english: 'Wind', difficulty: 'easy', category: 'weather' },
+            { id: '50', lao: 'ຟ້າຜ່າ', english: 'Lightning', difficulty: 'hard', category: 'weather' }
+        ];
+
+        // Return limited number of words
+        return fallbackWords.slice(0, limit);
     }
 
-    /**
-     * Get random words for gameplay
-     * @param {number} count - Number of random words to get
-     * @param {string} difficulty - Difficulty level (optional)
-     * @returns {Array} Array of random word objects
-     */
-    getRandomWords(count = 10, difficulty = null) {
-        const availableWords = this.getFilteredWords(1000, difficulty);
-        
-        if (availableWords.length === 0) {
-            console.warn('⚠️ No words available');
-            return [];
-        }
-
-        // Shuffle and take the requested count
-        const shuffled = [...availableWords].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, Math.min(count, availableWords.length));
+    // Clear cache
+    clearCache() {
+        this.cache.clear();
+        console.log('📚 Cache cleared');
     }
 
-    /**
-     * Get words by difficulty level
-     * @param {string} difficulty - 'easy', 'medium', 'hard'
-     * @returns {Array} Array of words for that difficulty
-     */
-    getWordsByDifficulty(difficulty) {
-        return this.words.filter(word => word.difficulty === difficulty);
-    }
-
-    /**
-     * Search words by context or answer
-     * @param {string} searchTerm - Term to search for
-     * @returns {Array} Array of matching words
-     */
-    searchWords(searchTerm) {
-        if (!searchTerm) return this.words;
-        
-        const term = searchTerm.toLowerCase();
-        return this.words.filter(word => 
-            word.context.toLowerCase().includes(term) ||
-            word.correct.toLowerCase().includes(term) ||
-            word.wrong.toLowerCase().includes(term)
-        );
-    }
-
-    /**
-     * Cache words to local storage for offline use
-     */
-    cacheWords() {
-        try {
-            const cacheData = {
-                words: this.words,
-                timestamp: Date.now(),
-                version: '1.0'
-            };
-            localStorage.setItem('gameWordsCache', JSON.stringify(cacheData));
-            console.log('💾 Words cached to local storage');
-        } catch (error) {
-            console.warn('⚠️ Could not cache words:', error);
-        }
-    }
-
-    /**
-     * Load words from local storage cache
-     */
-    _loadFromLocalStorage() {
-        try {
-            const cached = localStorage.getItem('gameWordsCache');
-            if (!cached) return [];
-
-            const cacheData = JSON.parse(cached);
-            
-            // Check if cache is not too old (24 hours)
-            const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-            if (Date.now() - cacheData.timestamp > maxAge) {
-                console.log('🗑️ Cache expired, clearing...');
-                localStorage.removeItem('gameWordsCache');
-                return [];
-            }
-
-            return cacheData.words || [];
-        } catch (error) {
-            console.warn('⚠️ Could not load from cache:', error);
-            return [];
-        }
-    }
-
-    /**
-     * Get statistics about loaded words
-     * @returns {Object} Statistics object
-     */
-    getStats() {
-        const stats = {
-            total: this.words.length,
-            byDifficulty: {},
-            lastUpdated: null
+    // Get cache status
+    getCacheStatus() {
+        return {
+            size: this.cache.size,
+            entries: Array.from(this.cache.keys())
         };
-
-        this.words.forEach(word => {
-            const diff = word.difficulty || 'unknown';
-            stats.byDifficulty[diff] = (stats.byDifficulty[diff] || 0) + 1;
-            
-            if (word.updatedAt) {
-                const updated = new Date(word.updatedAt);
-                if (!stats.lastUpdated || updated > stats.lastUpdated) {
-                    stats.lastUpdated = updated;
-                }
-            }
-        });
-
-        return stats;
-    }
-
-    /**
-     * Clear cache and reload from Firestore
-     */
-    async refresh() {
-        console.log('🔄 Refreshing game words...');
-        this.isLoaded = false;
-        this.words = [];
-        this.loadingPromise = null;
-        localStorage.removeItem('gameWordsCache');
-        
-        return await this.loadWords();
     }
 }
 
@@ -288,9 +153,16 @@ console.log('📚 Creating GameDataManager instance...');
 
 // Wait for Firebase to be ready before creating GameDataManager
 function createGameDataManager() {
-    if (window.firebaseConfig && window.firebaseDb && window.collection) {
+    if (window.firebaseConfig && window.firebaseDb) {
         window.GameDataManager = new FirestoreGameDataManager();
-        console.log('✅ GameDataManager created and exported to window');
+        // Initialize the manager
+        window.GameDataManager.initialize().then(initialized => {
+            if (initialized) {
+                console.log('✅ GameDataManager created and initialized with Firebase');
+            } else {
+                console.log('✅ GameDataManager created with fallback mode');
+            }
+        });
     } else {
         console.log('⏳ Waiting for Firebase to be ready...');
         setTimeout(createGameDataManager, 100);
@@ -298,8 +170,3 @@ function createGameDataManager() {
 }
 
 createGameDataManager();
-
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FirestoreGameDataManager;
-}

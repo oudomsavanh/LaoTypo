@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firebase Debug Console</h1>
+    <div id="debug-output"></div>
+
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+    
+    <script>
+        function debugLog(message, type = 'info') {
+            const output = document.getElementById('debug-output');
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            output.appendChild(div);
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // Monitor Firebase initialization
+        let checkCount = 0;
+        const maxChecks = 50;
+        
+        function checkFirebaseReady() {
+            checkCount++;
+            debugLog(`Check #${checkCount}: Checking Firebase availability...`, 'info');
+            
+            const checks = {
+                firebaseConfig: !!window.firebaseConfig,
+                firebase: !!window.firebase,
+                firebaseDb: !!window.firebaseDb,
+                firebaseAuth: !!window.firebaseAuth,
+                collection: !!window.collection,
+                getDocs: !!window.getDocs,
+                SecurityUtils: !!window.SecurityUtils,
+                GameDataManager: !!window.GameDataManager
+            };
+            
+            debugLog(`Firebase objects status: ${JSON.stringify(checks, null, 2)}`, 'info');
+            
+            const allReady = Object.values(checks).every(Boolean);
+            
+            if (allReady) {
+                debugLog('✅ All Firebase objects are ready!', 'success');
+                testFirebaseFunctionality();
+            } else if (checkCount < maxChecks) {
+                debugLog(`⏳ Not all objects ready, checking again in 200ms...`, 'warning');
+                setTimeout(checkFirebaseReady, 200);
+            } else {
+                debugLog('❌ Firebase initialization timeout after 10 seconds', 'error');
+                debugLog('Available objects: ' + Object.keys(checks).filter(key => checks[key]).join(', '), 'warning');
+            }
+        }
+
+        async function testFirebaseFunctionality() {
+            debugLog('🧪 Testing Firebase functionality...', 'info');
+            
+            try {
+                // Test GameDataManager
+                if (window.GameDataManager) {
+                    debugLog('📚 Testing GameDataManager...', 'info');
+                    const words = await window.GameDataManager.loadWords(5);
+                    debugLog(`✅ GameDataManager loaded ${words.length} words`, 'success');
+                    
+                    if (words.length > 0) {
+                        debugLog(`Sample word: "${words[0].lao}" = "${words[0].english}"`, 'info');
+                    }
+                } else {
+                    debugLog('❌ GameDataManager not available', 'error');
+                }
+                
+                // Test SecurityUtils
+                if (window.SecurityUtils) {
+                    debugLog('🛡️ Testing SecurityUtils...', 'info');
+                    const testInput = '<script>alert("test")</script>';
+                    const sanitized = window.SecurityUtils.sanitizeInput(testInput);
+                    debugLog(`✅ SecurityUtils sanitized input: "${sanitized}"`, 'success');
+                } else {
+                    debugLog('❌ SecurityUtils not available', 'error');
+                }
+                
+            } catch (error) {
+                debugLog(`❌ Firebase functionality test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Start checking when page loads
+        window.addEventListener('load', () => {
+            debugLog('📄 Page loaded, starting Firebase debug...', 'info');
+            checkFirebaseReady();
+        });
+
+        // Also log any errors
+        window.addEventListener('error', (e) => {
+            debugLog(`❌ JavaScript Error: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+        });
+    </script>
+</body>
+</html>

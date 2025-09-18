@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Firebase Test</title>
+</head>
+<body>
+    <h1>Firebase Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        log('Page loaded');
+        
+        // Check if firebase-config.js is loaded
+        setTimeout(() => {
+            log('Checking firebaseConfig: ' + (window.firebaseConfig ? 'Available' : 'Not available'));
+            log('Checking firebaseDb: ' + (window.firebaseDb ? 'Available' : 'Not available'));
+            log('Checking firebase: ' + (window.firebase ? 'Available' : 'Not available'));
+        }, 1000);
+    </script>
+    
+    <script src="firebase-config.js"></script>
+</body>
+</html>
