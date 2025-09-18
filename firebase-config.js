@@ -137,12 +137,12 @@ class FirebaseWordManager {
       let wordsQuery;
       
       if (difficulty === 'all') {
-        wordsQuery = query(wordsRef, orderBy('difficulty'), orderBy('lao'));
+        wordsQuery = query(wordsRef, orderBy('difficulty'), orderBy('order'));
       } else {
         wordsQuery = query(
-          wordsRef, 
+          wordsRef,
           where('difficulty', '==', difficulty),
-          orderBy('lao')
+          orderBy('order')
         );
       }
       
