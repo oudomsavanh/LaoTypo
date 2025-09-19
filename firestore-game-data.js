@@ -148,25 +148,25 @@ class FirestoreGameDataManager {
     }
 }
 
-// Create global instance
+// Create global instance immediately
 console.log('📚 Creating GameDataManager instance...');
+window.GameDataManager = new FirestoreGameDataManager();
 
-// Wait for Firebase to be ready before creating GameDataManager
-function createGameDataManager() {
+// Initialize the manager when Firebase is ready
+function initializeGameDataManager() {
     if (window.firebaseConfig && window.firebaseDb) {
-        window.GameDataManager = new FirestoreGameDataManager();
-        // Initialize the manager
         window.GameDataManager.initialize().then(initialized => {
             if (initialized) {
-                console.log('✅ GameDataManager created and initialized with Firebase');
+                console.log('✅ GameDataManager initialized with Firebase');
             } else {
-                console.log('✅ GameDataManager created with fallback mode');
+                console.log('✅ GameDataManager initialized with fallback mode');
             }
         });
     } else {
-        console.log('⏳ Waiting for Firebase to be ready...');
-        setTimeout(createGameDataManager, 100);
+        console.log('⏳ Waiting for Firebase to be ready for GameDataManager...');
+        setTimeout(initializeGameDataManager, 100);
     }
 }
 
-createGameDataManager();
+// Start initialization
+initializeGameDataManager();

@@ -28,7 +28,7 @@ console.log('🔥 Firebase config exported to global scope');
   
   // Wait for Firebase to load from CDN
   let attempts = 0;
-  const maxAttempts = 50; // 5 seconds max wait
+  const maxAttempts = 100; // 10 seconds max wait
   
   const checkFirebase = () => {
     attempts++;
@@ -44,6 +44,7 @@ console.log('🔥 Firebase config exported to global scope');
     }
   };
   
+  // Start checking immediately
   checkFirebase();
 })();
 
@@ -114,6 +115,17 @@ function initializeFirebase() {
     // Initialize managers
     initializeManagers();
     
+    // Ensure GameDataManager is available
+    if (window.GameDataManager) {
+        window.GameDataManager.initialize().then(initialized => {
+            if (initialized) {
+                console.log('✅ GameDataManager re-initialized with Firebase');
+            } else {
+                console.log('✅ GameDataManager re-initialized with fallback mode');
+            }
+        });
+    }
+    
   } catch (error) {
     console.error('❌ Firebase initialization failed:', error);
     console.log('🔄 Attempting fallback initialization...');
@@ -164,6 +176,13 @@ function initializeFallback() {
   
   // Initialize managers with fallback
   initializeManagers();
+  
+  // Ensure GameDataManager is available in fallback mode
+  if (window.GameDataManager) {
+    window.GameDataManager.initialize().then(initialized => {
+      console.log('✅ GameDataManager initialized in fallback mode');
+    });
+  }
 }
 
 // Initialize Firebase managers

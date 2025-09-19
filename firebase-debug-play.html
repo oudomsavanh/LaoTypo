@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug - Play.html Issues</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .success { color: #4ade80; font-weight: bold; }
+        .error { color: #f87171; font-weight: bold; }
+        .warning { color: #fbbf24; font-weight: bold; }
+        .info { color: #60a5fa; }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #60a5fa;
+        }
+        .result.success { border-left-color: #4ade80; }
+        .result.error { border-left-color: #f87171; }
+        .result.warning { border-left-color: #fbbf24; }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e5e7eb;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase Debug - Play.html Issues</h1>
+        <p>This debug tool will help identify why game words are not loading from Firebase on play.html</p>
+        
+        <div class="test-section">
+            <h2>🚀 Firebase Initialization Status</h2>
+            <div id="firebase-status">Initializing...</div>
+            <button onclick="checkFirebaseStatus()">Check Firebase Status</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📚 GameDataManager Test</h2>
+            <div id="gamedata-status">Not tested yet</div>
+            <button onclick="testGameDataManager()">Test GameDataManager</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔗 Firebase Connection Test</h2>
+            <div id="connection-status">Not tested yet</div>
+            <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📝 Word Loading Test</h2>
+            <div id="word-status">Not tested yet</div>
+            <button onclick="testWordLoading()">Load Game Words</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>⏱️ Timing Analysis</h2>
+            <div id="timing-status">Not analyzed yet</div>
+            <button onclick="analyzeTiming()">Analyze Timing</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Live Console</h2>
+            <div id="console-logs"></div>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    <script src="firestore-game-data.js"></script>
+    
+    <script>
+        let logCount = 0;
+        let timingData = [];
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 30 logs
+            if (logCount > 30) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        function checkFirebaseStatus() {
+            const status = document.getElementById('firebase-status');
+            const checks = [
+                { name: 'Firebase Core', value: typeof firebase !== 'undefined' },
+                { name: 'Firebase Config', value: !!window.firebaseConfig },
+                { name: 'Firebase Database', value: !!window.firebaseDb },
+                { name: 'Firebase Auth', value: !!window.firebaseAuth },
+                { name: 'Collection Function', value: !!window.collection },
+                { name: 'GetDocs Function', value: !!window.getDocs },
+                { name: 'Security Utils', value: !!window.SecurityUtils },
+                { name: 'Game Data Manager', value: !!window.GameDataManager }
+            ];
+
+            let html = '<div class="status-grid">';
+            let availableCount = 0;
+
+            checks.forEach(check => {
+                const available = check.value;
+                const statusClass = available ? 'success' : 'error';
+                const icon = available ? '✅' : '❌';
+                
+                html += `
+                    <div class="status-item">
+                        <div class="${statusClass}">${icon} ${check.name}</div>
+                        <div style="font-size: 0.9em; margin-top: 5px;">${available ? 'Ready' : 'Not Ready'}</div>
+                    </div>
+                `;
+                
+                if (available) availableCount++;
+            });
+
+            html += '</div>';
+            html += `<div class="info" style="text-align: center; margin-top: 20px; font-size: 1.2em;">
+                <strong>Status: ${availableCount}/${checks.length} components available</strong>
+            </div>`;
+
+            status.innerHTML = html;
+            
+            if (availableCount === checks.length) {
+                addLog('🎉 All Firebase components are available and ready!', 'success');
+            } else {
+                addLog(`⚠️ Only ${availableCount}/${checks.length} Firebase components are available`, 'warning');
+            }
+        }
+
+        async function testGameDataManager() {
+            const status = document.getElementById('gamedata-status');
+            status.innerHTML = '<div class="info">🔄 Testing GameDataManager...</div>';
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                
+                addLog('📚 GameDataManager is available', 'success');
+                
+                // Test cache status
+                const cacheStatus = window.GameDataManager.getCacheStatus();
+                addLog(`📊 Cache status: ${cacheStatus.size} entries`, 'info');
+                
+                // Test initialization
+                const initialized = await window.GameDataManager.initialize();
+                addLog(`🔧 GameDataManager initialized: ${initialized}`, initialized ? 'success' : 'warning');
+                
+                status.innerHTML = '<div class="success">✅ GameDataManager is working!</div>';
+                addLog('✅ GameDataManager test passed', 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ GameDataManager test failed</div>';
+                addLog(`❌ GameDataManager error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFirebaseConnection() {
+            const status = document.getElementById('connection-status');
+            status.innerHTML = '<div class="info">🔄 Testing Firebase connection...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('🔗 Testing Firebase connection...', 'info');
+                
+                // Test basic connection
+                const testCollection = window.firebaseDb.collection('test');
+                await testCollection.limit(1).get();
+                
+                status.innerHTML = '<div class="success">✅ Firebase connection successful!</div>';
+                addLog('✅ Firebase connection test passed', 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Firebase connection failed</div>';
+                addLog(`❌ Connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWordLoading() {
+            const status = document.getElementById('word-status');
+            status.innerHTML = '<div class="info">🔄 Loading game words...</div>';
+            
+            try {
+                if (!window.GameDataManager) {
+                    throw new Error('GameDataManager not available');
+                }
+                
+                addLog('📚 Testing word loading from GameDataManager...', 'info');
+                
+                const words = await window.GameDataManager.loadWords(10);
+                
+                if (words && words.length > 0) {
+                    status.innerHTML = `<div class="success">✅ Successfully loaded ${words.length} words!</div>`;
+                    addLog(`✅ Successfully loaded ${words.length} words from GameDataManager`, 'success');
+                    
+                    // Show sample words
+                    const sampleWords = words.slice(0, 3);
+                    sampleWords.forEach((word, index) => {
+                        addLog(`📝 Word ${index + 1}: "${word.lao}" = "${word.english}" (${word.difficulty})`, 'info');
+                    });
+                } else {
+                    throw new Error('No words loaded');
+                }
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Word loading failed - check console for details</div>';
+                addLog(`❌ Word loading error: ${error.message}`, 'error');
+            }
+        }
+
+        function analyzeTiming() {
+            const status = document.getElementById('timing-status');
+            status.innerHTML = '<div class="info">🔄 Analyzing timing...</div>';
+            
+            const timing = {
+                pageLoad: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                firebaseAvailable: typeof firebase !== 'undefined',
+                gameDataManagerAvailable: !!window.GameDataManager,
+                firebaseDbAvailable: !!window.firebaseDb
+            };
+            
+            let html = '<h3>Timing Analysis:</h3>';
+            html += `<pre>${JSON.stringify(timing, null, 2)}</pre>`;
+            
+            html += '<h3>Current Status:</h3>';
+            html += `<div class="info">Page Load Time: ${timing.pageLoad}ms</div>`;
+            html += `<div class="info">DOM Content Loaded: ${timing.domContentLoaded}ms</div>`;
+            html += `<div class="${timing.firebaseAvailable ? 'success' : 'error'}">Firebase Available: ${timing.firebaseAvailable}</div>`;
+            html += `<div class="${timing.gameDataManagerAvailable ? 'success' : 'error'}">GameDataManager Available: ${timing.gameDataManagerAvailable}</div>`;
+            html += `<div class="${timing.firebaseDbAvailable ? 'success' : 'error'}">Firebase DB Available: ${timing.firebaseDbAvailable}</div>`;
+            
+            status.innerHTML = html;
+            
+            addLog('⏱️ Timing analysis completed', 'info');
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Page loaded, starting Firebase debug tests...', 'info');
+            
+            // Wait for Firebase to initialize
+            setTimeout(() => {
+                addLog('🔍 Running Firebase status check...', 'info');
+                checkFirebaseStatus();
+                
+                setTimeout(() => {
+                    addLog('📚 Testing GameDataManager...', 'info');
+                    testGameDataManager();
+                    
+                    setTimeout(() => {
+                        addLog('🔗 Testing Firebase connection...', 'info');
+                        testFirebaseConnection();
+                        
+                        setTimeout(() => {
+                            addLog('📝 Testing word loading...', 'info');
+                            testWordLoading();
+                            
+                            setTimeout(() => {
+                                addLog('⏱️ Analyzing timing...', 'info');
+                                analyzeTiming();
+                            }, 1000);
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>
