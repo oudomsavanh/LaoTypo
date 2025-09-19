@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Debug - Data Access</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .success { color: #4ade80; font-weight: bold; }
+        .error { color: #f87171; font-weight: bold; }
+        .warning { color: #fbbf24; font-weight: bold; }
+        .info { color: #60a5fa; }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #60a5fa;
+        }
+        .result.success { border-left-color: #4ade80; }
+        .result.error { border-left-color: #f87171; }
+        .result.warning { border-left-color: #fbbf24; }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e5e7eb;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firestore Debug - Data Access</h1>
+        <p>This tool will test direct Firestore access to identify data loading issues</p>
+        
+        <div class="test-section">
+            <h2>🚀 Firebase Connection</h2>
+            <div id="firebase-status">Checking...</div>
+            <button onclick="checkFirebaseConnection()">Check Firebase</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📚 Direct Firestore Test</h2>
+            <div id="firestore-status">Not tested yet</div>
+            <button onclick="testDirectFirestore()">Test Direct Firestore</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📝 GameWords Collection Test</h2>
+            <div id="gamewords-status">Not tested yet</div>
+            <button onclick="testGameWordsCollection()">Test GameWords Collection</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Sample Data</h2>
+            <div id="sample-data">Not loaded yet</div>
+            <button onclick="loadSampleData()">Load Sample Data</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Live Console</h2>
+            <div id="console-logs"></div>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 30 logs
+            if (logCount > 30) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        function checkFirebaseConnection() {
+            const status = document.getElementById('firebase-status');
+            
+            const checks = [
+                { name: 'Firebase Core', value: typeof firebase !== 'undefined' },
+                { name: 'Firebase Config', value: !!window.firebaseConfig },
+                { name: 'Firebase Database', value: !!window.firebaseDb },
+                { name: 'Collection Function', value: !!window.collection },
+                { name: 'GetDocs Function', value: !!window.getDocs }
+            ];
+
+            let html = '<h3>Firebase Status:</h3>';
+            let availableCount = 0;
+
+            checks.forEach(check => {
+                const available = check.value;
+                const statusClass = available ? 'success' : 'error';
+                const icon = available ? '✅' : '❌';
+                
+                html += `<div class="${statusClass}">${icon} ${check.name}: ${available ? 'Available' : 'Not Available'}</div>`;
+                
+                if (available) availableCount++;
+            });
+
+            html += `<div class="info" style="margin-top: 15px;"><strong>Status: ${availableCount}/${checks.length} components available</strong></div>`;
+
+            status.innerHTML = html;
+            
+            if (availableCount === checks.length) {
+                addLog('🎉 Firebase connection is ready!', 'success');
+            } else {
+                addLog(`⚠️ Only ${availableCount}/${checks.length} Firebase components are available`, 'warning');
+            }
+        }
+
+        async function testDirectFirestore() {
+            const status = document.getElementById('firestore-status');
+            status.innerHTML = '<div class="info">🔄 Testing direct Firestore access...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('🔗 Testing direct Firestore connection...', 'info');
+                
+                // Test basic Firestore connection
+                const testCollection = window.firebaseDb.collection('test');
+                const testSnapshot = await testCollection.limit(1).get();
+                
+                status.innerHTML = '<div class="success">✅ Direct Firestore access successful!</div>';
+                addLog('✅ Direct Firestore connection test passed', 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Direct Firestore access failed</div>';
+                addLog(`❌ Direct Firestore test failed: ${error.message}`, 'error');
+                addLog(`❌ Error code: ${error.code || 'Unknown'}`, 'error');
+            }
+        }
+
+        async function testGameWordsCollection() {
+            const status = document.getElementById('gamewords-status');
+            status.innerHTML = '<div class="info">🔄 Testing gameWords collection...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('📚 Testing gameWords collection access...', 'info');
+                
+                // Test gameWords collection
+                const gameWordsCollection = window.firebaseDb.collection('gameWords');
+                const snapshot = await gameWordsCollection.limit(5).get();
+                
+                if (snapshot.empty) {
+                    status.innerHTML = '<div class="warning">⚠️ gameWords collection is empty!</div>';
+                    addLog('⚠️ gameWords collection is empty - no data found', 'warning');
+                } else {
+                    status.innerHTML = `<div class="success">✅ Found ${snapshot.size} documents in gameWords collection!</div>`;
+                    addLog(`✅ Found ${snapshot.size} documents in gameWords collection`, 'success');
+                    
+                    // Show document IDs
+                    snapshot.docs.forEach((doc, index) => {
+                        addLog(`📝 Document ${index + 1}: ${doc.id}`, 'info');
+                    });
+                }
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ gameWords collection access failed</div>';
+                addLog(`❌ gameWords collection test failed: ${error.message}`, 'error');
+                addLog(`❌ Error code: ${error.code || 'Unknown'}`, 'error');
+                
+                if (error.code === 'permission-denied') {
+                    addLog('🚨 PERMISSION DENIED - Check Firestore rules!', 'error');
+                }
+            }
+        }
+
+        async function loadSampleData() {
+            const status = document.getElementById('sample-data');
+            status.innerHTML = '<div class="info">🔄 Loading sample data...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('📚 Loading sample data from gameWords...', 'info');
+                
+                // Load sample data
+                const gameWordsCollection = window.firebaseDb.collection('gameWords');
+                const snapshot = await gameWordsCollection.limit(10).get();
+                
+                if (snapshot.empty) {
+                    status.innerHTML = '<div class="warning">⚠️ No data found in gameWords collection</div>';
+                    addLog('⚠️ No data found in gameWords collection', 'warning');
+                } else {
+                    const words = [];
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        words.push({
+                            id: doc.id,
+                            lao: data.lao || 'N/A',
+                            english: data.english || 'N/A',
+                            difficulty: data.difficulty || 'N/A',
+                            category: data.category || 'N/A'
+                        });
+                    });
+                    
+                    status.innerHTML = `<div class="success">✅ Loaded ${words.length} sample words!</div>`;
+                    addLog(`✅ Loaded ${words.length} sample words`, 'success');
+                    
+                    // Show sample data
+                    status.innerHTML += '<pre>' + JSON.stringify(words, null, 2) + '</pre>';
+                }
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Failed to load sample data</div>';
+                addLog(`❌ Sample data loading failed: ${error.message}`, 'error');
+                addLog(`❌ Error code: ${error.code || 'Unknown'}`, 'error');
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Page loaded, starting Firestore debug tests...', 'info');
+            
+            // Wait for Firebase to initialize
+            setTimeout(() => {
+                addLog('🔍 Running Firebase connection check...', 'info');
+                checkFirebaseConnection();
+                
+                setTimeout(() => {
+                    addLog('🔗 Testing direct Firestore access...', 'info');
+                    testDirectFirestore();
+                    
+                    setTimeout(() => {
+                        addLog('📚 Testing gameWords collection...', 'info');
+                        testGameWordsCollection();
+                        
+                        setTimeout(() => {
+                            addLog('📝 Loading sample data...', 'info');
+                            loadSampleData();
+                        }, 1000);
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>

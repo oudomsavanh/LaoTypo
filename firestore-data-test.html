@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Data Structure Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .info { color: #17a2b8; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firestore Data Structure Test</h1>
+        <p>This tool will test the exact data structure in your Firestore gameWords collection</p>
+        
+        <div class="test-section">
+            <h2>📚 GameWords Collection Analysis</h2>
+            <div id="collection-analysis">Not analyzed yet</div>
+            <button onclick="analyzeCollection()">Analyze Collection</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📝 Sample Documents</h2>
+            <div id="sample-documents">Not loaded yet</div>
+            <button onclick="loadSampleDocuments()">Load Sample Documents</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Data Structure Issues</h2>
+            <div id="structure-issues">Not checked yet</div>
+            <button onclick="checkDataStructure()">Check Data Structure</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Console Logs</h2>
+            <div id="console-logs"></div>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 20 logs
+            if (logCount > 20) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        async function analyzeCollection() {
+            const status = document.getElementById('collection-analysis');
+            status.innerHTML = '<div class="info">🔄 Analyzing gameWords collection...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('📚 Analyzing gameWords collection structure...', 'info');
+                
+                // Get collection info
+                const gameWordsCollection = window.firebaseDb.collection('gameWords');
+                const snapshot = await gameWordsCollection.limit(100).get();
+                
+                if (snapshot.empty) {
+                    status.innerHTML = '<div class="warning">⚠️ gameWords collection is empty!</div>';
+                    addLog('⚠️ gameWords collection is empty - no documents found', 'warning');
+                    return;
+                }
+                
+                // Analyze document structure
+                const documents = [];
+                const fieldAnalysis = {};
+                
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    documents.push({
+                        id: doc.id,
+                        data: data
+                    });
+                    
+                    // Analyze fields
+                    Object.keys(data).forEach(field => {
+                        if (!fieldAnalysis[field]) {
+                            fieldAnalysis[field] = {
+                                count: 0,
+                                types: new Set(),
+                                sampleValues: []
+                            };
+                        }
+                        fieldAnalysis[field].count++;
+                        fieldAnalysis[field].types.add(typeof data[field]);
+                        if (fieldAnalysis[field].sampleValues.length < 3) {
+                            fieldAnalysis[field].sampleValues.push(data[field]);
+                        }
+                    });
+                });
+                
+                let html = `<div class="success">✅ Found ${documents.length} documents in gameWords collection</div>`;
+                html += '<h3>Field Analysis:</h3>';
+                html += '<pre>';
+                
+                Object.keys(fieldAnalysis).forEach(field => {
+                    const analysis = fieldAnalysis[field];
+                    html += `${field}:\n`;
+                    html += `  - Count: ${analysis.count}/${documents.length} documents\n`;
+                    html += `  - Types: ${Array.from(analysis.types).join(', ')}\n`;
+                    html += `  - Sample values: ${analysis.sampleValues.join(', ')}\n\n`;
+                });
+                
+                html += '</pre>';
+                
+                status.innerHTML = html;
+                addLog(`✅ Analyzed ${documents.length} documents with ${Object.keys(fieldAnalysis).length} unique fields`, 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Collection analysis failed</div>';
+                addLog(`❌ Collection analysis failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadSampleDocuments() {
+            const status = document.getElementById('sample-documents');
+            status.innerHTML = '<div class="info">🔄 Loading sample documents...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('📝 Loading sample documents from gameWords...', 'info');
+                
+                const gameWordsCollection = window.firebaseDb.collection('gameWords');
+                const snapshot = await gameWordsCollection.limit(5).get();
+                
+                if (snapshot.empty) {
+                    status.innerHTML = '<div class="warning">⚠️ No documents found in gameWords collection</div>';
+                    addLog('⚠️ No documents found in gameWords collection', 'warning');
+                    return;
+                }
+                
+                const documents = [];
+                snapshot.docs.forEach(doc => {
+                    documents.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                status.innerHTML = `<div class="success">✅ Loaded ${documents.length} sample documents</div>`;
+                status.innerHTML += '<pre>' + JSON.stringify(documents, null, 2) + '</pre>';
+                
+                addLog(`✅ Loaded ${documents.length} sample documents`, 'success');
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Failed to load sample documents</div>';
+                addLog(`❌ Sample documents loading failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkDataStructure() {
+            const status = document.getElementById('structure-issues');
+            status.innerHTML = '<div class="info">🔄 Checking data structure issues...</div>';
+            
+            try {
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                addLog('🔍 Checking for data structure issues...', 'info');
+                
+                const gameWordsCollection = window.firebaseDb.collection('gameWords');
+                const snapshot = await gameWordsCollection.limit(10).get();
+                
+                if (snapshot.empty) {
+                    status.innerHTML = '<div class="warning">⚠️ No data to check - collection is empty</div>';
+                    addLog('⚠️ No data to check - collection is empty', 'warning');
+                    return;
+                }
+                
+                const issues = [];
+                const requiredFields = ['lao', 'english', 'difficulty'];
+                
+                snapshot.docs.forEach((doc, index) => {
+                    const data = doc.data();
+                    const docIssues = [];
+                    
+                    // Check required fields
+                    requiredFields.forEach(field => {
+                        if (!data[field]) {
+                            docIssues.push(`Missing required field: ${field}`);
+                        } else if (typeof data[field] !== 'string') {
+                            docIssues.push(`Invalid type for ${field}: expected string, got ${typeof data[field]}`);
+                        }
+                    });
+                    
+                    // Check for empty values
+                    Object.keys(data).forEach(field => {
+                        if (data[field] === '' || data[field] === null || data[field] === undefined) {
+                            docIssues.push(`Empty value for field: ${field}`);
+                        }
+                    });
+                    
+                    if (docIssues.length > 0) {
+                        issues.push({
+                            documentId: doc.id,
+                            issues: docIssues
+                        });
+                    }
+                });
+                
+                let html = '';
+                if (issues.length === 0) {
+                    html = '<div class="success">✅ No data structure issues found!</div>';
+                    addLog('✅ No data structure issues found', 'success');
+                } else {
+                    html = `<div class="warning">⚠️ Found ${issues.length} documents with issues</div>`;
+                    html += '<pre>';
+                    issues.forEach(issue => {
+                        html += `Document ${issue.documentId}:\n`;
+                        issue.issues.forEach(problem => {
+                            html += `  - ${problem}\n`;
+                        });
+                        html += '\n';
+                    });
+                    html += '</pre>';
+                    addLog(`⚠️ Found ${issues.length} documents with data structure issues`, 'warning');
+                }
+                
+                status.innerHTML = html;
+                
+            } catch (error) {
+                status.innerHTML = '<div class="error">❌ Data structure check failed</div>';
+                addLog(`❌ Data structure check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Page loaded, starting Firestore data tests...', 'info');
+            
+            // Wait for Firebase to initialize
+            setTimeout(() => {
+                addLog('📚 Analyzing collection...', 'info');
+                analyzeCollection();
+                
+                setTimeout(() => {
+                    addLog('📝 Loading sample documents...', 'info');
+                    loadSampleDocuments();
+                    
+                    setTimeout(() => {
+                        addLog('🔍 Checking data structure...', 'info');
+                        checkDataStructure();
+                    }, 1000);
+                }, 1000);
+            }, 2000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>

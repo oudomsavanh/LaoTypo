@@ -35,14 +35,26 @@ class FirestoreGameDataManager {
             // Try to load from Firestore
             if (this.db) {
                 console.log('📚 Loading words from Firestore...');
-                const snapshot = await this.db.collection(this.collection)
-                    .orderBy('createdAt', 'desc')
-                    .limit(limit)
-                    .get();
+                
+                // Try with orderBy first, fallback to simple query if it fails
+                let snapshot;
+                try {
+                    snapshot = await this.db.collection(this.collection)
+                        .orderBy('createdAt', 'desc')
+                        .limit(limit)
+                        .get();
+                } catch (orderByError) {
+                    console.warn('⚠️ orderBy failed, trying simple query:', orderByError.message);
+                    snapshot = await this.db.collection(this.collection)
+                        .limit(limit)
+                        .get();
+                }
 
                 if (!snapshot.empty) {
+                    console.log('📥 Raw snapshot size:', snapshot.size);
                     const words = snapshot.docs.map(doc => {
                         const data = doc.data();
+                        console.log('📄 Document data:', doc.id, data);
                         return {
                             id: doc.id,
                             lao: data.lao || '',
@@ -60,6 +72,8 @@ class FirestoreGameDataManager {
 
                     console.log('✅ Loaded', words.length, 'words from Firestore');
                     return words;
+                } else {
+                    console.warn('⚠️ Firestore query returned empty snapshot');
                 }
             }
 
