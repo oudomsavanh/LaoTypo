@@ -1,5 +1,5 @@
 // Service Worker for Lao Typo Game PWA
-const CACHE_NAME = 'lao-typo-v1.9.2';
+const CACHE_NAME = 'lao-typo-v1.9.3';
 const OFFLINE_URL = '/game.html';
 
 // Files to cache for offline use (same-origin only for security)
