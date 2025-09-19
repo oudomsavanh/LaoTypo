@@ -930,6 +930,8 @@
     </div>
 
     <script>
+        console.log('🚀 PLAY.HTML: Script started loading!');
+        
         // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
         
         // Global variables
@@ -1283,10 +1285,6 @@
                 localStorage.setItem('anonymousId', anonymousId);
             }
             const deviceInfo = getDeviceInfo();
-            const anonymousId = 'user_' + (localStorage.getItem('anonymousId') || Date.now());
-            if (!localStorage.getItem('anonymousId')) {
-                localStorage.setItem('anonymousId', anonymousId);
-            }
             
             trackGameEvent('game_start', {
                 difficulty: levelNames[currentLevel],
@@ -1701,6 +1699,10 @@
 
         // Initialize game
         async function initializeGame() {
+            console.log('🎮 PLAY.HTML: Game initialization started!');
+            console.log('🔗 Current URL:', window.location.href);
+            console.log('📊 URL Parameters:', Object.fromEntries(new URLSearchParams(window.location.search)));
+            
             loadGameSettings();
             
             // Initialize server validation
@@ -3661,6 +3663,7 @@
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 PLAY.HTML: DOM loaded, starting initialization!');
             try {
                 initializeGame();
                 setupLevelTransitionHandlers();
@@ -3915,10 +3918,10 @@
                 }
                 
                 // Fallback: copy image to clipboard
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
+                const response2 = await fetch(dataUrl);
+                const blob2 = await response2.blob();
                 await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
+                    new ClipboardItem({ 'image/png': blob2 })
                 ]);
                 this.showCopyStatus('✅ ຄັດລອກຮູບສຳເລັດແລ້ວ!');
                 

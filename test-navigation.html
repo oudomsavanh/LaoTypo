@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navigation Test</title>
+</head>
+<body>
+    <h1>Navigation Test</h1>
+    <button onclick="testNavigation()">Test Play Navigation</button>
+    <div id="result"></div>
+    
+    <script>
+        function testNavigation() {
+            const params = new URLSearchParams({
+                player: 'TestPlayer',
+                difficulty: 'easy',
+                timer: 'false',
+                sound: 'true',
+                music: 'true'
+            });
+            
+            const gameURL = `/play?${params.toString()}`;
+            console.log('🔗 Test URL:', gameURL);
+            
+            document.getElementById('result').innerHTML = `
+                <p>Generated URL: <a href="${gameURL}" target="_blank">${gameURL}</a></p>
+                <p>Click the link above to test navigation</p>
+            `;
+        }
+    </script>
+</body>
+</html>
