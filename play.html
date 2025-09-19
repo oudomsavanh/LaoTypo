@@ -1607,6 +1607,13 @@
         // Game content data source (Google Sheets CSV)
         // Replace with your own Google Sheet CSV export URL if needed
         const GAME_DATA_URL = 'https://docs.google.com/spreadsheets/d/1jhdIOg9aqy7Jb28pqnz9I5F23uQ8HYyABvvMxqSzGr0/export?format=csv&gid=0';
+        
+        // CORS proxy URLs as fallbacks
+        const CORS_PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://corsproxy.io/?'
+        ];
 
         // Game content loaded from Google Sheets
         
@@ -1637,28 +1644,67 @@
 
         // Test Google Sheets connection (for debugging)
         async function testGoogleSheetsConnection() {
-            console.log("Testing game data connection...");
-            console.log("URL:", GAME_DATA_URL);
+            console.log("🧪 Testing game data connection...");
+            console.log("🔗 URL:", GAME_DATA_URL);
             
             try {
                 const response = await fetch(GAME_DATA_URL);
-                console.log("Response status:", response.status);
-                console.log("Response headers:", [...response.headers.entries()]);
+                console.log("📡 Response status:", response.status);
+                console.log("📡 Response headers:", [...response.headers.entries()]);
                 
                 if (response.ok) {
                     const text = await response.text();
-                    console.log("Response text length:", text.length);
-                    console.log("Response preview:", text.substring(0, 500));
+                    console.log("📄 Response text length:", text.length);
+                    console.log("📄 Response preview:", text.substring(0, 500));
                     return true;
                 } else {
-                    console.error("Response not OK:", response.status, response.statusText);
+                    console.error("❌ Response not OK:", response.status, response.statusText);
                     return false;
                 }
             } catch (error) {
-                console.error("Fetch error:", error);
+                console.error("🚨 Fetch error:", error);
                 return false;
             }
         }
+        
+        // Enhanced test function for debugging
+        async function debugWordLoading() {
+            console.log('🔍 DEBUG: Starting comprehensive word loading test...');
+            console.log('🔗 Target URL:', GAME_DATA_URL);
+            console.log('🌐 User Agent:', navigator.userAgent);
+            console.log('🌍 Current URL:', window.location.href);
+            
+            // Test 1: Direct fetch
+            console.log('\n🧪 Test 1: Direct fetch');
+            try {
+                await testGoogleSheetsConnection();
+            } catch (error) {
+                console.error('❌ Direct fetch test failed:', error);
+            }
+            
+            // Test 2: Try the new fetchWordsFromGoogleSheets function
+            console.log('\n🧪 Test 2: fetchWordsFromGoogleSheets function');
+            try {
+                const words = await fetchWordsFromGoogleSheets(10); // Just get 10 words for testing
+                console.log('✅ fetchWordsFromGoogleSheets success!', words.length, 'words loaded');
+                console.log('📊 Sample words:', words.slice(0, 3));
+            } catch (error) {
+                console.error('❌ fetchWordsFromGoogleSheets failed:', error);
+            }
+            
+            // Test 3: Check if we have fallback words
+            console.log('\n🧪 Test 3: Fallback words check');
+            try {
+                const fallbackWords = getDefaultWords();
+                console.log('🛡️ Fallback words available:', fallbackWords.length);
+                console.log('📊 Sample fallback words:', fallbackWords.slice(0, 3));
+            } catch (error) {
+                console.error('❌ Fallback words test failed:', error);
+            }
+        }
+        
+        // Make debug function available globally
+        window.debugWordLoading = debugWordLoading;
 
         // Initialize game
         async function initializeGame() {
@@ -1833,13 +1879,75 @@
             return rows;
         }
 
-        async function fetchWordsFromGoogleSheets(maxCount = 500) {
-            const response = await fetch(GAME_DATA_URL);
-            if (!response.ok) {
-                throw new Error(`Google Sheets fetch failed: ${response.status} ${response.statusText}`);
+        // Try to fetch with different methods
+        async function tryFetchWithMethod(url, method = 'direct') {
+            console.log(`🔄 Trying ${method} fetch for:`, url);
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                console.log(`📡 ${method} response:`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const csvText = await response.text();
+                console.log(`✅ ${method} success! CSV length:`, csvText.length);
+                return csvText;
+                
+            } catch (error) {
+                console.error(`❌ ${method} failed:`, error.message);
+                throw error;
             }
-            const csvText = await response.text();
+        }
+
+        async function fetchWordsFromGoogleSheets(maxCount = 500) {
+            console.log('🌐 Starting Google Sheets fetch with multiple fallback methods...');
+            
+            // Try direct fetch first
+            let csvText = null;
+            let lastError = null;
+            
+            try {
+                csvText = await tryFetchWithMethod(GAME_DATA_URL, 'direct');
+            } catch (error) {
+                lastError = error;
+                console.log('🔄 Direct fetch failed, trying CORS proxies...');
+                
+                // Try CORS proxies
+                for (let i = 0; i < CORS_PROXIES.length; i++) {
+                    const proxy = CORS_PROXIES[i];
+                    const proxyUrl = proxy + encodeURIComponent(GAME_DATA_URL);
+                    
+                    try {
+                        csvText = await tryFetchWithMethod(proxyUrl, `proxy-${i + 1}`);
+                        break; // Success, exit loop
+                    } catch (proxyError) {
+                        console.log(`🔄 Proxy ${i + 1} failed, trying next...`);
+                        lastError = proxyError;
+                    }
+                }
+            }
+            
+            if (!csvText) {
+                throw new Error(`All fetch methods failed. Last error: ${lastError?.message || 'Unknown error'}`);
+            }
+            
+            console.log('📄 Processing CSV data...');
+            console.log('📄 CSV preview:', csvText.substring(0, 200));
+            
             const rows = parseCsv(csvText);
+            console.log('📊 Parsed rows count:', rows ? rows.length : 0);
+            
             if (!rows || rows.length === 0) {
                 throw new Error('Empty CSV from Google Sheets');
             }
