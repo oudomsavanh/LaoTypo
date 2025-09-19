@@ -932,6 +932,30 @@
     <script>
         console.log('🚀 PLAY.HTML: Script started loading!');
         
+        // SecurityUtils - Simple security utilities
+        const SecurityUtils = {
+            safeGetLocalStorage: function(key, defaultValue) {
+                try {
+                    const value = localStorage.getItem(key);
+                    return value !== null ? JSON.parse(value) : defaultValue;
+                } catch (error) {
+                    console.warn('Error reading localStorage:', error);
+                    return defaultValue;
+                }
+            },
+            
+            safeSetHTML: function(element, html) {
+                if (element && typeof element.innerHTML !== 'undefined') {
+                    element.innerHTML = html;
+                }
+            },
+            
+            sanitizeInput: function(input, maxLength = 100) {
+                if (!input || typeof input !== 'string') return '';
+                return input.trim().substring(0, maxLength).replace(/[<>]/g, '');
+            }
+        };
+        
         // --- UPDATE v2.2.0: Added looping result sound, background music auto-pause/resume with fade, reusable fade utility, renamed bg_sound.mp3, and live settings panel during gameplay ---
         
         // Global variables
@@ -3338,11 +3362,10 @@
             if (quickEditNameBtn) {
                 quickEditNameBtn.addEventListener('click', () => {
                     const newName = prompt('ໃສ່ຊື່ໃໝ່:', playerName);
-                    const sanitizednewName = SecurityUtils.sanitizeInput(newName, 50);
                     const sanitizedName = SecurityUtils.sanitizeInput(newName, 50);
-                    if (sanitizedsanitizedName && sanitizedsanitizedName.trim() !== '') {
+                    if (sanitizedName && sanitizedName.trim() !== '') {
                         const oldName = playerName;
-                        playerName = sanitizedsanitizedName.trim();
+                        playerName = sanitizedName.trim();
                         localStorage.setItem('displayName', playerName);
                         
                         // Reset best streak for new player in guest mode
