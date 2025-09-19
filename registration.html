@@ -1023,8 +1023,8 @@
             if (testGuestBtn) {
                 testGuestBtn.addEventListener('click', function() {
                     console.log('🧪 Guest button clicked (basic script handler)!');
-                    alert('Guest button clicked! Redirecting to testing.html...');
-                    window.location.href = 'testing.html';
+                    alert('Guest button clicked! Redirecting to start.html...');
+                    window.location.href = 'start.html';
                 });
             }
         });
@@ -1252,7 +1252,7 @@
                 console.log('Guest button clicked!');
                 isGuest = true;
                 
-                // Option 1: Direct redirect to testing.html without profile setup
+                // Option 1: Direct redirect to start.html without profile setup
                 // Uncomment the lines below if you want immediate redirect
                 
                 sessionStorage.setItem('userType', 'guest');
@@ -1265,7 +1265,7 @@
                 }));
                 showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ! ກຳລັງໄປໜ້າທົດສອບ...');
                 setTimeout(() => {
-                    window.location.href = 'testing.html';
+                    window.location.href = 'start.html';
                 }, 1000);
                 return;
                 
@@ -1351,7 +1351,7 @@
 
         function redirectToHomepage() {
             console.log('🏠 Redirecting to homepage...');
-            window.location.href = 'testing.html';
+            window.location.href = 'start.html';
         }
         
         // --- PANEL FUNCTIONS ---
