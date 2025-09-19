@@ -861,10 +861,6 @@
         <div class="w-full">
             <!-- Game Screen -->
             <div id="game-screen" class="screen active">
-                <!-- Word Loading Status -->
-                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base" style="display: none;">
-                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
-                </div>
                 
                 <!-- Retry Button (hidden by default) -->
                 <div id="retry-loading-container" class="text-center mb-4 hidden">
@@ -1833,7 +1829,6 @@
         const gamePlayerNameEl = document.getElementById('game-player-name');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
-        const wordLoadingStatus = document.getElementById('word-loading-status');
         const retryLoadingContainer = document.getElementById('retry-loading-container');
         const retryLoadingBtn = document.getElementById('retry-loading-btn');
         
