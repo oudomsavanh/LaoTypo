@@ -1738,6 +1738,20 @@
                 console.log('❌ No words loaded!');
             }
         };
+        
+        // Test embedded words function
+        window.testEmbeddedWords = async function() {
+            console.log('🧪 Testing embedded words function...');
+            try {
+                const words = await fetchWordsFromGoogleSheets(10);
+                console.log('✅ fetchWordsFromGoogleSheets returned:', words.length, 'words');
+                console.log('📝 Sample words:', words.slice(0, 3));
+                return words;
+            } catch (error) {
+                console.error('❌ fetchWordsFromGoogleSheets failed:', error);
+                return null;
+            }
+        };
 
         // Initialize game
         async function initializeGame() {
@@ -1950,9 +1964,12 @@
             console.log('   - Easy (Level 1):', embeddedWords.filter(w => w.difficulty === 1).length);
             console.log('   - Medium (Level 2):', embeddedWords.filter(w => w.difficulty === 2).length);
             console.log('   - Hard (Level 3):', embeddedWords.filter(w => w.difficulty === 3).length);
+            console.log('📝 Sample words:', embeddedWords.slice(0, 3));
             
             // Return limited words if maxCount is specified
-            return embeddedWords.slice(0, maxCount);
+            const result = embeddedWords.slice(0, maxCount);
+            console.log('✅ Returning', result.length, 'words from embedded data');
+            return result;
         }
         
         function processWordsFromRows(rows, maxCount) {
@@ -1995,8 +2012,8 @@
                 // Load up to 500 words from Google Sheets
                 const words = await fetchWordsFromGoogleSheets(500);
 
-                // Already normalized in fetchWordsFromGoogleSheets
-                wordPairs = words.filter(w => w.context && w.correct && w.incorrect);
+                // Words are already in correct format from embedded data
+                wordPairs = words;
 
                 if (wordPairs.length === 0) {
                     throw new Error('No words found in Google Sheets');
