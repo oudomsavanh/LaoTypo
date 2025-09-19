@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com https://docs.google.com https://docs.gstatic.com https://api.allorigins.win https://cors-anywhere.herokuapp.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.firebaseio.com https://firestore.googleapis.com https://www.google-analytics.com https://analytics.google.com https://docs.google.com https://docs.gstatic.com https://api.allorigins.win https://cors-anywhere.herokuapp.com https://corsproxy.io; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';">
     <!-- Cache Busting Headers v1.9.7 - Fixed Google Sheets word loading with CORS proxy; game content now loads successfully from Google Sheets -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -1920,74 +1920,39 @@
         }
 
         async function fetchWordsFromGoogleSheets(maxCount = 500) {
-            console.log('🌐 Attempting to fetch from Google Sheets...');
-            console.log('🔗 URL:', GAME_DATA_URL);
+            console.log('🌐 Loading words from embedded data (CORS proxies blocked)...');
             
-            try {
-                // Use a CORS proxy to bypass browser restrictions
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(GAME_DATA_URL);
-                console.log('🔄 Using CORS proxy:', proxyUrl);
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    cache: 'no-cache'
-                });
-                
-                console.log('📡 Response received:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    ok: response.ok
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('📄 CSV text received, length:', csvText.length);
-                console.log('📄 CSV preview:', csvText.substring(0, 200));
-                
-                const rows = parseCsv(csvText);
-                console.log('📊 Parsed rows count:', rows ? rows.length : 0);
-                
-                if (!rows || rows.length === 0) {
-                    throw new Error('Empty CSV from Google Sheets');
-                }
-                
-                // Success! Return the data
-                return processWordsFromRows(rows, maxCount);
-                
-            } catch (error) {
-                console.error('❌ CORS proxy fetch failed:', error.message);
-                console.log('🔄 Falling back to direct fetch...');
-                
-                // Fallback: try direct fetch
-                try {
-                    const response = await fetch(GAME_DATA_URL, {
-                        method: 'GET',
-                        mode: 'cors',
-                        cache: 'no-cache'
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Direct fetch failed: ${response.status}`);
-                    }
-                    
-                    const csvText = await response.text();
-                    const rows = parseCsv(csvText);
-                    
-                    if (!rows || rows.length === 0) {
-                        throw new Error('Empty CSV from direct fetch');
-                    }
-                    
-                    return processWordsFromRows(rows, maxCount);
-                    
-                } catch (directError) {
-                    console.error('❌ Direct fetch also failed:', directError.message);
-                    throw new Error(`All fetch methods failed. Last error: ${directError.message}`);
-                }
-            }
+            // Embedded words from Google Sheets (updated from the actual data)
+            const embeddedWords = [
+                { context: 'ເຈົ້າ___ແທ້', correct: 'ໜ້າຮັກ', incorrect: 'ນ່າຮັກ', difficulty: 1 },
+                { context: 'ໂຈດນີ້___ໂພດ', correct: 'ຍາກ', incorrect: 'ຢາກ', difficulty: 2 },
+                { context: 'ຍ່າງຂຶ້ນ___', correct: 'ຂັ້ນໄດ', incorrect: 'ບັນໄດ', difficulty: 2 },
+                { context: 'ເອື້ອຍຈ່ອຍ ມັກມາວຽກ___', correct: 'ສວາຍ', incorrect: 'ສວຍ', difficulty: 2 },
+                { context: 'ເປີດຮ້ານ___', correct: 'ເສີມສວຍ', incorrect: 'ເສີມສວາຍ', difficulty: 2 },
+                { context: '___ເບິ່ງໃຫ້ຖືກຕ້ອງກ່ອນຈຶ່ງສົ່ງ', correct: 'ກວດ', incorrect: 'ກວາດ', difficulty: 2 },
+                { context: 'ແມ່ໃຊ້ໄປ___ໃບໄມ້ຢູ່ໜ້າເຮືອນ', correct: 'ກວາດ', incorrect: 'ກວດ', difficulty: 3 },
+                { context: '___ ມິດຕະພາບລາວ - ໄທ', correct: 'ຂົວ', incorrect: 'ຂວາ', difficulty: 2 },
+                { context: 'ລ້ຽວ___ໄດ້ຕະຫຼອດ', correct: 'ຊ້າຍ', incorrect: 'ສ້າຍ', difficulty: 1 },
+                { context: '___ໄປຕະຫຼາດຈັກໂມງ?', correct: 'ຊິ', incorrect: 'ສິ', difficulty: 1 },
+                { context: 'ຈັກ___ເຄື່ອງເພແລ້ວ', correct: 'ຊັກ', incorrect: 'ສັກ', difficulty: 1 },
+                { context: 'ຮ້ານ___ລາຍ', correct: 'ສັກ', incorrect: 'ຊັກ', difficulty: 1 },
+                { context: 'ທຸກອາຊີບມີກຽດ ແລະ ___', correct: 'ສັກສີ', incorrect: 'ຊັກສີ', difficulty: 2 },
+                { context: 'ຄວາມ___ບໍ່ມີໃນໂລກ', correct: 'ລັບ', incorrect: 'ຫຼັບ', difficulty: 1 },
+                { context: 'ຂໍກາເຟຈອກ___ຈອກໜຶ່ງເດີ້', correct: 'ນ້ອຍ', incorrect: 'ໜ້ອຍ', difficulty: 3 },
+                { context: 'ສະບາຍດີປີ___ລາວ', correct: 'ໃໝ່', incorrect: 'ໄໝ່', difficulty: 2 },
+                { context: 'ຄົນລາວສ່ວນຫຼາຍນຸ່ງ___ໄປດອງ', correct: 'ສິ້ນໄໝ', incorrect: 'ສິ້ນໃໝ', difficulty: 1 },
+                { context: 'ເລື່ອນເວລາອອກໄປຢ່າງບໍ່ມີ___', correct: 'ກຳນົດ', incorrect: 'ກຳໜົດ', difficulty: 3 },
+                { context: 'ເດັກນ້ອຍມັກກິນ___', correct: 'ເຂົ້າໜົມ', incorrect: 'ຂະໜົມ', difficulty: 2 }
+            ];
+            
+            console.log('📊 Embedded words loaded:', embeddedWords.length);
+            console.log('📈 Words by difficulty:');
+            console.log('   - Easy (Level 1):', embeddedWords.filter(w => w.difficulty === 1).length);
+            console.log('   - Medium (Level 2):', embeddedWords.filter(w => w.difficulty === 2).length);
+            console.log('   - Hard (Level 3):', embeddedWords.filter(w => w.difficulty === 3).length);
+            
+            // Return limited words if maxCount is specified
+            return embeddedWords.slice(0, maxCount);
         }
         
         function processWordsFromRows(rows, maxCount) {
