@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Debug - Name Input Flow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .success { color: #4ade80; font-weight: bold; }
+        .error { color: #f87171; font-weight: bold; }
+        .warning { color: #fbbf24; font-weight: bold; }
+        .info { color: #60a5fa; }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #60a5fa;
+        }
+        .result.success { border-left-color: #4ade80; }
+        .result.error { border-left-color: #f87171; }
+        .result.warning { border-left-color: #fbbf24; }
+        input {
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            width: 300px;
+            margin: 10px;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e5e7eb;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Game Debug - Name Input Flow</h1>
+        <p>This tool will help debug why the game doesn't start after entering a name</p>
+        
+        <div class="test-section">
+            <h2>📝 Name Input Test</h2>
+            <input type="text" id="player-name-input" placeholder="Enter your name..." />
+            <br>
+            <button onclick="testNameInput()">Test Name Input</button>
+            <button onclick="simulateStartGame()">Simulate Start Game</button>
+            <div id="name-test-result">Not tested yet</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔗 Navigation Test</h2>
+            <div id="navigation-test">Not tested yet</div>
+            <button onclick="testNavigation()">Test Navigation to Play</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔥 Firebase Status Check</h2>
+            <div id="firebase-status">Not checked yet</div>
+            <button onclick="checkFirebaseStatus()">Check Firebase Status</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Live Console</h2>
+            <div id="console-logs"></div>
+            <button onclick="clearLogs()">Clear Logs</button>
+        </div>
+    </div>
+
+    <!-- Firebase Configuration (Modular API) -->
+    <script type="module" src="firebase-config.js"></script>
+    
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('console-logs');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            logs.appendChild(div);
+            logCount++;
+            
+            // Keep only last 30 logs
+            if (logCount > 30) {
+                logs.removeChild(logs.firstChild);
+                logCount--;
+            }
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+            logCount = 0;
+        }
+
+        function testNameInput() {
+            const nameInput = document.getElementById('player-name-input');
+            const result = document.getElementById('name-test-result');
+            
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                result.innerHTML = '<div class="error">❌ No name entered</div>';
+                addLog('❌ Name input test failed - no name entered', 'error');
+                return;
+            }
+            
+            result.innerHTML = `<div class="success">✅ Name entered: "${name}"</div>`;
+            addLog(`✅ Name input test passed: "${name}"`, 'success');
+        }
+
+        function simulateStartGame() {
+            const nameInput = document.getElementById('player-name-input');
+            const result = document.getElementById('name-test-result');
+            
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                result.innerHTML = '<div class="error">❌ Please enter a name first</div>';
+                addLog('❌ Cannot start game - no name entered', 'error');
+                return;
+            }
+            
+            addLog(`🎮 Simulating startGame() with name: "${name}"`, 'info');
+            
+            // Simulate the startGame function logic
+            try {
+                // Simulate settings
+                const settings = {
+                    difficulty: 'easy',
+                    timer: false
+                };
+                
+                const params = new URLSearchParams({
+                    player: encodeURIComponent(name),
+                    difficulty: settings.difficulty,
+                    timer: String(settings.timer),
+                    sound: 'true',
+                    music: 'true'
+                });
+                
+                const gameURL = `/play?${params.toString()}`;
+                
+                result.innerHTML = `<div class="success">✅ Game URL generated: ${gameURL}</div>`;
+                addLog(`✅ Game URL: ${gameURL}`, 'success');
+                
+                // Show what would happen
+                result.innerHTML += `<div class="info">🔗 Would navigate to: ${gameURL}</div>`;
+                addLog(`🔗 Would navigate to: ${gameURL}`, 'info');
+                
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error generating game URL: ${error.message}</div>`;
+                addLog(`❌ Error in simulateStartGame: ${error.message}`, 'error');
+            }
+        }
+
+        function testNavigation() {
+            const result = document.getElementById('navigation-test');
+            
+            addLog('🔗 Testing navigation to play.html...', 'info');
+            
+            // Test if we can access the play page
+            fetch('/play')
+                .then(response => {
+                    if (response.ok) {
+                        result.innerHTML = '<div class="success">✅ Play page is accessible</div>';
+                        addLog('✅ Play page is accessible', 'success');
+                    } else {
+                        result.innerHTML = `<div class="error">❌ Play page returned status: ${response.status}</div>`;
+                        addLog(`❌ Play page returned status: ${response.status}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    result.innerHTML = `<div class="error">❌ Error accessing play page: ${error.message}</div>`;
+                    addLog(`❌ Error accessing play page: ${error.message}`, 'error');
+                });
+        }
+
+        function checkFirebaseStatus() {
+            const status = document.getElementById('firebase-status');
+            
+            const checks = [
+                { name: 'Firebase Config', value: !!window.firebaseConfig },
+                { name: 'Firebase App', value: !!window.firebaseApp },
+                { name: 'Firebase Database', value: !!window.firebaseDb },
+                { name: 'Collection Function', value: !!window.collection },
+                { name: 'GetDocs Function', value: !!window.getDocs },
+                { name: 'Security Utils', value: !!window.SecurityUtils },
+                { name: 'Game Data Manager', value: !!window.GameDataManager }
+            ];
+
+            let html = '<h3>Firebase Status:</h3>';
+            let availableCount = 0;
+
+            checks.forEach(check => {
+                const available = check.value;
+                const statusClass = available ? 'success' : 'error';
+                const icon = available ? '✅' : '❌';
+                
+                html += `<div class="${statusClass}">${icon} ${check.name}: ${available ? 'Available' : 'Not Available'}</div>`;
+                
+                if (available) availableCount++;
+            });
+
+            html += `<div class="info" style="margin-top: 15px;"><strong>Status: ${availableCount}/${checks.length} components available</strong></div>`;
+
+            status.innerHTML = html;
+            
+            if (availableCount === checks.length) {
+                addLog('🎉 Firebase is fully working!', 'success');
+            } else {
+                addLog(`⚠️ Only ${availableCount}/${checks.length} Firebase components are available`, 'warning');
+            }
+        }
+
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addLog('📄 Game debug page loaded', 'info');
+            
+            // Wait for Firebase to initialize
+            setTimeout(() => {
+                addLog('🔍 Checking Firebase status...', 'info');
+                checkFirebaseStatus();
+            }, 2000);
+        });
+
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addLog(args.join(' '), 'warning');
+        };
+    </script>
+</body>
+</html>

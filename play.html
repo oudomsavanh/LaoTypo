@@ -3609,20 +3609,27 @@
                 console.log('🔥 Waiting for Firebase initialization...');
                 let firebaseReady = false;
                 let attempts = 0;
-                const maxAttempts = 50; // 5 seconds max wait
+                const maxAttempts = 100; // 10 seconds max wait
                 
                 while (!firebaseReady && attempts < maxAttempts) {
                     if (window.firebaseDb && window.collection && window.getDocs && window.GameDataManager) {
                         firebaseReady = true;
                         console.log('✅ Firebase and GameDataManager are ready!');
                     } else {
+                        console.log(`⏳ Waiting for Firebase... (${attempts + 1}/${maxAttempts})`);
                         await new Promise(resolve => setTimeout(resolve, 100));
                         attempts++;
                     }
                 }
                 
                 if (!firebaseReady) {
-                    throw new Error('Firebase initialization timeout');
+                    const missing = [];
+                    if (!window.firebaseDb) missing.push('firebaseDb');
+                    if (!window.collection) missing.push('collection');
+                    if (!window.getDocs) missing.push('getDocs');
+                    if (!window.GameDataManager) missing.push('GameDataManager');
+                    
+                    throw new Error(`Firebase initialization timeout. Missing: ${missing.join(', ')}`);
                 }
                 
                 console.log('🎮 Calling initializeGame()...');
