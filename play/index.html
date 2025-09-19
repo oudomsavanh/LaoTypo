@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url=/play.html">
+    <title>Redirecting…</title>
+    <script>
+        (function() {
+            var target = '/play.html' + (window.location.search || '') + (window.location.hash || '');
+            // Use replace to avoid creating a history entry
+            window.location.replace(target);
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting to <a id="target" href="/play.html">/play.html</a>…</p>
+    <script>
+        document.getElementById('target').setAttribute('href', '/play.html' + (window.location.search || '') + (window.location.hash || ''));
+    </script>
+</body>
+</html>
