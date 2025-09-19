@@ -31,9 +31,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     
-    <!-- Firebase Configuration -->
-    <script src="firebase-config.js"></script>
-    <script src="firestore-game-data.js"></script>
+    <!-- Firebase removed: now loading words directly from Google Sheets -->
     <script src="server-validation.js"></script>
     
     <!-- Google Analytics 4 -->
@@ -1637,8 +1635,8 @@
         const motivationText = document.getElementById('motivation-text');
         const totalWordsCompletedEl = document.getElementById('total-words-completed');
 
-        // Test game data connection (for debugging)
-        async function testFirestoreConnection() {
+        // Test Google Sheets connection (for debugging)
+        async function testGoogleSheetsConnection() {
             console.log("Testing game data connection...");
             console.log("URL:", GAME_DATA_URL);
             
@@ -1790,30 +1788,104 @@
             difficultyDisplay.style.color = levelColors[currentLevel];
         }
 
-        // Load game content data from Firestore (secure)
+        // Minimal CSV parser supporting quoted fields and commas within quotes
+        function parseCsv(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = i + 1 < text.length ? text[i + 1] : '';
+                if (inQuotes) {
+                    if (char === '"' && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else if (char === '"') {
+                        inQuotes = false;
+                    } else {
+                        currentField += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        currentRow.push(currentField);
+                        currentField = '';
+                    } else if (char === '\n') {
+                        currentRow.push(currentField);
+                        rows.push(currentRow);
+                        currentRow = [];
+                        currentField = '';
+                    } else if (char === '\r') {
+                        // ignore
+                    } else {
+                        currentField += char;
+                    }
+                }
+            }
+            // push last field/row
+            if (currentField.length > 0 || currentRow.length > 0) {
+                currentRow.push(currentField);
+                rows.push(currentRow);
+            }
+            return rows;
+        }
+
+        async function fetchWordsFromGoogleSheets(maxCount = 500) {
+            const response = await fetch(GAME_DATA_URL);
+            if (!response.ok) {
+                throw new Error(`Google Sheets fetch failed: ${response.status} ${response.statusText}`);
+            }
+            const csvText = await response.text();
+            const rows = parseCsv(csvText);
+            if (!rows || rows.length === 0) {
+                throw new Error('Empty CSV from Google Sheets');
+            }
+            // Detect header: if first row contains non-data labels
+            let startIndex = 0;
+            const firstRow = rows[0];
+            if (firstRow && firstRow.length >= 3) {
+                const joined = firstRow.join(' ').toLowerCase();
+                if (joined.includes('context') || joined.includes('correct') || joined.includes('incorrect') || joined.includes('difficulty')) {
+                    startIndex = 1;
+                }
+            }
+            const items = [];
+            for (let i = startIndex; i < rows.length && items.length < maxCount; i++) {
+                const r = rows[i];
+                if (!r || r.length < 3) continue;
+                const context = (r[0] || '').trim();
+                const correct = (r[1] || '').trim();
+                const incorrect = (r[2] || '').trim();
+                const difficultyRaw = (r[3] || '').toString().trim();
+                if (!context || !correct || !incorrect) continue;
+                let difficulty = parseInt(difficultyRaw || '1', 10);
+                if (Number.isNaN(difficulty) || difficulty < 1 || difficulty > 3) difficulty = 1;
+                items.push({ context, correct, incorrect, difficulty });
+            }
+            return items;
+        }
+
+        // Load game content data from Google Sheets CSV
         async function loadGameContent() {
             try {
-                wordLoadingStatus.textContent = 'Loading game content...';
+                wordLoadingStatus.textContent = 'Loading game content from Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
 
-                // Load up to 500 words from Firestore
-                const words = await GameDataManager.loadWords(500);
+                // Load up to 500 words from Google Sheets
+                const words = await fetchWordsFromGoogleSheets(500);
 
-                // Normalize to wordPairs structure expected by the game
-                wordPairs = words.map(w => ({
-                    context: w.context,
-                    correct: w.correct,
-                    incorrect: (w.incorrect ?? w.wrong ?? ''),
-                    difficulty: typeof w.difficulty === 'number' ? w.difficulty : parseInt(w.difficulty || '1', 10)
-                })).filter(w => w.context && w.correct && w.incorrect);
+                // Already normalized in fetchWordsFromGoogleSheets
+                wordPairs = words.filter(w => w.context && w.correct && w.incorrect);
 
                 if (wordPairs.length === 0) {
-                    throw new Error('No words found in Firestore');
+                    throw new Error('No words found in Google Sheets');
                 }
 
-                console.log('Loaded words from Firestore:', wordPairs.length);
+                console.log('Loaded words from Google Sheets:', wordPairs.length);
 
-                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
+                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ດຶງຈາກ Google Sheets ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
 
                 setTimeout(() => {
@@ -1830,7 +1902,7 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from Firestore:', error);
+                console.error('Error loading game content from Google Sheets:', error);
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
