@@ -1696,6 +1696,24 @@
         
         // Make debug function available globally
         window.debugWordLoading = debugWordLoading;
+        
+        // Simple test function to check game state
+        window.testGameState = function() {
+            console.log('🔍 GAME STATE TEST:');
+            console.log('📊 wordPairs length:', wordPairs ? wordPairs.length : 'undefined');
+            console.log('📊 shuffledWordsByDifficulty:', shuffledWordsByDifficulty);
+            console.log('📊 currentLevel:', currentLevel);
+            console.log('📊 gameActive:', gameActive);
+            console.log('📊 currentWordPair:', currentWordPair);
+            console.log('📊 currentWordIndex:', currentWordIndex);
+            
+            if (wordPairs && wordPairs.length > 0) {
+                console.log('✅ Words are loaded!');
+                console.log('📝 Sample words:', wordPairs.slice(0, 3));
+            } else {
+                console.log('❌ No words loaded!');
+            }
+        };
 
         // Initialize game
         async function initializeGame() {
@@ -1735,6 +1753,9 @@
                     toggleBackgroundMusic();
                 }, 1000); // Small delay to ensure audio is ready
             }
+            
+            console.log('🎯 About to start game with showNewWords()...');
+            console.log('📊 wordPairs available:', wordPairs ? wordPairs.length : 'undefined');
             
             showNewWords();
             
@@ -1997,6 +2018,12 @@
                 console.log('⏰ Load completed at:', new Date().toLocaleString());
                 console.log('⏱️ Load duration:', loadDuration + 'ms');
                 console.log('✅ Game is ready to start!');
+                
+                // Test the game state after loading
+                console.log('🧪 Testing game state after word loading...');
+                setTimeout(() => {
+                    window.testGameState();
+                }, 100);
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ດຶງຈາກ Google Sheets ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
@@ -2035,6 +2062,12 @@
                 console.log('   - Medium (Level 2):', wordPairs.filter(w => w.difficulty === 2).length);
                 console.log('   - Hard (Level 3):', wordPairs.filter(w => w.difficulty === 3).length);
                 console.log('⚠️ Game will use offline fallback data');
+                
+                // Test the game state after fallback loading
+                console.log('🧪 Testing game state after fallback word loading...');
+                setTimeout(() => {
+                    window.testGameState();
+                }, 100);
 
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
@@ -2080,12 +2113,20 @@
 
         // Show new words
         function showNewWords() {
+            console.log('🎮 showNewWords() called');
+            console.log('📊 currentLevel:', currentLevel);
+            console.log('📊 wordPairs length:', wordPairs ? wordPairs.length : 'undefined');
+            console.log('📊 shuffledWordsByDifficulty:', shuffledWordsByDifficulty);
+            
             // Track time spent on previous word
             trackWordTimeSpent();
             
             // Get current difficulty level (Column D: 1=Easy, 2=Medium, 3=Hard)
             const difficultyLevel = currentLevel + 1; // Convert 0,1,2 to 1,2,3
             const shuffledWords = shuffledWordsByDifficulty[difficultyLevel];
+            
+            console.log('📊 difficultyLevel:', difficultyLevel);
+            console.log('📊 shuffledWords for this difficulty:', shuffledWords ? shuffledWords.length : 'undefined');
             
             // Safety check: if shuffledWords is undefined or empty, use fallback
             if (!shuffledWords || shuffledWords.length === 0) {
