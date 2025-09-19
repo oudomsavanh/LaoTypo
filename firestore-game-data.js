@@ -39,15 +39,21 @@ class FirestoreGameDataManager {
                 // Try with orderBy first, fallback to simple query if it fails
                 let snapshot;
                 try {
-                    snapshot = await this.db.collection(this.collection)
-                        .orderBy('createdAt', 'desc')
-                        .limit(limit)
-                        .get();
+                    snapshot = await window.getDocs(
+                        window.query(
+                            window.collection(this.db, this.collection),
+                            window.orderBy('createdAt', 'desc'),
+                            window.limit(limit)
+                        )
+                    );
                 } catch (orderByError) {
                     console.warn('⚠️ orderBy failed, trying simple query:', orderByError.message);
-                    snapshot = await this.db.collection(this.collection)
-                        .limit(limit)
-                        .get();
+                    snapshot = await window.getDocs(
+                        window.query(
+                            window.collection(this.db, this.collection),
+                            window.limit(limit)
+                        )
+                    );
                 }
 
                 if (!snapshot.empty) {

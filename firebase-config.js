@@ -1,5 +1,15 @@
 // 🔥 Firebase Configuration for LaoTypo Game
-// ✅ CONFIGURED WITH REAL FIREBASE PROJECT
+// ✅ CONFIGURED WITH REAL FIREBASE PROJECT - MODULAR API
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+import {
+  getFirestore, collection, doc, setDoc, getDoc, getDocs,
+  addDoc, updateDoc, query, orderBy, limit, where, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js';
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyC6JCvbw_sipB5xiZtijndIXz9koAPQHXs",
@@ -15,125 +25,74 @@ const firebaseConfig = {
 window.firebaseConfig = firebaseConfig;
 console.log('🔥 Firebase config exported to global scope');
 
-// Initialize Firebase immediately
-(function() {
-  console.log('🔥 Starting Firebase initialization...');
+// Initialize Firebase with modular API
+try {
+  console.log('🔥 Initializing Firebase with modular API...');
   
-  // Check if Firebase is already loaded
-  if (typeof firebase !== 'undefined') {
-    console.log('✅ Firebase already loaded, initializing...');
-    initializeFirebase();
-    return;
-  }
+  // Initialize Firebase app
+  const app = initializeApp(firebaseConfig);
+  console.log('✅ Firebase app initialized');
   
-  // Wait for Firebase to load from CDN
-  let attempts = 0;
-  const maxAttempts = 100; // 10 seconds max wait
+  // Initialize services
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  let analytics = null;
   
-  const checkFirebase = () => {
-    attempts++;
-    if (typeof firebase !== 'undefined') {
-      console.log('✅ Firebase loaded from CDN, initializing...');
-      initializeFirebase();
-    } else if (attempts < maxAttempts) {
-      console.log(`⏳ Waiting for Firebase... (${attempts}/${maxAttempts})`);
-      setTimeout(checkFirebase, 100);
-    } else {
-      console.warn('⚠️ Firebase CDN timeout, using fallback');
-      initializeFallback();
-    }
-  };
-  
-  // Start checking immediately
-  checkFirebase();
-})();
-
-// Initialize Firebase
-function initializeFirebase() {
   try {
-    console.log('🔥 Initializing Firebase...');
-    
-    if (typeof firebase === 'undefined') {
-      throw new Error('Firebase not loaded');
-    }
-    
-    // Initialize Firebase app
-    const app = firebase.initializeApp(firebaseConfig);
-    console.log('✅ Firebase app initialized');
-    
-    // Initialize services
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    let analytics = null;
-    
-    try {
-      analytics = firebase.analytics();
-      console.log('✅ Firebase Analytics initialized');
-    } catch (analyticsError) {
-      console.warn('⚠️ Firebase Analytics not available:', analyticsError.message);
-    }
-    
-    console.log('✅ Firebase services initialized');
-    
-    // Export everything to global scope
-    window.firebase = firebase;
-    window.firebaseApp = app;
-    window.firebaseDb = db;
-    window.firebaseAuth = auth;
-    window.firebaseAnalytics = analytics;
-    
-    // Export Firestore functions
-    window.collection = firebase.firestore().collection.bind(firebase.firestore());
-    window.doc = firebase.firestore().doc.bind(firebase.firestore());
-    window.setDoc = firebase.firestore().setDoc;
-    window.getDoc = firebase.firestore().getDoc;
-    window.getDocs = firebase.firestore().getDocs;
-    window.addDoc = firebase.firestore().addDoc;
-    window.updateDoc = firebase.firestore().updateDoc;
-    window.query = firebase.firestore().query;
-    window.orderBy = firebase.firestore().orderBy;
-    window.limit = firebase.firestore().limit;
-    window.where = firebase.firestore().where;
-    window.serverTimestamp = firebase.firestore().serverTimestamp;
-    
-    // Export Auth functions
-    window.GoogleAuthProvider = firebase.auth.GoogleAuthProvider;
-    window.signInWithPopup = firebase.auth().signInWithPopup;
-    window.signOut = firebase.auth().signOut;
-    window.onAuthStateChanged = firebase.auth().onAuthStateChanged;
-    
-    console.log('🔥 Firebase fully initialized and exported to global scope');
-    console.log('📊 Available Firebase objects:', {
-      firebaseConfig: !!window.firebaseConfig,
-      firebaseDb: !!window.firebaseDb,
-      firebaseAuth: !!window.firebaseAuth,
-      firebaseAnalytics: !!window.firebaseAnalytics,
-      collection: !!window.collection,
-      getDocs: !!window.getDocs
-    });
-    
-    // Initialize managers
-    initializeManagers();
-    
-    // Ensure GameDataManager is available
-    if (window.GameDataManager) {
-        window.GameDataManager.initialize().then(initialized => {
-            if (initialized) {
-                console.log('✅ GameDataManager re-initialized with Firebase');
-            } else {
-                console.log('✅ GameDataManager re-initialized with fallback mode');
-            }
-        });
-    }
-    
-  } catch (error) {
-    console.error('❌ Firebase initialization failed:', error);
-    console.log('🔄 Attempting fallback initialization...');
-    initializeFallback();
+    analytics = getAnalytics(app);
+    console.log('✅ Firebase Analytics initialized');
+  } catch (analyticsError) {
+    console.warn('⚠️ Firebase Analytics not available:', analyticsError.message);
   }
+  
+  console.log('✅ Firebase services initialized');
+  
+  // Export everything to global scope for compatibility
+  window.firebaseApp = app;
+  window.firebaseDb = db;
+  window.firebaseAuth = auth;
+  window.firebaseAnalytics = analytics;
+  
+  // Export Firestore functions
+  window.collection = collection;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  window.getDoc = getDoc;
+  window.getDocs = getDocs;
+  window.addDoc = addDoc;
+  window.updateDoc = updateDoc;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.limit = limit;
+  window.where = where;
+  window.serverTimestamp = serverTimestamp;
+  
+  // Export Auth functions
+  window.GoogleAuthProvider = GoogleAuthProvider;
+  window.signInWithPopup = (provider) => signInWithPopup(auth, provider);
+  window.signOut = () => signOut(auth);
+  window.onAuthStateChanged = (callback) => onAuthStateChanged(auth, callback);
+  
+  console.log('🔥 Firebase fully initialized and exported to global scope');
+  console.log('📊 Available Firebase objects:', {
+    firebaseConfig: !!window.firebaseConfig,
+    firebaseDb: !!window.firebaseDb,
+    firebaseAuth: !!window.firebaseAuth,
+    firebaseAnalytics: !!window.firebaseAnalytics,
+    collection: !!window.collection,
+    getDocs: !!window.getDocs
+  });
+  
+  // Initialize managers
+  initializeManagers();
+  
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error);
+  console.log('🔄 Attempting fallback initialization...');
+  initializeFallback();
 }
 
-// Fallback initialization when Firebase CDN fails
+// Fallback initialization when Firebase fails
 function initializeFallback() {
   console.log('🔄 Initializing fallback mode...');
   
@@ -176,13 +135,6 @@ function initializeFallback() {
   
   // Initialize managers with fallback
   initializeManagers();
-  
-  // Ensure GameDataManager is available in fallback mode
-  if (window.GameDataManager) {
-    window.GameDataManager.initialize().then(initialized => {
-      console.log('✅ GameDataManager initialized in fallback mode');
-    });
-  }
 }
 
 // Initialize Firebase managers
@@ -199,10 +151,10 @@ function initializeManagers() {
       
       async createPlayer(playerData) {
         try {
-          const docRef = await this.db.collection(this.collection).add({
+          const docRef = await window.addDoc(window.collection(this.db, this.collection), {
             ...playerData,
-            createdAt: firebase.firestore().serverTimestamp(),
-            updatedAt: firebase.firestore().serverTimestamp()
+            createdAt: window.serverTimestamp(),
+            updatedAt: window.serverTimestamp()
           });
           return docRef.id;
         } catch (error) {
@@ -213,9 +165,9 @@ function initializeManagers() {
       
       async updatePlayer(playerId, updateData) {
         try {
-          await this.db.collection(this.collection).doc(playerId).update({
+          await window.updateDoc(window.doc(this.db, this.collection, playerId), {
             ...updateData,
-            updatedAt: firebase.firestore().serverTimestamp()
+            updatedAt: window.serverTimestamp()
           });
         } catch (error) {
           console.error('Error updating player:', error);
@@ -225,8 +177,8 @@ function initializeManagers() {
       
       async getPlayer(playerId) {
         try {
-          const doc = await this.db.collection(this.collection).doc(playerId).get();
-          return doc.exists ? doc.data() : null;
+          const doc = await window.getDoc(window.doc(this.db, this.collection, playerId));
+          return doc.exists() ? doc.data() : null;
         } catch (error) {
           console.error('Error getting player:', error);
           throw error;
@@ -243,10 +195,13 @@ function initializeManagers() {
       
       async getWords(limit = 100) {
         try {
-          const snapshot = await this.db.collection(this.collection)
-            .orderBy('createdAt', 'desc')
-            .limit(limit)
-            .get();
+          const snapshot = await window.getDocs(
+            window.query(
+              window.collection(this.db, this.collection),
+              window.orderBy('createdAt', 'desc'),
+              window.limit(limit)
+            )
+          );
           
           return snapshot.docs.map(doc => ({
             id: doc.id,
@@ -260,10 +215,10 @@ function initializeManagers() {
       
       async addWord(wordData) {
         try {
-          const docRef = await this.db.collection(this.collection).add({
+          const docRef = await window.addDoc(window.collection(this.db, this.collection), {
             ...wordData,
-            createdAt: firebase.firestore().serverTimestamp(),
-            updatedAt: firebase.firestore().serverTimestamp()
+            createdAt: window.serverTimestamp(),
+            updatedAt: window.serverTimestamp()
           });
           return docRef.id;
         } catch (error) {
@@ -282,10 +237,13 @@ function initializeManagers() {
       
       async getLeaderboard(limit = 10) {
         try {
-          const snapshot = await this.db.collection(this.collection)
-            .orderBy('score', 'desc')
-            .limit(limit)
-            .get();
+          const snapshot = await window.getDocs(
+            window.query(
+              window.collection(this.db, this.collection),
+              window.orderBy('score', 'desc'),
+              window.limit(limit)
+            )
+          );
           
           return snapshot.docs.map(doc => ({
             id: doc.id,
@@ -299,9 +257,9 @@ function initializeManagers() {
       
       async addScore(scoreData) {
         try {
-          const docRef = await this.db.collection(this.collection).add({
+          const docRef = await window.addDoc(window.collection(this.db, this.collection), {
             ...scoreData,
-            createdAt: firebase.firestore().serverTimestamp()
+            createdAt: window.serverTimestamp()
           });
           return docRef.id;
         } catch (error) {
@@ -320,7 +278,7 @@ function initializeManagers() {
       
       async checkConnection() {
         try {
-          await this.db.collection('test').limit(1).get();
+          await window.getDocs(window.query(window.collection(this.db, 'test'), window.limit(1)));
           return true;
         } catch (error) {
           console.error('Connection check failed:', error);
@@ -333,9 +291,9 @@ function initializeManagers() {
           const user = this.auth.currentUser;
           if (!user) return false;
           
-          await this.db.collection('userData').doc(user.uid).set({
+          await window.setDoc(window.doc(this.db, 'userData', user.uid), {
             ...localData,
-            lastSync: firebase.firestore().serverTimestamp()
+            lastSync: window.serverTimestamp()
           });
           return true;
         } catch (error) {
@@ -349,8 +307,8 @@ function initializeManagers() {
           const user = this.auth.currentUser;
           if (!user) return null;
           
-          const doc = await this.db.collection('userData').doc(user.uid).get();
-          return doc.exists ? doc.data() : null;
+          const doc = await window.getDoc(window.doc(this.db, 'userData', user.uid));
+          return doc.exists() ? doc.data() : null;
         } catch (error) {
           console.error('Sync from Firebase failed:', error);
           return null;
@@ -367,7 +325,7 @@ function initializeManagers() {
       
       async signInWithGoogle() {
         try {
-          const result = await window.signInWithPopup(this.auth, this.provider);
+          const result = await window.signInWithPopup(this.provider);
           return result.user;
         } catch (error) {
           console.error('Google sign-in failed:', error);
@@ -377,7 +335,7 @@ function initializeManagers() {
       
       async signOut() {
         try {
-          await window.signOut(this.auth);
+          await window.signOut();
         } catch (error) {
           console.error('Sign-out failed:', error);
           throw error;
@@ -389,7 +347,7 @@ function initializeManagers() {
       }
       
       onAuthStateChanged(callback) {
-        return window.onAuthStateChanged(this.auth, callback);
+        return window.onAuthStateChanged(callback);
       }
     }
     
@@ -451,6 +409,3 @@ function initializeManagers() {
     console.error('❌ Manager initialization failed:', error);
   }
 }
-
-// Export the config for immediate use
-window.firebaseConfig = firebaseConfig;
