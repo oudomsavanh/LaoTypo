@@ -5,6 +5,7 @@ const OFFLINE_URL = '/gameplay.html';
 // Files to cache for offline use
 const CACHE_FILES = [
     '/',
+    '/index.html',
     '/start.html',
     '/gameplay.html',
     '/leaderboard.html',
