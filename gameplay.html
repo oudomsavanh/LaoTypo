@@ -2831,11 +2831,11 @@
                         await navigator.share({
                             title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
                             text: shareText,
-                            url: 'https://www.laotypo.com'
+                            url: 'https://play.laotypo.com'
                         });
                     } else if (navigator.clipboard) {
                         // Fallback: copy text to clipboard
-                        await navigator.clipboard.writeText(shareText + '\nhttps://www.laotypo.com');
+                        await navigator.clipboard.writeText(shareText + '\nhttps://play.laotypo.com');
                         alert('✅ ຄັດລອກຂໍ້ຄວາມສຳເລັດແລ້ວ!');
                     } else {
                         throw new Error('Share and clipboard APIs not supported');
@@ -3696,12 +3696,12 @@
                     await navigator.share({
                         title: 'LaoTypo - ເຈົ້າແມ່ນຄົນລາວຈຣິງ ຫຼື ລາວອີ່ຫລີ?',
                         text: shareText,
-                        url: 'https://www.laotypo.com'
+                        url: 'https://play.laotypo.com'
                     });
                     this.showCopyStatus('✅ ແບ່ງປັນສຳເລັດແລ້ວ!');
                 } else if (navigator.clipboard) {
                     // Fallback to clipboard
-                    await navigator.clipboard.writeText(shareText + '\nhttps://www.laotypo.com');
+                    await navigator.clipboard.writeText(shareText + '\nhttps://play.laotypo.com');
                     this.showCopyStatus('✅ ຄັດລອກຂໍ້ຄວາມສຳເລັດແລ້ວ!');
                 } else {
                     throw new Error('Share and clipboard APIs not supported');
