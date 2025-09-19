@@ -633,7 +633,7 @@
             <!-- Game Screen -->
             <div id="game-screen" class="screen active">
                 <!-- Word Loading Status -->
-                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
+                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base" style="display: none;">
                     ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
                 </div>
                 
@@ -1770,8 +1770,7 @@
         // Load words from Google Sheets CSV
         async function loadWordsFromGoogleSheets() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
-                wordLoadingStatus.style.color = 'var(--main-color)';
+                console.log('ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...');
                 
                 console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
                 
@@ -1863,12 +1862,10 @@
                     throw new Error("No valid entries found in the spreadsheet");
                 }
                 
-                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
-                wordLoadingStatus.style.color = 'var(--correct-color)';
+                console.log(`ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`);
                 
-                // Hide loading status and retry button after successful load
+                // Hide retry button after successful load
                 setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
                     retryLoadingContainer.classList.add('hidden');
                 }, 2000);
                 
@@ -1886,8 +1883,7 @@
                 console.log("Error stack:", error.stack);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
-                wordLoadingStatus.style.color = 'var(--warning-color)';
+                console.log('ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ');
                 
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
@@ -1896,10 +1892,7 @@
                 wordPairs = getDefaultWords();
                 console.log("Using fallback words:", wordPairs.length, "entries");
                 
-                // Hide loading status after fallback load
-                setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
-                }, 3000);
+                // Fallback load completed
                 
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
@@ -2600,7 +2593,6 @@
             if (retryLoadingBtn) {
                 retryLoadingBtn.addEventListener('click', async () => {
                     retryLoadingContainer.classList.add('hidden');
-                    wordLoadingStatus.style.display = 'block';
                     await loadWordsFromGoogleSheets();
                 });
             }
