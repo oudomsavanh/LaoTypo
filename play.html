@@ -1682,6 +1682,7 @@
             updateDifficultyDisplay();
             
             updateUI();
+            console.log('🎮 Initializing game - starting word loading process...');
             await loadGameContent();
             setupEventListeners();
             setupNavigationHandlers();
@@ -1869,6 +1870,11 @@
 
         // Load game content data from Google Sheets CSV
         async function loadGameContent() {
+            const loadStartTime = Date.now();
+            console.log('🚀 Starting to load game words from Google Sheets...');
+            console.log('🔗 Source URL:', GAME_DATA_URL);
+            console.log('⏰ Load started at:', new Date().toLocaleString());
+            
             try {
                 wordLoadingStatus.textContent = 'Loading game content from Google Sheets...';
                 wordLoadingStatus.style.color = 'var(--main-color)';
@@ -1883,7 +1889,19 @@
                     throw new Error('No words found in Google Sheets');
                 }
 
-                console.log('Loaded words from Google Sheets:', wordPairs.length);
+                // Enhanced console logging for Google Sheets word loading completion
+                const loadEndTime = Date.now();
+                const loadDuration = loadEndTime - loadStartTime;
+                console.log('🎉 GAME WORDS LOADED SUCCESSFULLY FROM GOOGLE SHEETS!');
+                console.log('📊 Total words loaded:', wordPairs.length);
+                console.log('📈 Words by difficulty:');
+                console.log('   - Easy (Level 1):', wordPairs.filter(w => w.difficulty === 1).length);
+                console.log('   - Medium (Level 2):', wordPairs.filter(w => w.difficulty === 2).length);
+                console.log('   - Hard (Level 3):', wordPairs.filter(w => w.difficulty === 3).length);
+                console.log('🔗 Source URL:', GAME_DATA_URL);
+                console.log('⏰ Load completed at:', new Date().toLocaleString());
+                console.log('⏱️ Load duration:', loadDuration + 'ms');
+                console.log('✅ Game is ready to start!');
 
                 wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ດຶງຈາກ Google Sheets ${wordPairs.length} ຄຳສັບ`;
                 wordLoadingStatus.style.color = 'var(--correct-color)';
@@ -1902,7 +1920,11 @@
                 shuffledWordsByDifficulty[3] = shuffleArray(wordPairs.filter(word => word.difficulty === 3));
 
             } catch (error) {
-                console.error('Error loading game content from Google Sheets:', error);
+                const loadEndTime = Date.now();
+                const loadDuration = loadEndTime - loadStartTime;
+                console.error('❌ Error loading game content from Google Sheets:', error);
+                console.log('⏱️ Failed after:', loadDuration + 'ms');
+                console.log('🔄 Falling back to default words...');
 
                 wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສອບ';
                 wordLoadingStatus.style.color = 'var(--warning-color)';
@@ -1912,7 +1934,12 @@
 
                 // Fallback to default words
                 wordPairs = getDefaultWords();
-                console.log('Using fallback words:', wordPairs.length, 'entries');
+                console.log('🛡️ Using fallback words:', wordPairs.length, 'entries');
+                console.log('📈 Fallback words by difficulty:');
+                console.log('   - Easy (Level 1):', wordPairs.filter(w => w.difficulty === 1).length);
+                console.log('   - Medium (Level 2):', wordPairs.filter(w => w.difficulty === 2).length);
+                console.log('   - Hard (Level 3):', wordPairs.filter(w => w.difficulty === 3).length);
+                console.log('⚠️ Game will use offline fallback data');
 
                 setTimeout(() => {
                     wordLoadingStatus.style.display = 'none';
@@ -2655,6 +2682,7 @@
             // Retry loading button
             if (retryLoadingBtn) {
                 retryLoadingBtn.addEventListener('click', async () => {
+                    console.log('🔄 Retry button clicked - attempting to reload words from Google Sheets...');
                     retryLoadingContainer.classList.add('hidden');
                     wordLoadingStatus.style.display = 'block';
                     await loadGameContent();
