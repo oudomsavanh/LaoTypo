@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Cache Busting Headers v2.1.0 - Enhanced with authentication and scoring -->
+    <!-- Cache Busting Headers v2.1.1 - Enhanced with authentication and scoring; version sync -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -15,7 +15,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LaoTypo">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/images/Laotypo-logo.jpg">
     
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -323,7 +323,7 @@
             animation: fadeInUp 0.6s ease-out;
         }
         
-        /* Panel styles from testing.html */
+        /* Panel styles from start.html */
         .leaderboard-panel, .settings-panel, .account-panel {
             position: fixed;
             top: 15%;
@@ -355,7 +355,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation from testing.html -->
+    <!-- Navigation from start.html -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -539,7 +539,7 @@
         </div>
     </div>
 
-    <!-- Panels (from testing.html) -->
+    <!-- Panels (from start.html) -->
     <!-- Leaderboard Panel -->
     <div id="leaderboard-panel" class="leaderboard-panel hidden">
         <div class="panel-content">
@@ -577,7 +577,7 @@
                 <p style="color: var(--sub-color)">ທ່ານຢູ່ໃນໜ້າບັນຊີແລ້ວ</p>
             </div>
             <div class="text-center text-sub-color text-sm mt-6 pt-4 border-t border-sub-color border-opacity-20">
-                <p>Version: 2.1.0 - Enhanced</p>
+                <p>Version: 2.1.1 - Enhanced Safari</p>
                 <p>LaoTypo - Player Account Information</p>
             </div>
         </div>
@@ -721,7 +721,7 @@
             });
             
             document.getElementById('home-nav-btn').addEventListener('click', () => {
-                window.location.href = 'testing.html';
+                window.location.href = 'start.html';
             });
             
             // Panel toggles

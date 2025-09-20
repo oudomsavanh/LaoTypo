@@ -13,7 +13,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/images/Laotypo-logo.jpg">
     <meta name="theme-color" content="#f8af3c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="LaoTypo">
     <meta name="msapplication-TileColor" content="#f8af3c">
-    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    <meta name="msapplication-TileImage" content="/images/Laotypo-logo.jpg">
     
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -824,7 +824,7 @@
     </style>
 </head>
 <body>
-    <!-- Navigation from testing.html -->
+    <!-- Navigation from start.html -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-2 sm:p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="#" id="home-btn" class="flex items-center">
@@ -861,10 +861,6 @@
         <div class="w-full">
             <!-- Game Screen -->
             <div id="game-screen" class="screen active">
-                <!-- Word Loading Status -->
-                <div id="word-loading-status" class="text-center mb-4 text-main-color text-sm sm:text-base">
-                    ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...
-                </div>
                 
                 <!-- Retry Button (hidden by default) -->
                 <div id="retry-loading-container" class="text-center mb-4 hidden">
@@ -1142,7 +1138,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details text-xs font-medium" style="color: var(--sub-color);">
-        <p>📦 Version 2.9.0</p>
+        <p>📦 Version 2.9.4 - Enhanced Safari</p>
         <p>Status: Live</p>
         <p>🚀 PWA Ready</p>
         <p>✨ Modern UI/UX</p>
@@ -1833,7 +1829,6 @@
         const gamePlayerNameEl = document.getElementById('game-player-name');
         const gameSettingsDisplay = document.getElementById('game-settings-display');
         const difficultyDisplay = document.getElementById('difficulty-display');
-        const wordLoadingStatus = document.getElementById('word-loading-status');
         const retryLoadingContainer = document.getElementById('retry-loading-container');
         const retryLoadingBtn = document.getElementById('retry-loading-btn');
         
@@ -1965,8 +1960,7 @@
         // Load words from Google Sheets CSV
         async function loadWordsFromGoogleSheets() {
             try {
-                wordLoadingStatus.textContent = 'ກຳລັງໂຫຼດຄຳສັບຈາກ Google Sheets...';
-                wordLoadingStatus.style.color = 'var(--main-color)';
+                console.log('Loading gameWords');
                 
                 console.log("Attempting to fetch from:", GOOGLE_SHEETS_URL);
                 
@@ -2058,12 +2052,10 @@
                     throw new Error("No valid entries found in the spreadsheet");
                 }
                 
-                wordLoadingStatus.textContent = `ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`;
-                wordLoadingStatus.style.color = 'var(--correct-color)';
+                console.log(`ໂຫຼດສຳເລັດ! ມີ ${wordPairs.length} ຄຳສັບ`);
                 
-                // Hide loading status and retry button after successful load
+                // Hide retry button after successful load
                 setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
                     retryLoadingContainer.classList.add('hidden');
                 }, 2000);
                 
@@ -2081,8 +2073,7 @@
                 console.log("Error stack:", error.stack);
                 console.log("Fetch URL:", GOOGLE_SHEETS_URL);
                 
-                wordLoadingStatus.textContent = 'ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ';
-                wordLoadingStatus.style.color = 'var(--warning-color)';
+                console.log('ໂຫຼດຜິດພາດ! ໃຊ້ຂໍ້ມູນທົດສ୭ບ');
                 
                 // Show retry button
                 retryLoadingContainer.classList.remove('hidden');
@@ -2091,10 +2082,7 @@
                 wordPairs = getDefaultWords();
                 console.log("Using fallback words:", wordPairs.length, "entries");
                 
-                // Hide loading status after fallback load
-                setTimeout(() => {
-                    wordLoadingStatus.style.display = 'none';
-                }, 3000);
+                // Fallback load completed
                 
                 // Shuffle words
                 wordPairs = shuffleArray(wordPairs);
@@ -2715,13 +2703,14 @@
             if (soundEnabled) {
                 // Fade out background music
                 fadeAudio(backgroundMusic, 0, 1500);
-                // Fade in result sound
-                fadeAudio(resultSound, 1.0, 1500);
+                // Start result sound immediately at full volume (no fade in)
+                resultSound.volume = 1.0;
+                resultSound.play().catch(() => {});
             }
         }
         
         function stopResultSound() {
-            // Fade out result sound
+            // Fade out result sound when leaving endgame page
             fadeAudio(resultSound, 0, 1500, () => {
                 resultSound.pause();
                 resultSound.currentTime = 0;
@@ -2738,7 +2727,6 @@
             if (retryLoadingBtn) {
                 retryLoadingBtn.addEventListener('click', async () => {
                     retryLoadingContainer.classList.add('hidden');
-                    wordLoadingStatus.style.display = 'block';
                     await loadWordsFromGoogleSheets();
                 });
             }
@@ -2899,6 +2887,28 @@
             if (!downloadBtn || !shareBtn || !shareWithLinkBtn) {
                 console.log('Action grid buttons not found - skipping setup');
                 return;
+            }
+            
+            // Update download button for iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                // Update button text and icon for iOS
+                const downloadIcon = downloadBtn.querySelector('svg');
+                const downloadText = downloadBtn.querySelector('span');
+                
+                if (downloadIcon) {
+                    // Change to save icon (heart or bookmark style)
+                    downloadIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    `;
+                }
+                
+                if (downloadText) {
+                    downloadText.textContent = 'ບັນທຶກໃສ່ Photos';
+                }
             }
             
             let currentImageBlob = null;
@@ -3560,6 +3570,12 @@
             this.canvas.width = size;
             this.canvas.height = size;
             
+            // Set high DPI for iOS compatibility
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            this.canvas.width = size * devicePixelRatio;
+            this.canvas.height = size * devicePixelRatio;
+            this.ctx.scale(devicePixelRatio, devicePixelRatio);
+            
             // Clear canvas
             this.ctx.clearRect(0, 0, size, size);
             
@@ -3770,26 +3786,312 @@
             }
         }
         
+        async handleIOSSaveToPhotos(dataUrl) {
+            try {
+                // Method 1: Try iOS-specific share with proper file handling
+                if (navigator.share) {
+                    try {
+                        // Convert dataURL to blob with proper iOS metadata
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        
+                        // Create file with iOS-friendly properties
+                        const file = new File([blob], 'LaoTypo-Game-Result.png', { 
+                            type: 'image/png',
+                            lastModified: Date.now()
+                        });
+                        
+                        // Check if we can share files
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: 'LaoTypo Game Result',
+                                text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                files: [file]
+                            });
+                            this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                            return;
+                        }
+                    } catch (shareError) {
+                        console.log('Native share failed, trying alternative method:', shareError);
+                    }
+                }
+                
+                // Method 2: Try alternative iOS approach with canvas
+                try {
+                    await this.handleIOSAlternativeSave(dataUrl);
+                    return;
+                } catch (altError) {
+                    console.log('Alternative method failed:', altError);
+                }
+                
+                // Method 3: Fallback to manual instructions
+                this.showIOSInstructions(dataUrl);
+                
+            } catch (error) {
+                console.error('All iOS save methods failed:', error);
+                this.showIOSInstructions(dataUrl);
+            }
+        }
+        
+        async handleIOSAlternativeSave(dataUrl) {
+            try {
+                // Method 2A: Try with improved blob creation
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Convert to blob with iOS-optimized settings
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                // Create file with proper iOS metadata
+                                const file = new File([blob], 'LaoTypo-Game-Result.png', {
+                                    type: 'image/png',
+                                    lastModified: Date.now()
+                                });
+                                
+                                // Try share again with the new blob
+                                if (navigator.share && navigator.canShare({ files: [file] })) {
+                                    navigator.share({
+                                        title: 'LaoTypo Game Result',
+                                        text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                        files: [file]
+                                    }).then(() => {
+                                        this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                                    }).catch(() => {
+                                        this.tryIOSDownloadLink(dataUrl);
+                                    });
+                                } else {
+                                    this.tryIOSDownloadLink(dataUrl);
+                                }
+                                resolve();
+                            } else {
+                                reject(new Error('Failed to create blob'));
+                            }
+                        }, 'image/png', 0.95); // High quality for iOS
+                    };
+                    img.onerror = reject;
+                    img.src = dataUrl;
+                });
+                
+            } catch (error) {
+                console.log('Canvas method failed, trying download link:', error);
+                this.tryIOSDownloadLink(dataUrl);
+            }
+        }
+        
+        tryIOSDownloadLink(dataUrl) {
+            // Create a temporary link with download attribute for iOS
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'LaoTypo-Game-Result.png';
+            link.style.display = 'none';
+            
+            // Add to DOM temporarily
+            document.body.appendChild(link);
+            
+            // Try to trigger download
+            link.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            
+            // Show success message
+            this.showCopyStatus('✅ ກຳລັງບັນທຶກໃສ່ Photos...');
+        }
+        
+        showIOSInstructions(dataUrl) {
+            // Create modal with iOS save instructions
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75';
+            modal.innerHTML = `
+                <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl border-2 border-amber-400">
+                    <h3 class="text-xl font-bold text-amber-400 mb-4 text-center">📱 ບັນທຶກຮູບພາບໃນ iOS</h3>
+                    <div class="text-white space-y-3">
+                        <p class="text-sm">ເພື່ອບັນທຶກຮູບພາບໃນ Photos:</p>
+                        <ol class="text-sm space-y-2 list-decimal list-inside">
+                            <li>ກົດປຸ່ມ "ເປີດຮູບພາບ" ດ້ານລຸ່ມ</li>
+                            <li>ກົດປຸ່ມ Share (📤) ທີ່ມຸມລຸ່ມຂວາ</li>
+                            <li>ເລືອກ "Save to Photos" ຫຼື "ບັນທຶກໃສ່ Photos"</li>
+                        </ol>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button id="open-image-btn" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors">
+                            🖼️ ເປີດຮູບພາບ
+                        </button>
+                        <button id="close-modal-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                            ປິດ
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Event listeners
+            document.getElementById('open-image-btn').addEventListener('click', () => {
+                window.open(dataUrl, '_blank');
+                document.body.removeChild(modal);
+            });
+            
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+        
         async handleDownload() {
             try {
                 const dataUrl = await this.generateResultImage();
                 
-                // Create download link
-                const link = document.createElement('a');
-                link.download = 'laotypo-result.png';
-                link.href = dataUrl;
+                // Detect iOS devices
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                 
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                if (isIOS) {
+                    // Enhanced iOS-specific handling for better Safari experience
+                    await this.handleEnhancedIOSSave(dataUrl);
+                } else {
+                    // Android/Desktop - use standard download
+                    const link = document.createElement('a');
+                    link.download = 'laotypo-result.png';
+                    link.href = dataUrl;
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                }
                 
             } catch (error) {
                 console.error('Download failed:', error);
                 this.showCopyStatus('❌ ບໍ່ສາມາດດາວໂຫຼດໄດ້');
             }
+        }
+        
+        async handleEnhancedIOSSave(dataUrl) {
+            try {
+                // Method 1: Try Web Share API with Files (iOS 15+)
+                if (navigator.share && navigator.canShare) {
+                    try {
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'LaoTypo-Game-Result.png', { 
+                            type: 'image/png',
+                            lastModified: Date.now()
+                        });
+                        
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: 'LaoTypo Game Result',
+                                text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                files: [file]
+                            });
+                            this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                            return;
+                        }
+                    } catch (shareError) {
+                        console.log('Web Share API failed, trying alternative:', shareError);
+                    }
+                }
+                
+                // Method 2: Try improved blob creation and share
+                try {
+                    await this.handleIOSBlobShare(dataUrl);
+                    return;
+                } catch (blobError) {
+                    console.log('Blob share failed, trying download method:', blobError);
+                }
+                
+                // Method 3: Enhanced download with better iOS handling
+                this.handleIOSDownload(dataUrl);
+                
+            } catch (error) {
+                console.error('All iOS save methods failed:', error);
+                this.showIOSInstructions(dataUrl);
+            }
+        }
+        
+        async handleIOSBlobShare(dataUrl) {
+            // Create a new canvas to ensure proper iOS compatibility
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            await new Promise((resolve, reject) => {
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Convert to blob with iOS-optimized settings
+                    canvas.toBlob(async (blob) => {
+                        if (blob) {
+                            try {
+                                const file = new File([blob], 'LaoTypo-Game-Result.png', {
+                                    type: 'image/png',
+                                    lastModified: Date.now()
+                                });
+                                
+                                if (navigator.share && navigator.canShare({ files: [file] })) {
+                                    await navigator.share({
+                                        title: 'LaoTypo Game Result',
+                                        text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                        files: [file]
+                                    });
+                                    this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                                } else {
+                                    reject(new Error('Cannot share file'));
+                                }
+                            } catch (error) {
+                                reject(error);
+                            }
+                        } else {
+                            reject(new Error('Failed to create blob'));
+                        }
+                        resolve();
+                    }, 'image/png', 0.95);
+                };
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+        
+        handleIOSDownload(dataUrl) {
+            // Create a temporary link with enhanced iOS handling
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'LaoTypo-Game-Result.png';
+            link.style.display = 'none';
+            
+            // Add to DOM temporarily
+            document.body.appendChild(link);
+            
+            // Try to trigger download
+            link.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            
+            // Show instructions for manual save
+            this.showIOSInstructions(dataUrl);
         }
     }
 

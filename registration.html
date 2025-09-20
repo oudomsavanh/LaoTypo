@@ -13,7 +13,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/images/Laotypo-logo.jpg">
     <meta name="theme-color" content="#f8af3c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="LaoTypo">
     <meta name="msapplication-TileColor" content="#f8af3c">
-    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    <meta name="msapplication-TileImage" content="/images/Laotypo-logo.jpg">
     
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -909,7 +909,7 @@
             <div class="version-info-section">
                 <div class="version-divider"></div>
                 <div class="version-details">
-                    <p>📦 Version 2.9.3</p>
+                    <p>📦 Version 2.9.4 - Enhanced Safari</p>
                     <p>Status: Live</p>
                     <p>🚀 PWA Ready</p>
                     <p>🔧 Guest Score Fix</p>
@@ -1023,8 +1023,8 @@
             if (testGuestBtn) {
                 testGuestBtn.addEventListener('click', function() {
                     console.log('🧪 Guest button clicked (basic script handler)!');
-                    alert('Guest button clicked! Redirecting to testing.html...');
-                    window.location.href = 'testing.html';
+                    alert('Guest button clicked! Redirecting to start.html...');
+                    window.location.href = 'start.html';
                 });
             }
         });
@@ -1252,7 +1252,7 @@
                 console.log('Guest button clicked!');
                 isGuest = true;
                 
-                // Option 1: Direct redirect to testing.html without profile setup
+                // Option 1: Direct redirect to start.html without profile setup
                 // Uncomment the lines below if you want immediate redirect
                 
                 sessionStorage.setItem('userType', 'guest');
@@ -1265,7 +1265,7 @@
                 }));
                 showSuccess('ເຂົ້າສູ່ໂໝດແຂກສຳເລັດ! ກຳລັງໄປໜ້າທົດສອບ...');
                 setTimeout(() => {
-                    window.location.href = 'testing.html';
+                    window.location.href = 'start.html';
                 }, 1000);
                 return;
                 
@@ -1351,7 +1351,7 @@
 
         function redirectToHomepage() {
             console.log('🏠 Redirecting to homepage...');
-            window.location.href = 'testing.html';
+            window.location.href = 'start.html';
         }
         
         // --- PANEL FUNCTIONS ---

@@ -310,7 +310,7 @@ This application uses modern web technologies with a focus on real-time performa
   - **UI Fix**: Fixed level progression display to show per-level progress (15/15) instead of cumulative
   - **Player Name Tracking**: All analytics events now include player names for personalized data analysis
   - **Cumulative Progress Display**: Level progress now shows cumulative progress (15/30/45) across all levels
-  - **UI Consistency**: Made account panel design consistent between gameplay.html and testing.html
+  - **UI Consistency**: Made account panel design consistent between gameplay.html and start.html
 
 ### Version History
 - **v2.5.4** (Current): Made account panel design consistent across all pages
@@ -373,7 +373,7 @@ This application uses modern web technologies with a focus on real-time performa
 - **UI Clarity (v2.5.1)**: Each difficulty level now correctly shows "0 / 15" instead of confusing cumulative numbers
 - **User Experience (v2.5.1)**: Players now see consistent progress display across all difficulty levels
 - **Cumulative Progress (v2.5.3)**: Implemented proper cumulative progress display (15/30/45) across all levels
-- **UI Consistency (v2.5.4)**: Made account panel design consistent between gameplay.html and testing.html
+- **UI Consistency (v2.5.4)**: Made account panel design consistent between gameplay.html and start.html
 
 ## 📋 **Complete Development Record**
 
@@ -384,7 +384,7 @@ This application uses modern web technologies with a focus on real-time performa
 ```
 /workspace/
 ├── gameplay.html          # Main game logic and UI (v2.5.4)
-├── testing.html           # Landing page with game selection (v2.5.4)
+├── start.html             # Landing page with game selection (v2.5.4)
 ├── leaderboard.html       # Leaderboard page with gecko mascot (v2.5.3)
 ├── README.md              # This comprehensive documentation
 ├── GA4_SETUP_GUIDE.md     # Google Analytics setup instructions
@@ -514,7 +514,7 @@ let featureUsage = {};           // UI feature interaction tracking
 ### **🔧 Development History**
 
 #### **Version 2.5.4 (Current) - UI Consistency**
-- **Account Panel**: Made design consistent between gameplay.html and testing.html
+- **Account Panel**: Made design consistent between gameplay.html and start.html
 - **Styling**: Unified border, background, and spacing across all pages
 - **Avatar**: Consistent gradient styling and colors
 
@@ -651,7 +651,7 @@ let featureUsage = {};           // UI feature interaction tracking
 
 #### **Key Files to Monitor:**
 - **gameplay.html**: Main game logic and state management
-- **testing.html**: Landing page and navigation
+- **start.html**: Landing page and navigation
 - **leaderboard.html**: Leaderboard and mascot display
 - **README.md**: This comprehensive documentation
 - **Analytics Dashboard**: Google Analytics 4 reports

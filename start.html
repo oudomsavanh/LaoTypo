@@ -13,7 +13,7 @@
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/images/Laotypo-logo.jpg">
     <meta name="theme-color" content="#f8af3c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,7 +21,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="LaoTypo">
     <meta name="msapplication-TileColor" content="#f8af3c">
-    <meta name="msapplication-TileImage" content="/icon-192x192.png">
+    <meta name="msapplication-TileImage" content="/images/Laotypo-logo.jpg">
     
     <!-- Fonts and Styles -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1602,10 +1602,20 @@
         const gamePlayerName = document.getElementById('game-player-name');
 
         // --- AUDIO SYSTEM v2.2.0 ---
-        // Initialize sound settings from localStorage
+        // Initialize sound settings from localStorage with auto-enable
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
         let userHasInteracted = false;
+        
+        // Auto-enable sounds on first visit (if not previously set)
+        if (localStorage.getItem('soundEnabled') === null) {
+            soundEnabled = true;
+            localStorage.setItem('soundEnabled', 'true');
+        }
+        if (localStorage.getItem('musicEnabled') === null) {
+            musicEnabled = true;
+            localStorage.setItem('musicEnabled', 'true');
+        }
         
         // Audio objects
         const backgroundMusic = new Audio("sounds/bg_sound.mp3");
@@ -1668,13 +1678,14 @@
             if (soundEnabled) {
                 // Fade out background music
                 fadeAudio(backgroundMusic, 0, 1500);
-                // Fade in result sound
-                fadeAudio(resultSound, 1.0, 1500);
+                // Start result sound immediately at full volume (no fade in)
+                resultSound.volume = 1.0;
+                resultSound.play().catch(() => {});
             }
         }
         
         function stopResultSound() {
-            // Fade out result sound
+            // Fade out result sound when leaving endgame page
             fadeAudio(resultSound, 0, 1500, () => {
                 resultSound.pause();
                 resultSound.currentTime = 0;
