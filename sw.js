@@ -155,8 +155,8 @@ self.addEventListener('push', (event) => {
     
     const options = {
         body: event.data ? event.data.text() : 'New challenge available!',
-        icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
+        icon: '/images/Laotypo-logo.jpg',
+        badge: '/images/Laotypo-logo.jpg',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
@@ -166,12 +166,12 @@ self.addEventListener('push', (event) => {
             {
                 action: 'explore',
                 title: 'Play Now',
-                icon: '/icon-192x192.png'
+                icon: '/images/Laotypo-logo.jpg'
             },
             {
                 action: 'close',
                 title: 'Close',
-                icon: '/icon-192x192.png'
+                icon: '/images/Laotypo-logo.jpg'
             }
         ]
     };
