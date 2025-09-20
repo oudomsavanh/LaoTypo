@@ -3550,6 +3550,12 @@
             this.canvas.width = size;
             this.canvas.height = size;
             
+            // Set high DPI for iOS compatibility
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            this.canvas.width = size * devicePixelRatio;
+            this.canvas.height = size * devicePixelRatio;
+            this.ctx.scale(devicePixelRatio, devicePixelRatio);
+            
             // Clear canvas
             this.ctx.clearRect(0, 0, size, size);
             
@@ -3761,32 +3767,123 @@
         
         async handleIOSSaveToPhotos(dataUrl) {
             try {
-                // Convert to blob for iOS sharing
-                const response = await fetch(dataUrl);
-                const blob = await response.blob();
-                const file = new File([blob], 'laotypo-result.png', { type: 'image/png' });
-                
-                // Try native iOS share sheet first
-                if (navigator.share && navigator.canShare) {
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            title: 'LaoTypo Result',
-                            text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
-                            files: [file]
+                // Method 1: Try iOS-specific share with proper file handling
+                if (navigator.share) {
+                    try {
+                        // Convert dataURL to blob with proper iOS metadata
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        
+                        // Create file with iOS-friendly properties
+                        const file = new File([blob], 'LaoTypo-Game-Result.png', { 
+                            type: 'image/png',
+                            lastModified: Date.now()
                         });
-                        this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
-                        return;
+                        
+                        // Check if we can share files
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: 'LaoTypo Game Result',
+                                text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                files: [file]
+                            });
+                            this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                            return;
+                        }
+                    } catch (shareError) {
+                        console.log('Native share failed, trying alternative method:', shareError);
                     }
                 }
                 
-                // Fallback: Open image in new tab for manual save
+                // Method 2: Try alternative iOS approach with canvas
+                try {
+                    await this.handleIOSAlternativeSave(dataUrl);
+                    return;
+                } catch (altError) {
+                    console.log('Alternative method failed:', altError);
+                }
+                
+                // Method 3: Fallback to manual instructions
                 this.showIOSInstructions(dataUrl);
                 
             } catch (error) {
-                console.error('iOS save to photos failed:', error);
-                // Fallback to manual instructions
+                console.error('All iOS save methods failed:', error);
                 this.showIOSInstructions(dataUrl);
             }
+        }
+        
+        async handleIOSAlternativeSave(dataUrl) {
+            try {
+                // Method 2A: Try with improved blob creation
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                await new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Convert to blob with iOS-optimized settings
+                        canvas.toBlob((blob) => {
+                            if (blob) {
+                                // Create file with proper iOS metadata
+                                const file = new File([blob], 'LaoTypo-Game-Result.png', {
+                                    type: 'image/png',
+                                    lastModified: Date.now()
+                                });
+                                
+                                // Try share again with the new blob
+                                if (navigator.share && navigator.canShare({ files: [file] })) {
+                                    navigator.share({
+                                        title: 'LaoTypo Game Result',
+                                        text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                        files: [file]
+                                    }).then(() => {
+                                        this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                                    }).catch(() => {
+                                        this.tryIOSDownloadLink(dataUrl);
+                                    });
+                                } else {
+                                    this.tryIOSDownloadLink(dataUrl);
+                                }
+                                resolve();
+                            } else {
+                                reject(new Error('Failed to create blob'));
+                            }
+                        }, 'image/png', 0.95); // High quality for iOS
+                    };
+                    img.onerror = reject;
+                    img.src = dataUrl;
+                });
+                
+            } catch (error) {
+                console.log('Canvas method failed, trying download link:', error);
+                this.tryIOSDownloadLink(dataUrl);
+            }
+        }
+        
+        tryIOSDownloadLink(dataUrl) {
+            // Create a temporary link with download attribute for iOS
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'LaoTypo-Game-Result.png';
+            link.style.display = 'none';
+            
+            // Add to DOM temporarily
+            document.body.appendChild(link);
+            
+            // Try to trigger download
+            link.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            
+            // Show success message
+            this.showCopyStatus('✅ ກຳລັງບັນທຶກໃສ່ Photos...');
         }
         
         showIOSInstructions(dataUrl) {
