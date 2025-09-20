@@ -3758,19 +3758,104 @@
             }
         }
         
+        async handleIOSDownload(dataUrl) {
+            try {
+                // Convert to blob for iOS sharing
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], 'laotypo-result.png', { type: 'image/png' });
+                
+                // Try native iOS share sheet first
+                if (navigator.share && navigator.canShare) {
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'LaoTypo Result',
+                            text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                            files: [file]
+                        });
+                        this.showCopyStatus('✅ ແບ່ງປັນສຳເລັດແລ້ວ!');
+                        return;
+                    }
+                }
+                
+                // Fallback: Open image in new tab for manual save
+                this.showIOSInstructions(dataUrl);
+                
+            } catch (error) {
+                console.error('iOS download failed:', error);
+                // Fallback to manual instructions
+                this.showIOSInstructions(dataUrl);
+            }
+        }
+        
+        showIOSInstructions(dataUrl) {
+            // Create modal with iOS save instructions
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-75';
+            modal.innerHTML = `
+                <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl border-2 border-amber-400">
+                    <h3 class="text-xl font-bold text-amber-400 mb-4 text-center">📱 ບັນທຶກຮູບພາບໃນ iOS</h3>
+                    <div class="text-white space-y-3">
+                        <p class="text-sm">ເພື່ອບັນທຶກຮູບພາບໃນ Photos:</p>
+                        <ol class="text-sm space-y-2 list-decimal list-inside">
+                            <li>ກົດປຸ່ມ "ເປີດຮູບພາບ" ດ້ານລຸ່ມ</li>
+                            <li>ກົດປຸ່ມ Share (📤) ທີ່ມຸມລຸ່ມຂວາ</li>
+                            <li>ເລືອກ "Save to Photos" ຫຼື "ບັນທຶກໃສ່ Photos"</li>
+                        </ol>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button id="open-image-btn" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors">
+                            🖼️ ເປີດຮູບພາບ
+                        </button>
+                        <button id="close-modal-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                            ປິດ
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Event listeners
+            document.getElementById('open-image-btn').addEventListener('click', () => {
+                window.open(dataUrl, '_blank');
+                document.body.removeChild(modal);
+            });
+            
+            document.getElementById('close-modal-btn').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+            
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+        
         async handleDownload() {
             try {
                 const dataUrl = await this.generateResultImage();
                 
-                // Create download link
-                const link = document.createElement('a');
-                link.download = 'laotypo-result.png';
-                link.href = dataUrl;
+                // Detect iOS devices
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                 
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                if (isIOS) {
+                    // iOS-specific handling
+                    await this.handleIOSDownload(dataUrl);
+                } else {
+                    // Android/Desktop - use standard download
+                    const link = document.createElement('a');
+                    link.download = 'laotypo-result.png';
+                    link.href = dataUrl;
+                    
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
                 
                 this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
                 
