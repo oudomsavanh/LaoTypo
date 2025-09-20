@@ -2751,6 +2751,28 @@
                 return;
             }
             
+            // Update download button for iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                // Update button text and icon for iOS
+                const downloadIcon = downloadBtn.querySelector('svg');
+                const downloadText = downloadBtn.querySelector('span');
+                
+                if (downloadIcon) {
+                    // Change to save icon (heart or bookmark style)
+                    downloadIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    `;
+                }
+                
+                if (downloadText) {
+                    downloadText.textContent = 'ບັນທຶກໃສ່ Photos';
+                }
+            }
+            
             let currentImageBlob = null;
             
             // Download Button
@@ -3737,7 +3759,7 @@
             }
         }
         
-        async handleIOSDownload(dataUrl) {
+        async handleIOSSaveToPhotos(dataUrl) {
             try {
                 // Convert to blob for iOS sharing
                 const response = await fetch(dataUrl);
@@ -3752,7 +3774,7 @@
                             text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
                             files: [file]
                         });
-                        this.showCopyStatus('✅ ແບ່ງປັນສຳເລັດແລ້ວ!');
+                        this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
                         return;
                     }
                 }
@@ -3761,7 +3783,7 @@
                 this.showIOSInstructions(dataUrl);
                 
             } catch (error) {
-                console.error('iOS download failed:', error);
+                console.error('iOS save to photos failed:', error);
                 // Fallback to manual instructions
                 this.showIOSInstructions(dataUrl);
             }
@@ -3822,8 +3844,8 @@
                              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                 
                 if (isIOS) {
-                    // iOS-specific handling
-                    await this.handleIOSDownload(dataUrl);
+                    // iOS-specific handling - direct share sheet
+                    await this.handleIOSSaveToPhotos(dataUrl);
                 } else {
                     // Android/Desktop - use standard download
                     const link = document.createElement('a');
@@ -3834,9 +3856,9 @@
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
+                    
+                    this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
                 }
-                
-                this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
                 
             } catch (error) {
                 console.error('Download failed:', error);
