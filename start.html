@@ -1602,10 +1602,20 @@
         const gamePlayerName = document.getElementById('game-player-name');
 
         // --- AUDIO SYSTEM v2.2.0 ---
-        // Initialize sound settings from localStorage
+        // Initialize sound settings from localStorage with auto-enable
         let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') ?? 'true');
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
         let userHasInteracted = false;
+        
+        // Auto-enable sounds on first visit (if not previously set)
+        if (localStorage.getItem('soundEnabled') === null) {
+            soundEnabled = true;
+            localStorage.setItem('soundEnabled', 'true');
+        }
+        if (localStorage.getItem('musicEnabled') === null) {
+            musicEnabled = true;
+            localStorage.setItem('musicEnabled', 'true');
+        }
         
         // Audio objects
         const backgroundMusic = new Audio("sounds/bg_sound.mp3");

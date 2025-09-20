@@ -1564,6 +1564,16 @@
         let musicEnabled = JSON.parse(localStorage.getItem('musicEnabled') ?? 'true');
         let userHasInteracted = false;
         
+        // Auto-enable sounds on first visit (if not previously set)
+        if (localStorage.getItem('soundEnabled') === null) {
+            soundEnabled = true;
+            localStorage.setItem('soundEnabled', 'true');
+        }
+        if (localStorage.getItem('musicEnabled') === null) {
+            musicEnabled = true;
+            localStorage.setItem('musicEnabled', 'true');
+        }
+        
         // Audio objects
         const backgroundMusic = new Audio("sounds/bg_sound.mp3");
         backgroundMusic.loop = true;
@@ -1713,6 +1723,20 @@
             const urlTimer = urlParams.get('timer');
             if (urlTimer !== null) {
                 timerEnabled = urlTimer === 'true';
+            }
+            
+            // Get sound settings from URL parameters
+            const urlSound = urlParams.get('sound');
+            if (urlSound !== null) {
+                soundEnabled = urlSound === 'true';
+                localStorage.setItem('soundEnabled', soundEnabled.toString());
+            }
+            
+            // Get music settings from URL parameters
+            const urlMusic = urlParams.get('music');
+            if (urlMusic !== null) {
+                musicEnabled = urlMusic === 'true';
+                localStorage.setItem('musicEnabled', musicEnabled.toString());
             }
             
             bestStreak = parseInt(localStorage.getItem('bestStreak') || '0');
