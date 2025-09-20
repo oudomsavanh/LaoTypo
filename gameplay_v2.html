@@ -3957,30 +3957,25 @@
             try {
                 const dataUrl = await this.generateResultImage();
                 
-                // Check if running in native iOS app first
-                if (window.isNativeApp) {
-                    await this.handleNativeIOSSave(dataUrl);
+                // Detect iOS devices
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                
+                if (isIOS) {
+                    // Enhanced iOS-specific handling for better Safari experience
+                    await this.handleEnhancedIOSSave(dataUrl);
                 } else {
-                    // Detect iOS devices
-                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                    // Android/Desktop - use standard download
+                    const link = document.createElement('a');
+                    link.download = 'laotypo-result.png';
+                    link.href = dataUrl;
                     
-                    if (isIOS) {
-                        // iOS-specific handling - direct share sheet
-                        await this.handleIOSSaveToPhotos(dataUrl);
-                    } else {
-                        // Android/Desktop - use standard download
-                        const link = document.createElement('a');
-                        link.download = 'laotypo-result.png';
-                        link.href = dataUrl;
-                        
-                        // Trigger download
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        
-                        this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
-                    }
+                    // Trigger download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
                 }
                 
             } catch (error) {
@@ -3989,47 +3984,121 @@
             }
         }
         
-        async handleNativeIOSSave(dataUrl) {
+        async handleEnhancedIOSSave(dataUrl) {
             try {
-                // Send image data to native iOS app
-                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveToPhotos) {
-                    window.webkit.messageHandlers.saveToPhotos.postMessage({
-                        imageData: dataUrl,
-                        fileName: 'LaoTypo-Game-Result.png'
-                    });
-                    this.showCopyStatus('✅ ກຳລັງບັນທຶກໃສ່ Photos...');
-                } else {
-                    console.error('Native iOS bridge not available');
-                    this.showCopyStatus('❌ Native app bridge not available');
+                // Method 1: Try Web Share API with Files (iOS 15+)
+                if (navigator.share && navigator.canShare) {
+                    try {
+                        const response = await fetch(dataUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'LaoTypo-Game-Result.png', { 
+                            type: 'image/png',
+                            lastModified: Date.now()
+                        });
+                        
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: 'LaoTypo Game Result',
+                                text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                files: [file]
+                            });
+                            this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                            return;
+                        }
+                    } catch (shareError) {
+                        console.log('Web Share API failed, trying alternative:', shareError);
+                    }
                 }
+                
+                // Method 2: Try improved blob creation and share
+                try {
+                    await this.handleIOSBlobShare(dataUrl);
+                    return;
+                } catch (blobError) {
+                    console.log('Blob share failed, trying download method:', blobError);
+                }
+                
+                // Method 3: Enhanced download with better iOS handling
+                this.handleIOSDownload(dataUrl);
+                
             } catch (error) {
-                console.error('Native iOS save failed:', error);
-                this.showCopyStatus('❌ ບໍ່ສາມາດບັນທຶກໄດ້');
+                console.error('All iOS save methods failed:', error);
+                this.showIOSInstructions(dataUrl);
             }
+        }
+        
+        async handleIOSBlobShare(dataUrl) {
+            // Create a new canvas to ensure proper iOS compatibility
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            await new Promise((resolve, reject) => {
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Convert to blob with iOS-optimized settings
+                    canvas.toBlob(async (blob) => {
+                        if (blob) {
+                            try {
+                                const file = new File([blob], 'LaoTypo-Game-Result.png', {
+                                    type: 'image/png',
+                                    lastModified: Date.now()
+                                });
+                                
+                                if (navigator.share && navigator.canShare({ files: [file] })) {
+                                    await navigator.share({
+                                        title: 'LaoTypo Game Result',
+                                        text: 'ຜົນການເກມ LaoTypo ຂອງຂ້ອຍ!',
+                                        files: [file]
+                                    });
+                                    this.showCopyStatus('✅ ບັນທຶກໃສ່ Photos ສຳເລັດແລ້ວ!');
+                                } else {
+                                    reject(new Error('Cannot share file'));
+                                }
+                            } catch (error) {
+                                reject(error);
+                            }
+                        } else {
+                            reject(new Error('Failed to create blob'));
+                        }
+                        resolve();
+                    }, 'image/png', 0.95);
+                };
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+        
+        handleIOSDownload(dataUrl) {
+            // Create a temporary link with enhanced iOS handling
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'LaoTypo-Game-Result.png';
+            link.style.display = 'none';
+            
+            // Add to DOM temporarily
+            document.body.appendChild(link);
+            
+            // Try to trigger download
+            link.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+            
+            // Show instructions for manual save
+            this.showIOSInstructions(dataUrl);
         }
     }
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
-        // Check if running in native iOS app
-        checkNativeApp();
         new ResultShareGenerator();
     });
-    
-    // Check if running in native iOS app
-    function checkNativeApp() {
-        // Check for native app bridge
-        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.isNativeApp) {
-            window.isNativeApp = true;
-            console.log('Native iOS app detected');
-            
-            // Request native app confirmation
-            window.webkit.messageHandlers.isNativeApp.postMessage({});
-        } else {
-            window.isNativeApp = false;
-            console.log('Running in web browser');
-        }
-    }
     </script>
 </body>
 </html>
