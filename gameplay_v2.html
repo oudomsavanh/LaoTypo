@@ -3957,25 +3957,30 @@
             try {
                 const dataUrl = await this.generateResultImage();
                 
-                // Detect iOS devices
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                
-                if (isIOS) {
-                    // iOS-specific handling - direct share sheet
-                    await this.handleIOSSaveToPhotos(dataUrl);
+                // Check if running in native iOS app first
+                if (window.isNativeApp) {
+                    await this.handleNativeIOSSave(dataUrl);
                 } else {
-                    // Android/Desktop - use standard download
-                    const link = document.createElement('a');
-                    link.download = 'laotypo-result.png';
-                    link.href = dataUrl;
+                    // Detect iOS devices
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                     
-                    // Trigger download
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                    if (isIOS) {
+                        // iOS-specific handling - direct share sheet
+                        await this.handleIOSSaveToPhotos(dataUrl);
+                    } else {
+                        // Android/Desktop - use standard download
+                        const link = document.createElement('a');
+                        link.download = 'laotypo-result.png';
+                        link.href = dataUrl;
+                        
+                        // Trigger download
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        this.showCopyStatus('✅ ດາວໂຫຼດສຳເລັດແລ້ວ!');
+                    }
                 }
                 
             } catch (error) {
@@ -3983,12 +3988,48 @@
                 this.showCopyStatus('❌ ບໍ່ສາມາດດາວໂຫຼດໄດ້');
             }
         }
+        
+        async handleNativeIOSSave(dataUrl) {
+            try {
+                // Send image data to native iOS app
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.saveToPhotos) {
+                    window.webkit.messageHandlers.saveToPhotos.postMessage({
+                        imageData: dataUrl,
+                        fileName: 'LaoTypo-Game-Result.png'
+                    });
+                    this.showCopyStatus('✅ ກຳລັງບັນທຶກໃສ່ Photos...');
+                } else {
+                    console.error('Native iOS bridge not available');
+                    this.showCopyStatus('❌ Native app bridge not available');
+                }
+            } catch (error) {
+                console.error('Native iOS save failed:', error);
+                this.showCopyStatus('❌ ບໍ່ສາມາດບັນທຶກໄດ້');
+            }
+        }
     }
 
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
+        // Check if running in native iOS app
+        checkNativeApp();
         new ResultShareGenerator();
     });
+    
+    // Check if running in native iOS app
+    function checkNativeApp() {
+        // Check for native app bridge
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.isNativeApp) {
+            window.isNativeApp = true;
+            console.log('Native iOS app detected');
+            
+            // Request native app confirmation
+            window.webkit.messageHandlers.isNativeApp.postMessage({});
+        } else {
+            window.isNativeApp = false;
+            console.log('Running in web browser');
+        }
+    }
     </script>
 </body>
 </html>
