@@ -1670,14 +1670,27 @@
                 fadeAudio(backgroundMusic, 0, 1500);
                 // Fade in result sound
                 fadeAudio(resultSound, 1.0, 1500);
+                
+                // Set a minimum play time for result sound (8 seconds)
+                setTimeout(() => {
+                    // Allow result sound to be stopped after minimum play time
+                    resultSound.canStop = true;
+                }, 8000);
             }
         }
         
         function stopResultSound() {
+            // Only stop result sound if it has played for minimum time
+            if (resultSound.canStop !== true) {
+                console.log('Result sound still playing, cannot stop yet');
+                return;
+            }
+            
             // Fade out result sound
             fadeAudio(resultSound, 0, 1500, () => {
                 resultSound.pause();
                 resultSound.currentTime = 0;
+                resultSound.canStop = false; // Reset flag
                 // Resume background music if enabled
                 if (musicEnabled) {
                     fadeAudio(backgroundMusic, 1.0, 1500);
